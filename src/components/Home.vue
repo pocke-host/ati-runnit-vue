@@ -48,7 +48,7 @@
       <!-- TRUST BAR -->
       <section class="trust">
         <div class="container-xxl">
-          <div class="row g-3 align-items-center justify-content-center text-center">
+          <div class="row g-3 align-items-center justify-content-center text-center gap-2">
             <div class="col-auto small text-muted">Works with</div>
             <div class="col-auto device-pill">Garmin</div>
             <div class="col-auto device-pill">Apple&nbsp;Watch</div>

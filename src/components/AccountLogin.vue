@@ -179,13 +179,13 @@ const onSubmit = async (e) => {
 
 /* Primary button */
 .btn-primary {
-  background: #AA0505; border-color: #6a006a;
+  background: #AA0505; border-color: #AA0505;
   font-weight: 700; height: 48px; border-radius: 8px;
 }
-.btn-primary:hover { background: #AA0505; border-color: #6a006a; }
+.btn-primary:hover { background: #AA0505; border-color: #AA0505; }
 
 /* Links */
-.link { color: #6a006a; text-decoration: none; }
+.link { color: #AA0505; text-decoration: none; }
 .link:hover { text-decoration: underline; }
 .muted-link { color: #6b7280; text-decoration: none; }
 .muted-link:hover { text-decoration: underline; }

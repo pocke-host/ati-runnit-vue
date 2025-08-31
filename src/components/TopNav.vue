@@ -28,22 +28,22 @@
                 </router-link>
               </li>
               <li>
-                <router-link to="/activities/ride" class="dropdown-item d-flex align-items-center">
+                <router-link to="/sports/ride" class="dropdown-item d-flex align-items-center">
                   <i class="bi bi-bicycle me-2"></i> Ride
                 </router-link>
               </li>
               <li>
-                <router-link to="/activities/swim" class="dropdown-item d-flex align-items-center">
+                <router-link to="/sports/swim" class="dropdown-item d-flex align-items-center">
                   <i class="bi bi-droplet me-2"></i> Swim
                 </router-link>
               </li>
               <li>
-                <router-link to="/activities/walk" class="dropdown-item d-flex align-items-center">
+                <router-link to="/sports/walk" class="dropdown-item d-flex align-items-center">
                   <i class="bi bi-person-walking me-2"></i> Walk
                 </router-link>
               </li>
               <li>
-                <router-link to="/activities/hike" class="dropdown-item d-flex align-items-center">
+                <router-link to="/sports/hike" class="dropdown-item d-flex align-items-center">
                   <i class="bi bi-signpost-2 me-2"></i> Hike
                 </router-link>
               </li>
