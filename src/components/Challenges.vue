@@ -280,7 +280,7 @@
   /* Tabs */
   .sport-tabs .btn{ border-color:#ddd; }
   .sport-tabs .btn.active{
-    background:#800080; color:#fff; border-color:#800080;
+    background:#AA0505; color:#fff; border-color:#AA0505;
   }
   
   /* Cards */
@@ -317,7 +317,7 @@
   /* Progress */
   .progress-wrap{ margin-top:.25rem; }
   .progress{ height:8px; background:#eee; border-radius:999px; overflow:hidden; }
-  .progress-bar{ height:100%; background:#800080; } /* Runnit purple */
+  .progress-bar{ height:100%; background:#AA0505; } /* Runnit purple */
   
   /* Empty */
   .empty{
@@ -326,7 +326,7 @@
   
   /* Buttons in Runnit purple */
   .btn-primary{
-    --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
+    --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
     --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;
   }
   

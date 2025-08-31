@@ -12,7 +12,7 @@
               </p>
               <div class="d-flex gap-3">
                 <router-link to="/signup" class="btn btn-primary btn-lg">Get Started</router-link>
-                <router-link to="/login" class="btn btn-outline-dark btn-lg">Log In</router-link>
+                <router-link to="/join-us" class="btn btn-outline-dark btn-lg">Log In</router-link>
               </div>
             </div>
             <div class="col-12 col-lg-6">
@@ -169,8 +169,8 @@
   
   /* Strava-ish orange button */
   .btn-primary {
-    --bs-btn-bg: #800080;
-    --bs-btn-border-color: #800080;
+    --bs-btn-bg: #AA0505;
+    --bs-btn-border-color: #AA0505;
     --bs-btn-hover-bg: #6a006a;
     --bs-btn-hover-border-color: #6a006a;
   }

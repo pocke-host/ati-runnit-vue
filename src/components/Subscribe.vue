@@ -215,15 +215,15 @@
   }
   .knob {
     position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%;
-    background: #800080; transition: transform .2s ease;
+    background: #AA0505; transition: transform .2s ease;
   }
   .knob.annual { transform: translateX(26px); }
   
   /* PRICING */
   .pricing { padding: 56px 0; }
   .price-card { border: 1px solid #eee; border-radius: 12px; }
-  .price-card.highlight { border-color: #800080; box-shadow: 0 8px 24px rgba(252,76,2,.12); }
-  .badge.best { background: #800080; color: #fff; font-weight: 700; }
+  .price-card.highlight { border-color: #AA0505; box-shadow: 0 8px 24px rgba(252,76,2,.12); }
+  .badge.best { background: #AA0505; color: #fff; font-weight: 700; }
   .price .display-6 { line-height: 1; }
   
   /* COMPARE */
@@ -236,8 +236,8 @@
   
   /* Strava-ish orange button */
   .btn-primary {
-    --bs-btn-bg: #800080;
-    --bs-btn-border-color: #800080;
+    --bs-btn-bg: #AA0505;
+    --bs-btn-border-color: #AA0505;
     --bs-btn-hover-bg: #6a006a;
     --bs-btn-hover-border-color: #6a006a;
   }

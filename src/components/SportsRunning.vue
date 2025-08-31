@@ -12,7 +12,7 @@
                 Join millions of runners building consistency and having fun.
               </p>
               <div class="d-flex gap-3">
-                <router-link to="/login" class="btn btn-primary btn-lg">Sign Up With Email</router-link>
+                <router-link to="/join-us" class="btn btn-primary btn-lg">Sign Up With Email</router-link>
               </div>
               <p class="small text-muted mt-3 mb-0">By continuing you agree to our Terms and Privacy Policy.</p>
             </div>
@@ -184,8 +184,8 @@
   .eyebrow{ letter-spacing:.08em; color:#6b7280; }
   .hero-art{ height:360px; background:linear-gradient(135deg,#d7dadf,#aeb4bd); border-radius:12px; }
   .btn-primary{
-    --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
-    --bs-btn-hover-bg:#800080; --bs-btn-hover-border-color:#800080;
+    --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
+    --bs-btn-hover-bg:#AA0505; --bs-btn-hover-border-color:#AA0505;
   }
   </style>
   

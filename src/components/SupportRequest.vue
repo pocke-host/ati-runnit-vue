@@ -46,7 +46,7 @@
               <label for="category" class="form-label">Category</label>
               <select id="category" v-model="category" class="form-select" required>
                 <option disabled value="">Select a category</option>
-                <option>Account/Login Issues</option>
+                <option>Account/join-us Issues</option>
                 <option>Billing & Subscription</option>
                 <option>Technical Bug</option>
                 <option>Feature Request</option>
@@ -156,14 +156,14 @@
   }
   .form-control:focus,
   .form-select:focus {
-    border-color: #800080;
+    border-color: #AA0505;
     box-shadow: 0 0 0 3px rgba(128, 0, 128, 0.2);
   }
   
   /* Button */
   .btn-primary {
-    --bs-btn-bg: #800080;
-    --bs-btn-border-color: #800080;
+    --bs-btn-bg: #AA0505;
+    --bs-btn-border-color: #AA0505;
     --bs-btn-hover-bg: #6a006a;
     --bs-btn-hover-border-color: #6a006a;
     font-weight: 600;

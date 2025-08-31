@@ -13,7 +13,7 @@
                 progress, and motivation.
               </p>
               <div class="d-flex flex-wrap gap-3">
-                <router-link to="/login" class="btn btn-primary btn-lg">Start Free</router-link>
+                <router-link to="/join-us" class="btn btn-primary btn-lg">Start Free</router-link>
                 <router-link to="/features" class="btn btn-outline-dark btn-lg">See Features</router-link>
               </div>
               <div class="badges d-flex flex-wrap gap-3 mt-4">
@@ -126,7 +126,7 @@
         <div class="container-xxl text-center">
           <h2 class="fw-bold mb-2">Ready to get moving?</h2>
           <p class="text-muted mb-4">Join free, connect your device, and start your first plan today.</p>
-          <router-link to="/login" class="btn btn-primary btn-lg">Join Free</router-link>
+          <router-link to="/join-us" class="btn btn-primary btn-lg">Join Free</router-link>
         </div>
       </section>
     </main>
@@ -226,10 +226,10 @@
   
   /* Brand button color (Strava-ish) */
   .btn-primary {
-  --bs-btn-bg: #800080;              /* Runnit purple */
-  --bs-btn-border-color: #800080;
-  --bs-btn-hover-bg: #6a006a;        /* darker purple on hover */
-  --bs-btn-hover-border-color: #6a006a;
+  --bs-btn-bg: #AA0505;              /* Runnit purple */
+  --bs-btn-border-color: #AA0505;
+  --bs-btn-hover-bg: #AA0505;        /* darker purple on hover */
+  --bs-btn-hover-border-color: #AA0505;
 }
 
   /* Small helpers */

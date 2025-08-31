@@ -72,7 +72,7 @@
   
           <p class="small text-muted mt-4 mb-0">
             Already have an account?
-            <router-link to="/login" class="link">Log in</router-link>
+            <router-link to="/join-us" class="link">Log in</router-link>
           </p>
         </div>
       </section>
@@ -172,16 +172,16 @@
   
   /* Inputs */
   .form-control{ height:44px; border-radius:10px; border:1px solid #d1d5db; }
-  .form-control:focus{ border-color:#800080; box-shadow:0 0 0 3px rgba(128,0,128,.2); }
+  .form-control:focus{ border-color:#AA0505; box-shadow:0 0 0 3px rgba(128,0,128,.2); }
   .input-group .btn{ border-radius:10px; }
   
   /* Links */
-  .link{ color:#800080; text-decoration:none; }
+  .link{ color:#AA0505; text-decoration:none; }
   .link:hover{ text-decoration:underline; }
   
   /* Purple primary button */
   .btn-primary{
-    --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
+    --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
     --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;
     height:44px; border-radius:10px; font-weight:700;
   }

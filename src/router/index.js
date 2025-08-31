@@ -14,7 +14,7 @@ import SupportRequest from '@/components/SupportRequest.vue'
 import Clubs from '@/components/Clubs.vue'
 
 const routes = [
-  { path: '/login', name: 'Account Login', component: AccountLogin },
+  { path: '/join-us', name: 'Account Login', component: AccountLogin },
   { path: '/sports/running', name: 'SportsRunning', component: SportsRunning },
   { path: '/features', name: 'Features', component: Features },
   { path: '/subscribe', name: 'Subscribe', component: Subscribe },

@@ -196,7 +196,8 @@
   <style scoped>
   /* full screen between fixed nav/footer */
   .heatmap-page{
-    --nav-h:72px;     /* match your TopNav */
+    --nav-h:150px;   
+    padding-top: var(--nav-h);    /* match your TopNav */
     --footer-h:40px;  /* match your Footer */
     min-height: calc(100vh - var(--nav-h) - var(--footer-h));
     position: relative;

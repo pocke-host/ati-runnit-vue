@@ -62,8 +62,8 @@
     text-align: center;
   }
   .hero .btn-primary {
-    --bs-btn-bg: #800080;
-    --bs-btn-border-color: #800080;
+    --bs-btn-bg: #AA0505;
+    --bs-btn-border-color: #AA0505;
     --bs-btn-hover-bg: #6a006a;
     --bs-btn-hover-border-color: #6a006a;
   }
@@ -86,11 +86,11 @@
     background: #f7f5f2;
   }
   .btn-outline-primary {
-    --bs-btn-border-color: #800080;
-    --bs-btn-color: #800080;
+    --bs-btn-border-color: #AA0505;
+    --bs-btn-color: #AA0505;
   }
   .btn-outline-primary:hover {
-    background: #800080;
+    background: #AA0505;
     color: #fff;
   }
   </style>

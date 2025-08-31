@@ -176,7 +176,7 @@
   
   /* Purple buttons */
   .btn-primary{
-    --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
+    --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
     --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;
   }
   

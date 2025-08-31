@@ -127,7 +127,7 @@ const onSubmit = async (e) => {
   overflow: hidden;
   background:
     linear-gradient(to right, rgba(0,0,0,.65), rgba(0,0,0,.45)),
-    url('/images/login-bg.jpg') center/cover no-repeat; /* swap with your bg */
+    url('/images/join-us-bg.jpg') center/cover no-repeat; /* swap with your bg */
   padding: 20px;
 }
 
@@ -179,10 +179,10 @@ const onSubmit = async (e) => {
 
 /* Primary button */
 .btn-primary {
-  background: #800080; border-color: #6a006a;
+  background: #AA0505; border-color: #6a006a;
   font-weight: 700; height: 48px; border-radius: 8px;
 }
-.btn-primary:hover { background: #800080; border-color: #6a006a; }
+.btn-primary:hover { background: #AA0505; border-color: #6a006a; }
 
 /* Links */
 .link { color: #6a006a; text-decoration: none; }

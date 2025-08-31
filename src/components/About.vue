@@ -188,7 +188,7 @@
   .mission-card {
     background:#f8f9fb; border:1px solid #eee;
   }
-  .mission-card .bi { color:#800080; font-size:1.1rem; margin-top:.15rem; }
+  .mission-card .bi { color:#AA0505; font-size:1.1rem; margin-top:.15rem; }
   
   /* STATS */
   .stats { padding: 40px 0; background:#fff; }
@@ -212,12 +212,12 @@
   
   /* Buttons (Runnit purple) */
   .btn-primary{
-    --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
-    --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;
+    --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
+    --bs-btn-hover-bg:#AA0505; --bs-btn-hover-border-color:#AA0505;
   }
   
   /* Links */
-  .link { color:#800080; text-decoration:none; }
+  .link { color:#AA0505; text-decoration:none; }
   .link:hover { text-decoration:underline; }
   
   /* Responsive tweaks */

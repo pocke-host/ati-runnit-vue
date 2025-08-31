@@ -3,7 +3,7 @@
       <div class="container-xxl position-relative align-items-center">
   
         <!-- Brand -->
-        <router-link to="/" class="navbar-brand fw-bold" style="color: purple;">
+        <router-link to="/" class="navbar-brand fw-bold" style="color: darkred;">
           Runnit
         </router-link>
   
@@ -56,7 +56,7 @@
           <li class="nav-item"><router-link to="/subscribe" class="nav-link">Subscription</router-link></li>
   
           <div class="ms-auto d-none d-lg-block">
-            <router-link class="btn btn-outline-dark rounded-pill px-3" to="/login">Join Us</router-link>
+            <router-link class="btn btn-outline-dark rounded-pill px-3" to="/join-us">Join Us</router-link>
           </div>
         </ul>
   
@@ -78,7 +78,7 @@
             <li class="nav-item"><router-link class="nav-link" to="/challenges">Challenges</router-link></li>
             <li class="nav-item"><router-link class="nav-link" to="/subscription">Subscription</router-link></li>
             <li class="nav-item mt-2">
-              <router-link class="btn btn-outline-dark w-100 rounded-pill" to="/login">Log In</router-link>
+              <router-link class="btn btn-outline-dark w-100 rounded-pill" to="/join-us">Log In</router-link>
             </li>
           </ul>
         </div>
@@ -99,7 +99,7 @@
   }
   .activity-menu .dropdown-item i {
     font-size: 1rem;
-    color: #800080; /* orange accent */
+    color: #AA0505; /* orange accent */
   }
   .activity-menu .dropdown-item:hover {
     background-color: #f8f9fa;

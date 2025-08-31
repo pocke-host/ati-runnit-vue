@@ -4,7 +4,7 @@
       <div class="row gy-4">
         <!-- Brand -->
         <div class="col-12 col-md-3">
-          <h4 class="fw-bold mb-2" style="color: purple;">Runnit</h4>
+          <h4 class="fw-bold mb-2" style="color: darkred;">Runnit</h4>
           <p class="text-secondary mb-0">Aspire to Inspire. Train for Greatness.</p>
         </div>
 
