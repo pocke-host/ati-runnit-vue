@@ -1,7 +1,9 @@
 <!-- src/pages/Home.vue -->
 <template>
     <main class="home-page">
-      <!-- HERO -->
+      <!-- HERO SECTION -->
+      <!-- the prominent, large-scale visual element at the top of a webpage that immediately grabs 
+      a visitor's attention to convey the site's purpose and valu -->
       <section class="hero">
         <div class="container-xxl">
           <div class="row align-items-center g-4">

@@ -53,6 +53,7 @@
           <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
           <li class="nav-item"><router-link to="/maps" class="nav-link">Maps</router-link></li>
           <li class="nav-item"><router-link to="/challenges" class="nav-link">Challenges</router-link></li>
+          <li class="nav-item"><router-link to="/races" class="nav-link">Races</router-link></li>
           <li class="nav-item"><router-link to="/subscribe" class="nav-link">Subscription</router-link></li>
   
           <div class="ms-auto d-none d-lg-block">
