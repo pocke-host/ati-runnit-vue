@@ -1,96 +1,76 @@
+<!-- ========== TopNav.vue (Updated) ========== -->
 <template>
-  <nav class="navbar navbar-expand-lg fixed-top runnit-nav shadow-0">
-    <div class="container-xxl position-relative align-items-center">
-
-      <!-- Brand -->
-      <router-link to="/" class="navbar-brand fw-bold">
-        RUNNIT
+  <nav class="navbar">
+    <div class="navbar-content">
+      <router-link to="/" class="navbar-brand">
+        <span class="brand-text">RUNNIT</span>
       </router-link>
 
-      <!-- Toggler (mobile) -->
-      <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+      <div class="navbar-menu" v-if="isAuthenticated">
+        <router-link to="/dashboard" class="nav-link">
+          <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
+        </router-link>
+        <router-link to="/feed" class="nav-link">
+          <i class="bi bi-collection me-2"></i>Feed
+        </router-link>
+        <router-link to="/track" class="nav-link nav-link-primary">
+          <i class="bi bi-play-circle-fill me-2"></i>Track
+        </router-link>
+        <router-link to="/devices" class="nav-link">
+          <i class="bi bi-smartwatch me-2"></i>Devices
+        </router-link>
+        <button class="nav-link" @click="handleLogout">
+          <i class="bi bi-box-arrow-right me-2"></i>Logout
+        </button>
+      </div>
+
+      <div class="navbar-menu" v-else>
+        <router-link to="/login" class="nav-link">Login</router-link>
+        <router-link to="/register" class="nav-link nav-link-primary">Join Us</router-link>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" @click="mobileMenuOpen = !mobileMenuOpen">
+        <i class="bi bi-list"></i>
       </button>
+    </div>
 
-      <!-- Centered Nav -->
-      <ul class="navbar-nav align-items-center gap-3 mx-auto">
-        <!-- Activities dropdown -->
-        <li class="nav-item dropdown hover-dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button">
-            Activities
-          </a>
-          <ul class="dropdown-menu shadow activity-menu">
-            <li>
-              <router-link to="/sports/running" class="dropdown-item d-flex align-items-center">
-                <i class="bi bi-speedometer2 me-2"></i> Run
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/sports/ride" class="dropdown-item d-flex align-items-center">
-                <i class="bi bi-bicycle me-2"></i> Ride
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/sports/swim" class="dropdown-item d-flex align-items-center">
-                <i class="bi bi-droplet me-2"></i> Swim
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/sports/hike" class="dropdown-item d-flex align-items-center">
-                <i class="bi bi-signpost-2 me-2"></i> Hike
-              </router-link>
-            </li>
-          </ul>
-        </li>
-
-        <!-- Standard nav links -->
-        <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
-        <li class="nav-item"><router-link to="/challenges" class="nav-link">Challenges</router-link></li>
-        <li class="nav-item"><router-link to="/races" class="nav-link">Races</router-link></li>
-        <li class="nav-item"><router-link to="/subscribe" class="nav-link">Subscription</router-link></li>
-
-        <!-- Show different buttons based on auth state -->
-        <template v-if="!isAuthenticated">
-          <!-- CTA button - only show when NOT logged in -->
-          <li class="nav-item">
-            <router-link class="btn btn-outline-light rounded-pill px-4 py-1" to="/join-us">
-              Join Us
-            </router-link>
-          </li>
-        </template>
-        
-        <template v-else>
-          <!-- Show when logged in -->
-          <li class="nav-item">
-            <router-link class="btn btn-primary rounded-pill px-4 py-1" to="/dashboard">
-              Dashboard
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <button class="btn btn-outline-light rounded-pill px-4 py-1" @click="handleLogout">
-              Logout
-            </button>
-          </li>
-        </template>
-      </ul>
+    <!-- Mobile Menu -->
+    <div v-if="mobileMenuOpen && isAuthenticated" class="mobile-menu">
+      <router-link to="/dashboard" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-grid-3x3-gap"></i> Dashboard
+      </router-link>
+      <router-link to="/feed" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-collection"></i> Feed
+      </router-link>
+      <router-link to="/track" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-play-circle-fill"></i> Track Activity
+      </router-link>
+      <router-link to="/devices" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-smartwatch"></i> Devices
+      </router-link>
+      <button class="mobile-link" @click="handleLogout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { isAuthenticated } = storeToRefs(authStore)
+const mobileMenuOpen = ref(false)
+
+const isAuthenticated = computed(() => !!localStorage.getItem('token'))
 
 const handleLogout = () => {
   authStore.logout()
-  router.push('/')
+  mobileMenuOpen.value = false
+  router.push('/login')
 }
 </script>
 
@@ -101,57 +81,128 @@ const handleLogout = () => {
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 72px;
-  padding: 0 24px;
-  
-  /* Glass olive green effect */
   background: rgba(90, 107, 78, 0.85);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 24px rgba(15, 18, 16, 0.12);
 }
 
-/* Optional: lighter text for contrast */
-.navbar a,
-.navbar .nav-link {
-  color: rgba(255, 255, 255, 0.95) !important;
-  font-weight: 600;
+.navbar-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.navbar a:hover,
-.navbar .nav-link:hover {
-  color: rgba(255, 255, 255, 1) !important;
-}
-
-/* Logo/brand styling */
 .navbar-brand {
-  color: white !important;
+  text-decoration: none;
+}
+
+.brand-text {
   font-weight: 900;
-  letter-spacing: 0.1em;
-}
-
-/* Button styling */
-.btn-outline-light {
-  color: rgba(255, 255, 255, 0.95);
-  border-color: rgba(255, 255, 255, 0.3);
-  background: transparent;
-}
-
-.btn-outline-light:hover {
-  background: rgba(255, 255, 255, 0.15);
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
   color: white;
-  border-color: rgba(255, 255, 255, 0.5);
 }
 
-.btn-primary {
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.nav-link-primary {
+  background: rgba(196, 106, 42, 0.95);
+  color: white;
+  border-color: rgba(196, 106, 42, 0.95);
+}
+
+.nav-link-primary:hover {
   background: #C46A2A;
   border-color: #C46A2A;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mobile-link {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.mobile-link:hover {
+  background: rgba(255, 255, 255, 0.12);
   color: white;
 }
 
-.btn-primary:hover {
-  background: #a85722;
-  border-color: #a85722;
+.me-2 {
+  margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+  .navbar-menu {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
 }
 </style>

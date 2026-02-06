@@ -1,5 +1,6 @@
 <template>
   <main class="dash">
+    <StoriesViewer />
     <!-- Loading State -->
     <div v-if="!user" class="loading-screen">
       <div class="spinner-border text-primary" role="status"></div>

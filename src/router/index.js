@@ -17,6 +17,9 @@ import SportsSwim from '@/components/sports/SportsSwim.vue'
 import Races from '@/components/Races.vue'
 import AccountDashboard from '@/components/AccountDashboard.vue'
 import Feed from '@/components/Feed.vue'
+import LiveTracker from '@/components/LiveTracker.vue'
+import ConnectDevices from '@/components/ConnectDevices.vue'
+import CreateMoment from '@/views/CreateMoment.vue'
 
 const routes = [
   { path: '/join-us', name: 'Account Login', component: AccountLogin },
@@ -36,11 +39,39 @@ const routes = [
   { path: '/sports/swim', component: SportsSwim },
   { path: '/dashboard', name: 'Dashboard', component: AccountDashboard },
   { path: '/feed', name: 'Feed', component: Feed },
+  {
+    path: '/track',
+    name: 'LiveTracker',
+    component: LiveTracker,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/devices',
+    name: 'ConnectDevices',
+    component: ConnectDevices,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/create-moment',
+    name: 'CreateMoment',
+    component: CreateMoment,
+    meta: { requiresAuth: true }
+  }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  
+  if (to.meta.requiresAuth && !token) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router
