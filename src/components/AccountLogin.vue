@@ -6,7 +6,7 @@ import { apiLogin } from "@/lib/api";
 const router = useRouter()
 
 const email = ref('')
-const passwordHash = ref('')
+const password = ref('')          // FIX: you were using passwordHash but binding v-model="password"
 const remember = ref(true)
 const loading = ref(false)
 const error = ref('')
@@ -40,15 +40,18 @@ const handleGoogleSignIn = async () => {
   console.log('Google name:', profile.getName(), 'email:', profile.getEmail())
 }
 
-// --- Email/password login to PHP backend ---
+// --- Email/password login ---
 const onSubmit = async (e) => {
   e.preventDefault()
   error.value = ''
   loading.value = true
   try {
     if (!email.value || !password.value) throw new Error('Please enter email and password')
-    await apiUsersSignup({ email: email.value, password: passwordHash.value })   // <-- real call
-    router.push('/dashboard')                                                   // success redirect
+
+    // FIX: use apiLogin (not apiUsersSignup)
+    await apiLogin({ email: email.value, password: password.value, remember: remember.value })
+
+    router.push('/dashboard') // or '/'
   } catch (err) {
     error.value = err?.response?.data?.message || err?.message || 'Login failed'
   } finally {
@@ -60,7 +63,9 @@ const onSubmit = async (e) => {
 <template>
   <section class="login-hero">
     <div class="login-box">
-      <h3 class="text-center mb-4">Already a Member? Log In</h3>
+      <p class="eyebrow text-uppercase fw-semibold mb-2">Resume the loop.</p>
+      <h3 class="mb-2">Log in</h3>
+      <p class="text-muted mb-4">Pick up where you left off — momentum saved.</p>
 
       <!-- Social buttons -->
       <div class="mb-3">
@@ -81,12 +86,28 @@ const onSubmit = async (e) => {
       <form @submit="onSubmit" novalidate>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input v-model.trim="email" id="email" type="email" class="form-control" placeholder="you@example.com" required autocomplete="email" />
+          <input
+            v-model.trim="email"
+            id="email"
+            type="email"
+            class="form-control"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
         </div>
 
         <div class="mb-2">
           <label for="password" class="form-label">Password</label>
-          <input v-model="password" id="password" type="password" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
+          <input
+            v-model="password"
+            id="password"
+            type="password"
+            class="form-control"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          />
         </div>
 
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -115,70 +136,116 @@ const onSubmit = async (e) => {
 </template>
 
 <style scoped>
-/* Respect fixed TopNav/Footer: fill the space between them */
-.login-hero {
-  --nav-h: 72px;         /* keep in sync with your TopNav */
-  --footer-h: 40px;      /* keep in sync with your Footer */
+.login-hero{
+  --r-olive:#5A6B4E;
+  --r-olive-deep:#2C3726;
+  --r-black:#0F1210;
+  --r-stone:#A3A69F;
+  --r-offwhite:#F5F6F3;
+  --r-white:#FFFFFF;
+  --r-accent:#C46A2A;
+
+  --nav-h: 72px;
+  --footer-h: 40px;
   min-height: calc(100vh - var(--nav-h) - var(--footer-h));
   padding: 20px;
-  display: flex; align-items: center; justify-content: center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  /* “simulation feel” through atmosphere, not pixels */
   background:
-    linear-gradient(to right, rgba(0,0,0,.55), rgba(0,0,0,.35)),
-    url('/images/join-us-bg.jpg') center/cover no-repeat; /* replace as needed */
+    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
+    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
+    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
   overflow: hidden;
+
+  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
+    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
-/* Centered form card */
-.login-box {
-  background: #fff;
-  border-radius: 12px;
-  padding: 40px;
-  width: 100%;
+/* Glass card */
+.login-box{
+  width:100%;
   max-width: 560px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 34px;
+
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 18px;
+  box-shadow: 0 22px 70px rgba(15,18,16,0.28);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.eyebrow{
+  letter-spacing:.16em;
+  color: rgba(15,18,16,0.60);
 }
 
 /* Social buttons */
-.btn-social {
-  height: 48px; border-radius: 8px; font-weight: 600;
-  border: 1px solid #e5e7eb; background: #fff;
+.btn-social{
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(15,18,16,0.12);
+  background: rgba(255,255,255,0.92);
 }
-.btn-facebook { background:#1877f2; color:#fff; border-color:#1877f2; }
-.btn-apple    { background:#000;    color:#fff; border-color:#000; }
+.btn-social:hover{ background: rgba(255,255,255,0.98); }
+.btn-facebook{ background:#1877f2; color:#fff; border-color:#1877f2; }
+.btn-apple{ background:#000; color:#fff; border-color:#000; }
 
 /* Divider */
-.divider { position: relative; text-align: center; }
-.divider::before {
-  content: ""; position: absolute; left: 0; right: 0; top: 50%;
-  height: 1px; background: #e5e7eb;
+.divider{ position: relative; text-align: center; }
+.divider::before{
+  content:"";
+  position:absolute; left:0; right:0; top:50%;
+  height:1px; background: rgba(15,18,16,0.12);
 }
-.divider > span {
-  position: relative; background: #fff; padding: 0 .75rem;
-  font-size: 12px; color: #6b7280;
+.divider > span{
+  position: relative;
+  background: rgba(255,255,255,0.85);
+  padding: 0 .75rem;
+  font-size: 12px;
+  color: rgba(15,18,16,0.55);
+  border: 1px solid rgba(15,18,16,0.08);
+  border-radius: 999px;
 }
 
 /* Inputs */
-.form-control {
-  height: 48px; border-radius: 8px; border: 1px solid #d1d5db;
+.form-control{
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,18,16,0.16);
+  background: rgba(255,255,255,0.92);
 }
-.form-control:focus {
-  border-color: #800080;                     /* RUNNIT purple */
-  box-shadow: 0 0 0 3px rgba(128,0,128,.22); /* soft purple ring */
+.form-control:focus{
+  border-color: rgba(196,106,42,0.65);
+  box-shadow: 0 0 0 3px rgba(196,106,42,0.20);
 }
 
-/* Primary button (RUNNIT purple) */
-.btn-primary {
-  background: #800080; border-color: #800080;
-  font-weight: 700; height: 48px; border-radius: 8px;
+/* Primary button (burnt orange) */
+.btn-primary{
+  --bs-btn-bg: var(--r-accent);
+  --bs-btn-border-color: rgba(255,255,255,0.12);
+  --bs-btn-hover-bg: #a85722;
+  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  font-weight: 900;
+  height: 48px;
+  border-radius: 12px;
+  letter-spacing: .02em;
 }
-.btn-primary:hover { background: #6a006a; border-color: #6a006a; }
 
 /* Links */
-.link { color: #800080; text-decoration: none; }
-.link:hover { text-decoration: underline; }
-.muted-link { color: #6b7280; text-decoration: none; }
-.muted-link:hover { text-decoration: underline; }
+.link{ color: var(--r-accent); text-decoration: none; font-weight: 900; }
+.link:hover{ text-decoration: underline; }
+.muted-link{ color: rgba(255,255,255,0.85); text-decoration:none; }
+.muted-link:hover{ text-decoration: underline; }
 
-/* Make sure there’s never horizontal scroll on this page */
-:host, .login-hero { overflow-x: hidden; }
+/* Checkbox spacing */
+.form-check-input{ margin-top: 0; }
+
+/* never horizontal scroll */
+:host, .login-hero{ overflow-x: hidden; }
 </style>

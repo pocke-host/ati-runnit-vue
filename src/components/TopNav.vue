@@ -37,16 +37,6 @@
                 </router-link>
               </li>
               <li>
-                <router-link to="/sports/triathlon" class="dropdown-item d-flex align-items-center">
-                  <i class="bi bi-signpost-2 me-2"></i> Triathlon
-                </router-link>
-              </li>
-              <li>
-                <router-link to="/sports/walk" class="dropdown-item d-flex align-items-center">
-                  <i class="bi bi-person-walking me-2"></i> Walk
-                </router-link>
-              </li>
-              <li>
                 <router-link to="/sports/hike" class="dropdown-item d-flex align-items-center">
                   <i class="bi bi-signpost-2 me-2"></i> Hike
                 </router-link>
