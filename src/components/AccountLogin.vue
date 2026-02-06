@@ -1,9 +1,10 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { apiLogin } from "@/lib/api";
+import { useAuthStore } from '@/stores/auth'  // ← Add this
 
 const router = useRouter()
+const authStore = useAuthStore()  // ← Add this
 
 const email = ref('')
 const password = ref('')          // FIX: you were using passwordHash but binding v-model="password"
@@ -48,7 +49,7 @@ const onSubmit = async (e) => {
   try {
     if (!email.value || !password.value) throw new Error('Please enter email and password')
 
-    await apiLogin({ email: email.value, password: password.value, remember: remember.value })
+    await authStore.login(email.value, password.value)
 
     router.push('/dashboard') // or '/'
   } catch (err) {

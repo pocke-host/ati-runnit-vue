@@ -16,6 +16,7 @@ import SportsRide from '@/components/sports/SportsRide.vue'
 import SportsSwim from '@/components/sports/SportsSwim.vue'
 import Races from '@/components/Races.vue'
 import AccountDashboard from '@/components/AccountDashboard.vue'
+import Feed from '@/components/Feed.vue'
 
 const routes = [
   { path: '/join-us', name: 'Account Login', component: AccountLogin },
@@ -34,6 +35,7 @@ const routes = [
   { path: '/sports/ride', component: SportsRide },
   { path: '/sports/swim', component: SportsSwim },
   { path: '/dashboard', name: 'Dashboard', component: AccountDashboard },
+  { path: '/feed', name: 'Feed', component: Feed },
 ]
 
 const router = createRouter({
