@@ -1,9 +1,9 @@
 <template>
-    <nav class="navbar navbar-expand-lg fixed-top bg-white border-bottom shadow-0">
+    <nav class="navbar navbar-expand-lg fixed-top runnit-nav shadow-0">
       <div class="container-xxl position-relative align-items-center">
   
         <!-- Brand -->
-        <router-link to="/" class="navbar-brand fw-bold" style="color: darkred;">
+        <router-link to="/" class="navbar-brand fw-bold">
           RUNNIT
         </router-link>
   
@@ -56,7 +56,7 @@
 
           <!-- Standard nav links -->
           <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
-          <li class="nav-item"><router-link to="/maps" class="nav-link">Maps</router-link></li>
+          <!-- <li class="nav-item"><router-link to="/maps" class="nav-link">Maps</router-link></li> -->
           <li class="nav-item"><router-link to="/challenges" class="nav-link">Challenges</router-link></li>
           <li class="nav-item"><router-link to="/races" class="nav-link">Races</router-link></li>
           <li class="nav-item"><router-link to="/subscribe" class="nav-link">Subscription</router-link></li>
@@ -78,9 +78,9 @@
     min-width: 200px;
     padding: .5rem 0;
   }
-  .activity-menu .dropdown-item {
-    font-weight: 500;
-    font-size: 0.95rem;
+  .activity-menu .dropdown-item i {
+    font-size: 1rem;
+    color: var(--r-accent);
   }
   .activity-menu .dropdown-item i {
     font-size: 1rem;

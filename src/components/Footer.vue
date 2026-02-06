@@ -3,7 +3,7 @@
     <div class="container-xxl">
       <div class="row">
         <div class="col-md-3 mb-3">
-          <h5 class="fw-bold" style="color: darkred;">RUNNIT</h5>
+          <h5 class="fw-bold">RUNNIT</h5>
           <p class="small">Movement with purpose.</p>
         </div>
         <div class="col-6 col-md-2 mb-3">
@@ -46,7 +46,7 @@
         <p class="small mb-0">© 2025 RUNNIT. All rights reserved.</p>
         <div>
           <a href="https://www.tiktok.com/@RUNNIT.app" class="footer-link me-3">Tiktok</a>
-          <a href="https://www.instagram.com/weareRUNNIT" class="footer-link me-3">Instagram</a>
+          <a href="https://www.instagram.com/runnit.co" class="footer-link me-3">Instagram</a>
           <a href="" class="footer-link">Facebook</a>
         </div>
       </div>
@@ -56,18 +56,23 @@
 
 <style scoped>
 .footer {
-  background: #fff; /* pure white background */
-  color: #000;      /* black text */
+  background: var(--r-offwhite);
+  color: var(--r-black);
   padding: 40px 0;
   font-size: 0.95rem;
+  border-top: 1px solid rgba(15,18,16,0.08);
+}
+
+.footer h5, .footer h6 {
+  color: var(--r-black);
 }
 
 .footer-link {
-  color: #000; /* black links */
+  color: rgba(15,18,16,0.70);
   text-decoration: none;
   transition: color .2s ease;
 }
 .footer-link:hover {
-  color: #800080; /* RUNNIT purple hover */
+  color: var(--r-accent);
 }
 </style>

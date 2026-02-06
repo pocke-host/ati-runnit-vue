@@ -3,8 +3,9 @@
     <!-- LEFT: form -->
     <section class="form-side">
       <div class="register-box">
+        <p class="eyebrow text-uppercase fw-semibold mb-2">Start the loop.</p>
         <h1 class="mb-3">Create your account</h1>
-        <p class="text-muted mb-4">Join the community. Build your momentum.</p>
+        <p class="text-muted mb-4">Log your moments. Build your momentum.</p>
 
         <!-- Social buttons (UI-only) -->
         <div class="mb-3">
@@ -27,7 +28,7 @@
             <label for="name" class="form-label">Full name</label>
             <input
               id="name" name="name" v-model.trim="name"
-              class="form-control" placeholder="Enter Your Name Here"
+              class="form-control" placeholder="Your name"
               required autofocus autocomplete="name"
             />
           </div>
@@ -79,14 +80,20 @@
         </form>
 
         <p class="small text-muted mt-4 mb-0">
-          Already have an account?
+          Already in?
           <router-link to="/login" class="link">Log in</router-link>
         </p>
       </div>
     </section>
 
     <!-- RIGHT: image / promo -->
-    <section class="art-side" aria-hidden="true"></section>
+    <section class="art-side" aria-hidden="true">
+      <div class="art-overlay">
+        <div class="art-badge">RUNNIT</div>
+        <div class="art-title">Movement with purpose.</div>
+        <div class="art-sub">Show up. Log it. Repeat.</div>
+      </div>
+    </section>
   </main>
 </template>
 
@@ -115,7 +122,7 @@ const submit = async () => {
   error.value = ''
   try {
     await apiRegister({ name: name.value, email: email.value, password: password.value })
-    router.push('/') // success landing
+    router.push('/')
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || 'Registration failed'
   } finally {
@@ -124,41 +131,103 @@ const submit = async () => {
 }
 
 const onSocial = (provider) => {
-  // Hook up real OAuth later
   console.log(`Social signup: ${provider}`)
 }
 </script>
 
 <style scoped>
-/* Full-page split layout */
 .register-page{
-  --nav-h:72px;      /* match your TopNav height */
-  --footer-h:40px;   /* match your Footer height */
+  --r-olive:#5A6B4E;
+  --r-olive-deep:#2C3726;
+  --r-black:#0F1210;
+  --r-stone:#A3A69F;
+  --r-offwhite:#F5F6F3;
+  --r-white:#FFFFFF;
+  --r-accent:#C46A2A;
+
+  --nav-h:72px;
+  --footer-h:40px;
   min-height: calc(100vh - var(--nav-h) - var(--footer-h));
   display: grid;
   grid-template-columns: 1fr 1fr;
-  overflow: hidden;       /* avoid horizontal scroll */
-  background: #fff;
+  overflow: hidden;
+  background: var(--r-offwhite);
+
+  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
+    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
 /* Left/form */
 .form-side{
-  display: flex; align-items: center; justify-content: center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   padding: 32px 24px;
 }
-.register-box{ width: 100%; max-width: 460px; }
+.register-box{
+  width:100%;
+  max-width: 460px;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(15,18,16,0.10);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 18px 50px rgba(15,18,16,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.eyebrow{
+  letter-spacing:.16em;
+  color: rgba(15,18,16,0.65);
+}
 
 /* Right/art */
 .art-side{
+  position: relative;
   background:
-    linear-gradient(0deg, rgba(128,0,128,.35), rgba(128,0,128,.35)),
-    url('/images/register-side.jpg') center/cover no-repeat;
+    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%),
+    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
+    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+}
+.art-overlay{
+  position:absolute;
+  inset: 0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding: 34px;
+  color: var(--r-white);
+}
+.art-badge{
+  font-weight: 900;
+  letter-spacing: .22em;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.16);
+  margin-bottom: 10px;
+}
+.art-title{
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+.art-sub{
+  color: rgba(255,255,255,0.78);
+  font-weight: 700;
 }
 
 /* Social buttons */
 .btn-social{
-  height: 44px; border-radius: 10px; font-weight: 600;
-  border: 1px solid #e5e7eb; background: #fff;
+  height: 44px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: 1px solid rgba(15,18,16,0.12);
+  background: rgba(255,255,255,0.90);
+}
+.btn-social:hover{
+  background: rgba(255,255,255,0.98);
 }
 .btn-facebook{ background:#1877f2; color:#fff; border-color:#1877f2; }
 .btn-apple{ background:#000; color:#fff; border-color:#000; }
@@ -166,38 +235,61 @@ const onSocial = (provider) => {
 /* Divider */
 .divider{ position:relative; text-align:center; }
 .divider::before{
-  content:""; position:absolute; left:0; right:0; top:50%;
-  height:1px; background:#e5e7eb;
+  content:"";
+  position:absolute; left:0; right:0; top:50%;
+  height:1px; background: rgba(15,18,16,0.12);
 }
 .divider > span{
-  position:relative; background:#fff; padding:0 .75rem;
-  font-size:12px; color:#6b7280;
+  position:relative;
+  background: rgba(255,255,255,0.85);
+  padding:0 .75rem;
+  font-size:12px;
+  color: rgba(15,18,16,0.55);
+  border-radius: 999px;
+  border: 1px solid rgba(15,18,16,0.08);
 }
 
 /* Inputs */
 .form-control{
-  height:44px; border-radius:10px; border:1px solid #d1d5db;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,18,16,0.16);
+  background: rgba(255,255,255,0.92);
 }
 .form-control:focus{
-  border-color:#800080;
-  box-shadow:0 0 0 3px rgba(128,0,128,.2);
+  border-color: rgba(196,106,42,0.65);
+  box-shadow: 0 0 0 3px rgba(196,106,42,0.20);
 }
-.input-group .btn{ border-radius:10px; }
+.input-group .btn{ border-radius: 12px; }
 
-/* Links (RUNNIT purple) */
-.link{ color:#800080; text-decoration:none; }
+/* Links */
+.link{ color: var(--r-accent); text-decoration:none; font-weight: 800; }
 .link:hover{ text-decoration:underline; }
 
-/* Primary button (RUNNIT purple) */
+/* Primary button (RUNNIT accent) */
 .btn-primary{
-  --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
-  --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;
-  height:44px; border-radius:10px; font-weight:700;
+  --bs-btn-bg: var(--r-accent);
+  --bs-btn-border-color: rgba(255,255,255,0.12);
+  --bs-btn-hover-bg: #a85722;
+  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  height: 44px;
+  border-radius: 12px;
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+
+/* Make outline-secondary button (eye icon) match vibe */
+.btn-outline-secondary{
+  border-color: rgba(15,18,16,0.16);
+}
+.btn-outline-secondary:hover{
+  background: rgba(15,18,16,0.04);
 }
 
 /* Responsive: stack form, hide art */
 @media (max-width: 992px){
   .register-page{ grid-template-columns: 1fr; }
   .art-side{ display:none; }
+  .register-box{ padding: 18px; }
 }
 </style>

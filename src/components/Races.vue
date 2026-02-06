@@ -5,11 +5,23 @@
     <section class="hero">
       <div class="container-xxl d-flex align-items-center justify-content-between gap-4">
         <div class="hero-copy">
-          <p class="eyebrow mb-2">Discover races</p>
-          <h1 class="display-5 fw-bold mb-2">Find Your Next Start Line</h1>
-          <p class="lead mb-0">Browse 5Ks to ultras—filter by month, distance, and location.</p>
+          <p class="eyebrow mb-2">Race queue</p>
+          <h1 class="display-5 fw-bold mb-2">Pick your next start line.</h1>
+          <p class="lead mb-0">
+            Browse 5Ks to ultras — filter by month, distance, and terrain. Build your season on purpose.
+          </p>
         </div>
-        <div class="hero-art d-none d-lg-block" aria-hidden="true"></div>
+        <div class="hero-art d-none d-lg-block" aria-hidden="true">
+          <div class="hero-panel">
+            <div class="panel-kicker">TODAY’S LOADOUT</div>
+            <div class="panel-row">
+              <span class="panel-pill">Road</span>
+              <span class="panel-pill">Scenic</span>
+              <span class="panel-pill">Half</span>
+            </div>
+            <div class="panel-sub">Find a race that matches your loop.</div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -78,9 +90,7 @@
           <div v-for="race in pagedRaces" :key="race.id" class="col-12 col-md-6 col-lg-4">
             <article class="race-card h-100">
               <div class="race-img" :style="{ backgroundImage: `url(${race.image})` }">
-                <span class="badge date-badge">
-                  {{ formatDateShort(race.date) }}
-                </span>
+                <span class="badge date-badge">{{ formatDateShort(race.date) }}</span>
                 <span class="badge dist-badge">{{ race.distance }}</span>
               </div>
               <div class="card-body">
@@ -89,6 +99,7 @@
                   <i class="bi bi-geo-alt me-1"></i>{{ race.city }}, {{ race.country }}
                 </p>
                 <p class="small mb-3">{{ race.summary }}</p>
+
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="small text-muted">
                     <i class="bi bi-calendar-event me-1"></i>{{ formatDateLong(race.date) }}
@@ -217,25 +228,13 @@ const filteredRaces = computed(() => {
     )
   }
 
-  if (month.value) {
-    r = r.filter(x => (x.date || '').slice(5, 7) === month.value)
-  }
+  if (month.value) r = r.filter(x => (x.date || '').slice(5, 7) === month.value)
+  if (distance.value) r = r.filter(x => x.distance === distance.value)
+  if (chipActive.value) r = r.filter(x => x.tags?.includes(chipActive.value))
 
-  if (distance.value) {
-    r = r.filter(x => x.distance === distance.value)
-  }
-
-  if (chipActive.value) {
-    r = r.filter(x => x.tags?.includes(chipActive.value))
-  }
-
-  if (sort.value === 'soon') {
-    r.sort((a, b) => new Date(a.date) - new Date(b.date))
-  } else if (sort.value === 'new') {
-    r.sort((a, b) => b.id - a.id)
-  } else if (sort.value === 'name') {
-    r.sort((a, b) => a.name.localeCompare(b.name))
-  }
+  if (sort.value === 'soon') r.sort((a, b) => new Date(a.date) - new Date(b.date))
+  else if (sort.value === 'new') r.sort((a, b) => b.id - a.id)
+  else if (sort.value === 'name') r.sort((a, b) => a.name.localeCompare(b.name))
 
   return r
 })
@@ -245,89 +244,195 @@ const perPage = ref(9)
 const pagedRaces = computed(() => filteredRaces.value.slice(0, perPage.value))
 
 /* Helpers */
-const resetFilters = () => {
-  q.value = ''; month.value = ''; distance.value = ''; sort.value = 'soon'; chipActive.value = ''
-}
-const formatDateShort = (iso) => {
-  const d = new Date(iso)
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-}
-const formatDateLong = (iso) => {
-  const d = new Date(iso)
-  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })
-}
+const resetFilters = () => { q.value=''; month.value=''; distance.value=''; sort.value='soon'; chipActive.value='' }
+const formatDateShort = (iso) => new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric' })
+const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { weekday:'short', month:'long', day:'numeric', year:'numeric' })
 </script>
 
 <style scoped>
-:root { --runnit-purple: #800080; }
-
-/* Fill the viewport between fixed nav & footer */
 .races-page{
-  --nav-h:72px; --footer-h:40px;
+  --r-olive:#5A6B4E;
+  --r-olive-deep:#2C3726;
+  --r-black:#0F1210;
+  --r-stone:#A3A69F;
+  --r-offwhite:#F5F6F3;
+  --r-white:#FFFFFF;
+  --r-accent:#C46A2A;
+
+  --nav-h:72px;
+  --footer-h:40px;
   min-height: calc(100vh - var(--nav-h) - var(--footer-h));
-  background:#fff;
+  background: var(--r-offwhite);
+
+  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
+    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
 /* HERO */
 .hero{
-  background:
-    linear-gradient(90deg, rgba(128,0,128,.12), rgba(128,0,128,0) 60%),
-    #faf7ff;
   padding: 48px 0;
-  border-bottom: 1px solid #eee;
-}
-.eyebrow{ letter-spacing:.08em; text-transform:uppercase; color:#6b7280; font-weight:600; }
-.hero-art{
-  width: 420px; height: 220px;
-  border-radius: 16px;
+  border-bottom: 1px solid rgba(15,18,16,0.08);
   background:
-    linear-gradient(135deg, rgba(128,0,128,.3), rgba(128,0,128,.05)),
-    url('https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
-  box-shadow: 0 12px 28px rgba(0,0,0,.12);
+    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
+    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
+    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  color: var(--r-white);
+}
+.eyebrow{
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color: rgba(255,255,255,0.82);
+  font-weight: 800;
+}
+.hero :deep(.lead){
+  color: rgba(255,255,255,0.76) !important;
+}
+
+/* hero panel = subtle “system” feel (not game UI) */
+.hero-art{
+  width: 420px;
+  height: 220px;
+  border-radius: 18px;
+  position: relative;
+  overflow:hidden;
+
+  background:
+    radial-gradient(700px 260px at 30% 20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 60%),
+    radial-gradient(800px 320px at 80% 80%, rgba(15,18,16,0.35), rgba(15,18,16,0) 60%),
+    linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 26px 70px rgba(15,18,16,0.34);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.hero-panel{
+  position:absolute;
+  inset: 16px;
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  background: rgba(15,18,16,0.16);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.panel-kicker{
+  font-weight: 900;
+  letter-spacing: .18em;
+  font-size: .74rem;
+  color: rgba(255,255,255,0.86);
+  margin-bottom: 10px;
+}
+.panel-row{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.panel-pill{
+  display:inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.88);
+  font-weight: 800;
+  font-size: .78rem;
+}
+.panel-sub{
+  color: rgba(255,255,255,0.74);
+  font-weight: 700;
 }
 
 /* FILTERS */
 .filters{ background:#fff; padding: 16px 0; }
-.btn-chip{
-  border:1px solid #e5e7eb; background:#fff; border-radius:999px; padding:.25rem .75rem;
-  font-weight:600; font-size:.9rem;
+.input-group-text{
+  background: rgba(245,246,243,0.9);
+  border-color: rgba(15,18,16,0.12);
 }
-.btn-chip.active{ border-color:var(--runnit-purple); color:#fff; background:var(--runnit-purple); }
-
-/* CARDS */
-.race-card{
-  border:1px solid #eee; border-radius:14px; overflow:hidden; background:#fff;
-  transition: transform .12s ease, box-shadow .12s ease;
+.form-control, .form-select{
+  border-color: rgba(15,18,16,0.12);
+  border-radius: 12px;
 }
-.race-card:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
-.race-img{
-  position:relative; height:180px; background:#ddd center/cover no-repeat;
-}
-.date-badge{
-  position:absolute; left:12px; top:12px; background:#fff; color:#111; border:1px solid #eee;
-}
-.dist-badge{
-  position:absolute; right:12px; top:12px; background:var(--runnit-purple);
-}
-.card-body{ padding:16px; }
-.btn-primary{
-  --bs-btn-bg: var(--runnit-purple);
-  --bs-btn-border-color: var(--runnit-purple);
-  --bs-btn-hover-bg: #6a006a;
-  --bs-btn-hover-border-color: #6a006a;
-}
-
-/* Inputs focus (brand) */
 .form-control:focus, .form-select:focus{
-  border-color: var(--runnit-purple);
-  box-shadow: 0 0 0 .2rem rgba(128,0,128,.15);
+  border-color: rgba(196,106,42,0.65);
+  box-shadow: 0 0 0 .2rem rgba(196,106,42,0.18);
 }
 
-/* Spacing */
+/* Chips */
+.btn-chip{
+  border: 1px solid rgba(15,18,16,0.12);
+  background: rgba(255,255,255,0.85);
+  border-radius: 999px;
+  padding: .28rem .85rem;
+  font-weight: 800;
+  font-size: .9rem;
+}
+.btn-chip.active{
+  border-color: rgba(196,106,42,0.30);
+  background: rgba(196,106,42,0.14);
+  color: var(--r-black);
+}
+
+/* RESULTS */
 .results{ padding: 28px 0 60px; }
 
+/* Cards */
+.race-card{
+  border: 1px solid rgba(15,18,16,0.10);
+  border-radius: 16px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.race-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 18px 46px rgba(15,18,16,0.10);
+}
+.race-img{
+  position:relative;
+  height: 180px;
+  background:#ddd center/cover no-repeat;
+}
+.badge{
+  border-radius: 999px;
+  padding: .4rem .65rem;
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+.date-badge{
+  position:absolute;
+  left:12px;
+  top:12px;
+  background: rgba(255,255,255,0.92);
+  color: var(--r-black);
+  border: 1px solid rgba(15,18,16,0.10);
+}
+.dist-badge{
+  position:absolute;
+  right:12px;
+  top:12px;
+  background: rgba(196,106,42,0.98);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.card-body{ padding: 16px; }
+
+/* Buttons */
+.btn-primary{
+  --bs-btn-bg: var(--r-accent);
+  --bs-btn-border-color: rgba(255,255,255,0.12);
+  --bs-btn-hover-bg: #a85722;
+  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+}
+.btn-outline-secondary{
+  border-color: rgba(15,18,16,0.12);
+}
+.btn-outline-secondary:hover{
+  background: rgba(15,18,16,0.04);
+}
+
 @media (max-width: 992px){
-  .hero{ padding:32px 0; }
+  .hero{ padding: 32px 0; }
   .hero-art{ display:none; }
 }
 </style>
