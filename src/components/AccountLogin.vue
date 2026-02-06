@@ -48,7 +48,6 @@ const onSubmit = async (e) => {
   try {
     if (!email.value || !password.value) throw new Error('Please enter email and password')
 
-    // FIX: use apiLogin (not apiUsersSignup)
     await apiLogin({ email: email.value, password: password.value, remember: remember.value })
 
     router.push('/dashboard') // or '/'

@@ -1,4 +1,3 @@
-// ========== Feed.vue ==========
 <template>
   <div class="feed-container">
     <div class="feed-header">

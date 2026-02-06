@@ -25,9 +25,9 @@
         <!-- Email form -->
         <form @submit.prevent="submit" novalidate>
           <div class="mb-3">
-            <label for="name" class="form-label">Full name</label>
+            <label for="displayName" class="form-label">Full name</label>
             <input
-              id="name" name="name" v-model.trim="name"
+              id="displayName" displayName="name" v-model.trim="displayName"
               class="form-control" placeholder="Your name"
               required autofocus autocomplete="name"
             />
@@ -104,7 +104,7 @@ import { apiRegister } from "@/lib/api";
 
 const router = useRouter()
 
-const name = ref('')
+const displayName = ref('')
 const email = ref('')
 const password = ref('')
 const agree = ref(false)
@@ -113,7 +113,7 @@ const loading = ref(false)
 const error = ref('')
 
 const canSubmit = computed(() =>
-  name.value && email.value && password.value.length >= 8 && agree.value && !loading.value
+displayName.value && email.value && password.value.length >= 8 && agree.value && !loading.value
 )
 
 const submit = async () => {
@@ -121,7 +121,7 @@ const submit = async () => {
   loading.value = true
   error.value = ''
   try {
-    await apiRegister({ name: name.value, email: email.value, password: password.value })
+    await apiRegister({ displayName: displayName.value, email: email.value, password: password.value })
     router.push('/')
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || 'Registration failed'
