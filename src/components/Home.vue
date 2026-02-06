@@ -228,7 +228,7 @@
   
   /* Brand button color (Strava-ish) */
   .btn-primary {
-  --bs-btn-bg: #AA0505;              /* KINETAI purple */
+  --bs-btn-bg: #AA0505;              /* RUNNIT purple */
   --bs-btn-border-color: #AA0505;
   --bs-btn-hover-bg: #AA0505;        /* darker purple on hover */
   --bs-btn-hover-border-color: #AA0505;

@@ -61,7 +61,7 @@
         <div class="container-xxl">
           <div class="row align-items-center g-5">
             <div class="col-12 col-lg-5">
-              <h2 class="fw-bold mb-3">Why runners choose KINETAI</h2>
+              <h2 class="fw-bold mb-3">Why runners choose RUNNIT</h2>
               <p class="text-muted mb-4">
                 Everything you need to build a habit you love — routes, motivation, and
                 insights powered by your data.

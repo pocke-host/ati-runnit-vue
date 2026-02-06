@@ -4,7 +4,7 @@
   
         <!-- Brand -->
         <router-link to="/" class="navbar-brand fw-bold" style="color: darkred;">
-          KINETAI
+          RUNNIT
         </router-link>
   
         <!-- Toggler (mobile) -->

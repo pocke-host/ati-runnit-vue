@@ -184,11 +184,11 @@ const onSocial = (provider) => {
 }
 .input-group .btn{ border-radius:10px; }
 
-/* Links (KINETAI purple) */
+/* Links (RUNNIT purple) */
 .link{ color:#800080; text-decoration:none; }
 .link:hover{ text-decoration:underline; }
 
-/* Primary button (KINETAI purple) */
+/* Primary button (RUNNIT purple) */
 .btn-primary{
   --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
   --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;

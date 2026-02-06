@@ -162,11 +162,11 @@ const onSubmit = async (e) => {
   height: 48px; border-radius: 8px; border: 1px solid #d1d5db;
 }
 .form-control:focus {
-  border-color: #800080;                     /* KINETAI purple */
+  border-color: #800080;                     /* RUNNIT purple */
   box-shadow: 0 0 0 3px rgba(128,0,128,.22); /* soft purple ring */
 }
 
-/* Primary button (KINETAI purple) */
+/* Primary button (RUNNIT purple) */
 .btn-primary {
   background: #800080; border-color: #800080;
   font-weight: 700; height: 48px; border-radius: 8px;

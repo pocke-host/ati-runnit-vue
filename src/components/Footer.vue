@@ -3,7 +3,7 @@
     <div class="container-xxl">
       <div class="row">
         <div class="col-md-3 mb-3">
-          <h5 class="fw-bold" style="color: darkred;">KINETAI</h5>
+          <h5 class="fw-bold" style="color: darkred;">RUNNIT</h5>
           <p class="small">Movement with purpose.</p>
         </div>
         <div class="col-6 col-md-2 mb-3">
@@ -43,10 +43,10 @@
         </div>
       </div>
       <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
-        <p class="small mb-0">© 2025 KINETAI. All rights reserved.</p>
+        <p class="small mb-0">© 2025 RUNNIT. All rights reserved.</p>
         <div>
-          <a href="https://www.tiktok.com/@kinetai.app" class="footer-link me-3">Tiktok</a>
-          <a href="https://www.instagram.com/wearekinetai" class="footer-link me-3">Instagram</a>
+          <a href="https://www.tiktok.com/@RUNNIT.app" class="footer-link me-3">Tiktok</a>
+          <a href="https://www.instagram.com/weareRUNNIT" class="footer-link me-3">Instagram</a>
           <a href="" class="footer-link">Facebook</a>
         </div>
       </div>
@@ -68,6 +68,6 @@
   transition: color .2s ease;
 }
 .footer-link:hover {
-  color: #800080; /* KINETAI purple hover */
+  color: #800080; /* RUNNIT purple hover */
 }
 </style>

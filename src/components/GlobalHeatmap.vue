@@ -26,7 +26,7 @@
           <div class="col-12">
             <label class="form-label small mb-1">Color theme</label>
             <select v-model="colorTheme" class="form-select form-select-sm" @change="updateHeatmapPaint">
-              <option value="purple">KINETAI Purple</option>
+              <option value="purple">RUNNIT Purple</option>
               <option value="fire">Fire</option>
               <option value="mobileblue">Mobile Blue</option>
               <option value="viridis">Viridis</option>
