@@ -8,7 +8,7 @@
         <div class="container-xxl">
           <div class="row align-items-center g-4">
             <div class="col-12 col-lg-6">
-              <p class="eyebrow text-uppercase fw-semibold mb-2">Train. Track. Thrive.</p>
+              <p class="eyebrow text-uppercase fw-semibold mb-2">Movement with purpose.</p>
               <h1 class="display-4 fw-bold mb-3">Personalized AI plans + the world’s best community</h1>
               <p class="lead text-muted mb-4">
                 Get a training plan that adapts to you, then log every run and earn kudos. One place for maps,
@@ -228,7 +228,7 @@
   
   /* Brand button color (Strava-ish) */
   .btn-primary {
-  --bs-btn-bg: #AA0505;              /* Runnit purple */
+  --bs-btn-bg: #AA0505;              /* KINETAI purple */
   --bs-btn-border-color: #AA0505;
   --bs-btn-hover-bg: #AA0505;        /* darker purple on hover */
   --bs-btn-hover-border-color: #AA0505;

@@ -93,7 +93,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { register as apiRegister } from '@/lib/auth'
+import { apiRegister } from "@/lib/api";
 
 const router = useRouter()
 
@@ -184,11 +184,11 @@ const onSocial = (provider) => {
 }
 .input-group .btn{ border-radius:10px; }
 
-/* Links (Runnit purple) */
+/* Links (KINETAI purple) */
 .link{ color:#800080; text-decoration:none; }
 .link:hover{ text-decoration:underline; }
 
-/* Primary button (Runnit purple) */
+/* Primary button (KINETAI purple) */
 .btn-primary{
   --bs-btn-bg:#800080; --bs-btn-border-color:#800080;
   --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;

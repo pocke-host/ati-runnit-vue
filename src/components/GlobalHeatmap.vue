@@ -26,7 +26,7 @@
           <div class="col-12">
             <label class="form-label small mb-1">Color theme</label>
             <select v-model="colorTheme" class="form-select form-select-sm" @change="updateHeatmapPaint">
-              <option value="purple">Runnit Purple</option>
+              <option value="purple">KINETAI Purple</option>
               <option value="fire">Fire</option>
               <option value="mobileblue">Mobile Blue</option>
               <option value="viridis">Viridis</option>
@@ -196,7 +196,7 @@
   <style scoped>
   /* full screen between fixed nav/footer */
   .heatmap-page{
-    --nav-h:150px;   
+    --nav-h:100px;   
     padding-top: var(--nav-h);    /* match your TopNav */
     --footer-h:40px;  /* match your Footer */
     min-height: calc(100vh - var(--nav-h) - var(--footer-h));

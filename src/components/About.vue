@@ -6,14 +6,14 @@
         <div class="container-xxl">
           <div class="row align-items-center g-4">
             <div class="col-12 col-lg-7">
-              <p class="eyebrow">About Runnit</p>
-              <h1 class="display-5 fw-bold mb-3">Aspire. Train. Inspire.</h1>
+              <p class="eyebrow">About KINETAI</p>
+              <h1 class="display-5 fw-bold mb-3">Movement with purpose.</h1>
               <p class="lead mb-4">
                 We’re building the most welcoming place for athletes to show up,
                 build momentum, and celebrate the journey together.
               </p>
               <div class="d-flex gap-3">
-                <router-link to="/signup" class="btn btn-primary btn-lg">Join Runnit</router-link>
+                <router-link to="/signup" class="btn btn-primary btn-lg">Join KINETAI</router-link>
                 <router-link to="/features" class="btn btn-outline-light btn-lg">Explore Features</router-link>
               </div>
             </div>
@@ -70,7 +70,7 @@
             <div class="col-12 col-lg-6">
               <h2 class="fw-bold mb-3">Our story</h2>
               <p class="text-muted">
-                Runnit started with a simple idea: the best training partner is a community.
+                KINETAI started with a simple idea: the best training partner is a community.
                 We pair thoughtful coaching tools with a social layer that makes consistency fun.
                 Whether it’s your first 5K or your fastest marathon, you’ll find your people here.
               </p>
@@ -210,7 +210,7 @@
   .mini-card { background:#fff; border:1px solid #eee; }
   .mini-card.highlight { border-color:#e7d4ff; box-shadow: 0 0 0 3px rgba(128,0,128,.08) inset; }
   
-  /* Buttons (Runnit purple) */
+  /* Buttons (KINETAI purple) */
   .btn-primary{
     --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
     --bs-btn-hover-bg:#AA0505; --bs-btn-hover-border-color:#AA0505;

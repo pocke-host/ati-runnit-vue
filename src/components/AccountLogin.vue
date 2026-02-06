@@ -1,12 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { login as apiLogin } from '@/lib/auth'   // <-- uses axios client we set up
+import { apiLogin } from "@/lib/api";
 
 const router = useRouter()
 
 const email = ref('')
-const password = ref('')
+const passwordHash = ref('')
 const remember = ref(true)
 const loading = ref(false)
 const error = ref('')
@@ -47,8 +47,8 @@ const onSubmit = async (e) => {
   loading.value = true
   try {
     if (!email.value || !password.value) throw new Error('Please enter email and password')
-    await apiLogin({ email: email.value, password: password.value })   // <-- real call
-    router.push('/')                                                   // success redirect
+    await apiUsersSignup({ email: email.value, password: passwordHash.value })   // <-- real call
+    router.push('/dashboard')                                                   // success redirect
   } catch (err) {
     error.value = err?.response?.data?.message || err?.message || 'Login failed'
   } finally {
@@ -162,11 +162,11 @@ const onSubmit = async (e) => {
   height: 48px; border-radius: 8px; border: 1px solid #d1d5db;
 }
 .form-control:focus {
-  border-color: #800080;                     /* Runnit purple */
+  border-color: #800080;                     /* KINETAI purple */
   box-shadow: 0 0 0 3px rgba(128,0,128,.22); /* soft purple ring */
 }
 
-/* Primary button (Runnit purple) */
+/* Primary button (KINETAI purple) */
 .btn-primary {
   background: #800080; border-color: #800080;
   font-weight: 700; height: 48px; border-radius: 8px;

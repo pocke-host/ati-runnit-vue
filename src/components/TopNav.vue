@@ -4,7 +4,7 @@
   
         <!-- Brand -->
         <router-link to="/" class="navbar-brand fw-bold" style="color: darkred;">
-          Runnit
+          KINETAI
         </router-link>
   
         <!-- Toggler (mobile) -->
@@ -14,8 +14,7 @@
         </button>
   
         <!-- Centered Nav -->
-        <ul class="navbar-nav d-none d-lg-flex gap-3 position-absolute start-50 translate-middle-x runnit-center">
-  
+        <ul class="navbar-nav align-items-center gap-3 mx-auto">
           <!-- Activities dropdown -->
           <li class="nav-item dropdown hover-dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button">
@@ -38,6 +37,11 @@
                 </router-link>
               </li>
               <li>
+                <router-link to="/sports/triathlon" class="dropdown-item d-flex align-items-center">
+                  <i class="bi bi-signpost-2 me-2"></i> Triathlon
+                </router-link>
+              </li>
+              <li>
                 <router-link to="/sports/walk" class="dropdown-item d-flex align-items-center">
                   <i class="bi bi-person-walking me-2"></i> Walk
                 </router-link>
@@ -49,41 +53,21 @@
               </li>
             </ul>
           </li>
-  
+
+          <!-- Standard nav links -->
           <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
           <li class="nav-item"><router-link to="/maps" class="nav-link">Maps</router-link></li>
           <li class="nav-item"><router-link to="/challenges" class="nav-link">Challenges</router-link></li>
           <li class="nav-item"><router-link to="/races" class="nav-link">Races</router-link></li>
           <li class="nav-item"><router-link to="/subscribe" class="nav-link">Subscription</router-link></li>
-  
-          <div class="ms-auto d-none d-lg-block">
-            <router-link class="btn btn-outline-dark rounded-pill px-3" to="/join-us">Join Us</router-link>
-          </div>
+
+          <!-- CTA button -->
+          <li class="nav-item">
+            <router-link class="btn btn-outline-dark rounded-pill px-4 py-1" to="/join-us">
+              Join Us
+            </router-link>
+          </li>
         </ul>
-  
-        <!-- Mobile Collapse (click still works) -->
-        <div class="collapse navbar-collapse mt-2" id="mainNav">
-          <ul class="navbar-nav d-lg-none">
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Activities</a>
-              <ul class="dropdown-menu">
-                <li><router-link class="dropdown-item" to="/activities/run">Run</router-link></li>
-                <li><router-link class="dropdown-item" to="/activities/ride">Ride</router-link></li>
-                <li><router-link class="dropdown-item" to="/activities/swim">Swim</router-link></li>
-                <li><router-link class="dropdown-item" to="/activities/walk">Walk</router-link></li>
-                <li><router-link class="dropdown-item" to="/activities/hike">Hike</router-link></li>
-              </ul>
-            </li>
-            <li class="nav-item"><router-link class="nav-link" to="/features">Features</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" to="/maps">Maps</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" to="/challenges">Challenges</router-link></li>
-            <li class="nav-item"><router-link class="nav-link" to="/subscription">Subscription</router-link></li>
-            <li class="nav-item mt-2">
-              <router-link class="btn btn-outline-dark w-100 rounded-pill" to="/join-us">Log In</router-link>
-            </li>
-          </ul>
-        </div>
-  
       </div>
     </nav>
   </template>

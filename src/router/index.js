@@ -16,6 +16,8 @@ import SportsRide from '@/components/sports/SportsRide.vue'
 import SportsSwim from '@/components/sports/SportsSwim.vue'
 import SportsWalk from '@/components/sports/SportsWalk.vue'
 import SportsHike from '@/components/sports/SportsHike.vue'
+import Races from '@/components/Races.vue'
+import AccountDashboard from '@/components/AccountDashboard.vue'
 
 const routes = [
   { path: '/join-us', name: 'Account Login', component: AccountLogin },
@@ -30,10 +32,12 @@ const routes = [
   { path: '/support', name: 'Support', component: Support },
   { path: '/request', name: 'Request', component: SupportRequest },
   { path: '/clubs', name: 'Clubs', component: Clubs },
+  { path: '/races', name: 'Races', component: Races },
   { path: '/sports/ride', component: SportsRide },
   { path: '/sports/swim', component: SportsSwim },
   { path: '/sports/walk', component: SportsWalk },
   { path: '/sports/hike', component: SportsHike },
+  { path: '/dashboard', name: 'Dashboard', component: AccountDashboard },
 ]
 
 const router = createRouter({

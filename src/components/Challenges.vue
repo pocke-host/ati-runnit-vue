@@ -6,7 +6,7 @@
         <div class="container-xxl">
           <h1 class="display-6 fw-bold mb-2">Challenges</h1>
           <p class="lead text-muted m-0">
-            Pick a goal, stay consistent, and earn badges with the Runnit community.
+            Pick a goal, stay consistent, and earn badges with the KINETAI community.
           </p>
         </div>
       </section>
@@ -317,14 +317,14 @@
   /* Progress */
   .progress-wrap{ margin-top:.25rem; }
   .progress{ height:8px; background:#eee; border-radius:999px; overflow:hidden; }
-  .progress-bar{ height:100%; background:#AA0505; } /* Runnit purple */
+  .progress-bar{ height:100%; background:#AA0505; } /* KINETAI purple */
   
   /* Empty */
   .empty{
     text-align:center; padding:48px; border:1px dashed #e5e7eb; border-radius:16px; background:#fafafa;
   }
   
-  /* Buttons in Runnit purple */
+  /* Buttons in KINETAI purple */
   .btn-primary{
     --bs-btn-bg:#AA0505; --bs-btn-border-color:#AA0505;
     --bs-btn-hover-bg:#6a006a; --bs-btn-hover-border-color:#6a006a;
