@@ -36,9 +36,9 @@
         <div class="col-6 col-md-3 mb-3">
           <h6 class="fw-bold">Legal</h6>
           <ul class="list-unstyled">
-            <li><a href="#" class="footer-link">Privacy Policy</a></li>
-            <li><a href="#" class="footer-link">Terms of Service</a></li>
-            <li><a href="#" class="footer-link">Cookie Policy</a></li>
+            <li><router-link to="/privacy" class="footer-link">Privacy Policy</router-link></li>
+            <li><router-link to="/terms" class="footer-link">Terms of Service</router-link></li>
+            <li><router-link to="/cookies" class="footer-link">Cookie Policy</router-link></li>
           </ul>
         </div>
       </div>

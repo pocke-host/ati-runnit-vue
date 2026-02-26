@@ -20,6 +20,9 @@ import Feed from '@/components/Feed.vue'
 import LiveTracker from '@/components/LiveTracker.vue'
 import ConnectDevices from '@/components/ConnectDevices.vue'
 import CreateMoment from '@/views/CreateMoment.vue'
+import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
+import TermsOfService from '@/components/TermsOfService.vue'
+import CookiePolicy from '@/components/CookiePolicy.vue'
 
 const routes = [
   { path: '/join-us', name: 'Account Login', component: AccountLogin },
@@ -56,7 +59,10 @@ const routes = [
     name: 'CreateMoment',
     component: CreateMoment,
     meta: { requiresAuth: true }
-  }
+  },
+  { path: '/privacy', name: 'PrivacyPolicy', component: PrivacyPolicy },
+  { path: '/terms', name: 'TermsOfService', component: TermsOfService },
+  { path: '/cookies', name: 'CookiePolicy', component: CookiePolicy }
 ]
 
 const router = createRouter({
