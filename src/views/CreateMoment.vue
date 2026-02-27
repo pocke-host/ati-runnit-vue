@@ -98,6 +98,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { useMomentStore } from '@/stores/moment'
 import { useUploadStore } from '@/stores/upload'
 import { storeToRefs } from 'pinia'
+import { Capacitor } from '@capacitor/core'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 
 const router = useRouter()
 const route = useRoute()
@@ -121,16 +123,36 @@ const routeFile = ref(null)
 const error = ref('')
 const fileInput = ref(null)
 
-const triggerFileInput = () => {
-  fileInput.value.click()
+const triggerFileInput = async () => {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 85,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt
+      })
+      photoPreview.value = image.dataUrl
+      // Convert dataUrl to File for the upload store
+      const res = await fetch(image.dataUrl)
+      const blob = await res.blob()
+      photoFile.value = new File([blob], 'photo.jpg', { type: blob.type })
+    } catch (err) {
+      if (err?.message !== 'User cancelled photos app') {
+        error.value = 'Could not open camera'
+      }
+    }
+  } else {
+    fileInput.value.click()
+  }
 }
 
 const handlePhotoSelect = (event) => {
   const file = event.target.files[0]
   if (!file) return
-  
+
   photoFile.value = file
-  
+
   const reader = new FileReader()
   reader.onload = (e) => {
     photoPreview.value = e.target.result

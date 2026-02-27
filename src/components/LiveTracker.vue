@@ -81,6 +81,7 @@
   import { useRouter } from 'vue-router'
   import mapboxgl from 'mapbox-gl'
   import 'mapbox-gl/dist/mapbox-gl.css'
+  import { Geolocation } from '@capacitor/geolocation'
   
   const router = useRouter()
   
@@ -110,85 +111,72 @@
     return timeMinutes / distanceKm
   })
   
-  const initializeMap = () => {
+  const initializeMap = async () => {
     mapboxgl.accessToken = MAPBOX_TOKEN
-  
-    // Get user's current location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords
-  
-          map.value = new mapboxgl.Map({
-            container: liveMapContainer.value,
-            style: 'mapbox://styles/mapbox/outdoors-v12',
-            center: [longitude, latitude],
-            zoom: 15
-          })
-  
-          map.value.on('load', () => {
-            // Add route source
-            map.value.addSource('route', {
-              type: 'geojson',
-              data: {
-                type: 'Feature',
-                geometry: {
-                  type: 'LineString',
-                  coordinates: []
-                }
-              }
-            })
-  
-            // Add route layer
-            map.value.addLayer({
-              id: 'route',
-              type: 'line',
-              source: 'route',
-              paint: {
-                'line-color': '#C46A2A',
-                'line-width': 4,
-                'line-opacity': 0.8
-              }
-            })
-  
-            // Add current position marker
-            currentMarker = new mapboxgl.Marker({ color: '#10b981' })
-              .setLngLat([longitude, latitude])
-              .addTo(map.value)
-          })
-        },
-        (error) => {
-          console.error('Geolocation error:', error)
-          alert('Please enable location access to use live tracking')
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      )
-    } else {
-      alert('Geolocation is not supported by your browser')
+
+    try {
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000
+      })
+      const { latitude, longitude } = position.coords
+
+      map.value = new mapboxgl.Map({
+        container: liveMapContainer.value,
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        center: [longitude, latitude],
+        zoom: 15
+      })
+
+      map.value.on('load', () => {
+        // Add route source
+        map.value.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: []
+            }
+          }
+        })
+
+        // Add route layer
+        map.value.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          paint: {
+            'line-color': '#C46A2A',
+            'line-width': 4,
+            'line-opacity': 0.8
+          }
+        })
+
+        // Add current position marker
+        currentMarker = new mapboxgl.Marker({ color: '#10b981' })
+          .setLngLat([longitude, latitude])
+          .addTo(map.value)
+      })
+    } catch (error) {
+      console.error('Geolocation error:', error)
+      alert('Please enable location access to use live tracking')
     }
   }
   
-  const startTracking = () => {
+  const startTracking = async () => {
     isTracking.value = true
     hasStarted.value = true
     startTime.value = Date.now() - pausedTime.value
   
     // Start GPS tracking
-    if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        handlePositionUpdate,
-        handlePositionError,
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      )
-    }
+    watchId = await Geolocation.watchPosition(
+      { enableHighAccuracy: true, timeout: 5000 },
+      (position, err) => {
+        if (err) { handlePositionError(err); return }
+        handlePositionUpdate(position)
+      }
+    )
   
     // Start timer
     timerInterval = setInterval(() => {
@@ -196,13 +184,13 @@
     }, 1000)
   }
   
-  const pauseTracking = () => {
+  const pauseTracking = async () => {
     isTracking.value = false
     pausedTime.value = elapsedTime.value * 1000
   
     // Stop GPS tracking
     if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId)
+      await Geolocation.clearWatch({ id: watchId })
       watchId = null
     }
   
@@ -370,7 +358,7 @@
   
   onUnmounted(() => {
     if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId)
+      Geolocation.clearWatch({ id: watchId })
     }
     if (timerInterval) {
       clearInterval(timerInterval)

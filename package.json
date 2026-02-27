@@ -11,12 +11,14 @@
     "build": "vite build",
     "preview": "vite preview",
     "android": "npx cap sync android && npx cap open android",
-    "ios": "npx cap sync ios && npx cap open ios"
+    "ios": "npx cap sync ios && npx cap open ios",
+    "build:ios": "npm run build && npx cap sync ios && npx cap open ios"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
     "@capacitor/camera": "^6.0.0",
     "@capacitor/core": "^6.0.0",
+    "@capacitor/geolocation": "^6.0.0",
     "@capacitor/ios": "^6.0.0",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
