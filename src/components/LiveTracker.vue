@@ -1,6 +1,14 @@
 <!-- ========== LiveTracker.vue ========== -->
 <template>
     <div class="live-tracker">
+      <!-- Sport Picker (pre-start only) -->
+      <div v-if="!hasStarted" class="sport-picker-row">
+        <SportsPicker v-model="selectedSport" />
+      </div>
+      <div v-else class="active-sport-chip">
+        <i :class="`bi ${sportIcon}`"></i> {{ selectedSport }}
+      </div>
+
       <!-- Header -->
       <div class="tracker-header">
         <div class="tracker-status">
@@ -8,8 +16,9 @@
           <span>{{ isTracking ? 'Tracking...' : 'Paused' }}</span>
         </div>
         <div class="tracker-time">{{ formatTime(elapsedTime) }}</div>
+        <SOSButton v-if="hasStarted" />
       </div>
-  
+
       <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="live-stat">
@@ -29,43 +38,63 @@
           <div class="stat-value">{{ elevationGain.toFixed(0) }} <span class="unit">m</span></div>
         </div>
       </div>
-  
+
       <!-- Map -->
       <div class="live-map-container">
         <div ref="liveMapContainer" class="live-map"></div>
       </div>
-  
+
+      <!-- Live Share Toggle -->
+      <div class="live-share-row">
+        <div class="share-info">
+          <i class="bi bi-broadcast"></i>
+          <div>
+            <div class="share-label">Live Location Sharing</div>
+            <div class="share-sub">{{ safetyStore.liveShareActive ? 'Your contacts can follow your run' : 'Share route with selected contacts' }}</div>
+          </div>
+        </div>
+        <button
+          :class="['share-toggle', { active: safetyStore.liveShareActive }]"
+          @click="toggleLiveShare"
+        >
+          {{ safetyStore.liveShareActive ? 'ON' : 'OFF' }}
+        </button>
+      </div>
+
+      <!-- Music Player -->
+      <MusicPlayer />
+
       <!-- Controls -->
       <div class="tracker-controls">
-        <button 
-          v-if="!isTracking && !hasStarted" 
+        <button
+          v-if="!isTracking && !hasStarted"
           class="control-btn control-btn-primary"
           @click="startTracking"
         >
           <i class="bi bi-play-fill"></i>
           Start
         </button>
-  
-        <button 
-          v-if="isTracking" 
+
+        <button
+          v-if="isTracking"
           class="control-btn control-btn-warning"
           @click="pauseTracking"
         >
           <i class="bi bi-pause-fill"></i>
           Pause
         </button>
-  
-        <button 
-          v-if="!isTracking && hasStarted" 
+
+        <button
+          v-if="!isTracking && hasStarted"
           class="control-btn control-btn-primary"
           @click="resumeTracking"
         >
           <i class="bi bi-play-fill"></i>
           Resume
         </button>
-  
-        <button 
-          v-if="hasStarted" 
+
+        <button
+          v-if="hasStarted"
           class="control-btn control-btn-danger"
           @click="stopTracking"
         >
@@ -82,9 +111,20 @@
   import mapboxgl from 'mapbox-gl'
   import 'mapbox-gl/dist/mapbox-gl.css'
   import { Geolocation } from '@capacitor/geolocation'
+  import SOSButton from '@/components/SOSButton.vue'
+  import MusicPlayer from '@/components/MusicPlayer.vue'
+  import SportsPicker from '@/components/SportsPicker.vue'
+  import { useSafetyStore } from '@/stores/safety'
+  import { useMusicStore } from '@/stores/music'
   
   const router = useRouter()
-  
+  const safetyStore = useSafetyStore()
+  const musicStore = useMusicStore()
+
+  const selectedSport = ref('running')
+  const sportIconMap = { running: 'bi-person-walking', cycling: 'bi-bicycle', swimming: 'bi-water', hiking: 'bi-tree-fill', triathlon: 'bi-lightning-charge-fill', strength: 'bi-award-fill', yoga: 'bi-stars' }
+  const sportIcon = computed(() => sportIconMap[selectedSport.value] || 'bi-activity')
+
   const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoicnVubml0IiwiYSI6ImNsZjR...'
   
   const liveMapContainer = ref(null)
@@ -267,6 +307,14 @@
     routeCoordinates.value.push(newCoord)
     lastPosition.value = [longitude, latitude, Date.now(), altitude]
   
+    // Broadcast live location if sharing
+    safetyStore.broadcastLocation({ latitude, longitude })
+
+    // Sync music to current pace
+    if (currentPace.value > 0 && currentPace.value < 60) {
+      musicStore.syncToPace(currentPace.value)
+    }
+
     // Update route on map
     if (map.value && map.value.getSource('route')) {
       map.value.getSource('route').setData({
@@ -281,6 +329,14 @@
   
   const handlePositionError = (error) => {
     console.error('Position error:', error)
+  }
+
+  const toggleLiveShare = async () => {
+    if (safetyStore.liveShareActive) {
+      await safetyStore.stopLiveShare()
+    } else {
+      await safetyStore.startLiveShare()
+    }
   }
   
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -379,6 +435,40 @@
     padding: 20px;
     max-width: 600px;
     margin: 0 auto;
+  }
+
+  .sport-picker-row { background: rgba(255,255,255,.85); border-radius: 16px; padding: 12px; }
+  .active-sport-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(90,107,78,.15); border-radius: 999px; padding: 6px 14px; font-size: .85rem; font-weight: 800; color: #2C3726; text-transform: capitalize; }
+
+  .live-share-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(255,255,255,.92));
+    border: 1px solid rgba(15,18,16,.10);
+    border-radius: 16px;
+    padding: 14px 16px;
+  }
+  .share-info { display: flex; align-items: center; gap: 12px; }
+  .share-info > i { font-size: 1.3rem; color: #5A6B4E; }
+  .share-label { font-weight: 800; font-size: .9rem; }
+  .share-sub { font-size: .78rem; color: #6b7280; }
+  .share-toggle {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 2px solid rgba(15,18,16,.15);
+    background: rgba(15,18,16,.06);
+    font-weight: 900;
+    font-size: .8rem;
+    cursor: pointer;
+    transition: all .2s;
+    color: #6b7280;
+  }
+  .share-toggle.active {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(16,185,129,.2);
   }
   
   .tracker-header {

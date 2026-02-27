@@ -13,6 +13,12 @@
         <router-link to="/feed" class="nav-link">
           <i class="bi bi-collection me-2"></i>Feed
         </router-link>
+        <router-link to="/training" class="nav-link">
+          <i class="bi bi-clipboard-check me-2"></i>Training
+        </router-link>
+        <router-link to="/community" class="nav-link">
+          <i class="bi bi-hash me-2"></i>Community
+        </router-link>
         <router-link to="/track" class="nav-link nav-link-primary">
           <i class="bi bi-play-circle-fill me-2"></i>Track
         </router-link>
@@ -42,6 +48,12 @@
       </router-link>
       <router-link to="/feed" class="mobile-link" @click="mobileMenuOpen = false">
         <i class="bi bi-collection"></i> Feed
+      </router-link>
+      <router-link to="/training" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-clipboard-check"></i> Training
+      </router-link>
+      <router-link to="/community" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-hash"></i> Community
       </router-link>
       <router-link to="/track" class="mobile-link" @click="mobileMenuOpen = false">
         <i class="bi bi-play-circle-fill"></i> Track Activity

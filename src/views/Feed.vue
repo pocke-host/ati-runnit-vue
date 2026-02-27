@@ -10,6 +10,21 @@
       </div>
     </header>
 
+    <!-- BeReal-style Daily Moment Prompt -->
+    <div v-if="dailyMomentActive" class="daily-moment-banner">
+      <div class="daily-moment-inner">
+        <div class="daily-moment-icon">📸</div>
+        <div class="daily-moment-text">
+          <div class="daily-moment-title">Time for your Workout Moment!</div>
+          <div class="daily-moment-sub">
+            <span class="countdown-badge">{{ momentCountdown }}</span>
+            left to capture an authentic post
+          </div>
+        </div>
+        <router-link to="/create-moment" class="btn btn-capture">Capture Now</router-link>
+      </div>
+    </div>
+
     <!-- Tabs -->
     <div class="feed-tabs-wrapper">
       <div class="feed-tabs">
@@ -326,7 +341,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
@@ -337,6 +352,40 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const router = useRouter()
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
+
+// Daily Moment prompt (BeReal-style)
+const dailyMomentActive = ref(false)
+const momentCountdown = ref('2:00')
+let momentTimer = null
+
+const checkDailyMomentWindow = () => {
+  const now = new Date()
+  const hours = now.getHours()
+  // Active between 9am and 9pm — server would normally push the exact trigger time
+  if (hours >= 9 && hours < 21) {
+    // For demo: show banner if today's moment not yet captured
+    const lastCapture = localStorage.getItem('lastMomentDate')
+    const today = now.toDateString()
+    if (lastCapture !== today) {
+      dailyMomentActive.value = true
+      startMomentCountdown()
+    }
+  }
+}
+
+const startMomentCountdown = () => {
+  let seconds = 120
+  momentTimer = setInterval(() => {
+    seconds--
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    momentCountdown.value = `${m}:${s.toString().padStart(2, '0')}`
+    if (seconds <= 0) {
+      clearInterval(momentTimer)
+      dailyMomentActive.value = false
+    }
+  }, 1000)
+}
 
 const activeTab = ref('all')
 const sortOrder = ref('newest')
@@ -615,6 +664,11 @@ const goToDashboard = () => {
 onMounted(() => {
   fetchFeed()
   loadFollowStatus()
+  checkDailyMomentWindow()
+})
+
+onUnmounted(() => {
+  if (momentTimer) clearInterval(momentTimer)
 })
 </script>
 
@@ -632,6 +686,32 @@ onMounted(() => {
               var(--r-offwhite);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
+
+.daily-moment-banner {
+  margin: 8px 16px 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0F1210, #2C3726);
+  border: 1px solid rgba(190,231,194,.25);
+  overflow: hidden;
+  animation: banner-glow 2s ease-in-out infinite;
+}
+@keyframes banner-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(190,231,194,.0); }
+  50% { box-shadow: 0 0 20px 2px rgba(190,231,194,.15); }
+}
+.daily-moment-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.daily-moment-icon { font-size: 1.8rem; flex-shrink: 0; }
+.daily-moment-text { flex: 1; }
+.daily-moment-title { font-weight: 900; font-size: .95rem; color: white; }
+.daily-moment-sub { font-size: .8rem; color: rgba(255,255,255,.65); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.countdown-badge { background: rgba(196,106,42,.9); color: white; border-radius: 999px; padding: 2px 10px; font-weight: 900; font-size: .78rem; font-family: monospace; }
+.btn-capture { background: rgba(190,231,194,.15); border: 1px solid rgba(190,231,194,.3); color: rgba(190,231,194,.95); border-radius: 12px; padding: 8px 14px; font-weight: 800; font-size: .82rem; text-decoration: none; white-space: nowrap; transition: all .2s; }
+.btn-capture:hover { background: rgba(190,231,194,.25); }
 
 .feed-header {
   position: fixed;
