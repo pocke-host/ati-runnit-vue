@@ -25,8 +25,8 @@
       </div>
 
       <div class="navbar-menu" v-else>
-        <router-link to="/login" class="nav-link">Login</router-link>
-        <router-link to="/register" class="nav-link nav-link-primary">Join Us</router-link>
+        <router-link to="/join-us" class="nav-link">Login</router-link>
+        <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
       </div>
 
       <!-- Mobile Menu Toggle -->
@@ -70,7 +70,7 @@ const isAuthenticated = computed(() => !!localStorage.getItem('token'))
 const handleLogout = () => {
   authStore.logout()
   mobileMenuOpen.value = false
-  router.push('/login')
+  router.push('/')
 }
 </script>
 
