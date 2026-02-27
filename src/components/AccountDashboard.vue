@@ -36,7 +36,7 @@
           <div class="stat-content">
             <div class="stat-label">Total Distance</div>
             <div class="stat-value">{{ totalStats.distance }} <span class="unit">km</span></div>
-            <div class="stat-change positive">+12% vs last month</div>
+            <div v-if="monthCompare" :class="['stat-change', monthCompare.startsWith('+') ? 'positive' : 'negative']">{{ monthCompare }}</div>
           </div>
         </div>
 
@@ -45,7 +45,7 @@
           <div class="stat-content">
             <div class="stat-label">Total Time</div>
             <div class="stat-value">{{ totalStats.duration }} <span class="unit">hrs</span></div>
-            <div class="stat-change positive">+8% vs last month</div>
+            <div class="stat-change positive">This month</div>
           </div>
         </div>
 
@@ -650,15 +650,89 @@ const userInitial = computed(() => {
   return user.value?.displayName?.charAt(0).toUpperCase() || 'U'
 })
 
+const currentStreak = computed(() => {
+  const acts = activities.value || []
+  if (!acts.length) return 0
+
+  const uniqueDays = [...new Set(
+    acts.map(a => {
+      const d = new Date(a.createdAt)
+      d.setHours(0, 0, 0, 0)
+      return d.getTime()
+    })
+  )].sort((a, b) => b - a)
+
+  let streak = 0
+  let cursor = new Date()
+  cursor.setHours(0, 0, 0, 0)
+
+  for (const ts of uniqueDays) {
+    const diff = Math.round((cursor.getTime() - ts) / (1000 * 60 * 60 * 24))
+    if (diff <= 1) {
+      streak++
+      cursor = new Date(ts)
+    } else {
+      break
+    }
+  }
+  return streak
+})
+
+const monthCompare = computed(() => {
+  const acts = activities.value || []
+  const now = new Date()
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+
+  const thisKm = acts
+    .filter(a => new Date(a.createdAt) >= thisMonthStart)
+    .reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
+
+  const lastKm = acts
+    .filter(a => {
+      const d = new Date(a.createdAt)
+      return d >= lastMonthStart && d < thisMonthStart
+    })
+    .reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
+
+  if (lastKm === 0) return null
+  const pct = Math.round(((thisKm - lastKm) / lastKm) * 100)
+  return pct >= 0 ? `+${pct}% vs last month` : `${pct}% vs last month`
+})
+
+const weeklyChartData = computed(() => {
+  const acts = activities.value || []
+  const days = [0, 0, 0, 0, 0, 0, 0] // Mon–Sun
+
+  const now = new Date()
+  const monday = new Date(now)
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7))
+  monday.setHours(0, 0, 0, 0)
+
+  acts.forEach(a => {
+    const d = new Date(a.createdAt)
+    if (d >= monday) {
+      const idx = (d.getDay() + 6) % 7
+      if (chartView.value === 'distance') {
+        days[idx] += (a.distanceMeters || 0) / 1000
+      } else {
+        days[idx] += (a.durationSeconds || 0) / 60
+      }
+    }
+  })
+
+  return days.map(v => parseFloat(v.toFixed(1)))
+})
+
 const totalStats = computed(() => {
   const acts = activities.value || []
   const totalDistance = acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
   const totalDuration = acts.reduce((sum, a) => sum + (a.durationSeconds || 0), 0) / 3600
-  
+
   return {
     distance: totalDistance.toFixed(1),
     duration: totalDuration.toFixed(1),
-    streak: 5,
+    streak: currentStreak.value,
     activities: acts.length
   }
 })
@@ -927,7 +1001,7 @@ const initWeeklyChart = () => {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [{
         label: chartView.value === 'distance' ? 'Distance (km)' : 'Duration (min)',
-        data: [5.2, 0, 7.1, 3.5, 0, 10.2, 8.0],
+        data: weeklyChartData.value,
         backgroundColor: 'rgba(196, 106, 42, 0.8)',
         borderColor: 'rgba(196, 106, 42, 1)',
         borderWidth: 2,
@@ -1263,7 +1337,7 @@ onMounted(async () => {
 .stat-value{font-size:2.2rem;font-weight:900;line-height:1;color:rgba(15,18,16,0.92)}
 .stat-value .unit{font-size:1.2rem;font-weight:600;color:rgba(15,18,16,0.50);margin-left:4px}
 .stat-change{font-size:0.8rem;font-weight:600;margin-top:6px}
-.stat-change.positive{color:#10b981}
+.stat-change.positive{color:#10b981}.stat-change.negative{color:#ef4444}
 .dashboard-grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
 .charts-section{display:flex;flex-direction:column;gap:24px}
 .sidebar-section{display:flex;flex-direction:column;gap:24px}

@@ -35,10 +35,32 @@
         <div ref="liveMapContainer" class="live-map"></div>
       </div>
   
+      <!-- Sport Selector (shown before first start) -->
+      <div v-if="!hasStarted" class="sport-selector">
+        <div class="sport-label">Select sport</div>
+        <div class="sport-options">
+          <button
+            v-for="sport in sports"
+            :key="sport.value"
+            :class="['sport-btn', { active: selectedSport === sport.value }]"
+            @click="selectedSport = sport.value"
+            type="button"
+          >
+            <span class="sport-emoji">{{ sport.emoji }}</span>
+            <span class="sport-name">{{ sport.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Save error -->
+      <div v-if="saveError" class="save-error">
+        <i class="bi bi-exclamation-circle me-2"></i>{{ saveError }}
+      </div>
+
       <!-- Controls -->
       <div class="tracker-controls">
-        <button 
-          v-if="!isTracking && !hasStarted" 
+        <button
+          v-if="!isTracking && !hasStarted"
           class="control-btn control-btn-primary"
           @click="startTracking"
         >
@@ -64,13 +86,15 @@
           Resume
         </button>
   
-        <button 
-          v-if="hasStarted" 
+        <button
+          v-if="hasStarted"
           class="control-btn control-btn-danger"
           @click="stopTracking"
+          :disabled="saving"
         >
-          <i class="bi bi-stop-fill"></i>
-          Finish
+          <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
+          <i v-else class="bi bi-stop-fill"></i>
+          {{ saving ? 'Saving...' : 'Finish' }}
         </button>
       </div>
     </div>
@@ -81,11 +105,22 @@
   import { useRouter } from 'vue-router'
   import mapboxgl from 'mapbox-gl'
   import 'mapbox-gl/dist/mapbox-gl.css'
-  
+  import axios from 'axios'
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
   const router = useRouter()
-  
-  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoicnVubml0IiwiYSI6ImNsZjR...'
-  
+
+  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
+
+  const sports = [
+    { value: 'RUN',  emoji: '🏃', label: 'Run'  },
+    { value: 'BIKE', emoji: '🚴', label: 'Bike' },
+    { value: 'SWIM', emoji: '🏊', label: 'Swim' },
+    { value: 'HIKE', emoji: '🥾', label: 'Hike' },
+    { value: 'WALK', emoji: '🚶', label: 'Walk' },
+  ]
+
+  const selectedSport = ref('RUN')
   const liveMapContainer = ref(null)
   const map = ref(null)
   const isTracking = ref(false)
@@ -98,7 +133,9 @@
   const lastPosition = ref(null)
   const startTime = ref(null)
   const pausedTime = ref(0)
-  
+  const saving = ref(false)
+  const saveError = ref('')
+
   let watchId = null
   let timerInterval = null
   let currentMarker = null
@@ -219,23 +256,34 @@
   
   const stopTracking = async () => {
     if (!confirm('Finish this activity?')) return
-  
+
     pauseTracking()
-  
-    // Encode route as polyline
-    const encodedPolyline = encodePolyline(routeCoordinates.value)
-  
-    // Navigate to create activity page with pre-filled data
-    router.push({
-      path: '/dashboard',
-      query: {
-        autoCreate: 'true',
-        distance: totalDistance.value.toFixed(0),
-        duration: elapsedTime.value,
-        polyline: encodedPolyline,
-        elevation: elevationGain.value.toFixed(0)
-      }
-    })
+    saving.value = true
+    saveError.value = ''
+
+    try {
+      const token = localStorage.getItem('token')
+      await axios.post(
+        `${API_URL}/activities`,
+        {
+          sportType: selectedSport.value,
+          durationSeconds: elapsedTime.value,
+          distanceMeters: Math.round(totalDistance.value),
+          elevationGain: Math.round(elevationGain.value),
+          routePolyline: routeCoordinates.value.length
+            ? encodePolyline(routeCoordinates.value)
+            : null
+        },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      )
+      router.push('/dashboard')
+    } catch (err) {
+      console.error('Failed to save activity:', err)
+      saveError.value = 'Failed to save activity. Tap Finish again to retry.'
+      saving.value = false
+      // Resume tracking so the user doesn't lose their data
+      startTracking()
+    }
   }
   
   const handlePositionUpdate = (position) => {
@@ -545,11 +593,85 @@
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
   }
   
+  .sport-selector {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92));
+    border: 1px solid rgba(15,18,16,0.10);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 16px rgba(15,18,16,0.08);
+  }
+
+  .sport-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(15,18,16,0.60);
+    margin-bottom: 12px;
+  }
+
+  .sport-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .sport-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(15,18,16,0.12);
+    background: rgba(255,255,255,0.70);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 60px;
+  }
+
+  .sport-btn:hover {
+    background: rgba(255,255,255,0.95);
+    border-color: var(--r-accent);
+  }
+
+  .sport-btn.active {
+    background: var(--r-accent);
+    border-color: var(--r-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(196,106,42,0.30);
+  }
+
+  .sport-emoji {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .sport-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .save-error {
+    background: rgba(239,68,68,0.10);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #dc2626;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
   @media (max-width: 768px) {
     .stats-grid {
       grid-template-columns: 1fr;
     }
-    
+
     .tracker-time {
       font-size: 1.5rem;
     }

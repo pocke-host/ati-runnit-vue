@@ -4,7 +4,13 @@
       <h2>Connect Your Devices</h2>
       <p>Automatically sync your workouts from your favorite fitness platforms</p>
   
-      <div class="devices-grid">
+      <!-- Status Banner -->
+    <div v-if="statusMessage" :class="['status-banner', statusType]">
+      <i :class="statusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
+      {{ statusMessage }}
+    </div>
+
+    <div class="devices-grid">
         <!-- Garmin -->
         <div class="device-card">
           <div class="device-icon">🏃</div>
@@ -73,6 +79,14 @@
   const garminConnected = ref(false)
   const stravaConnected = ref(false)
   const loading = ref(false)
+  const statusMessage = ref('')
+  const statusType = ref('success')
+
+  const showStatus = (message, type = 'success') => {
+    statusMessage.value = message
+    statusType.value = type
+    setTimeout(() => { statusMessage.value = '' }, 4000)
+  }
   
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token')
@@ -104,68 +118,72 @@
       window.location.href = data.authorizationUrl
     } catch (err) {
       console.error('Failed to connect Garmin:', err)
-      alert('Failed to connect Garmin')
+      showStatus('Failed to connect Garmin. Please try again.', 'error')
     } finally {
       loading.value = false
     }
   }
-  
+
   const disconnectGarmin = async () => {
     if (!confirm('Are you sure you want to disconnect Garmin?')) return
-    
+
     try {
       await axios.delete(`${API_URL}/integrations/garmin/disconnect`, {
         headers: getAuthHeaders()
       })
       garminConnected.value = false
+      showStatus('Garmin disconnected.')
     } catch (err) {
       console.error('Failed to disconnect Garmin:', err)
-      alert('Failed to disconnect Garmin')
+      showStatus('Failed to disconnect Garmin.', 'error')
     }
   }
-  
+
   const connectStrava = async () => {
     loading.value = true
     try {
       const { data } = await axios.get(`${API_URL}/integrations/strava/connect`, {
         headers: getAuthHeaders()
       })
-      
+
       // Redirect to Strava authorization page
       window.location.href = data.authorizationUrl
     } catch (err) {
       console.error('Failed to connect Strava:', err)
-      alert('Failed to connect Strava')
+      showStatus('Failed to connect Strava. Please try again.', 'error')
     } finally {
       loading.value = false
     }
   }
-  
+
   const disconnectStrava = async () => {
     if (!confirm('Are you sure you want to disconnect Strava?')) return
-    
+
     try {
       await axios.delete(`${API_URL}/integrations/strava/disconnect`, {
         headers: getAuthHeaders()
       })
       stravaConnected.value = false
+      showStatus('Strava disconnected.')
     } catch (err) {
       console.error('Failed to disconnect Strava:', err)
-      alert('Failed to disconnect Strava')
+      showStatus('Failed to disconnect Strava.', 'error')
     }
   }
-  
+
   onMounted(() => {
     checkConnectionStatus()
-    
-    // Check for connection success/error from callback
+
+    // Check for connection success/error from OAuth callback
     const params = new URLSearchParams(window.location.search)
     if (params.get('garmin') === 'connected') {
       garminConnected.value = true
-      alert('Garmin connected successfully!')
+      showStatus('Garmin connected successfully!')
     } else if (params.get('strava') === 'connected') {
       stravaConnected.value = true
-      alert('Strava connected successfully!')
+      showStatus('Strava connected successfully!')
+    } else if (params.get('error')) {
+      showStatus('Connection failed. Please try again.', 'error')
     }
   })
   </script>

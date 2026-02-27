@@ -17,8 +17,8 @@ import SportsSwim from '@/components/sports/SportsSwim.vue'
 import Races from '@/components/Races.vue'
 import AccountDashboard from '@/components/AccountDashboard.vue'
 import Feed from '@/components/Feed.vue'
-import LiveTracker from '@/components/LiveTracker.vue'
-import ConnectDevices from '@/components/ConnectDevices.vue'
+import Track from '@/views/Track.vue'
+import Devices from '@/views/Devices.vue'
 import CreateMoment from '@/views/CreateMoment.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TermsOfService from '@/components/TermsOfService.vue'
@@ -44,14 +44,14 @@ const routes = [
   { path: '/feed', name: 'Feed', component: Feed },
   {
     path: '/track',
-    name: 'LiveTracker',
-    component: LiveTracker,
+    name: 'Track',
+    component: Track,
     meta: { requiresAuth: true }
   },
   {
     path: '/devices',
-    name: 'ConnectDevices',
-    component: ConnectDevices,
+    name: 'Devices',
+    component: Devices,
     meta: { requiresAuth: true }
   },
   {
