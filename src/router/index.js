@@ -1,74 +1,69 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import AccountLogin from '@/components/AccountLogin.vue'
-import SportsRunning from '@/components/sports/SportsRunning.vue'
-import Features from '@/components/Features.vue'
-import Subscribe from '@/components/Subscribe.vue'
-import Home from '@/components/Home.vue'
-import GlobalHeatMap from '@/components/GlobalHeatmap.vue'
-import About from '@/components/About.vue'
-import AccountRegister from '@/components/AccountRegister.vue'
-import Challenges from '@/components/Challenges.vue'
-import Support from '@/components/Support.vue'
-import SupportRequest from '@/components/SupportRequest.vue'
-import Clubs from '@/components/Clubs.vue'
-import SportsRide from '@/components/sports/SportsRide.vue'
-import SportsSwim from '@/components/sports/SportsSwim.vue'
-import Races from '@/components/Races.vue'
-import AccountDashboard from '@/components/AccountDashboard.vue'
-import Feed from '@/components/Feed.vue'
-import LiveTracker from '@/components/LiveTracker.vue'
-import ConnectDevices from '@/components/ConnectDevices.vue'
-import CreateMoment from '@/views/CreateMoment.vue'
-
 const routes = [
-  { path: '/join-us', name: 'Account Login', component: AccountLogin },
-  { path: '/sports/running', name: 'SportsRunning', component: SportsRunning },
-  { path: '/features', name: 'Features', component: Features },
-  { path: '/subscribe', name: 'Subscribe', component: Subscribe },
-  { path: '/', name: 'Home', component: Home },
-  { path: '/maps', name: 'Map', component: GlobalHeatMap },
-  { path: '/about', name: 'About', component: About },
-  { path: '/signup', name: 'Signup', component: AccountRegister },
-  { path: '/challenges', name: 'Challenges', component: Challenges },
-  { path: '/support', name: 'Support', component: Support },
-  { path: '/request', name: 'Request', component: SupportRequest },
-  { path: '/clubs', name: 'Clubs', component: Clubs },
-  { path: '/races', name: 'Races', component: Races },
-  { path: '/sports/ride', component: SportsRide },
-  { path: '/sports/swim', component: SportsSwim },
-  { path: '/dashboard', name: 'Dashboard', component: AccountDashboard },
-  { path: '/feed', name: 'Feed', component: Feed },
+  { path: '/', name: 'Home', component: () => import('@/views/Home.vue') },
+  { path: '/join-us', name: 'Login', component: () => import('@/views/AccountLogin.vue') },
+  { path: '/signup', name: 'Signup', component: () => import('@/views/AccountRegister.vue') },
+  { path: '/features', name: 'Features', component: () => import('@/views/Features.vue') },
+  { path: '/subscribe', name: 'Subscribe', component: () => import('@/views/Subscribe.vue') },
+  { path: '/about', name: 'About', component: () => import('@/views/About.vue') },
+  { path: '/maps', name: 'Map', component: () => import('@/views/GlobalHeatmap.vue') },
+  { path: '/challenges', name: 'Challenges', component: () => import('@/views/Challenges.vue') },
+  { path: '/clubs', name: 'Clubs', component: () => import('@/views/Clubs.vue') },
+  { path: '/races', name: 'Races', component: () => import('@/views/Races.vue') },
+  { path: '/support', name: 'Support', component: () => import('@/views/Support.vue') },
+  { path: '/request', name: 'Request', component: () => import('@/views/SupportRequest.vue') },
+  { path: '/sports/running', name: 'SportsRunning', component: () => import('@/views/sports/SportsRunning.vue') },
+  { path: '/sports/ride', name: 'SportsRide', component: () => import('@/views/sports/SportsRide.vue') },
+  { path: '/sports/swim', name: 'SportsSwim', component: () => import('@/views/sports/SportsSwim.vue') },
+  { path: '/sports/hike', name: 'SportsHike', component: () => import('@/views/sports/SportsHike.vue') },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('@/views/AccountDashboard.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/feed',
+    name: 'Feed',
+    component: () => import('@/views/Feed.vue'),
+    meta: { requiresAuth: true }
+  },
   {
     path: '/track',
-    name: 'LiveTracker',
-    component: LiveTracker,
+    name: 'Track',
+    component: () => import('@/views/Track.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/devices',
-    name: 'ConnectDevices',
-    component: ConnectDevices,
+    name: 'Devices',
+    component: () => import('@/views/Devices.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/create-moment',
     name: 'CreateMoment',
-    component: CreateMoment,
+    component: () => import('@/views/CreateMoment.vue'),
     meta: { requiresAuth: true }
-  }
+  },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFound.vue') }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  }
 })
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  
+
   if (to.meta.requiresAuth && !token) {
-    next('/login')
+    next({ name: 'Login', query: { redirect: to.fullPath } })
   } else {
     next()
   }
