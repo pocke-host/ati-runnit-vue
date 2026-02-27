@@ -1,121 +1,165 @@
-<!-- src/pages/Challenges.vue -->
 <template>
   <main class="challenges-page">
-    <!-- HERO -->
+    <!-- HERO: Clean & Simple -->
     <section class="hero">
       <div class="container-xxl">
-        <p class="eyebrow text-uppercase fw-semibold mb-2">Consistency is the game.</p>
-        <h1 class="display-6 fw-bold mb-2">Challenges</h1>
-        <p class="lead text-muted m-0">
-          Pick a mission, stack your days, and keep the loop alive — with the RUNNIT community.
+        <h1 class="display-5 fw-bold mb-3">Challenges</h1>
+        <p class="lead mb-0">
+          Join monthly challenges, track your progress, and stay motivated with the community.
         </p>
       </div>
     </section>
 
-    <!-- CONTROLS -->
-    <section class="controls">
+    <!-- FILTERS: Simplified Controls -->
+    <section class="filters">
       <div class="container-xxl">
-        <div class="row g-2 align-items-center">
-          <div class="col-12 col-md-auto">
-            <div class="btn-group sport-tabs" role="tablist">
-              <button
-                v-for="s in sports"
-                :key="s"
-                class="btn btn-outline-secondary"
-                :class="{ active: sport === s }"
-                @click="sport = s"
-              >
-                {{ s }}
-              </button>
+        <div class="filter-bar">
+          <!-- Sport Pills -->
+          <div class="sport-pills">
+            <button
+              v-for="s in sports"
+              :key="s"
+              class="sport-pill"
+              :class="{ active: sport === s }"
+              @click="sport = s"
+            >
+              {{ s }}
+            </button>
+          </div>
+
+          <!-- Search & Sort -->
+          <div class="search-sort">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input
+                v-model.trim="q"
+                class="form-control"
+                placeholder="Search challenges..."
+              />
             </div>
-          </div>
-
-          <div class="col-12 col-md">
-            <input v-model.trim="q" class="form-control" placeholder="Search missions…" />
-          </div>
-
-          <div class="col-6 col-md-auto">
-            <select v-model="month" class="form-select">
-              <option v-for="m in months" :key="m.value" :value="m.value">{{ m.label }}</option>
-            </select>
-          </div>
-
-          <div class="col-6 col-md-auto">
-            <select v-model="sortBy" class="form-select">
-              <option value="popular">Most active</option>
-              <option value="new">New</option>
-              <option value="ending">Ending soon</option>
+            <select v-model="sortBy" class="form-select sort-select">
+              <option value="popular">Most Popular</option>
+              <option value="new">Newest</option>
+              <option value="ending">Ending Soon</option>
             </select>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- GRID -->
-    <section class="list">
+    <!-- CHALLENGES GRID -->
+    <section class="challenges-grid">
       <div class="container-xxl">
         <div class="row g-4">
           <div
-            class="col-12 col-sm-6 col-lg-4"
+            class="col-12 col-md-6 col-lg-4"
             v-for="c in paged"
             :key="c.id"
           >
-            <article class="challenge-card h-100">
-              <div class="thumb" :style="{ backgroundImage: `url(${c.image})` }">
-                <span class="badge sport-badge" :class="c.sport.toLowerCase()">{{ c.sport }}</span>
-                <span class="badge status" :class="c.status">{{ c.statusLabel }}</span>
+            <article class="challenge-card">
+              <!-- Challenge Image -->
+              <div
+                class="challenge-image"
+                :style="{ backgroundImage: `url(${c.image})` }"
+              >
+                <span class="status-badge" :class="c.status">
+                  {{ c.statusLabel }}
+                </span>
               </div>
 
-              <div class="body">
-                <h5 class="title mb-1">{{ c.title }}</h5>
-                <p class="text-muted small mb-2">{{ c.subtitle }}</p>
+              <!-- Challenge Content -->
+              <div class="challenge-content">
+                <div class="challenge-header">
+                  <span class="sport-tag">{{ c.sport }}</span>
+                  <span class="participants">
+                    <i class="bi bi-people-fill"></i>
+                    {{ formatK(c.participants) }}
+                  </span>
+                </div>
 
-                <ul class="meta small text-muted">
-                  <li><i class="bi bi-calendar2-week me-1"></i>{{ c.window }}</li>
-                  <li><i class="bi bi-people me-1"></i>{{ formatK(c.participants) }} active</li>
-                </ul>
+                <h3 class="challenge-title">{{ c.title }}</h3>
+                <p class="challenge-subtitle">{{ c.subtitle }}</p>
 
-                <div v-if="c.progress" class="progress-wrap">
-                  <div class="d-flex justify-content-between small mb-1">
-                    <span>{{ c.progress.current }} / {{ c.progress.target }} {{ c.progress.unit }}</span>
-                    <span class="pct">{{ pct(c.progress) }}%</span>
+                <div class="challenge-meta">
+                  <span class="meta-item">
+                    <i class="bi bi-calendar3"></i>
+                    {{ c.window }}
+                  </span>
+                </div>
+
+                <!-- Progress Bar (if active) -->
+                <div v-if="c.progress" class="progress-section">
+                  <div class="progress-header">
+                    <span class="progress-text">
+                      {{ c.progress.current }} / {{ c.progress.target }} {{ c.progress.unit }}
+                    </span>
+                    <span class="progress-percent">{{ pct(c.progress) }}%</span>
                   </div>
-                  <div class="progress" role="progressbar" :aria-valuenow="pct(c.progress)" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar" :style="{ width: pct(c.progress) + '%' }"></div>
+                  <div class="progress-bar-container">
+                    <div
+                      class="progress-bar-fill"
+                      :style="{ width: pct(c.progress) + '%' }"
+                    ></div>
                   </div>
                 </div>
 
-                <div class="d-flex gap-2 mt-3">
-                  <button class="btn btn-primary w-50">Enter</button>
-                  <button class="btn btn-outline-dark w-50">Details</button>
-                </div>
+                <!-- Action Button -->
+                <button class="btn-join" :class="{ active: c.progress }">
+                  {{ c.progress ? 'Continue' : 'Join Challenge' }}
+                </button>
               </div>
             </article>
           </div>
 
-          <!-- Empty state -->
+          <!-- Empty State -->
           <div class="col-12" v-if="paged.length === 0">
-            <div class="empty">
-              <h5 class="mb-1">No missions found</h5>
-              <p class="text-muted m-0">Try a different sport, month, or search.</p>
+            <div class="empty-state">
+              <div class="empty-icon">🏃</div>
+              <h3 class="empty-title">No challenges found</h3>
+              <p class="empty-text">
+                Try adjusting your filters or check back later for new challenges.
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- Pagination-ish (UI only) -->
-        <div class="d-flex justify-content-center mt-4" v-if="filtered.length > pageSize">
-          <button class="btn btn-outline-dark me-2" :disabled="page === 1" @click="page--">Previous</button>
-          <button class="btn btn-outline-dark" :disabled="pageEnd >= filtered.length" @click="page++">Next</button>
+        <!-- Pagination -->
+        <div class="pagination" v-if="filtered.length > pageSize">
+          <button
+            class="btn-page"
+            :disabled="page === 1"
+            @click="page--"
+          >
+            <i class="bi bi-chevron-left"></i>
+            Previous
+          </button>
+          <span class="page-info">
+            Page {{ page }} of {{ Math.ceil(filtered.length / pageSize) }}
+          </span>
+          <button
+            class="btn-page"
+            :disabled="pageEnd >= filtered.length"
+            @click="page++"
+          >
+            Next
+            <i class="bi bi-chevron-right"></i>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- CTA BAND -->
-    <section class="cta">
-      <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-2">Start a new streak.</h2>
-        <p class="text-muted mb-3">Pick one mission and show up — we’ll handle the momentum.</p>
-        <router-link to="/signup" class="btn btn-primary btn-lg">Create free account</router-link>
+    <!-- CTA: Simple & Direct -->
+    <section class="cta-section">
+      <div class="container-xxl">
+        <div class="cta-content">
+          <h2 class="cta-title">Ready to challenge yourself?</h2>
+          <p class="cta-text">
+            Join thousands competing in monthly challenges. Track progress, stay motivated, achieve your goals.
+          </p>
+          <router-link to="/join-us" class="btn-cta">
+            Get Started Free
+          </router-link>
+        </div>
       </div>
     </section>
   </main>
@@ -128,20 +172,20 @@ import { ref, computed } from 'vue'
 const challenges = ref([
   {
     id: 1,
-    title: 'Run 50 Miles in September',
-    subtitle: 'Stack consistent miles all month',
+    title: 'Run 100 Miles',
+    subtitle: 'Complete 100 miles in 30 days',
     sport: 'Running',
     image: 'https://images.unsplash.com/photo-1540481391483-826de3c13485?q=80&w=1200&auto=format&fit=crop',
     window: 'Sep 1 – Sep 30',
     participants: 124500,
     status: 'ongoing',
-    statusLabel: 'Ongoing',
-    progress: { current: 42, target: 100, unit: 'km' }
+    statusLabel: 'Active',
+    progress: { current: 42, target: 100, unit: 'mi' }
   },
   {
     id: 2,
-    title: 'Ride 100K',
-    subtitle: 'Build aerobic base on two wheels',
+    title: 'Ride 500K',
+    subtitle: 'Cycle 500 kilometers this month',
     sport: 'Cycling',
     image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=1200&auto=format&fit=crop',
     window: 'Sep 1 – Sep 30',
@@ -152,44 +196,44 @@ const challenges = ref([
   },
   {
     id: 3,
-    title: '5K a Day',
-    subtitle: 'Run 5 kilometers every day',
+    title: '30 Day Streak',
+    subtitle: 'Run every single day for 30 days',
     sport: 'Running',
     image: 'https://images.unsplash.com/photo-1518310952931-b1de897abd79?q=80&w=1200&auto=format&fit=crop',
     window: 'Oct 1 – Oct 31',
     participants: 45210,
     status: 'upcoming',
-    statusLabel: 'Opens soon',
+    statusLabel: 'Coming Soon',
     progress: null
   },
   {
     id: 4,
-    title: 'Swim the Distance',
-    subtitle: 'Accumulate 10K in the pool or open water',
+    title: 'Swim 25K',
+    subtitle: 'Total 25 kilometers in the pool',
     sport: 'Swimming',
     image: 'https://images.unsplash.com/photo-1505764706515-aa95265c5abc?q=80&w=1200&auto=format&fit=crop',
     window: 'Sep 1 – Sep 30',
     participants: 11200,
     status: 'ongoing',
-    statusLabel: 'Ongoing',
-    progress: { current: 6, target: 10, unit: 'km' }
+    statusLabel: 'Active',
+    progress: { current: 15, target: 25, unit: 'km' }
   },
   {
     id: 5,
-    title: 'Climb High',
-    subtitle: 'Climb 3,000 m of elevation gain',
+    title: 'Elevation Gain 10K',
+    subtitle: 'Climb 10,000 feet total elevation',
     sport: 'Hiking',
     image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop',
     window: 'Sep 1 – Sep 30',
     participants: 22050,
     status: 'ongoing',
-    statusLabel: 'Ongoing',
-    progress: { current: 1875, target: 3000, unit: 'm' }
+    statusLabel: 'Active',
+    progress: { current: 6250, target: 10000, unit: 'ft' }
   },
   {
     id: 6,
-    title: 'Walk 200K Steps',
-    subtitle: 'Just keep moving — anywhere counts',
+    title: 'Walk 200 Miles',
+    subtitle: 'Hit 200 miles walking this month',
     sport: 'Walking',
     image: 'https://images.unsplash.com/photo-1425136738262-212551713a58?q=80&w=1200&auto=format&fit=crop',
     window: 'Sep 1 – Sep 30',
@@ -205,16 +249,8 @@ const sports = ['All', 'Running', 'Cycling', 'Swimming', 'Hiking', 'Walking']
 const sport = ref('All')
 const q = ref('')
 const sortBy = ref('popular')
-const month = ref('sep')
 const page = ref(1)
 const pageSize = 9
-
-const months = [
-  { value: 'sep', label: 'September' },
-  { value: 'oct', label: 'October' },
-  { value: 'nov', label: 'November' },
-  { value: 'dec', label: 'December' }
-]
 
 // Derived lists
 const filtered = computed(() => {
@@ -223,213 +259,531 @@ const filtered = computed(() => {
   if (sport.value !== 'All') {
     list = list.filter(c => c.sport === sport.value)
   }
+  
   if (q.value) {
-    const t = q.value.toLowerCase()
+    const term = q.value.toLowerCase()
     list = list.filter(c =>
-      c.title.toLowerCase().includes(t) ||
-      (c.subtitle && c.subtitle.toLowerCase().includes(t))
+      c.title.toLowerCase().includes(term) ||
+      c.subtitle.toLowerCase().includes(term)
     )
-  }
-  // Basic “month” filter demo: keep September if sep, etc. (mock)
-  if (month.value === 'sep') {
-    list = list.filter(c => c.window.toLowerCase().includes('sep'))
   }
 
   // Sort
   if (sortBy.value === 'popular') {
-    list.sort((a, b) => (b.participants || 0) - (a.participants || 0))
+    list.sort((a, b) => b.participants - a.participants)
   } else if (sortBy.value === 'new') {
-    list.sort((a, b) => (b.status === 'new') - (a.status === 'new'))
+    list.sort((a, b) => (b.status === 'new' ? 1 : 0) - (a.status === 'new' ? 1 : 0))
   } else if (sortBy.value === 'ending') {
-    list.sort((a, b) => (a.status === 'ongoing') - (b.status === 'ongoing')) // placeholder
+    list.sort((a, b) => (a.status === 'ongoing' ? 1 : 0) - (b.status === 'ongoing' ? 1 : 0))
   }
 
   return list
 })
 
 const pageEnd = computed(() => page.value * pageSize)
-const paged = computed(() => filtered.value.slice((page.value - 1) * pageSize, pageEnd.value))
+const paged = computed(() => 
+  filtered.value.slice((page.value - 1) * pageSize, pageEnd.value)
+)
 
 // Helpers
 function pct(p) {
   if (!p) return 0
   return Math.min(100, Math.round((p.current / p.target) * 100))
 }
+
 function formatK(n) {
   if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k'
-  return '' + n
+  return String(n)
 }
 </script>
 
 <style scoped>
-/* RUNNIT vibe: clean + “game-like” through language and motion, not gimmicks */
-.challenges-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
-  --nav-h:72px;
-  --footer-h:40px;
-  padding-top: var(--nav-h);
-  min-height: calc(100vh - var(--nav-h) - var(--footer-h));
+/* ===== Design Tokens ===== */
+.challenges-page {
+  --r-olive: #5A6B4E;
+  --r-olive-deep: #2C3726;
+  --r-accent: #C46A2A;
+  --r-offwhite: #F5F6F3;
+  --r-white: #FFFFFF;
+  
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background: var(--r-offwhite);
-  display:flex; flex-direction:column;
-
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  min-height: 100vh;
+  padding-top: 57px;
 }
 
-/* Sections */
-.hero{
-  padding: 42px 0 22px;
-  border-bottom:1px solid rgba(15,18,16,0.08);
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
-  color: var(--r-white);
-}
-.eyebrow{
-  letter-spacing:.16em;
-  color: rgba(255,255,255,0.82);
-  margin: 0 0 6px 0;
-}
-.hero :deep(.lead){
-  color: rgba(255,255,255,0.76) !important;
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  padding: 140px 0 120px;
+  background-image: url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?q=80&w=2000&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center 30%;
+  overflow: hidden;
 }
 
-.controls{
-  padding:16px 0;
-  border-bottom:1px solid rgba(15,18,16,0.06);
-  background: rgba(255,255,255,0.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(15, 18, 16, 0.82) 0%, rgba(15, 18, 16, 0.45) 100%);
 }
 
-.list{ padding: 28px 0 36px; }
-
-.cta{
-  padding: 56px 0 72px;
-  background:#fff;
-  border-top:1px solid rgba(15,18,16,0.08);
+.hero .container-xxl {
+  position: relative;
+  z-index: 1;
 }
 
-/* Tabs */
-.sport-tabs .btn{
-  border-color: rgba(15,18,16,0.16);
-  border-radius: 12px;
-  font-weight: 700;
+.hero h1 {
+  color: white;
+  letter-spacing: -0.02em;
 }
-.sport-tabs .btn.active{
+
+.hero .lead {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 18px;
+  font-weight: 400;
+  max-width: 600px;
+}
+
+/* ===== FILTERS ===== */
+.filters {
+  background: white;
+  padding: 24px 0;
+  border-bottom: 1px solid #E5E7EB;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Sport Pills */
+.sport-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sport-pill {
+  padding: 8px 20px;
+  border: 1px solid #E5E7EB;
+  border-radius: 24px;
+  background: white;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sport-pill:hover {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+}
+
+.sport-pill.active {
   background: var(--r-accent);
-  color:#fff;
-  border-color: rgba(255,255,255,0.12);
-  box-shadow: 0 14px 34px rgba(196,106,42,0.22);
+  border-color: var(--r-accent);
+  color: white;
 }
 
-/* Cards */
-.challenge-card{
-  border:1px solid rgba(15,18,16,0.10);
-  border-radius:16px;
-  overflow:hidden;
-  background:#fff;
-  display:flex;
-  flex-direction:column;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
-  transition: transform 140ms ease, box-shadow 140ms ease;
+/* Search & Sort */
+.search-sort {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
-.challenge-card:hover{
+
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CA3AF;
+  font-size: 16px;
+}
+
+.search-box .form-control {
+  height: 44px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding-left: 40px;
+  font-size: 15px;
+}
+
+.search-box .form-control:focus {
+  outline: none;
+  border-color: var(--r-accent);
+  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+}
+
+.sort-select {
+  width: auto;
+  min-width: 160px;
+  height: 44px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.sort-select:focus {
+  border-color: var(--r-accent);
+  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+}
+
+/* ===== CHALLENGES GRID ===== */
+.challenges-grid {
+  padding: 40px 0 60px;
+}
+
+.challenge-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #E5E7EB;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.challenge-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: #D1D5DB;
+}
+
+/* Challenge Image */
+.challenge-image {
+  position: relative;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+
+.status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(10px);
+}
+
+.status-badge.ongoing {
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+}
+
+.status-badge.new {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+}
+
+.status-badge.upcoming {
+  background: rgba(107, 114, 128, 0.9);
+  color: white;
+}
+
+/* Challenge Content */
+.challenge-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sport-tag {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--r-accent);
+}
+
+.participants {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B7280;
+}
+
+.challenge-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.challenge-subtitle {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.challenge-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.meta-item i {
+  font-size: 14px;
+}
+
+/* Progress Section */
+.progress-section {
+  margin-bottom: 16px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-percent {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--r-accent);
+}
+
+.progress-bar-container {
+  height: 8px;
+  background: #F3F4F6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--r-accent) 0%, #d97939 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Join Button */
+.btn-join {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: var(--r-accent);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: auto;
+}
+
+.btn-join:hover {
+  background: #a85722;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(196, 106, 42, 0.3);
+}
+
+.btn-join.active {
+  background: var(--r-olive);
+}
+
+.btn-join.active:hover {
+  background: var(--r-olive-deep);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.empty-text {
+  font-size: 16px;
+  color: #6B7280;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.btn-page {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  background: white;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+}
+
+.btn-page:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6B7280;
+}
+
+/* ===== CTA SECTION ===== */
+.cta-section {
+  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  padding: 80px 0;
+}
+
+.cta-content {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.cta-text {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.btn-cta {
+  display: inline-block;
+  padding: 14px 40px;
+  background: var(--r-accent);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.btn-cta:hover {
+  background: #a85722;
   transform: translateY(-2px);
-  box-shadow: 0 18px 50px rgba(15,18,16,0.10);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.challenge-card .thumb{
-  position:relative;
-  height:160px;
-  background:#e9ecef center/cover no-repeat;
-}
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero {
+    padding: 60px 0 40px;
+  }
 
-.badge{
-  position:absolute;
-  top:12px;
-  left:12px;
-  background: rgba(15,18,16,0.60);
-  color:#fff;
-  border-radius:999px;
-  padding:.35rem .6rem;
-  font-size:.75rem;
-  backdrop-filter:saturate(140%) blur(2px);
-}
-.badge.status{ left:auto; right:12px; }
+  .hero h1 {
+    font-size: 32px;
+  }
 
-/* Status (subtle, consistent) */
-.badge.status.new{ background: rgba(15,18,16,0.75); }
-.badge.status.ongoing{ background: rgba(22,163,74,0.85); }
-.badge.status.upcoming{ background: rgba(107,114,128,0.85); }
+  .filter-bar {
+    gap: 12px;
+  }
 
-/* Sport badge: tame, RUNNIT-toned (no Strava orange blasts) */
-.sport-badge{
-  border: 1px solid rgba(255,255,255,0.12);
-}
-.sport-badge.running{ background: rgba(196,106,42,0.90); }     /* accent */
-.sport-badge.cycling{ background: rgba(90,107,78,0.92); }      /* olive */
-.sport-badge.swimming{ background: rgba(15,18,16,0.78); }      /* near-black */
-.sport-badge.hiking{ background: rgba(44,55,38,0.90); }        /* deep olive */
-.sport-badge.walking{ background: rgba(163,166,159,0.85); color: #111; } /* stone */
+  .search-sort {
+    flex-direction: column;
+  }
 
-/* Body */
-.challenge-card .body{ padding:14px 14px 16px; }
-.title{ line-height:1.25; }
-.pct{ font-weight: 700; color: rgba(15,18,16,0.80); }
+  .search-box {
+    max-width: 100%;
+  }
 
-/* Meta */
-.meta{
-  list-style:none;
-  padding:0;
-  margin:0 0 .25rem 0;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-.meta li{ display:flex; align-items:center; }
+  .sort-select {
+    width: 100%;
+  }
 
-/* Progress */
-.progress-wrap{ margin-top:.25rem; }
-.progress{
-  height:8px;
-  background: rgba(15,18,16,0.08);
-  border-radius:999px;
-  overflow:hidden;
-}
-.progress-bar{
-  height:100%;
-  background: linear-gradient(90deg, rgba(196,106,42,1), rgba(196,106,42,0.70));
-  box-shadow: 0 10px 20px rgba(196,106,42,0.20);
-}
+  .sport-pills {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+  }
 
-/* Primary button = RUNNIT accent */
-.btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(255,255,255,0.12);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
-}
+  .challenge-image {
+    height: 180px;
+  }
 
-/* Empty */
-.empty{
-  text-align:center;
-  padding:48px;
-  border:1px dashed rgba(15,18,16,0.18);
-  border-radius:16px;
-  background:#fff;
-}
-
-/* Responsive */
-@media (max-width: 768px){
-  .challenge-card .thumb{ height:150px; }
+  .cta-title {
+    font-size: 28px;
+  }
 }
 </style>

@@ -215,6 +215,7 @@ const sections = [
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background: var(--r-offwhite);
   min-height: 100vh;
+  padding-top: 57px;
 }
 
 /* ===== HERO ===== */

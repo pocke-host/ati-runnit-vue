@@ -25,8 +25,11 @@
       </div>
 
       <div class="navbar-menu" v-else>
-        <router-link to="/login" class="nav-link">Login</router-link>
-        <router-link to="/register" class="nav-link nav-link-primary">Join Us</router-link>
+        <router-link to="/challenges" class="nav-link">Challenges</router-link>
+        <router-link to="/clubs" class="nav-link">Clubs</router-link>
+        <router-link to="/races" class="nav-link">Races</router-link>
+        <router-link to="/join-us" class="nav-link">Login</router-link>
+        <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
       </div>
 
       <!-- Mobile Menu Toggle -->
@@ -90,7 +93,7 @@ const handleLogout = () => {
 .navbar-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
