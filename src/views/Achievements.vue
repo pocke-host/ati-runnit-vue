@@ -221,6 +221,11 @@ onMounted(async () => {
   padding: 0 24px;
   display: flex;
   overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs-inner::-webkit-scrollbar {
+  display: none;
 }
 .tab-btn {
   padding: 16px 22px;
@@ -371,5 +376,10 @@ onMounted(async () => {
   .badge-card { padding: 18px 12px 16px; }
   .badge-icon { font-size: 1.7rem; }
   .badge-name { font-size: 0.85rem; }
+}
+@media (max-width: 400px) {
+  .badge-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 1.6rem; }
+  .badge-card { padding: 14px; }
 }
 </style>

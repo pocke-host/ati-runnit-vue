@@ -566,10 +566,17 @@ const handleLogout = () => {
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 10px; }
 
 /* ── Responsive ── */
+@media (max-width: 768px) {
+  .settings-body { padding: 20px 16px 60px; }
+  .section-card { padding: 20px 16px; }
+  .unit-cards { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 480px) {
   .field-row { flex-direction: column; align-items: flex-start; }
   .field-input-wrap { width: 100%; }
   .field-readonly { width: 100%; }
-  .unit-preview-row { grid-template-columns: repeat(3, 1fr); }
+  .unit-preview-row { grid-template-columns: repeat(2, 1fr); }
+  .unit-cards { grid-template-columns: 1fr; }
+  .section-title { font-size: 1rem; }
 }
 </style>

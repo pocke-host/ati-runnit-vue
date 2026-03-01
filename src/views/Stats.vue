@@ -563,10 +563,26 @@ onMounted(async () => {
   .milestone-grid { grid-template-columns: repeat(2, 1fr); }
   .section-split { grid-template-columns: 1fr; }
 }
+@media (max-width: 768px) {
+  .pr-grid { grid-template-columns: repeat(2, 1fr); }
+  .milestone-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-chips { flex-wrap: wrap; gap: 8px; }
+  .hero-chip { font-size: 0.8rem; padding: 8px 14px; }
+  .chart-card canvas { max-height: 200px; }
+  .stats-content { padding: 28px 16px 64px; }
+}
 @media (max-width: 600px) {
   .hero-title { font-size: 2rem; }
   .hero-chips { gap: 12px; }
   .hero-chip { min-width: 100px; padding: 12px 18px; }
   .stats-content { padding: 28px 16px 64px; }
+}
+@media (max-width: 480px) {
+  .pr-grid { grid-template-columns: 1fr; }
+  .milestone-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-title { font-size: 1.8rem; }
+  .section-title { font-size: 1.1rem; }
+  .pr-card { padding: 16px; }
+  .pr-value { font-size: 1.3rem; }
 }
 </style>

@@ -534,17 +534,50 @@
     padding: 60px 0;
     min-height: auto;
   }
-  
+  .hero-visual { height: 400px; }
+  .phone-mockup { transform: scale(0.85); }
+  .floating-pill { display: none; }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 48px 0 36px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+  .hero .lead {
+    font-size: 1.05rem;
+  }
+  .hero .d-flex {
+    justify-content: center;
+  }
   .hero-visual {
-    height: 400px;
+    height: 300px;
+    margin-top: 12px;
   }
-  
   .phone-mockup {
-    transform: scale(0.85);
+    width: 200px;
+    height: 420px;
+    transform: none;
   }
-  
-  .floating-pill {
-    display: none;
-  }
+  .features { padding: 60px 0; }
+  .how-it-works { padding: 52px 0; }
+  .integrations { padding: 40px 0; }
+  .final-cta { padding: 60px 0; }
+  .final-cta h2 { font-size: 1.8rem; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 36px 0 24px; }
+  .hero h1 { font-size: 1.85rem; }
+  .hero-visual { display: none; }
+  .feature-card { padding: 24px 18px; }
+  .step-card { padding: 24px 12px; }
+  .integration-pill { padding: 10px 14px; font-size: 13px; }
+  .final-cta { padding: 48px 0; }
+  .final-cta h2 { font-size: 1.5rem; }
+  .final-cta .lead { font-size: 1rem; }
 }
 </style>

@@ -735,11 +735,16 @@ onMounted(() => {
 /* Responsive */
 .new-plan-section { max-width: 860px; }
 @media (max-width: 640px) {
-  .level-cards { grid-template-columns: 1fr 1fr 1fr; }
+  .level-cards { grid-template-columns: 1fr 1fr; }
   .goal-tabs { gap: 8px; }
   .goal-tab { padding: 12px 14px; min-width: 72px; }
   .preview-meta-row { flex-wrap: wrap; gap: 10px; }
   .preview-workouts { gap: 6px; }
   .preview-workout { min-width: 80px; }
+  .plans-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 400px) {
+  .level-cards { grid-template-columns: 1fr; }
+  .goal-tab { min-width: 60px; font-size: 0.82rem; padding: 10px 12px; }
 }
 </style>
