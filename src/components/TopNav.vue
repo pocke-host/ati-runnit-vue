@@ -100,12 +100,14 @@
       </button>
     </div>
 
-    <!-- Mobile Drawer Overlay -->
+  </nav>
+
+  <!-- Teleport drawer outside navbar to avoid backdrop-filter stacking context clipping -->
+  <Teleport to="body">
     <Transition name="drawer-fade">
       <div v-if="mobileMenuOpen" class="mobile-overlay" @click="mobileMenuOpen = false"></div>
     </Transition>
 
-    <!-- Mobile Drawer -->
     <Transition name="drawer-slide">
       <div v-if="mobileMenuOpen" class="mobile-drawer">
         <!-- Drawer Header -->
@@ -193,7 +195,7 @@
         </template>
       </div>
     </Transition>
-  </nav>
+  </Teleport>
 </template>
 
 <script setup>
@@ -541,13 +543,39 @@ onUnmounted(() => {
 }
 .mobile-menu-toggle:hover { background: rgba(255, 255, 255, 0.20); }
 
+/* (drawer styles moved to non-scoped block below) */
+
+.me-2 { margin-right: 8px; }
+.spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(15,18,16,0.15); border-top-color: #5A6B4E; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
+.spinner-border-sm { width: 1rem; height: 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .navbar-menu { display: none; }
+  .mobile-menu-toggle { display: flex; }
+  .navbar-content {
+    padding: 18px 20px;
+    min-height: 68px;
+  }
+  .brand-text { font-size: 1.4rem; }
+  .mobile-menu-toggle {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+    border-radius: 14px;
+  }
+}
+</style>
+
+<!-- Non-scoped: drawer teleported to <body>, scoped attrs don't follow -->
+<style>
 /* Drawer overlay */
 .mobile-overlay {
   position: fixed;
   inset: 0;
   background: rgba(15, 18, 16, 0.55);
   backdrop-filter: blur(4px);
-  z-index: 1998;
+  z-index: 9998;
 }
 
 /* Drawer panel */
@@ -558,11 +586,12 @@ onUnmounted(() => {
   bottom: 0;
   width: min(320px, 85vw);
   background: #1e2a1a;
-  z-index: 1999;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   box-shadow: -8px 0 40px rgba(15, 18, 16, 0.35);
+  font-family: Futura, 'Avenir Next', system-ui, sans-serif;
 }
 
 .drawer-header {
@@ -658,6 +687,7 @@ onUnmounted(() => {
   transition: all 0.15s;
   width: 100%;
   text-align: left;
+  box-sizing: border-box;
 }
 .drawer-link i { font-size: 1.05rem; width: 20px; text-align: center; }
 .drawer-link:hover { background: rgba(255, 255, 255, 0.08); color: white; }
@@ -677,25 +707,4 @@ onUnmounted(() => {
 
 .drawer-slide-enter-active, .drawer-slide-leave-active { transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
 .drawer-slide-enter-from, .drawer-slide-leave-to { transform: translateX(100%); }
-
-.me-2 { margin-right: 8px; }
-.spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(15,18,16,0.15); border-top-color: #5A6B4E; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
-.spinner-border-sm { width: 1rem; height: 1rem; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@media (max-width: 768px) {
-  .navbar-menu { display: none; }
-  .mobile-menu-toggle { display: flex; }
-  .navbar-content {
-    padding: 18px 20px;
-    min-height: 68px;
-  }
-  .brand-text { font-size: 1.4rem; }
-  .mobile-menu-toggle {
-    width: 48px;
-    height: 48px;
-    font-size: 1.4rem;
-    border-radius: 14px;
-  }
-}
 </style>
