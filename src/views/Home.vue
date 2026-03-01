@@ -541,7 +541,7 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding: 48px 0 36px;
+    padding: 96px 0 36px;
     text-align: center;
   }
   .hero h1 {
@@ -570,7 +570,7 @@
 }
 
 @media (max-width: 480px) {
-  .hero { padding: 36px 0 24px; }
+  .hero { padding: 88px 0 24px; }
   .hero h1 { font-size: 1.85rem; }
   .hero-visual { display: none; }
   .feature-card { padding: 24px 18px; }
