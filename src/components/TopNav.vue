@@ -313,7 +313,8 @@ onUnmounted(() => {
 .navbar-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 0 24px;
+  height: var(--nav-h, 64px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -553,17 +554,9 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .navbar-menu { display: none; }
   .mobile-menu-toggle { display: flex; }
-  .navbar-content {
-    padding: 18px 20px;
-    min-height: 68px;
-  }
-  .brand-text { font-size: 1.4rem; }
-  .mobile-menu-toggle {
-    width: 48px;
-    height: 48px;
-    font-size: 1.4rem;
-    border-radius: 14px;
-  }
+  .navbar-content { padding: 0 16px; }
+  .brand-text { font-size: 1.35rem; }
+  .mobile-menu-toggle { width: 40px; height: 40px; font-size: 1.25rem; }
 }
 </style>
 

@@ -263,10 +263,11 @@
   --r-accent: #C46A2A;
   --r-offwhite: #F5F6F3;
   --r-white: #FFFFFF;
-  
+
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background: var(--r-white);
   color: #1a1a1a;
+  padding-top: var(--nav-h, 64px);
 }
 
 /* ===== HERO ===== */
@@ -541,7 +542,7 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding: 96px 0 36px;
+    padding: 40px 0 36px;
     text-align: center;
   }
   .hero h1 {
@@ -570,7 +571,7 @@
 }
 
 @media (max-width: 480px) {
-  .hero { padding: 88px 0 24px; }
+  .hero { padding: 28px 0 24px; }
   .hero h1 { font-size: 1.85rem; }
   .hero-visual { display: none; }
   .feature-card { padding: 24px 18px; }

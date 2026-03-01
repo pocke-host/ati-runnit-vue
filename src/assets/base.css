@@ -7,6 +7,9 @@
 @tailwind utilities;
 
 :root {
+  /* Navbar height — used to offset page content below fixed nav */
+  --nav-h: 64px;
+
   /* RUNNIT brand */
   --r-olive: #5A6B4E;
   --r-olive-deep: #2C3726;
