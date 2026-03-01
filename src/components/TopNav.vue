@@ -686,5 +686,13 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .navbar-menu { display: none; }
   .mobile-menu-toggle { display: flex; }
+  .navbar-content { padding: 10px 16px; }
+  .brand-text { font-size: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .navbar-content { padding: 8px 14px; }
+  .brand-text { font-size: 1.15rem; }
+  .mobile-menu-toggle { width: 40px; height: 40px; font-size: 1.15rem; }
 }
 </style>
