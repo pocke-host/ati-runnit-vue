@@ -35,7 +35,7 @@
           <div class="stat-icon">🏃</div>
           <div class="stat-content">
             <div class="stat-label">Total Distance</div>
-            <div class="stat-value">{{ totalStats.distance }} <span class="unit">km</span></div>
+            <div class="stat-value">{{ formatDistance(totalStats.distance) }}</div>
             <div v-if="monthCompare" :class="['stat-change', monthCompare.startsWith('+') ? 'positive' : 'negative']">{{ monthCompare }}</div>
           </div>
         </div>
@@ -155,13 +155,30 @@
             </div>
 
             <div class="profile-badges">
-              <div class="badge-item">
-                <div class="badge-icon">🏆</div>
+              <template v-if="latestEarned.length">
+                <div v-for="badge in latestEarned" :key="badge.id" class="badge-item">
+                  <div class="badge-icon">{{ badge.icon }}</div>
+                  <div class="badge-text">{{ badge.name }}</div>
+                </div>
+              </template>
+              <div v-else class="badge-item">
+                <div class="badge-icon">⭐</div>
                 <div class="badge-text">Early Adopter</div>
               </div>
-              <div class="badge-item">
-                <div class="badge-icon">⚡</div>
-                <div class="badge-text">5 Day Streak</div>
+            </div>
+
+            <!-- PR Widget -->
+            <div class="profile-prs">
+              <div class="prs-row-header">
+                <span class="prs-label">⚡ Personal Records</span>
+                <router-link to="/stats" class="prs-all-link">View all →</router-link>
+              </div>
+              <div v-if="!topPRs.length" class="prs-empty">Log activities to set PRs!</div>
+              <div v-else class="prs-list">
+                <div v-for="pr in topPRs" :key="pr.id" class="pr-mini">
+                  <div class="pr-mini-label">{{ pr.label }}</div>
+                  <div class="pr-mini-val">{{ formatPRValue(pr) }}</div>
+                </div>
               </div>
             </div>
 
@@ -238,10 +255,10 @@
             <div class="goal-item">
               <div class="goal-label">
                 <span>Distance</span>
-                <span class="goal-progress-text">{{ monthlyDistance }}/100 km</span>
+                <span class="goal-progress-text">{{ formatDistance(monthlyDistanceMeters) }}/{{ isImperial ? '100 mi' : '100 km' }}</span>
               </div>
               <div class="goal-bar">
-                <div class="goal-fill" :style="{width: `${Math.min(monthlyDistance, 100)}%`}"></div>
+                <div class="goal-fill" :style="{width: `${Math.min(Math.round(metersToDisplay(monthlyDistanceMeters)), 100)}%`}"></div>
               </div>
             </div>
             <div class="goal-item">
@@ -581,6 +598,10 @@ import { useFollowStore } from '@/stores/follow'
 import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
+import { useUnits } from '@/composables/useUnits'
+import { usePlanStore } from '@/stores/plan'
+import { useAchievementStore } from '@/stores/achievement'
+import { usePRStore } from '@/stores/pr'
 
 Chart.register(...registerables)
 
@@ -596,6 +617,14 @@ const followStore = useFollowStore()
 const { user } = storeToRefs(authStore)
 const { activities, loading } = storeToRefs(activityStore)
 const { uploading: momentLoading, progress: uploadProgress } = storeToRefs(uploadStore)
+
+const planStore = usePlanStore()
+const achievementStore = useAchievementStore()
+const prStore = usePRStore()
+const { activePlan } = storeToRefs(planStore)
+const { latestEarned } = storeToRefs(achievementStore)
+const { topPRs } = storeToRefs(prStore)
+const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, metersToDisplay } = useUnits()
 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
@@ -714,7 +743,7 @@ const weeklyChartData = computed(() => {
     if (d >= monday) {
       const idx = (d.getDay() + 6) % 7
       if (chartView.value === 'distance') {
-        days[idx] += (a.distanceMeters || 0) / 1000
+        days[idx] += metersToDisplay(a.distanceMeters || 0)
       } else {
         days[idx] += (a.durationSeconds || 0) / 60
       }
@@ -726,15 +755,20 @@ const weeklyChartData = computed(() => {
 
 const totalStats = computed(() => {
   const acts = activities.value || []
-  const totalDistance = acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
+  const totalMeters = acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
   const totalDuration = acts.reduce((sum, a) => sum + (a.durationSeconds || 0), 0) / 3600
 
   return {
-    distance: totalDistance.toFixed(1),
+    distance: totalMeters,
     duration: totalDuration.toFixed(1),
     streak: currentStreak.value,
     activities: acts.length
   }
+})
+
+const monthlyDistanceMeters = computed(() => {
+  const acts = activities.value || []
+  return acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
 })
 
 const monthlyDistance = computed(() => {
@@ -790,21 +824,22 @@ const getSportIcon = (sportType) => {
   return icons[sportType] || '🏋️'
 }
 
-const formatDuration = (seconds) => {
-  const mins = Math.floor(seconds / 60)
-  return `${mins} min`
-}
-
-const formatDistance = (meters) => {
-  if (!meters) return '—'
-  return `${(meters / 1000).toFixed(2)} km`
-}
-
 const formatDateShort = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric'
   })
+}
+
+const formatPRValue = (pr) => {
+  if (!pr.data) return '—'
+  const { id, data: d } = pr
+  if (['best_5k', 'best_10k', 'best_half', 'best_marathon'].includes(id)) {
+    return formatDurationClock(d.estTime)
+  }
+  if (id === 'fastest_pace') return formatPace(d.pace / 60)
+  if (id === 'most_elevation') return formatElevation(d.elevationMeters)
+  return formatDistance(d.distanceMeters)
 }
 
 const openActivityModal = () => {
@@ -1000,7 +1035,7 @@ const initWeeklyChart = () => {
     data: {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [{
-        label: chartView.value === 'distance' ? 'Distance (km)' : 'Duration (min)',
+        label: chartView.value === 'distance' ? `Distance (${distanceLabel.value})` : 'Duration (min)',
         data: weeklyChartData.value,
         backgroundColor: 'rgba(196, 106, 42, 0.8)',
         borderColor: 'rgba(196, 106, 42, 1)',
@@ -1127,6 +1162,11 @@ onMounted(async () => {
   try {
     await activityStore.fetchActivities()
     await loadFollowData()
+    await Promise.all([
+      planStore.fetchPlans(),
+      achievementStore.fetchAchievements(activities.value),
+      prStore.fetchPRs(activities.value)
+    ])
     await nextTick()
     updateCharts()
   } catch (err) {
@@ -1371,6 +1411,16 @@ onMounted(async () => {
 .badge-item{flex:1;padding:12px;background:rgba(196,106,42,0.08);border-radius:12px;text-align:center}
 .badge-icon{font-size:1.5rem;margin-bottom:4px}
 .badge-text{font-size:0.75rem;font-weight:700;color:rgba(15,18,16,0.70)}
+.profile-prs{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08)}
+.prs-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.prs-label{font-weight:900;font-size:0.85rem;color:rgba(15,18,16,0.80)}
+.prs-all-link{font-size:0.8rem;color:var(--r-olive);font-weight:700;text-decoration:none}
+.prs-all-link:hover{color:var(--r-olive-deep)}
+.prs-empty{font-size:0.85rem;color:rgba(15,18,16,0.50);text-align:center;padding:8px}
+.prs-list{display:flex;flex-direction:column;gap:8px}
+.pr-mini{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(90,107,78,0.08);border-radius:10px;border:1px solid rgba(90,107,78,0.15)}
+.pr-mini-label{font-size:0.8rem;color:rgba(15,18,16,0.60);font-weight:700}
+.pr-mini-val{font-size:0.9rem;color:var(--r-olive-deep);font-weight:900}
 .profile-actions{display:flex;flex-direction:column;gap:10px}
 .action-btn{padding:14px;border-radius:12px;border:1px solid rgba(15,18,16,0.12);background:rgba(255,255,255,0.70);font-weight:700;font-size:0.9rem;text-align:left;cursor:pointer;transition:all 0.2s;display:flex;align-items:center}
 .action-btn:hover{background:rgba(255,255,255,0.95);transform:translateX(4px)}

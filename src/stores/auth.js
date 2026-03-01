@@ -8,8 +8,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token'))
   const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
-  
+  const unitSystem = ref(localStorage.getItem('unitSystem') || 'imperial')
+
   const isAuthenticated = computed(() => !!token.value)
+
+  function setUnitSystem(system) {
+    unitSystem.value = system
+    localStorage.setItem('unitSystem', system)
+  }
   
   async function login(email, password) {
     const { data } = await axios.post(`${API_URL}/auth/login`, { email, password })
@@ -50,8 +56,8 @@ export const useAuthStore = defineStore('auth', () => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
   }
   
-  return { 
-    token, user, isAuthenticated, 
-    login, register, fetchCurrentUser, logout, setAuth 
+  return {
+    token, user, isAuthenticated, unitSystem,
+    login, register, fetchCurrentUser, logout, setAuth, setUnitSystem
   }
 })

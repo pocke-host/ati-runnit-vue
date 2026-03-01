@@ -31,11 +31,17 @@
         >
           Moments
         </button>
-        <button 
-          :class="['feed-tab', {active: activeTab === 'mine'}]" 
+        <button
+          :class="['feed-tab', {active: activeTab === 'mine'}]"
           @click="activeTab = 'mine'"
         >
           Mine
+        </button>
+        <button
+          :class="['feed-tab', {active: activeTab === 'following'}]"
+          @click="activeTab = 'following'"
+        >
+          Following
         </button>
       </div>
 
@@ -97,12 +103,14 @@
 
             <div class="card-info">
               <div class="card-user">
-                <div class="user-avatar-small">{{ getUserInitial(item.user) }}</div>
+                <router-link :to="`/profile/${item.user.id}`" class="user-avatar-small avatar-link">{{ getUserInitial(item.user) }}</router-link>
                 <div class="user-details">
-                  <div class="user-name">
-                    {{ item.user.displayName }}
-                    <span v-if="item.user.id === user?.id" class="you-label">(You)</span>
-                  </div>
+                  <router-link :to="`/profile/${item.user.id}`" class="user-name-link">
+                    <div class="user-name">
+                      {{ item.user.displayName }}
+                      <span v-if="item.user.id === user?.id" class="you-label">(You)</span>
+                    </div>
+                  </router-link>
                   <div class="card-time">{{ formatTime(item.createdAt) }}</div>
                 </div>
               </div>
@@ -120,7 +128,7 @@
           <!-- ACTIVITY CARD -->
           <template v-else-if="item.type === 'activity'">
             <div class="activity-card-content">
-              <div class="activity-header">
+              <router-link :to="`/activities/${item.id}`" class="activity-header activity-header-link">
                 <div class="activity-icon-large">{{ getSportIcon(item.sportType) }}</div>
                 <div v-if="item.user.id === user?.id" class="item-badge">
                   <i class="bi bi-person-fill me-1"></i>You
@@ -128,7 +136,7 @@
                 <div class="type-badge activity-badge-type">
                   <i class="bi bi-activity"></i>
                 </div>
-              </div>
+              </router-link>
 
               <div class="activity-stats-grid">
                 <div class="activity-stat">
@@ -147,12 +155,14 @@
 
               <div class="card-info">
                 <div class="card-user">
-                  <div class="user-avatar-small">{{ getUserInitial(item.user) }}</div>
+                  <router-link :to="`/profile/${item.user.id}`" class="user-avatar-small avatar-link">{{ getUserInitial(item.user) }}</router-link>
                   <div class="user-details">
-                    <div class="user-name">
-                      {{ item.user.displayName }}
-                      <span v-if="item.user.id === user?.id" class="you-label">(You)</span>
-                    </div>
+                    <router-link :to="`/profile/${item.user.id}`" class="user-name-link">
+                      <div class="user-name">
+                        {{ item.user.displayName }}
+                        <span v-if="item.user.id === user?.id" class="you-label">(You)</span>
+                      </div>
+                    </router-link>
                     <div class="card-time">{{ formatTime(item.createdAt) }}</div>
                   </div>
                 </div>
@@ -173,6 +183,9 @@
         </p>
         <p v-else-if="activeTab === 'moments'">
           No moments have been shared yet
+        </p>
+        <p v-else-if="activeTab === 'following'">
+          Follow other athletes to see their activities here
         </p>
         <p v-else>
           Be the first to log an activity or share a moment!
@@ -331,12 +344,14 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
+import { useUnits } from '@/composables/useUnits'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
+const { formatDistance, formatDuration } = useUnits()
 
 const activeTab = ref('all')
 const sortOrder = ref('newest')
@@ -381,6 +396,8 @@ const sortedFeedItems = computed(() => {
     filtered = feedItems.value.filter(item => item.type === 'moment')
   } else if (activeTab.value === 'mine') {
     filtered = feedItems.value.filter(item => item.user.id === user.value?.id)
+  } else if (activeTab.value === 'following') {
+    filtered = feedItems.value.filter(item => item.user.id !== user.value?.id)
   }
 
   if (sortOrder.value === 'newest') {
@@ -437,16 +454,6 @@ const formatTimeFull = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   })
-}
-
-const formatDuration = (seconds) => {
-  const mins = Math.floor(seconds / 60)
-  return `${mins} min`
-}
-
-const formatDistance = (meters) => {
-  if (!meters) return '—'
-  return `${(meters / 1000).toFixed(2)} km`
 }
 
 const fetchFeed = async () => {
@@ -917,6 +924,28 @@ onMounted(() => {
 .user-details {
   flex: 1;
 }
+
+.avatar-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.avatar-link:hover { opacity: 0.8; }
+
+.user-name-link {
+  text-decoration: none;
+  color: inherit;
+}
+.user-name-link:hover .user-name { color: var(--r-olive); }
+
+.activity-header-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.activity-header-link:hover { opacity: 0.9; }
 
 .user-name {
   font-weight: 900;

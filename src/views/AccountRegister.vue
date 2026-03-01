@@ -152,9 +152,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { apiRegister } from "@/lib/api"
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const displayName = ref('')
 const email = ref('')
@@ -178,12 +179,8 @@ const submit = async () => {
   error.value = ''
   
   try {
-    await apiRegister({
-      displayName: displayName.value,
-      email: email.value,
-      password: password.value
-    })
-    router.push('/')
+    await authStore.register(email.value, password.value, displayName.value)
+    router.push('/dashboard')
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
   } finally {

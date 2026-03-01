@@ -1,6 +1,6 @@
 <template>
   <main class="challenges-page">
-    <!-- HERO: Clean & Simple -->
+    <!-- HERO -->
     <section class="hero">
       <div class="container-xxl">
         <h1 class="display-5 fw-bold mb-3">Challenges</h1>
@@ -10,11 +10,35 @@
       </div>
     </section>
 
-    <!-- FILTERS: Simplified Controls -->
-    <section class="filters">
+    <!-- TAB BAR -->
+    <section class="tab-section">
+      <div class="container-xxl">
+        <div class="tab-bar">
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'all' }"
+            @click="activeTab = 'all'"
+          >
+            <i class="bi bi-trophy"></i>
+            All Challenges
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'my' }"
+            @click="activeTab = 'my'"
+          >
+            <i class="bi bi-person-check"></i>
+            My Challenges
+            <span v-if="myChallenges.length" class="tab-count">{{ myChallenges.length }}</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTERS (All tab only) -->
+    <section v-if="activeTab === 'all'" class="filters">
       <div class="container-xxl">
         <div class="filter-bar">
-          <!-- Sport Pills -->
           <div class="sport-pills">
             <button
               v-for="s in sports"
@@ -26,8 +50,6 @@
               {{ s }}
             </button>
           </div>
-
-          <!-- Search & Sort -->
           <div class="search-sort">
             <div class="search-box">
               <i class="bi bi-search"></i>
@@ -50,266 +72,414 @@
     <!-- CHALLENGES GRID -->
     <section class="challenges-grid">
       <div class="container-xxl">
-        <div class="row g-4">
-          <div
-            class="col-12 col-md-6 col-lg-4"
-            v-for="c in paged"
-            :key="c.id"
-          >
-            <article class="challenge-card">
-              <!-- Challenge Image -->
-              <div
-                class="challenge-image"
-                :style="{ backgroundImage: `url(${c.image})` }"
-              >
-                <span class="status-badge" :class="c.status">
-                  {{ c.statusLabel }}
-                </span>
-              </div>
 
-              <!-- Challenge Content -->
-              <div class="challenge-content">
-                <div class="challenge-header">
-                  <span class="sport-tag">{{ c.sport }}</span>
-                  <span class="participants">
-                    <i class="bi bi-people-fill"></i>
-                    {{ formatK(c.participants) }}
+        <!-- Loading state -->
+        <div v-if="loading" class="loading-state">
+          <div class="spinner-border text-olive" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="loading-text">Loading challenges...</p>
+        </div>
+
+        <template v-else>
+          <div class="row g-4">
+            <div
+              class="col-12 col-md-6 col-lg-4"
+              v-for="c in displayedChallenges"
+              :key="c.id"
+            >
+              <article class="challenge-card" :class="{ entered: isEntered(c.id) }">
+                <!-- Challenge Image -->
+                <div
+                  class="challenge-image"
+                  :style="c.imageUrl ? { backgroundImage: `url(${c.imageUrl})` } : {}"
+                >
+                  <div v-if="!c.imageUrl" class="image-placeholder">
+                    <i class="bi bi-trophy-fill"></i>
+                  </div>
+                  <span v-if="c.sport" class="status-badge ongoing">{{ c.sport }}</span>
+                  <span v-if="isEntered(c.id)" class="entered-badge">
+                    <i class="bi bi-check-circle-fill"></i> Entered
                   </span>
                 </div>
 
-                <h3 class="challenge-title">{{ c.title }}</h3>
-                <p class="challenge-subtitle">{{ c.subtitle }}</p>
-
-                <div class="challenge-meta">
-                  <span class="meta-item">
-                    <i class="bi bi-calendar3"></i>
-                    {{ c.window }}
-                  </span>
-                </div>
-
-                <!-- Progress Bar (if active) -->
-                <div v-if="c.progress" class="progress-section">
-                  <div class="progress-header">
-                    <span class="progress-text">
-                      {{ c.progress.current }} / {{ c.progress.target }} {{ c.progress.unit }}
+                <!-- Challenge Content -->
+                <div class="challenge-content">
+                  <div class="challenge-header">
+                    <span class="sport-tag">{{ c.sport || 'General' }}</span>
+                    <span class="participants">
+                      <i class="bi bi-people-fill"></i>
+                      {{ formatK(c.participantCount || 0) }}
                     </span>
-                    <span class="progress-percent">{{ pct(c.progress) }}%</span>
                   </div>
-                  <div class="progress-bar-container">
-                    <div
-                      class="progress-bar-fill"
-                      :style="{ width: pct(c.progress) + '%' }"
-                    ></div>
+
+                  <h3 class="challenge-title">{{ c.name }}</h3>
+                  <p class="challenge-subtitle">{{ c.description }}</p>
+
+                  <div class="challenge-meta">
+                    <span v-if="c.endDate" class="meta-item">
+                      <i class="bi bi-calendar3"></i>
+                      Ends {{ formatDate(c.endDate) }}
+                    </span>
+                    <span v-if="c.prize" class="meta-item prize-item">
+                      <i class="bi bi-gift-fill"></i>
+                      {{ c.prize }}
+                    </span>
+                  </div>
+
+                  <!-- Action buttons row -->
+                  <div class="card-actions">
+                    <button
+                      v-if="!isEntered(c.id)"
+                      class="btn-join"
+                      :disabled="enteringId === c.id"
+                      @click="enterChallenge(c.id)"
+                    >
+                      <span v-if="enteringId === c.id">
+                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Joining...
+                      </span>
+                      <span v-else>Join Challenge</span>
+                    </button>
+
+                    <template v-else>
+                      <button class="btn-lb" @click="openLeaderboard(c)">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        Leaderboard
+                      </button>
+                      <button
+                        class="btn-leave"
+                        :disabled="enteringId === c.id"
+                        @click="leaveChallenge(c.id)"
+                      >
+                        <span v-if="enteringId === c.id">
+                          <span class="spinner-border spinner-border-sm" role="status"></span>
+                        </span>
+                        <span v-else>Leave</span>
+                      </button>
+                    </template>
                   </div>
                 </div>
+              </article>
+            </div>
 
-                <!-- Action Button -->
-                <button class="btn-join" :class="{ active: c.progress }">
-                  {{ c.progress ? 'Continue' : 'Join Challenge' }}
+            <!-- Empty state -->
+            <div class="col-12" v-if="displayedChallenges.length === 0">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="bi bi-trophy"></i>
+                </div>
+                <h3 class="empty-title">
+                  {{ activeTab === 'my' ? 'No challenges entered yet' : 'No challenges found' }}
+                </h3>
+                <p class="empty-text">
+                  {{
+                    activeTab === 'my'
+                      ? 'Browse All Challenges and join one to get started.'
+                      : 'Try adjusting your filters or check back later for new challenges.'
+                  }}
+                </p>
+                <button
+                  v-if="activeTab === 'my'"
+                  class="btn-join mt-2"
+                  style="width: auto; padding: 0 28px;"
+                  @click="activeTab = 'all'"
+                >
+                  Browse Challenges
                 </button>
               </div>
-            </article>
-          </div>
-
-          <!-- Empty State -->
-          <div class="col-12" v-if="paged.length === 0">
-            <div class="empty-state">
-              <div class="empty-icon">🏃</div>
-              <h3 class="empty-title">No challenges found</h3>
-              <p class="empty-text">
-                Try adjusting your filters or check back later for new challenges.
-              </p>
             </div>
           </div>
-        </div>
 
-        <!-- Pagination -->
-        <div class="pagination" v-if="filtered.length > pageSize">
-          <button
-            class="btn-page"
-            :disabled="page === 1"
-            @click="page--"
-          >
-            <i class="bi bi-chevron-left"></i>
-            Previous
-          </button>
-          <span class="page-info">
-            Page {{ page }} of {{ Math.ceil(filtered.length / pageSize) }}
-          </span>
-          <button
-            class="btn-page"
-            :disabled="pageEnd >= filtered.length"
-            @click="page++"
-          >
-            Next
-            <i class="bi bi-chevron-right"></i>
-          </button>
-        </div>
+          <!-- Pagination (All tab only) -->
+          <div class="pagination" v-if="activeTab === 'all' && filtered.length > pageSize">
+            <button
+              class="btn-page"
+              :disabled="page === 1"
+              @click="page--"
+            >
+              <i class="bi bi-chevron-left"></i>
+              Previous
+            </button>
+            <span class="page-info">
+              Page {{ page }} of {{ Math.ceil(filtered.length / pageSize) }}
+            </span>
+            <button
+              class="btn-page"
+              :disabled="pageEnd >= filtered.length"
+              @click="page++"
+            >
+              Next
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </template>
       </div>
     </section>
 
-    <!-- CTA: Simple & Direct -->
-    <section class="cta-section">
-      <div class="container-xxl">
-        <div class="cta-content">
-          <h2 class="cta-title">Ready to challenge yourself?</h2>
-          <p class="cta-text">
-            Join thousands competing in monthly challenges. Track progress, stay motivated, achieve your goals.
-          </p>
-          <router-link to="/join-us" class="btn-cta">
-            Get Started Free
-          </router-link>
+    <!-- LEADERBOARD OVERLAY -->
+    <Transition name="lb-fade">
+      <div v-if="lbOpen" class="lb-overlay" @click="lbOpen = false"></div>
+    </Transition>
+
+    <!-- LEADERBOARD DRAWER -->
+    <Transition name="lb-slide">
+      <div v-if="lbOpen" class="lb-drawer">
+        <div class="lb-header">
+          <div>
+            <div class="lb-label">Leaderboard</div>
+            <h2 class="lb-title">{{ lbChallenge?.name }}</h2>
+          </div>
+          <button class="lb-close" @click="lbOpen = false">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
+
+        <!-- Loading -->
+        <div v-if="lbLoading" class="lb-loading">
+          <div class="spinner-border text-olive" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 mb-0" style="color:#6B7280; font-size:14px;">Fetching leaderboard...</p>
+        </div>
+
+        <!-- Empty leaderboard -->
+        <div v-else-if="leaderboard.length === 0" class="lb-empty">
+          <i class="bi bi-bar-chart-line" style="font-size:48px; color:#D1D5DB;"></i>
+          <p class="mt-3 mb-0" style="color:#6B7280;">No entries yet. Be the first!</p>
+        </div>
+
+        <!-- Ranked list -->
+        <ul v-else class="lb-list">
+          <li
+            v-for="entry in leaderboard"
+            :key="entry.userId"
+            class="lb-row"
+            :class="{ 'lb-row-top': entry.rank <= 3 }"
+          >
+            <span class="lb-rank" :class="rankClass(entry.rank)">
+              {{ entry.rank <= 3 ? rankEmoji(entry.rank) : entry.rank }}
+            </span>
+            <div class="lb-avatar">
+              {{ getInitial(entry.displayName) }}
+            </div>
+            <router-link
+              :to="`/profile/${entry.userId}`"
+              class="lb-name"
+              @click="lbOpen = false"
+            >
+              {{ entry.displayName }}
+            </router-link>
+            <span class="lb-value">{{ entry.value }}</span>
+          </li>
+        </ul>
       </div>
-    </section>
+    </Transition>
   </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
-// Mock data
-const challenges = ref([
-  {
-    id: 1,
-    title: 'Run 100 Miles',
-    subtitle: 'Complete 100 miles in 30 days',
-    sport: 'Running',
-    image: 'https://images.unsplash.com/photo-1540481391483-826de3c13485?q=80&w=1200&auto=format&fit=crop',
-    window: 'Sep 1 – Sep 30',
-    participants: 124500,
-    status: 'ongoing',
-    statusLabel: 'Active',
-    progress: { current: 42, target: 100, unit: 'mi' }
-  },
-  {
-    id: 2,
-    title: 'Ride 500K',
-    subtitle: 'Cycle 500 kilometers this month',
-    sport: 'Cycling',
-    image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=1200&auto=format&fit=crop',
-    window: 'Sep 1 – Sep 30',
-    participants: 98000,
-    status: 'new',
-    statusLabel: 'New',
-    progress: null
-  },
-  {
-    id: 3,
-    title: '30 Day Streak',
-    subtitle: 'Run every single day for 30 days',
-    sport: 'Running',
-    image: 'https://images.unsplash.com/photo-1518310952931-b1de897abd79?q=80&w=1200&auto=format&fit=crop',
-    window: 'Oct 1 – Oct 31',
-    participants: 45210,
-    status: 'upcoming',
-    statusLabel: 'Coming Soon',
-    progress: null
-  },
-  {
-    id: 4,
-    title: 'Swim 25K',
-    subtitle: 'Total 25 kilometers in the pool',
-    sport: 'Swimming',
-    image: 'https://images.unsplash.com/photo-1505764706515-aa95265c5abc?q=80&w=1200&auto=format&fit=crop',
-    window: 'Sep 1 – Sep 30',
-    participants: 11200,
-    status: 'ongoing',
-    statusLabel: 'Active',
-    progress: { current: 15, target: 25, unit: 'km' }
-  },
-  {
-    id: 5,
-    title: 'Elevation Gain 10K',
-    subtitle: 'Climb 10,000 feet total elevation',
-    sport: 'Hiking',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop',
-    window: 'Sep 1 – Sep 30',
-    participants: 22050,
-    status: 'ongoing',
-    statusLabel: 'Active',
-    progress: { current: 6250, target: 10000, unit: 'ft' }
-  },
-  {
-    id: 6,
-    title: 'Walk 200 Miles',
-    subtitle: 'Hit 200 miles walking this month',
-    sport: 'Walking',
-    image: 'https://images.unsplash.com/photo-1425136738262-212551713a58?q=80&w=1200&auto=format&fit=crop',
-    window: 'Sep 1 – Sep 30',
-    participants: 67500,
-    status: 'new',
-    statusLabel: 'New',
-    progress: null
-  }
-])
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const getAuthHeaders = () => ({ Authorization: 'Bearer ' + localStorage.getItem('token') })
 
-// UI state
-const sports = ['All', 'Running', 'Cycling', 'Swimming', 'Hiking', 'Walking']
-const sport = ref('All')
-const q = ref('')
-const sortBy = ref('popular')
-const page = ref(1)
+// ── Tab state ────────────────────────────────────────────────
+const activeTab = ref('all')  // 'all' | 'my'
+
+// ── Data ─────────────────────────────────────────────────────
+const allChallenges = ref([])
+const myChallenges  = ref([])
+const loading       = ref(false)
+const enteringId    = ref(null)
+
+// ── Leaderboard drawer ───────────────────────────────────────
+const lbOpen       = ref(false)
+const lbChallenge  = ref(null)
+const leaderboard  = ref([])
+const lbLoading    = ref(false)
+
+// ── Filter / sort / pagination (All tab) ─────────────────────
+const sports   = ['All', 'Running', 'Cycling', 'Swimming', 'Hiking', 'Walking', 'Triathlon']
+const sport    = ref('All')
+const q        = ref('')
+const sortBy   = ref('popular')
+const page     = ref(1)
 const pageSize = 9
 
-// Derived lists
-const filtered = computed(() => {
-  let list = challenges.value.slice()
-
-  if (sport.value !== 'All') {
-    list = list.filter(c => c.sport === sport.value)
+// ── API calls ─────────────────────────────────────────────────
+async function fetchChallenges() {
+  loading.value = true
+  try {
+    const res = await fetch(`${API_URL}/challenges`, {
+      headers: getAuthHeaders()
+    })
+    if (!res.ok) throw new Error('Failed to fetch challenges')
+    allChallenges.value = await res.json()
+  } catch (err) {
+    console.error('fetchChallenges:', err)
+    allChallenges.value = []
+  } finally {
+    loading.value = false
   }
-  
-  if (q.value) {
-    const term = q.value.toLowerCase()
-    list = list.filter(c =>
-      c.title.toLowerCase().includes(term) ||
-      c.subtitle.toLowerCase().includes(term)
-    )
+}
+
+async function fetchMyChallenges() {
+  try {
+    const res = await fetch(`${API_URL}/challenges/my`, {
+      headers: getAuthHeaders()
+    })
+    if (!res.ok) throw new Error('Failed to fetch my challenges')
+    myChallenges.value = await res.json()
+  } catch (err) {
+    console.error('fetchMyChallenges:', err)
+    myChallenges.value = []
   }
+}
 
-  // Sort
-  if (sortBy.value === 'popular') {
-    list.sort((a, b) => b.participants - a.participants)
-  } else if (sortBy.value === 'new') {
-    list.sort((a, b) => (b.status === 'new' ? 1 : 0) - (a.status === 'new' ? 1 : 0))
-  } else if (sortBy.value === 'ending') {
-    list.sort((a, b) => (a.status === 'ongoing' ? 1 : 0) - (b.status === 'ongoing' ? 1 : 0))
+async function enterChallenge(id) {
+  enteringId.value = id
+  try {
+    const res = await fetch(`${API_URL}/challenges/${id}/enter`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    })
+    if (!res.ok) throw new Error('Failed to enter challenge')
+    await fetchMyChallenges()
+  } catch (err) {
+    console.error('enterChallenge:', err)
+  } finally {
+    enteringId.value = null
   }
+}
 
-  return list
-})
+async function leaveChallenge(id) {
+  enteringId.value = id
+  try {
+    const res = await fetch(`${API_URL}/challenges/${id}/leave`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    })
+    if (!res.ok) throw new Error('Failed to leave challenge')
+    await fetchMyChallenges()
+    // If the leaderboard drawer is open for this challenge, close it
+    if (lbChallenge.value?.id === id) lbOpen.value = false
+  } catch (err) {
+    console.error('leaveChallenge:', err)
+  } finally {
+    enteringId.value = null
+  }
+}
 
-const pageEnd = computed(() => page.value * pageSize)
-const paged = computed(() => 
-  filtered.value.slice((page.value - 1) * pageSize, pageEnd.value)
-)
+async function fetchLeaderboard(id) {
+  lbLoading.value = true
+  leaderboard.value = []
+  try {
+    const res = await fetch(`${API_URL}/challenges/${id}/leaderboard`, {
+      headers: getAuthHeaders()
+    })
+    if (!res.ok) throw new Error('Failed to fetch leaderboard')
+    leaderboard.value = await res.json()
+  } catch (err) {
+    console.error('fetchLeaderboard:', err)
+    leaderboard.value = []
+  } finally {
+    lbLoading.value = false
+  }
+}
 
-// Helpers
-function pct(p) {
-  if (!p) return 0
-  return Math.min(100, Math.round((p.current / p.target) * 100))
+async function openLeaderboard(challenge) {
+  lbChallenge.value = challenge
+  lbOpen.value = true
+  await fetchLeaderboard(challenge.id)
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+function isEntered(id) {
+  return myChallenges.value.some(c => c.id === id)
+}
+
+function formatDate(d) {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 function formatK(n) {
   if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k'
   return String(n)
 }
+
+function getInitial(name) {
+  return (name || '?').charAt(0).toUpperCase()
+}
+
+function rankClass(rank) {
+  if (rank === 1) return 'rank-gold'
+  if (rank === 2) return 'rank-silver'
+  if (rank === 3) return 'rank-bronze'
+  return ''
+}
+
+function rankEmoji(rank) {
+  if (rank === 1) return '🥇'
+  if (rank === 2) return '🥈'
+  if (rank === 3) return '🥉'
+  return rank
+}
+
+// ── Derived lists ─────────────────────────────────────────────
+const filtered = computed(() => {
+  let list = allChallenges.value.slice()
+
+  if (sport.value !== 'All') {
+    list = list.filter(c => (c.sport || '').toLowerCase() === sport.value.toLowerCase())
+  }
+
+  if (q.value) {
+    const term = q.value.toLowerCase()
+    list = list.filter(c =>
+      (c.name || '').toLowerCase().includes(term) ||
+      (c.description || '').toLowerCase().includes(term)
+    )
+  }
+
+  if (sortBy.value === 'popular') {
+    list.sort((a, b) => (b.participantCount || 0) - (a.participantCount || 0))
+  } else if (sortBy.value === 'ending') {
+    list.sort((a, b) => new Date(a.endDate || 0) - new Date(b.endDate || 0))
+  }
+
+  return list
+})
+
+const pageEnd = computed(() => page.value * pageSize)
+const paged   = computed(() =>
+  filtered.value.slice((page.value - 1) * pageSize, pageEnd.value)
+)
+
+const displayedChallenges = computed(() =>
+  activeTab.value === 'all' ? paged.value : myChallenges.value
+)
+
+onMounted(() => {
+  fetchChallenges()
+  fetchMyChallenges()
+})
 </script>
 
 <style scoped>
 /* ===== Design Tokens ===== */
 .challenges-page {
-  --r-olive: #5A6B4E;
+  --r-olive:      #5A6B4E;
   --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
-  --r-white: #FFFFFF;
-  
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --r-accent:     #C46A2A;
+  --r-offwhite:   #F5F6F3;
+  --r-white:      #FFFFFF;
+
+  font-family: Futura, 'Avenir Next', 'Avenir', system-ui, -apple-system, sans-serif;
   background: var(--r-offwhite);
   min-height: 100vh;
-  padding-top: 57px;
+  padding-top: 72px;
 }
 
 /* ===== HERO ===== */
@@ -326,7 +496,7 @@ function formatK(n) {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(15, 18, 16, 0.82) 0%, rgba(15, 18, 16, 0.45) 100%);
+  background: linear-gradient(to right, rgba(15,18,16,0.82) 0%, rgba(15,18,16,0.45) 100%);
 }
 
 .hero .container-xxl {
@@ -340,20 +510,78 @@ function formatK(n) {
 }
 
 .hero .lead {
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255,255,255,0.88);
   font-size: 18px;
   font-weight: 400;
   max-width: 600px;
 }
 
+/* ===== TAB BAR ===== */
+.tab-section {
+  background: white;
+  border-bottom: 1px solid #E5E7EB;
+  position: sticky;
+  top: 72px;
+  z-index: 90;
+}
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  padding: 12px 0 0;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tab-btn i {
+  font-size: 15px;
+}
+
+.tab-btn:hover {
+  color: var(--r-olive);
+}
+
+.tab-btn.active {
+  color: var(--r-olive-deep);
+  border-bottom-color: var(--r-accent);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--r-accent);
+  color: white;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
 /* ===== FILTERS ===== */
 .filters {
   background: white;
-  padding: 24px 0;
+  padding: 20px 0;
   border-bottom: 1px solid #E5E7EB;
   position: sticky;
-  top: 0;
-  z-index: 100;
+  top: calc(72px + 49px);
+  z-index: 80;
 }
 
 .filter-bar {
@@ -362,7 +590,6 @@ function formatK(n) {
   gap: 16px;
 }
 
-/* Sport Pills */
 .sport-pills {
   display: flex;
   gap: 8px;
@@ -370,15 +597,16 @@ function formatK(n) {
 }
 
 .sport-pill {
-  padding: 8px 20px;
+  padding: 7px 18px;
   border: 1px solid #E5E7EB;
   border-radius: 24px;
   background: white;
   color: #374151;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .sport-pill:hover {
@@ -392,7 +620,6 @@ function formatK(n) {
   color: white;
 }
 
-/* Search & Sort */
 .search-sort {
   display: flex;
   gap: 12px;
@@ -411,36 +638,38 @@ function formatK(n) {
   top: 50%;
   transform: translateY(-50%);
   color: #9CA3AF;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .search-box .form-control {
-  height: 44px;
+  height: 42px;
   border: 1px solid #E5E7EB;
   border-radius: 10px;
   padding-left: 40px;
-  font-size: 15px;
+  font-size: 14px;
+  font-family: inherit;
 }
 
 .search-box .form-control:focus {
   outline: none;
   border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+  box-shadow: 0 0 0 3px rgba(196,106,42,0.1);
 }
 
 .sort-select {
   width: auto;
   min-width: 160px;
-  height: 44px;
+  height: 42px;
   border: 1px solid #E5E7EB;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
+  font-family: inherit;
 }
 
 .sort-select:focus {
   border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+  box-shadow: 0 0 0 3px rgba(196,106,42,0.1);
 }
 
 /* ===== CHALLENGES GRID ===== */
@@ -448,6 +677,25 @@ function formatK(n) {
   padding: 40px 0 60px;
 }
 
+/* Loading */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 16px;
+}
+
+.text-olive { color: var(--r-olive) !important; }
+
+.loading-text {
+  color: #6B7280;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* Cards */
 .challenge-card {
   background: white;
   border-radius: 16px;
@@ -461,8 +709,13 @@ function formatK(n) {
 
 .challenge-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
   border-color: #D1D5DB;
+}
+
+.challenge-card.entered {
+  border-color: var(--r-olive);
+  border-width: 2px;
 }
 
 /* Challenge Image */
@@ -471,34 +724,51 @@ function formatK(n) {
   height: 200px;
   background-size: cover;
   background-position: center;
+  background-color: #E5E7EB;
+}
+
+.image-placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  font-size: 56px;
+  color: rgba(255,255,255,0.3);
 }
 
 .status-badge {
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   backdrop-filter: blur(10px);
 }
 
 .status-badge.ongoing {
-  background: rgba(34, 197, 94, 0.9);
+  background: rgba(34,197,94,0.9);
   color: white;
 }
 
-.status-badge.new {
-  background: rgba(59, 130, 246, 0.9);
+.entered-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(90,107,78,0.92);
   color: white;
-}
-
-.status-badge.upcoming {
-  background: rgba(107, 114, 128, 0.9);
-  color: white;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* Challenge Content */
@@ -513,14 +783,14 @@ function formatK(n) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .sport-tag {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--r-accent);
 }
 
@@ -534,24 +804,25 @@ function formatK(n) {
 }
 
 .challenge-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   line-height: 1.3;
 }
 
 .challenge-subtitle {
   font-size: 14px;
   color: #6B7280;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   line-height: 1.5;
+  flex: 1;
 }
 
 .challenge-meta {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid #F3F4F6;
@@ -560,81 +831,96 @@ function formatK(n) {
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 5px;
+  font-size: 12px;
   color: #6B7280;
   font-weight: 500;
 }
 
-.meta-item i {
-  font-size: 14px;
-}
-
-/* Progress Section */
-.progress-section {
-  margin-bottom: 16px;
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.progress-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.progress-percent {
-  font-size: 13px;
-  font-weight: 700;
+.prize-item {
   color: var(--r-accent);
+  font-weight: 600;
 }
 
-.progress-bar-container {
-  height: 8px;
-  background: #F3F4F6;
-  border-radius: 4px;
-  overflow: hidden;
+/* Card action buttons */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
 }
 
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--r-accent) 0%, #d97939 100%);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-/* Join Button */
 .btn-join {
-  width: 100%;
-  height: 44px;
+  flex: 1;
+  height: 42px;
   border: none;
   border-radius: 10px;
   background: var(--r-accent);
   color: white;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: auto;
+  font-family: inherit;
 }
 
-.btn-join:hover {
+.btn-join:hover:not(:disabled) {
   background: #a85722;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196, 106, 42, 0.3);
+  box-shadow: 0 4px 12px rgba(196,106,42,0.3);
 }
 
-.btn-join.active {
+.btn-join:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-lb {
+  flex: 1;
+  height: 42px;
+  border: 1.5px solid var(--r-olive);
+  border-radius: 10px;
+  background: white;
+  color: var(--r-olive-deep);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.btn-lb:hover {
   background: var(--r-olive);
+  color: white;
 }
 
-.btn-join.active:hover {
-  background: var(--r-olive-deep);
+.btn-leave {
+  height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 10px;
+  background: white;
+  color: #9CA3AF;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-leave:hover:not(:disabled) {
+  border-color: #EF4444;
+  color: #EF4444;
+  background: #FEF2F2;
+}
+
+.btn-leave:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Empty State */
@@ -645,19 +931,20 @@ function formatK(n) {
 
 .empty-icon {
   font-size: 64px;
+  color: #D1D5DB;
   margin-bottom: 20px;
-  opacity: 0.5;
+  line-height: 1;
 }
 
 .empty-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #111827;
   margin-bottom: 8px;
 }
 
 .empty-text {
-  font-size: 16px;
+  font-size: 15px;
   color: #6B7280;
 }
 
@@ -683,6 +970,7 @@ function formatK(n) {
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .btn-page:hover:not(:disabled) {
@@ -701,50 +989,178 @@ function formatK(n) {
   color: #6B7280;
 }
 
-/* ===== CTA SECTION ===== */
-.cta-section {
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
-  padding: 80px 0;
+/* ===== LEADERBOARD OVERLAY ===== */
+.lb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1090;
+  backdrop-filter: blur(2px);
 }
 
-.cta-content {
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
+/* ===== LEADERBOARD DRAWER ===== */
+.lb-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background: white;
+  z-index: 1100;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.cta-title {
-  font-size: 36px;
+.lb-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid #F3F4F6;
+  background: white;
+  flex-shrink: 0;
+}
+
+.lb-label {
+  font-size: 11px;
   font-weight: 700;
-  color: white;
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--r-accent);
+  margin-bottom: 4px;
 }
 
-.cta-text {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 32px;
-  line-height: 1.6;
+.lb-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--r-olive-deep);
+  margin: 0;
+  line-height: 1.3;
 }
 
-.btn-cta {
-  display: inline-block;
-  padding: 14px 40px;
-  background: var(--r-accent);
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
+.lb-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #F3F4F6;
+  color: #374151;
   font-size: 16px;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-left: 12px;
 }
 
-.btn-cta:hover {
-  background: #a85722;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+.lb-close:hover {
+  background: #E5E7EB;
 }
+
+/* Loading / empty inside drawer */
+.lb-loading,
+.lb-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+/* Ranked list */
+.lb-list {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  transition: background 0.15s ease;
+}
+
+.lb-row:hover {
+  background: #F9FAFB;
+}
+
+.lb-row-top {
+  background: #FAFDF8;
+}
+
+.lb-row-top:hover {
+  background: #F4F9F0;
+}
+
+.lb-rank {
+  width: 32px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: #9CA3AF;
+  flex-shrink: 0;
+}
+
+.rank-gold   { color: #F59E0B; font-size: 20px; }
+.rank-silver { color: #9CA3AF; font-size: 20px; }
+.rank-bronze { color: #B45309; font-size: 20px; }
+
+.lb-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lb-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-name:hover {
+  color: var(--r-accent);
+}
+
+.lb-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--r-olive);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ===== TRANSITIONS ===== */
+.lb-fade-enter-active,
+.lb-fade-leave-active { transition: opacity 0.25s ease; }
+.lb-fade-enter-from,
+.lb-fade-leave-to   { opacity: 0; }
+
+.lb-slide-enter-active,
+.lb-slide-leave-active { transition: transform 0.3s cubic-bezier(0.32,0,0.15,1); }
+.lb-slide-enter-from,
+.lb-slide-leave-to   { transform: translateX(100%); }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -776,14 +1192,15 @@ function formatK(n) {
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .challenge-image {
     height: 180px;
   }
 
-  .cta-title {
-    font-size: 28px;
+  .lb-drawer {
+    width: 100%;
   }
 }
 </style>
