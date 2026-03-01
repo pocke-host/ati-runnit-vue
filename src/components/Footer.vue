@@ -9,25 +9,25 @@
         <div class="col-6 col-md-2 mb-3">
           <h6 class="fw-bold">Explore</h6>
           <ul class="list-unstyled">
-            <li><a href="/features" class="footer-link">Features</a></li>
-            <li><a href="/maps" class="footer-link">Maps</a></li>
-            <li><a href="/challenges" class="footer-link">Challenges</a></li>
-            <li><a href="/subscribe" class="footer-link">Subscription</a></li>
+            <li><router-link to="/features" class="footer-link">Features</router-link></li>
+            <li><router-link to="/maps" class="footer-link">Maps</router-link></li>
+            <li><router-link to="/challenges" class="footer-link">Challenges</router-link></li>
+            <li><router-link to="/subscribe" class="footer-link">Subscription</router-link></li>
           </ul>
         </div>
         <div class="col-6 col-md-2 mb-3">
           <h6 class="fw-bold">Community</h6>
           <ul class="list-unstyled">
-            <li><a href="#" class="footer-link">Athletes</a></li>
-            <li><a href="#" class="footer-link">Clubs</a></li>
-            <li><a href="#" class="footer-link">Events</a></li>
-            <li><a href="/support" class="footer-link">Support</a></li>
+            <li><router-link to="/feed" class="footer-link">Athletes</router-link></li>
+            <li><router-link to="/clubs" class="footer-link">Clubs</router-link></li>
+            <li><router-link to="/races" class="footer-link">Events</router-link></li>
+            <li><router-link to="/support" class="footer-link">Support</router-link></li>
           </ul>
         </div>
         <div class="col-6 col-md-2 mb-3">
           <h6 class="fw-bold">Company</h6>
           <ul class="list-unstyled">
-            <li><a href="/about" class="footer-link">About</a></li>
+            <li><router-link to="/about" class="footer-link">About</router-link></li>
             <li><a href="#" class="footer-link">Careers</a></li>
             <li><a href="#" class="footer-link">Press</a></li>
             <li><a href="#" class="footer-link">Blog</a></li>
@@ -43,11 +43,10 @@
         </div>
       </div>
       <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
-        <p class="small mb-0">© 2025 RUNNIT. All rights reserved.</p>
+        <p class="small mb-0">© 2026 RUNNIT. All rights reserved.</p>
         <div>
-          <a href="https://www.tiktok.com/@RUNNIT.app" class="footer-link me-3">Tiktok</a>
-          <a href="https://www.instagram.com/runnit.co" class="footer-link me-3">Instagram</a>
-          <a href="" class="footer-link">Facebook</a>
+          <a href="https://www.tiktok.com/@RUNNIT.app" class="footer-link me-3" target="_blank" rel="noopener">TikTok</a>
+          <a href="https://www.instagram.com/runnit.co" class="footer-link me-3" target="_blank" rel="noopener">Instagram</a>
         </div>
       </div>
     </div>
