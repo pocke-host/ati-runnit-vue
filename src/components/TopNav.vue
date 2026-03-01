@@ -87,6 +87,9 @@
       </div>
 
       <div class="navbar-menu" v-else>
+        <router-link to="/features" class="nav-link">Features</router-link>
+        <router-link to="/about" class="nav-link">About</router-link>
+        <router-link to="/support" class="nav-link">Support</router-link>
         <router-link to="/join-us" class="nav-link">Login</router-link>
         <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
       </div>
@@ -98,6 +101,24 @@
     </div>
 
     <!-- Mobile Menu -->
+    <div v-if="mobileMenuOpen && !isAuthenticated" class="mobile-menu">
+      <router-link to="/features" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-star"></i> Features
+      </router-link>
+      <router-link to="/about" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-info-circle"></i> About
+      </router-link>
+      <router-link to="/support" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-question-circle"></i> Support
+      </router-link>
+      <router-link to="/join-us" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-box-arrow-in-right"></i> Login
+      </router-link>
+      <router-link to="/signup" class="mobile-link" @click="mobileMenuOpen = false">
+        <i class="bi bi-person-plus"></i> Join Us
+      </router-link>
+    </div>
+
     <div v-if="mobileMenuOpen && isAuthenticated" class="mobile-menu">
       <router-link to="/dashboard" class="mobile-link" @click="mobileMenuOpen = false">
         <i class="bi bi-grid-3x3-gap"></i> Dashboard
