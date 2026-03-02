@@ -41,6 +41,7 @@ const routes = [
   { path: '/profile/:id',         name: 'UserProfile',    component: () => import('@/views/UserProfile.vue'),      meta: { requiresAuth: true } },
   { path: '/achievements',        name: 'Achievements',   component: () => import('@/views/Achievements.vue'),     meta: { requiresAuth: true } },
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },
+  { path: '/onboard',             name: 'Onboard',        component: () => import('@/views/Onboarding.vue'),       meta: { requiresAuth: true } },
 
   // Catch-all
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFound.vue') },
@@ -57,11 +58,16 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) {
-    next('/join-us')
-  } else {
-    next()
+  const onboardingDone = localStorage.getItem('onboarding_complete') === 'true'
+
+  if (to.meta.requiresAuth && !token) return next('/join-us')
+
+  // New authenticated users must complete onboarding first
+  if (token && !onboardingDone && to.meta.requiresAuth && to.path !== '/onboard') {
+    return next('/onboard')
   }
+
+  next()
 })
 
 export default router

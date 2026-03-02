@@ -91,9 +91,10 @@
   const map = ref(null)
   const loading = ref(true)
   const error = ref(null)
-  const currentStyle = ref('outdoors-v12')
-  
+  const currentStyle = ref('runnit')
+
   const mapStyles = {
+    'runnit': 'mapbox://styles/quinn-runnit/cmm9rrbrb000a01rd0lvbap5i',
     'outdoors-v12': 'mapbox://styles/mapbox/outdoors-v12',
     'streets-v12': 'mapbox://styles/mapbox/streets-v12',
     'satellite-v9': 'mapbox://styles/mapbox/satellite-v9',

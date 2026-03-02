@@ -437,11 +437,11 @@ const toggleFollow = async () => {
     if (following.value) {
       await axios.delete(`${API_URL}/follow/${profileId.value}`, { headers: getAuthHeaders() })
       following.value = false
-      if (profile.value.followerCount != null) profile.value.followerCount--
+      profile.value.followerCount = (profile.value.followerCount ?? 0) - 1
     } else {
       await axios.post(`${API_URL}/follow/${profileId.value}`, {}, { headers: getAuthHeaders() })
       following.value = true
-      if (profile.value.followerCount != null) profile.value.followerCount++
+      profile.value.followerCount = (profile.value.followerCount ?? 0) + 1
     }
   } catch { /* silent */ } finally {
     followLoading.value = false

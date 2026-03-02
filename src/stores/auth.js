@@ -9,12 +9,18 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token'))
   const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
   const unitSystem = ref(localStorage.getItem('unitSystem') || 'imperial')
+  const onboardingComplete = ref(localStorage.getItem('onboarding_complete') === 'true')
 
   const isAuthenticated = computed(() => !!token.value)
 
   function setUnitSystem(system) {
     unitSystem.value = system
     localStorage.setItem('unitSystem', system)
+  }
+
+  function completeOnboarding() {
+    localStorage.setItem('onboarding_complete', 'true')
+    onboardingComplete.value = true
   }
   
   async function login(email, password) {
@@ -46,8 +52,10 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     token.value = null
     user.value = null
+    onboardingComplete.value = false
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('onboarding_complete')
     delete axios.defaults.headers.common['Authorization']
   }
   
@@ -57,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   
   return {
-    token, user, isAuthenticated, unitSystem,
-    login, register, fetchCurrentUser, logout, setAuth, setUnitSystem
+    token, user, isAuthenticated, unitSystem, onboardingComplete,
+    login, register, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding
   }
 })

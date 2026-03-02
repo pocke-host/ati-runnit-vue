@@ -180,7 +180,7 @@ const submit = async () => {
   
   try {
     await authStore.register(email.value, password.value, displayName.value)
-    router.push('/dashboard')
+    router.push('/onboard')
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
   } finally {
