@@ -272,10 +272,7 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
 .hero{
   padding: 48px 0;
   border-bottom: 1px solid rgba(15,18,16,0.08);
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: var(--r-white);
 }
 .eyebrow{
@@ -292,23 +289,19 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
 .hero-art{
   width: 420px;
   height: 220px;
-  border-radius: 18px;
+  border-radius: 0;
   position: relative;
   overflow:hidden;
 
-  background:
-    radial-gradient(700px 260px at 30% 20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 60%),
-    radial-gradient(800px 320px at 80% 80%, rgba(15,18,16,0.35), rgba(15,18,16,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+  background: #111;
   border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 26px 70px rgba(15,18,16,0.34);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: none;
+  
 }
 .hero-panel{
   position:absolute;
   inset: 16px;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 14px 14px 12px;
   background: rgba(15,18,16,0.16);
   border: 1px solid rgba(255,255,255,0.14);
@@ -329,7 +322,7 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
 .panel-pill{
   display:inline-flex;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 0;
   background: rgba(255,255,255,0.10);
   border: 1px solid rgba(255,255,255,0.16);
   color: rgba(255,255,255,0.88);
@@ -349,25 +342,25 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
 }
 .form-control, .form-select{
   border-color: rgba(15,18,16,0.12);
-  border-radius: 12px;
+  border-radius: 0;
 }
 .form-control:focus, .form-select:focus{
-  border-color: rgba(196,106,42,0.65);
-  box-shadow: 0 0 0 .2rem rgba(196,106,42,0.18);
+  border-color: #000;
+  box-shadow: none;
 }
 
 /* Chips */
 .btn-chip{
   border: 1px solid rgba(15,18,16,0.12);
   background: rgba(255,255,255,0.85);
-  border-radius: 999px;
+  border-radius: 0;
   padding: .28rem .85rem;
   font-weight: 800;
   font-size: .9rem;
 }
 .btn-chip.active{
-  border-color: rgba(196,106,42,0.30);
-  background: rgba(196,106,42,0.14);
+  border-color: #000;
+  background: #f0f0f0;
   color: var(--r-black);
 }
 
@@ -377,15 +370,15 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
 /* Cards */
 .race-card{
   border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 16px;
+  border-radius: 0;
   overflow:hidden;
   background:#fff;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
   transition: transform .12s ease, box-shadow .12s ease;
 }
 .race-card:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 18px 46px rgba(15,18,16,0.10);
+  transform: none;
+  box-shadow: none;
 }
 .race-img{
   position:relative;
@@ -393,7 +386,7 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
   background:#ddd center/cover no-repeat;
 }
 .badge{
-  border-radius: 999px;
+  border-radius: 0;
   padding: .4rem .65rem;
   font-size: .78rem;
   font-weight: 900;
@@ -411,7 +404,7 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
   position:absolute;
   right:12px;
   top:12px;
-  background: rgba(196,106,42,0.98);
+  background: #000;
   color: #fff;
   border: 1px solid rgba(255,255,255,0.12);
 }
@@ -419,10 +412,10 @@ const formatDateLong = (iso) => new Date(iso).toLocaleDateString(undefined, { we
 
 /* Buttons */
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(255,255,255,0.12);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
 }
 .btn-outline-secondary{
   border-color: rgba(15,18,16,0.12);

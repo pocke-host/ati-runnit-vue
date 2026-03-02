@@ -347,7 +347,7 @@ onMounted(async () => {
 
 /* ── Plan Header ── */
 .plan-header {
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: white; padding: 24px 0 28px;
 }
 .plan-header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 20px; }
@@ -359,12 +359,12 @@ onMounted(async () => {
 .plan-sport-big { font-size: 3.5rem; }
 .plan-header-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 
-.ph-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: capitalize; }
+.ph-badge { padding: 4px 12px; border-radius: 0; font-size: 0.75rem; font-weight: 700; text-transform: capitalize; }
 .ph-badge-sport { background: rgba(255,255,255,0.15); color: white; }
 .ph-badge-beginner     { background: rgba(16,185,129,0.25); color: #a7f3d0; }
 .ph-badge-intermediate { background: rgba(245,158,11,0.25); color: #fde68a; }
 .ph-badge-advanced     { background: rgba(239,68,68,0.25);  color: #fecaca; }
-.ph-badge-active { background: rgba(196,106,42,0.30); color: #fed7aa; display: inline-flex; align-items: center; }
+.ph-badge-active { background: rgba(255,255,255,0.15); color: #fff; display: inline-flex; align-items: center; }
 
 .plan-header-name { font-weight: 900; font-size: 1.6rem; margin: 0 0 4px; color: white; }
 .plan-header-meta { font-size: 0.88rem; color: rgba(255,255,255,0.70); }
@@ -383,9 +383,9 @@ onMounted(async () => {
 .status-toast {
   position: fixed; top: 90px; right: 24px; z-index: 9000;
   display: flex; align-items: center; gap: 10px;
-  padding: 14px 20px; border-radius: 14px;
+  padding: 14px 20px; border-radius: 0;
   font-weight: 700; font-size: 0.9rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  box-shadow: none;
   animation: slideInRight 0.3s ease;
 }
 .status-toast.success { background: #047857; color: white; }
@@ -394,7 +394,7 @@ onMounted(async () => {
 
 /* ── Week Tabs ── */
 .week-tabs-wrapper {
-  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.95); 
   border-bottom: 1px solid rgba(15,18,16,0.08);
   position: sticky; top: var(--nav-h); z-index: 50;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
@@ -409,9 +409,9 @@ onMounted(async () => {
   border-bottom: 3px solid transparent; white-space: nowrap;
 }
 .week-tab:hover { color: rgba(15,18,16,0.85); }
-.week-tab.active { color: var(--r-accent); border-bottom-color: var(--r-accent); }
-.week-tab.current .week-tab-label { color: var(--r-olive); }
-.week-tab-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--r-accent); margin-top: 4px; }
+.week-tab.active { color: #000; border-bottom-color: #000; }
+.week-tab.current .week-tab-label { color: #000; }
+.week-tab-dot { width: 6px; height: 6px; border-radius: 0; background: #000; margin-top: 4px; }
 
 /* ── Week Content ── */
 .week-content { padding: 28px 24px 60px; }
@@ -420,7 +420,7 @@ onMounted(async () => {
 .week-title { font-weight: 900; font-size: 1.2rem; color: rgba(15,18,16,0.92); margin-bottom: 6px; }
 .week-stats { display: flex; gap: 16px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; }
 .week-progress-mini { width: 120px; height: 6px; background: rgba(15,18,16,0.10); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
-.week-progress-fill { height: 100%; background: linear-gradient(90deg, var(--r-accent), #a85722); border-radius: 99px; transition: width 0.4s; }
+.week-progress-fill { height: 100%; background: #000; border-radius: 0; transition: width 0.4s; }
 
 /* ── Workout Cards ── */
 .workouts-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
@@ -428,23 +428,23 @@ onMounted(async () => {
 .workout-card {
   display: flex; gap: 16px; align-items: flex-start;
   background: white; border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 18px; padding: 20px;
-  transition: all 0.2s; box-shadow: 0 2px 12px rgba(15,18,16,0.05);
+  border-radius: 0; padding: 20px;
+  transition: all 0.2s; box-shadow: none;
 }
-.workout-card:hover { box-shadow: 0 6px 24px rgba(15,18,16,0.10); }
-.workout-today { border-color: var(--r-accent); box-shadow: 0 0 0 3px rgba(196,106,42,0.12), 0 4px 20px rgba(196,106,42,0.15); }
+.workout-card:hover { box-shadow: none; }
+.workout-today { border-color: #000; box-shadow: none; }
 .workout-completed { background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.20); }
 .workout-missed { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.02); }
 
 /* Check button */
 .check-btn {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 0;
   border: 2px solid rgba(15,18,16,0.20);
   background: transparent; display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all 0.2s; flex-shrink: 0; font-size: 1rem;
   color: rgba(15,18,16,0.50);
 }
-.check-btn:hover { border-color: var(--r-accent); color: var(--r-accent); }
+.check-btn:hover { border-color: #000; color: #000; }
 .check-btn.checked { background: rgba(16,185,129,1); border-color: rgba(16,185,129,1); color: white; }
 .check-btn:disabled { opacity: 0.50; cursor: not-allowed; }
 
@@ -460,13 +460,13 @@ onMounted(async () => {
 /* Workout type colors */
 .type-easy, .type-recovery   { color: #047857; }
 .type-tempo                  { color: #b45309; }
-.type-long                   { color: var(--r-olive); }
+.type-long                   { color: #000; }
 .type-interval               { color: #b91c1c; }
 .type-endurance              { color: #047857; }
 
 .workout-tags { display: flex; gap: 6px; }
-.tag-today { background: rgba(196,106,42,0.12); color: var(--r-accent); padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-.tag-missed { background: rgba(239,68,68,0.10); color: #dc2626; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+.tag-today { background: rgba(196,106,42,0.12); color: #000; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
+.tag-missed { background: rgba(239,68,68,0.10); color: #dc2626; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 
 .workout-detail-row { display: flex; gap: 12px; font-size: 0.88rem; font-weight: 700; color: rgba(15,18,16,0.70); margin-bottom: 8px; }
 .workout-desc { font-size: 0.85rem; color: rgba(15,18,16,0.55); margin: 0; line-height: 1.5; font-style: italic; }
@@ -475,11 +475,11 @@ onMounted(async () => {
 .week-summary {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   background: white; border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 20px; padding: 20px 28px;
+  border-radius: 0; padding: 20px 28px;
   box-shadow: 0 2px 12px rgba(15,18,16,0.06);
 }
 .summary-stat { text-align: center; }
-.summary-val { font-size: 1.4rem; font-weight: 900; color: var(--r-accent); margin-bottom: 4px; }
+.summary-val { font-size: 1.4rem; font-weight: 900; color: #000; margin-bottom: 4px; }
 .summary-key { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.50); }
 
 /* Spin animation for loading icon */
@@ -489,17 +489,17 @@ onMounted(async () => {
 /* Buttons */
 .btn {
   border: 1px solid rgba(15,18,16,0.14); background: rgba(255,255,255,0.60);
-  color: rgba(15,18,16,0.78); border-radius: 12px; height: 40px; padding: 0 18px;
+  color: rgba(15,18,16,0.78); border-radius: 0; height: 40px; padding: 0 18px;
   font-weight: 700; font-family: inherit;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: linear-gradient(135deg, var(--r-accent), #a85722); border-color: transparent; color: white; }
-.btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #a85722, #914a1e); }
+.btn-primary { background: #000; border-color: transparent; color: white; }
+.btn-primary:hover:not(:disabled) { background: #333; }
 .btn-outline-danger { background: rgba(255,255,255,0.70); border-color: rgba(220,38,38,0.30); color: #dc2626; }
 .btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
-.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 10px; }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }
 .mt-3 { margin-top: 16px; }
 
 @media (max-width: 640px) {

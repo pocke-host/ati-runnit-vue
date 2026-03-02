@@ -180,9 +180,7 @@ const handleSubmit = async () => {
   --r-offwhite: #F5F6F3;
   
   min-height: 100vh;
-  background: radial-gradient(900px 420px at 18% 12%, rgba(90,107,78,0.18), rgba(90,107,78,0) 60%),
-              radial-gradient(900px 420px at 85% 20%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-              var(--r-offwhite);
+  background: #fff;
   padding: 40px 20px;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
@@ -190,11 +188,11 @@ const handleSubmit = async () => {
 .moment-card {
   max-width: 600px;
   margin: 0 auto;
-  background: radial-gradient(700px 220px at 30% 0%, rgba(196,106,42,0.08), rgba(196,106,42,0) 60%),
-              linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
-  border-radius: 24px;
+  background: #fff;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   border: 1px solid rgba(15,18,16,0.12);
-  box-shadow: 0 20px 60px rgba(15,18,16,0.15);
+  box-shadow: none;
   padding: 32px;
 }
 
@@ -215,9 +213,9 @@ const handleSubmit = async () => {
 .back-btn {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0;
   border: 1px solid rgba(15,18,16,0.14);
-  background: rgba(255,255,255,0.60);
+  background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -227,7 +225,7 @@ const handleSubmit = async () => {
 }
 
 .back-btn:hover {
-  background: rgba(255,255,255,0.90);
+  background: #fff;
   transform: translateX(-2px);
 }
 
@@ -251,17 +249,17 @@ const handleSubmit = async () => {
 
 .upload-area {
   border: 2px dashed rgba(15,18,16,0.20);
-  border-radius: 16px;
+  border-radius: 0;
   padding: 60px 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s;
-  background: rgba(255,255,255,0.50);
+  background: #f9f9f9;
 }
 
 .upload-area:hover {
-  border-color: var(--r-accent);
-  background: rgba(196,106,42,0.08);
+  border-color: #000;
+  background: rgba(0,0,0,0.04);
 }
 
 .upload-area i {
@@ -277,7 +275,7 @@ const handleSubmit = async () => {
 
 .photo-preview {
   position: relative;
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
   border: 1px solid rgba(15,18,16,0.12);
 }
@@ -298,8 +296,8 @@ const handleSubmit = async () => {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid rgba(15,18,16,0.16);
-  border-radius: 12px;
-  background: rgba(255,255,255,0.70);
+  border-radius: 0;
+  background: #fff;
   font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.2s;
@@ -308,9 +306,9 @@ const handleSubmit = async () => {
 
 .form-control:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196,106,42,0.12);
-  background: rgba(255,255,255,0.95);
+  border-color: #000;
+  box-shadow: none;
+  background: #fff;
 }
 
 .form-control::placeholder {
@@ -319,7 +317,7 @@ const handleSubmit = async () => {
 
 .alert {
   padding: 14px 16px;
-  border-radius: 12px;
+  border-radius: 0;
   margin-bottom: 20px;
 }
 
@@ -332,9 +330,9 @@ const handleSubmit = async () => {
 
 .btn {
   border: 1px solid rgba(15,18,16,0.14);
-  background: rgba(255,255,255,0.60);
+  background: #f5f5f5;
   color: rgba(15,18,16,0.78);
-  border-radius: 14px;
+  border-radius: 0;
   height: 44px;
   padding: 0 16px;
   font-weight: 900;
@@ -348,21 +346,19 @@ const handleSubmit = async () => {
 }
 
 .btn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(15,18,16,0.18);
-  background: rgba(255,255,255,0.72);
+  border-color: #E5E5E5;
+  background: #fff;
 }
 
 .btn-primary {
   height: 52px;
-  background: radial-gradient(700px 220px at 30% 0%, rgba(255,255,255,0.18), rgba(255,255,255,0) 60%),
-              linear-gradient(135deg, var(--r-accent), #a85722);
+  background: #000;
   border-color: rgba(15,18,16,0.12);
   color: rgba(255,255,255,0.96);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #a85722, #914a1e);
+  background: #333;
 }
 
 .btn-primary:disabled {

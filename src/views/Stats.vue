@@ -292,22 +292,22 @@ onMounted(async () => {
 
 <style scoped>
 .stats-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
+  --r-olive: #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent: #B85C20;
+  --r-offwhite: #FFFFFF;
+  --r-warm-gray: #6B6B6B;
+  --r-border: rgba(15,18,16,0.10);
+  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
   min-height: 100vh;
   padding-top: 72px;
-  background: var(--r-offwhite);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
 /* HERO */
 .hero {
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: white;
   padding: 52px 24px 44px;
 }
@@ -331,7 +331,7 @@ onMounted(async () => {
 .hero-chip {
   background: rgba(255,255,255,0.14);
   border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 16px;
+  border-radius: 0;
   padding: 14px 28px;
   display: flex;
   flex-direction: column;
@@ -391,7 +391,7 @@ onMounted(async () => {
 .pr-card {
   background: white;
   border: 1.5px solid rgba(15,18,16,0.09);
-  border-radius: 18px;
+  border-radius: 0;
   padding: 22px 16px 18px;
   display: flex;
   flex-direction: column;
@@ -403,26 +403,26 @@ onMounted(async () => {
 }
 .pr-card.pr-card-set {
   opacity: 1;
-  box-shadow: 0 6px 24px rgba(90,107,78,0.12);
-  border-color: rgba(90,107,78,0.20);
+  box-shadow: none;
+  border-color: #000;
 }
-.pr-card.pr-card-set:hover { transform: translateY(-3px); }
+.pr-card.pr-card-set:hover { transform: none; }
 
 .pr-icon-wrap {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: rgba(90,107,78,0.10);
+  background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.35rem;
-  color: var(--r-olive);
+  color: #767676;
   margin-bottom: 2px;
 }
 .pr-card.pr-card-set .pr-icon-wrap {
-  background: rgba(196,106,42,0.12);
-  color: var(--r-accent);
+  background: #f0f0f0;
+  color: #767676;
 }
 .pr-label {
   font-weight: 900;
@@ -433,12 +433,12 @@ onMounted(async () => {
 .pr-value {
   font-size: 1.25rem;
   font-weight: 900;
-  color: var(--r-olive-deep);
+  color: #000;
 }
 .pr-link {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--r-accent);
+  color: #767676;
   text-decoration: none;
 }
 .pr-link:hover { text-decoration: underline; }
@@ -451,8 +451,8 @@ onMounted(async () => {
 /* CHART CARDS */
 .chart-card {
   background: white;
-  border: 1px solid rgba(15,18,16,0.09);
-  border-radius: 18px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 24px;
   height: 280px;
   position: relative;
@@ -484,8 +484,8 @@ onMounted(async () => {
 /* LEGEND */
 .legend-list {
   background: white;
-  border: 1px solid rgba(15,18,16,0.09);
-  border-radius: 18px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -520,23 +520,23 @@ onMounted(async () => {
 }
 .milestone-card {
   background: white;
-  border: 1px solid rgba(15,18,16,0.09);
-  border-radius: 18px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 28px 16px 22px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 8px;
-  box-shadow: 0 4px 16px rgba(15,18,16,0.05);
+  box-shadow: none;
   transition: transform 0.2s;
 }
-.milestone-card:hover { transform: translateY(-2px); }
+.milestone-card:hover { transform: none; }
 .milestone-icon { font-size: 2rem; line-height: 1; }
 .milestone-val {
   font-size: 1.4rem;
   font-weight: 900;
-  color: var(--r-olive-deep);
+  color: #000;
 }
 .milestone-label {
   font-size: 0.75rem;
@@ -551,7 +551,7 @@ onMounted(async () => {
   width: 2rem;
   height: 2rem;
   border: 3px solid rgba(15,18,16,0.12);
-  border-top-color: var(--r-accent);
+  border-top-color: #767676;
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
 }

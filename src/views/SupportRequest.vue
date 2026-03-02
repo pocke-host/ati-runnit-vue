@@ -156,10 +156,7 @@ const onSubmit = () => {
   padding: 52px 0 40px;
   color: var(--r-white);
   border-bottom: 1px solid rgba(255,255,255,0.10);
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
 }
 .kicker{
   letter-spacing: .18em;
@@ -178,14 +175,11 @@ const onSubmit = () => {
 
 /* “Control panel” container (feel like a system, not literal) */
 .panel{
-  border-radius: 18px;
-  background:
-    radial-gradient(900px 360px at 30% 0%, rgba(90,107,78,0.18), rgba(90,107,78,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.72), rgba(255,255,255,0.50));
+  border-radius: 0;
+  background: #fff;
   border: 1px solid rgba(15,18,16,0.12);
-  box-shadow: 0 18px 50px rgba(15,18,16,0.10);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: none;
+  
   overflow: hidden;
 }
 
@@ -194,7 +188,7 @@ const onSubmit = () => {
   align-items:center;
   justify-content:space-between;
   padding: 14px 16px;
-  background: rgba(15,18,16,0.06);
+  background: #f5f5f5;
   border-bottom: 1px solid rgba(15,18,16,0.10);
 }
 .panel-title{
@@ -209,8 +203,7 @@ const onSubmit = () => {
 }
 .panel-title .dot{
   width:10px; height:10px; border-radius:50%;
-  background: rgba(196,106,42,0.95);
-  box-shadow: 0 0 0 4px rgba(196,106,42,0.16);
+  background: #000;
 }
 .panel-status{
   font-weight: 900;
@@ -226,10 +219,10 @@ const onSubmit = () => {
 
 .form-control,
 .form-select{
-  border-radius: 12px;
-  border: 1px solid rgba(15,18,16,0.14);
+  border-radius: 0;
+  border: 1px solid #E5E5E5;
   height: 46px;
-  background: rgba(255,255,255,0.86);
+  background: #fff;
 }
 textarea.form-control{
   height: auto;
@@ -239,8 +232,8 @@ textarea.form-control{
 
 .form-control:focus,
 .form-select:focus{
-  border-color: rgba(196,106,42,0.75);
-  box-shadow: 0 0 0 4px rgba(196,106,42,0.18);
+  border-color: #000;
+  box-shadow: none;
 }
 
 /* Hint text */
@@ -251,15 +244,15 @@ textarea.form-control{
 
 /* Button */
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(15,18,16,0.10);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(15,18,16,0.10);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
 
   font-weight: 900;
   letter-spacing: .02em;
   height: 50px;
-  border-radius: 14px;
+  border-radius: 0;
 }
 
 /* Mobile spacing */

@@ -627,16 +627,18 @@ onMounted(() => {
 
 <style scoped>
 .feed-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
-  
+  --r-olive: #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent: #B85C20;
+  --r-offwhite: #FFFFFF;
+  --r-warm-gray: #6B6B6B;
+  --r-border: rgba(15,18,16,0.10);
+  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
+  --r-shadow: 0 8px 32px rgba(15,18,16,0.10);
+
   min-height: 100vh;
   padding-top: 90px;
-  background: radial-gradient(900px 420px at 18% 12%, rgba(90,107,78,0.18), rgba(90,107,78,0) 60%),
-              radial-gradient(900px 420px at 85% 20%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-              var(--r-offwhite);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -692,8 +694,8 @@ onMounted(() => {
   flex: 1;
   max-width: 180px;
   padding: 12px 20px;
-  border-radius: 12px;
-  border: 1px solid rgba(15,18,16,0.12);
+  border-radius: 0;
+  border: 1px solid #E5E5E5;
   background: rgba(255,255,255,0.70);
   font-weight: 900;
   font-size: 0.9rem;
@@ -708,9 +710,9 @@ onMounted(() => {
 }
 
 .feed-tab.active {
-  background: var(--r-olive);
+  background: var(--r-black, #0F1210);
   color: white;
-  border-color: var(--r-olive);
+  border-color: var(--r-black, #0F1210);
 }
 
 .feed-sort {
@@ -725,7 +727,7 @@ onMounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(15,18,16,0.12);
+  border: 1px solid #E5E5E5;
   background: rgba(255,255,255,0.70);
   display: flex;
   align-items: center;
@@ -742,9 +744,9 @@ onMounted(() => {
 }
 
 .sort-btn.active {
-  background: var(--r-accent);
+  background: var(--r-black, #0F1210);
   color: white;
-  border-color: var(--r-accent);
+  border-color: var(--r-black, #0F1210);
 }
 
 .feed-container {
@@ -783,18 +785,18 @@ onMounted(() => {
 }
 
 .feed-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92));
-  border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   overflow: hidden;
-  transition: all 0.3s;
-  box-shadow: 0 8px 32px rgba(15,18,16,0.08);
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: none;
   position: relative;
 }
 
 .feed-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 48px rgba(15,18,16,0.15);
+  transform: none;
+  box-shadow: none;
 }
 
 /* Moment Cards */
@@ -855,8 +857,8 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   padding: 32px 20px 24px;
-  background: linear-gradient(135deg, rgba(90,107,78,0.12), rgba(90,107,78,0.05));
-  border-bottom: 1px solid rgba(15,18,16,0.08);
+  background: #fff;
+  border-bottom: 1px solid var(--r-border);
   position: relative;
 }
 
@@ -878,8 +880,8 @@ onMounted(() => {
   text-align: center;
   padding: 12px;
   background: rgba(255,255,255,0.90);
-  border: 1px solid rgba(15,18,16,0.08);
-  border-radius: 12px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
 }
 
 .stat-label {
@@ -912,7 +914,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -936,7 +938,7 @@ onMounted(() => {
   text-decoration: none;
   color: inherit;
 }
-.user-name-link:hover .user-name { color: var(--r-olive); }
+.user-name-link:hover .user-name { color: #767676; }
 
 .activity-header-link {
   display: flex;
@@ -963,15 +965,15 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   padding: 12px;
-  background: rgba(196,106,42,0.08);
-  border-radius: 12px;
-  border: 1px solid rgba(196,106,42,0.15);
+  background: #f9f9f9;
+  border-radius: 0;
+  border: 1px solid #E5E5E5;
   margin-top: 12px;
 }
 
 .moment-song-compact i {
   font-size: 1.2rem;
-  color: var(--r-accent);
+  color: #767676;
 }
 
 .song-text {
@@ -1003,16 +1005,15 @@ onMounted(() => {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: linear-gradient(135deg, var(--r-accent), #a85722);
+  background: rgba(15,18,16,0.80);
   color: white;
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 0;
   font-weight: 700;
   font-size: 0.75rem;
   display: flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 4px 12px rgba(196,106,42,0.30);
   z-index: 2;
 }
 
@@ -1027,29 +1028,29 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: none;
   z-index: 2;
 }
 
 .moment-badge-type {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: #000;
   color: white;
 }
 
 .activity-badge-type {
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: white;
 }
 
 .you-label {
-  color: var(--r-accent);
+  color: #000;
   font-weight: 700;
   font-size: 0.85rem;
   margin-left: 6px;
 }
 
 .you-label-small {
-  color: var(--r-accent);
+  color: #000;
   font-weight: 700;
   font-size: 0.75rem;
   margin-left: 4px;
@@ -1059,10 +1060,10 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(196,106,42,0.15);
-  color: var(--r-accent);
+  background: rgba(0,0,0,0.08);
+  color: #000;
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: 0;
   font-weight: 700;
   font-size: 0.75rem;
   margin-left: 8px;
@@ -1089,7 +1090,7 @@ onMounted(() => {
 
 .moment-modal {
   background: rgba(255,255,255,0.98);
-  border-radius: 24px;
+  border-radius: 0;
   max-width: 1200px;
   width: 100%;
   max-height: 90vh;
@@ -1118,7 +1119,7 @@ onMounted(() => {
   height: 44px;
   border-radius: 50%;
   background: rgba(255,255,255,0.95);
-  border: 1px solid rgba(15,18,16,0.12);
+  border: 1px solid #E5E5E5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1171,7 +1172,7 @@ onMounted(() => {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1214,7 +1215,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--r-accent);
+  color: #000;
   font-weight: 700;
   font-size: 0.85rem;
   text-decoration: none;
@@ -1235,8 +1236,8 @@ onMounted(() => {
 .reaction-btn {
   flex: 1;
   padding: 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(15,18,16,0.12);
+  border-radius: 0;
+  border: 1px solid #E5E5E5;
   background: rgba(255,255,255,0.70);
   display: flex;
   align-items: center;
@@ -1249,13 +1250,13 @@ onMounted(() => {
 
 .reaction-btn:hover {
   background: rgba(255,255,255,0.95);
-  transform: translateY(-2px);
+  transform: none;
 }
 
 .reaction-btn.active {
-  background: var(--r-accent);
+  background: #000;
   color: white;
-  border-color: var(--r-accent);
+  border-color: #000;
   transform: scale(1.05);
 }
 
@@ -1334,7 +1335,7 @@ onMounted(() => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1384,8 +1385,8 @@ onMounted(() => {
 .comment-input {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid rgba(15,18,16,0.16);
-  border-radius: 24px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   background: rgba(255,255,255,0.70);
   font-family: inherit;
   font-size: 0.95rem;
@@ -1394,8 +1395,8 @@ onMounted(() => {
 
 .comment-input:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196,106,42,0.12);
+  border-color: #000;
+  box-shadow: none;
   background: white;
 }
 
@@ -1403,7 +1404,7 @@ onMounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--r-accent);
+  background: #000;
   border: none;
   color: white;
   display: flex;
@@ -1415,7 +1416,7 @@ onMounted(() => {
 }
 
 .comment-submit:hover:not(:disabled) {
-  background: #a85722;
+  background: #111;
   transform: scale(1.05);
 }
 
@@ -1425,10 +1426,10 @@ onMounted(() => {
 }
 
 .btn {
-  border: 1px solid rgba(15,18,16,0.14);
+  border: 1px solid #E5E5E5;
   background: rgba(255,255,255,0.60);
   color: rgba(15,18,16,0.78);
-  border-radius: 14px;
+  border-radius: 0;
   height: 44px;
   padding: 0 20px;
   font-weight: 900;
@@ -1449,13 +1450,13 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--r-accent), #a85722);
+  background: #000;
   border-color: rgba(15,18,16,0.12);
   color: white;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #a85722, #914a1e);
+  background: #111;
 }
 
 .btn-danger {

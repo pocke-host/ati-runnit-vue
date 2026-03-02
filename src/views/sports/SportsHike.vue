@@ -115,10 +115,7 @@ const feats = [
 .hero{
   padding:64px 0;
 
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: var(--r-white);
   border-bottom:1px solid rgba(255,255,255,0.10);
 }
@@ -137,21 +134,16 @@ const feats = [
   position:relative;
   overflow:hidden;
 
-  background:
-    radial-gradient(700px 260px at 30% 20%, rgba(255,255,255,0.16), rgba(255,255,255,0) 60%),
-    radial-gradient(800px 320px at 80% 80%, rgba(15,18,16,0.35), rgba(15,18,16,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  background: #111;
   border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 26px 70px rgba(15,18,16,0.34);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
+  box-shadow: none;
+  }
 
 /* subtle “HUD” (feel, not literal game UI) */
 .hud{
   position:absolute;
   inset: 18px;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 16px;
   background: rgba(15,18,16,0.16);
   border: 1px solid rgba(255,255,255,0.14);
@@ -167,7 +159,7 @@ const feats = [
 .hud-stat{
   flex:1;
   padding: 10px 10px 8px;
-  border-radius: 14px;
+  border-radius: 0;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
 }
@@ -185,7 +177,7 @@ const feats = [
 }
 .hud-bar{
   height: 10px;
-  border-radius: 999px;
+  border-radius: 0;
   overflow: hidden;
   background: rgba(255,255,255,0.10);
   border: 1px solid rgba(255,255,255,0.14);
@@ -195,7 +187,7 @@ const feats = [
   display:block;
   height: 100%;
   width: 58%;
-  background: rgba(196,106,42,0.90);
+  background: rgba(255,255,255,0.60);
 }
 .hud-sub{
   color: rgba(255,255,255,0.74);
@@ -225,19 +217,11 @@ const feats = [
   border:1px solid rgba(15,18,16,0.10);
   border-radius:16px;
   overflow:hidden;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
 }
-.feature-img{
-  height:160px;
-  background:
-    radial-gradient(700px 220px at 30% 20%, rgba(90,107,78,0.18), rgba(90,107,78,0) 60%),
-    repeating-linear-gradient(
-      45deg,
-      rgba(15,18,16,0.03),
-      rgba(15,18,16,0.03) 12px,
-      rgba(15,18,16,0.06) 12px,
-      rgba(15,18,16,0.06) 24px
-    );
+.feature-img {
+  height: 160px;
+  background: #f5f5f5;
 }
 
 /* CTA */
@@ -249,12 +233,12 @@ const feats = [
 
 /* Buttons */
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(255,255,255,0.12);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
   font-weight: 900;
-  border-radius: 12px;
+  border-radius: 0;
 }
 .hero :deep(.btn-outline-dark){
   --bs-btn-color: rgba(255,255,255,0.92);
@@ -262,6 +246,6 @@ const feats = [
   --bs-btn-hover-bg: rgba(255,255,255,0.12);
   --bs-btn-hover-border-color: rgba(255,255,255,0.40);
   --bs-btn-hover-color: rgba(255,255,255,0.96);
-  border-radius: 12px;
+  border-radius: 0;
 }
 </style>

@@ -232,14 +232,17 @@ const handleLogout = () => {
 
 <style scoped>
 .settings-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
+  --r-olive: #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent: #B85C20;
+  --r-offwhite: #FFFFFF;
   --nav-h: 72px;
+  --r-warm-gray: #6B6B6B;
+  --r-border: rgba(15,18,16,0.10);
+  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
 
   min-height: 100vh;
-  background: var(--r-offwhite);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -311,8 +314,8 @@ const handleLogout = () => {
 /* ── Card ── */
 .settings-card {
   background: white;
-  border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 20px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -330,7 +333,7 @@ const handleLogout = () => {
 .profile-avatar {
   width: 64px; height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   display: flex; align-items: center; justify-content: center;
   font-weight: 900;
   color: white;
@@ -375,18 +378,18 @@ const handleLogout = () => {
 .field-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid rgba(15,18,16,0.16);
-  border-radius: 12px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   font-family: inherit;
   font-size: 0.95rem;
   color: rgba(15,18,16,0.90);
-  background: var(--r-offwhite);
+  background: #fff;
   transition: all 0.2s;
 }
 .field-input:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196,106,42,0.12);
+  border-color: #767676;
+  box-shadow: none;
   background: white;
 }
 .field-input:disabled { opacity: 0.60; cursor: not-allowed; }
@@ -394,18 +397,18 @@ const handleLogout = () => {
 .field-readonly {
   flex: 1;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: 0;
   background: rgba(15,18,16,0.04);
-  border: 1px solid rgba(15,18,16,0.08);
+  border: 1px solid #E5E5E5;
   font-size: 0.95rem;
   color: rgba(15,18,16,0.55);
 }
 .field-select {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid rgba(15,18,16,0.16);
-  border-radius: 12px;
-  background: var(--r-offwhite);
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  background: #fff;
   font-family: inherit;
   font-size: 0.95rem;
   cursor: not-allowed;
@@ -419,7 +422,7 @@ const handleLogout = () => {
   font-size: 0.88rem;
   font-weight: 700;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: 0;
 }
 .field-status.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.20); color: #047857; }
 .field-status.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; }
@@ -431,7 +434,7 @@ const handleLogout = () => {
   align-items: center;
   padding: 10px 14px;
   background: rgba(15,18,16,0.03);
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px dashed rgba(15,18,16,0.14);
 }
 
@@ -445,7 +448,7 @@ const handleLogout = () => {
   position: relative;
   background: white;
   border: 2px solid rgba(15,18,16,0.12);
-  border-radius: 20px;
+  border-radius: 0;
   padding: 24px 20px;
   text-align: center;
   cursor: pointer;
@@ -456,11 +459,11 @@ const handleLogout = () => {
   gap: 10px;
   font-family: inherit;
 }
-.unit-card:hover { border-color: rgba(15,18,16,0.25); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(15,18,16,0.10); }
+.unit-card:hover { border-color: rgba(15,18,16,0.25); transform: none; box-shadow: none; }
 .unit-card.active {
-  border-color: var(--r-accent);
-  background: rgba(196,106,42,0.04);
-  box-shadow: 0 8px 32px rgba(196,106,42,0.18);
+  border-color: #767676;
+  background: #f9f9f9;
+  box-shadow: none;
 }
 .unit-flag { font-size: 2rem; }
 .unit-name {
@@ -478,13 +481,13 @@ const handleLogout = () => {
   background: rgba(15,18,16,0.06);
   color: rgba(15,18,16,0.65);
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 0.8rem;
   font-weight: 700;
 }
 .unit-card.active .unit-example {
-  background: rgba(196,106,42,0.12);
-  color: var(--r-accent);
+  background: #f0f0f0;
+  color: #000;
 }
 .unit-check {
   position: absolute;
@@ -492,7 +495,7 @@ const handleLogout = () => {
   right: 14px;
   width: 28px; height: 28px;
   border-radius: 50%;
-  background: var(--r-accent);
+  background: #000;
   color: white;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.9rem;
@@ -502,8 +505,8 @@ const handleLogout = () => {
 /* ── Unit Preview ── */
 .unit-preview {
   background: white;
-  border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 16px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 20px 24px;
 }
 .unit-preview-label {
@@ -523,7 +526,7 @@ const handleLogout = () => {
 .preview-val {
   font-size: 1.3rem;
   font-weight: 900;
-  color: var(--r-accent);
+  color: #000;
   letter-spacing: -0.01em;
 }
 .preview-key {
@@ -535,10 +538,10 @@ const handleLogout = () => {
 
 /* ── Buttons ── */
 .btn {
-  border: 1px solid rgba(15,18,16,0.14);
+  border: 1px solid #E5E5E5;
   background: rgba(255,255,255,0.60);
   color: rgba(15,18,16,0.78);
-  border-radius: 12px;
+  border-radius: 0;
   height: 40px;
   padding: 0 18px;
   font-weight: 700;
@@ -552,18 +555,18 @@ const handleLogout = () => {
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn-primary {
-  background: linear-gradient(135deg, var(--r-accent), #a85722);
-  border-color: transparent;
+  background: var(--r-black, #0F1210);
+  border-color: var(--r-black, #0F1210);
   color: white;
 }
-.btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #a85722, #914a1e); }
+.btn-primary:hover:not(:disabled) { background: #2a2a2a; border-color: #2a2a2a; }
 .btn-outline-danger {
   background: transparent;
   border-color: rgba(220,38,38,0.30);
   color: #dc2626;
 }
 .btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
-.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 10px; }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {

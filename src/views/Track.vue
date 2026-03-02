@@ -27,8 +27,7 @@
   
   <style scoped>
   .tracker-page {
-    background: radial-gradient(900px 420px at 50% 20%, rgba(16,185,129,0.12), transparent),
-                #F5F6F3;
+    background: #fff;
   }
   
   .page-container {
@@ -48,9 +47,9 @@
   .btn-back {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 0;
     border: 1px solid rgba(15,18,16,0.14);
-    background: rgba(255,255,255,0.90);
+    background: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -60,8 +59,7 @@
   }
   
   .btn-back:hover {
-    background: white;
-    transform: translateX(-2px);
+    background: #eee;
   }
   
   .page-header h1 {

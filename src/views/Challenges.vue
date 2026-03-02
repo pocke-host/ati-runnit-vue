@@ -470,49 +470,38 @@ onMounted(() => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .challenges-page {
-  --r-olive:      #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent:     #C46A2A;
-  --r-offwhite:   #F5F6F3;
+  --r-olive:      #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent:     #B85C20;
+  --r-offwhite:   #F8F7F4;
   --r-white:      #FFFFFF;
+  --r-warm-gray:  #6B6B6B;
+  --r-border:     rgba(15,18,16,0.10);
+  --r-shadow-sm:  0 2px 12px rgba(15,18,16,0.06);
 
   font-family: Futura, 'Avenir Next', 'Avenir', system-ui, -apple-system, sans-serif;
-  background: var(--r-offwhite);
+  background: #fff;
   min-height: 100vh;
   padding-top: 72px;
 }
 
 /* ===== HERO ===== */
 .hero {
-  position: relative;
-  padding: 140px 0 120px;
-  background-image: url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?q=80&w=2000&auto=format&fit=crop');
-  background-size: cover;
-  background-position: center 30%;
-  overflow: hidden;
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, rgba(15,18,16,0.82) 0%, rgba(15,18,16,0.45) 100%);
-}
-
-.hero .container-xxl {
-  position: relative;
-  z-index: 1;
+  padding: 80px 0 60px;
+  background: #000;
+  color: white;
 }
 
 .hero h1 {
   color: white;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-weight: 900;
 }
 
 .hero .lead {
-  color: rgba(255,255,255,0.88);
-  font-size: 18px;
-  font-weight: 400;
+  color: rgba(255,255,255,0.70);
+  font-size: 1rem;
+  font-weight: 300;
   max-width: 600px;
 }
 
@@ -552,12 +541,12 @@ onMounted(() => {
 }
 
 .tab-btn:hover {
-  color: var(--r-olive);
+  color: #767676;
 }
 
 .tab-btn.active {
-  color: var(--r-olive-deep);
-  border-bottom-color: var(--r-accent);
+  color: #000;
+  border-bottom-color: #000;
 }
 
 .tab-count {
@@ -567,9 +556,9 @@ onMounted(() => {
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  background: var(--r-accent);
+  background: #000;
   color: white;
-  border-radius: 10px;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 700;
 }
@@ -599,7 +588,7 @@ onMounted(() => {
 .sport-pill {
   padding: 7px 18px;
   border: 1px solid #E5E7EB;
-  border-radius: 24px;
+  border-radius: 0;
   background: white;
   color: #374151;
   font-weight: 600;
@@ -615,8 +604,8 @@ onMounted(() => {
 }
 
 .sport-pill.active {
-  background: var(--r-accent);
-  border-color: var(--r-accent);
+  background: var(--r-black, #0F1210);
+  border-color: var(--r-black, #0F1210);
   color: white;
 }
 
@@ -644,7 +633,7 @@ onMounted(() => {
 .search-box .form-control {
   height: 42px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   padding-left: 40px;
   font-size: 14px;
   font-family: inherit;
@@ -652,8 +641,8 @@ onMounted(() => {
 
 .search-box .form-control:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196,106,42,0.1);
+  border-color: #767676;
+  box-shadow: none;
 }
 
 .sort-select {
@@ -661,15 +650,15 @@ onMounted(() => {
   min-width: 160px;
   height: 42px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   font-size: 14px;
   font-weight: 500;
   font-family: inherit;
 }
 
 .sort-select:focus {
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196,106,42,0.1);
+  border-color: #767676;
+  box-shadow: none;
 }
 
 /* ===== CHALLENGES GRID ===== */
@@ -687,7 +676,7 @@ onMounted(() => {
   gap: 16px;
 }
 
-.text-olive { color: var(--r-olive) !important; }
+.text-olive { color: #767676 !important; }
 
 .loading-text {
   color: #6B7280;
@@ -698,7 +687,7 @@ onMounted(() => {
 /* Cards */
 .challenge-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
   border: 1px solid #E5E7EB;
   transition: all 0.3s ease;
@@ -708,13 +697,13 @@ onMounted(() => {
 }
 
 .challenge-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  transform: none;
+  box-shadow: none;
   border-color: #D1D5DB;
 }
 
 .challenge-card.entered {
-  border-color: var(--r-olive);
+  border-color: #767676;
   border-width: 2px;
 }
 
@@ -732,7 +721,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   font-size: 56px;
   color: rgba(255,255,255,0.3);
 }
@@ -742,7 +731,7 @@ onMounted(() => {
   top: 12px;
   right: 12px;
   padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -760,10 +749,10 @@ onMounted(() => {
   top: 12px;
   left: 12px;
   padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(90,107,78,0.92);
+  background: #000;
   color: white;
   backdrop-filter: blur(10px);
   display: flex;
@@ -791,7 +780,7 @@ onMounted(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--r-accent);
+  color: #767676;
 }
 
 .participants {
@@ -838,7 +827,7 @@ onMounted(() => {
 }
 
 .prize-item {
-  color: var(--r-accent);
+  color: #767676;
   font-weight: 600;
 }
 
@@ -853,8 +842,8 @@ onMounted(() => {
   flex: 1;
   height: 42px;
   border: none;
-  border-radius: 10px;
-  background: var(--r-accent);
+  border-radius: 0;
+  background: var(--r-black, #0F1210);
   color: white;
   font-weight: 600;
   font-size: 14px;
@@ -864,9 +853,9 @@ onMounted(() => {
 }
 
 .btn-join:hover:not(:disabled) {
-  background: #a85722;
+  background: #2a2a2a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196,106,42,0.3);
+  box-shadow: none);
 }
 
 .btn-join:disabled {
@@ -877,10 +866,10 @@ onMounted(() => {
 .btn-lb {
   flex: 1;
   height: 42px;
-  border: 1.5px solid var(--r-olive);
-  border-radius: 10px;
+  border: 1.5px solid #000;
+  border-radius: 0;
   background: white;
-  color: var(--r-olive-deep);
+  color: #000;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -893,7 +882,7 @@ onMounted(() => {
 }
 
 .btn-lb:hover {
-  background: var(--r-olive);
+  background: #000;
   color: white;
 }
 
@@ -901,7 +890,7 @@ onMounted(() => {
   height: 42px;
   padding: 0 14px;
   border: 1.5px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   background: white;
   color: #9CA3AF;
   font-weight: 600;
@@ -963,7 +952,7 @@ onMounted(() => {
   gap: 6px;
   padding: 10px 20px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   background: white;
   color: #374151;
   font-weight: 600;
@@ -1028,14 +1017,14 @@ onMounted(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--r-accent);
+  color: #767676;
   margin-bottom: 4px;
 }
 
 .lb-title {
   font-size: 19px;
   font-weight: 700;
-  color: var(--r-olive-deep);
+  color: #000;
   margin: 0;
   line-height: 1.3;
 }
@@ -1044,7 +1033,7 @@ onMounted(() => {
   width: 36px;
   height: 36px;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   background: #F3F4F6;
   color: #374151;
   font-size: 16px;
@@ -1118,7 +1107,7 @@ onMounted(() => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   color: white;
   font-size: 14px;
   font-weight: 700;
@@ -1140,13 +1129,13 @@ onMounted(() => {
 }
 
 .lb-name:hover {
-  color: var(--r-accent);
+  color: #767676;
 }
 
 .lb-value {
   font-size: 14px;
   font-weight: 700;
-  color: var(--r-olive);
+  color: #767676;
   white-space: nowrap;
   flex-shrink: 0;
 }

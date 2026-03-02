@@ -544,21 +544,24 @@ onMounted(() => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .clubs-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
+  --r-olive: #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent: #B85C20;
+  --r-offwhite: #FFFFFF;
   --r-white: #FFFFFF;
+  --r-warm-gray: #6B6B6B;
+  --r-border: rgba(15,18,16,0.10);
+  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
 
   font-family: Futura, "Avenir Next", system-ui, -apple-system, sans-serif;
-  background: var(--r-offwhite);
+  background: #fff;
   min-height: 100vh;
   padding-top: 72px;
 }
 
 /* ===== HERO ===== */
 .hero {
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   color: white;
   padding: 80px 0 60px;
 }
@@ -611,23 +614,23 @@ onMounted(() => {
 }
 
 .tab-btn:hover {
-  color: var(--r-olive);
+  color: #000;
 }
 
 .tab-btn.active {
-  color: var(--r-olive-deep);
-  border-bottom-color: var(--r-accent);
+  color: #000;
+  border-bottom-color: #000;
 }
 
 .tab-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  background: var(--r-accent);
+  width: 18px;
+  height: 18px;
+  background: #000;
   color: white;
-  border-radius: 50%;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 700;
   margin-left: 6px;
@@ -648,8 +651,8 @@ onMounted(() => {
 
 .sport-pill {
   padding: 8px 20px;
-  border: 1px solid #E5E7EB;
-  border-radius: 24px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   background: white;
   color: #374151;
   font-family: inherit;
@@ -665,8 +668,8 @@ onMounted(() => {
 }
 
 .sport-pill.active {
-  background: var(--r-accent);
-  border-color: var(--r-accent);
+  background: var(--r-black, #0F1210);
+  border-color: var(--r-black, #0F1210);
   color: white;
 }
 
@@ -694,8 +697,8 @@ onMounted(() => {
 
 .search-box .form-control {
   height: 44px;
-  border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding-left: 40px;
   font-family: inherit;
   font-size: 15px;
@@ -703,24 +706,24 @@ onMounted(() => {
 
 .search-box .form-control:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+  border-color: #767676;
+  box-shadow: none;
 }
 
 .sort-select {
   width: auto;
   min-width: 160px;
   height: 44px;
-  border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   font-family: inherit;
   font-size: 15px;
   font-weight: 500;
 }
 
 .sort-select:focus {
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+  border-color: #767676;
+  box-shadow: none;
 }
 
 /* ===== CLUB CARDS ===== */
@@ -729,8 +732,8 @@ onMounted(() => {
 }
 
 .club-card {
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   overflow: hidden;
   background: white;
   display: flex;
@@ -739,15 +742,15 @@ onMounted(() => {
 }
 
 .club-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  transform: none;
+  box-shadow: none;
   border-color: #D1D5DB;
 }
 
 .club-card .thumb {
   position: relative;
   height: 180px;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%) center/cover no-repeat;
+  background: #000 center/cover no-repeat;
 }
 
 .sport-tag {
@@ -761,7 +764,7 @@ onMounted(() => {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: 0;
   backdrop-filter: blur(4px);
 }
 
@@ -782,8 +785,8 @@ onMounted(() => {
 .btn-join {
   padding: 8px 18px;
   border: none;
-  border-radius: 10px;
-  background: var(--r-accent);
+  border-radius: 0;
+  background: var(--r-black, #0F1210);
   color: white;
   font-family: inherit;
   font-weight: 600;
@@ -793,9 +796,9 @@ onMounted(() => {
 }
 
 .btn-join:hover:not(:disabled) {
-  background: #a85722;
+  background: #2a2a2a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196, 106, 42, 0.3);
+  box-shadow: none);
 }
 
 .btn-join:disabled {
@@ -806,7 +809,7 @@ onMounted(() => {
 .btn-leave {
   padding: 8px 14px;
   border: 1px solid #D1D5DB;
-  border-radius: 10px;
+  border-radius: 0;
   background: white;
   color: #6B7280;
   font-family: inherit;
@@ -834,8 +837,8 @@ onMounted(() => {
   align-items: center;
   padding: 8px 16px;
   border: none;
-  border-radius: 10px;
-  background: var(--r-olive);
+  border-radius: 0;
+  background: #000;
   color: white;
   font-family: inherit;
   font-weight: 600;
@@ -846,9 +849,9 @@ onMounted(() => {
 }
 
 .chat-btn:hover {
-  background: var(--r-olive-deep);
+  background: #000;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(44, 55, 38, 0.3);
+  box-shadow: none);
 }
 
 /* Empty state */
@@ -856,23 +859,23 @@ onMounted(() => {
   text-align: center;
   padding: 80px 24px;
   border: 2px dashed rgba(15, 18, 16, 0.15);
-  border-radius: 20px;
-  background: rgba(245, 246, 243, 0.4);
+  border-radius: 0;
+  background: #f9f9f9;
 }
 
 /* ===== INVITE CARDS ===== */
 .invite-card {
   background: white;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 20px;
 }
 
 .invite-avatar {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  border-radius: 0;
+  background: #000;
   color: white;
   font-size: 18px;
   font-weight: 700;
@@ -890,8 +893,8 @@ onMounted(() => {
 
 .invite-link-input {
   flex: 1;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 8px 12px;
   font-size: 13px;
   color: #6B7280;
@@ -906,8 +909,8 @@ onMounted(() => {
   gap: 5px;
   padding: 8px 14px;
   border: none;
-  border-radius: 8px;
-  background: var(--r-olive);
+  border-radius: 0;
+  background: #000;
   color: white;
   font-family: inherit;
   font-size: 13px;
@@ -918,12 +921,12 @@ onMounted(() => {
 }
 
 .btn-copy:hover {
-  background: var(--r-olive-deep);
+  background: #000;
 }
 
 /* ===== CTA SECTION ===== */
 .cta {
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   padding: 80px 0;
 }
 
@@ -951,11 +954,11 @@ onMounted(() => {
 .btn-cta {
   display: inline-block;
   padding: 14px 40px;
-  background: var(--r-accent);
-  color: white;
+  background: white;
+  color: var(--r-olive-deep);
   text-decoration: none;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   font-family: inherit;
   font-weight: 600;
   font-size: 16px;
@@ -964,9 +967,9 @@ onMounted(() => {
 }
 
 .btn-cta:hover {
-  background: #a85722;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: rgba(255,255,255,0.88);
+  transform: none;
+  box-shadow: none;
 }
 
 /* ===== CHAT DRAWER ===== */
@@ -1003,8 +1006,8 @@ onMounted(() => {
 .chat-club-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  border-radius: 0;
+  background: #000;
   color: white;
   font-size: 16px;
   font-weight: 700;
@@ -1030,7 +1033,7 @@ onMounted(() => {
   height: 36px;
   border: none;
   background: #F3F4F6;
-  border-radius: 8px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1082,7 +1085,7 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   color: white;
   font-size: 13px;
   font-weight: 700;
@@ -1143,8 +1146,8 @@ onMounted(() => {
 
 .chat-input {
   flex: 1;
-  border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 10px 14px;
   font-family: inherit;
   font-size: 14px;
@@ -1153,16 +1156,16 @@ onMounted(() => {
 }
 
 .chat-input:focus {
-  border-color: var(--r-olive);
-  box-shadow: 0 0 0 3px rgba(90, 107, 78, 0.12);
+  border-color: #767676;
+  box-shadow: none;
 }
 
 .chat-send {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 10px;
-  background: var(--r-olive);
+  border-radius: 0;
+  background: #000;
   color: white;
   font-size: 16px;
   display: flex;
@@ -1174,7 +1177,7 @@ onMounted(() => {
 }
 
 .chat-send:hover:not(:disabled) {
-  background: var(--r-olive-deep);
+  background: #000;
 }
 
 .chat-send:disabled {

@@ -81,10 +81,7 @@ const articles = [
   padding: 52px 0 44px;
   color: var(--r-white);
   border-bottom: 1px solid rgba(255,255,255,0.10);
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
 }
 .kicker{
   letter-spacing: .18em;
@@ -110,26 +107,16 @@ const articles = [
     radial-gradient(700px 220px at 30% 0%, rgba(90,107,78,0.12), rgba(90,107,78,0) 60%),
     linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.56));
   border: 1px solid rgba(15,18,16,0.12);
-  box-shadow: 0 12px 32px rgba(15,18,16,0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: none;
+  
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   position: relative;
   overflow: hidden;
 }
-.help-link::after{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  background:
-    linear-gradient(120deg, rgba(196,106,42,0.14), rgba(196,106,42,0) 55%);
-  opacity: 0;
-  transition: opacity .12s ease;
-  pointer-events:none;
-}
+.help-link::after{ display: none; }
 .help-link:hover{
-  transform: translateY(-2px);
-  border-color: rgba(196,106,42,0.28);
+  transform: none;
+  border-color: #000;
   box-shadow: 0 18px 44px rgba(15,18,16,0.10);
 }
 .help-link:hover::after{ opacity: 1; }
@@ -137,11 +124,11 @@ const articles = [
 .icon-wrap{
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 0;
   display:flex;
   align-items:center;
   justify-content:center;
-  background: rgba(15,18,16,0.06);
+  background: #f5f5f5;
   border: 1px solid rgba(15,18,16,0.10);
 }
 .icon-wrap .bi{
@@ -170,13 +157,13 @@ const articles = [
 
 /* Buttons */
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(15,18,16,0.10);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(15,18,16,0.10);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
   font-weight: 900;
   height: 46px;
-  border-radius: 14px;
+  border-radius: 0;
   padding-inline: 18px;
 }
 
@@ -190,6 +177,6 @@ const articles = [
 
 /* Small */
 @media (max-width: 576px){
-  .help-link{ border-radius: 16px; }
+  .help-link{ border-radius: 0; }
 }
 </style>

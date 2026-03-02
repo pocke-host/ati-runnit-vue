@@ -34,7 +34,7 @@
   .btn-back {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 0;
     border: 1px solid rgba(15,18,16,0.14);
     background: rgba(255,255,255,0.90);
     display: flex;

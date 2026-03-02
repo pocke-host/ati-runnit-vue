@@ -174,53 +174,23 @@ const modules = [
   position:relative;
   overflow:hidden;
 
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
 }
 
-/* Pixel grid */
-.hero::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  pointer-events:none;
-  opacity:.40;
-  background:
-    linear-gradient(var(--hud-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--hud-line) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mix-blend-mode: overlay;
-}
+/* Pixel grid removed */
 
-/* Scanlines */
-.hero::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:.22;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,255,0.06),
-    rgba(255,255,255,0.06) 2px,
-    rgba(0,0,0,0.05) 3px,
-    rgba(0,0,0,0.05) 6px
-  );
-  mix-blend-mode: soft-light;
-}
+/* Scanlines removed */
 
 .eyebrow{
   letter-spacing:.18em;
-  color: rgba(190,231,194,0.92);
-  text-shadow: 0 0 14px rgba(190,231,194,0.22);
+  color: rgba(255,255,255,0.75);
+  
   text-transform: uppercase;
 }
 
 .hero :deep(h1){
   color: var(--r-white);
-  text-shadow: 0 10px 40px rgba(15,18,16,0.35);
+  
 }
 
 .hero :deep(.lead),
@@ -230,7 +200,7 @@ const modules = [
 
 /* Buttons = game UI */
 .btn{
-  border-radius: 14px;
+  border-radius: 0;
   font-weight: 800;
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -238,26 +208,18 @@ const modules = [
   box-shadow: 0 12px 34px rgba(15,18,16,0.25);
 }
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(255,255,255,0.12);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
   position: relative;
 }
-.btn-primary::before{
-  content:"";
-  position:absolute;
-  inset:2px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.18);
-  pointer-events:none;
-}
+
 .hero :deep(.btn-outline-dark){
-  --bs-btn-color: rgba(190,231,194,0.95);
-  --bs-btn-border-color: rgba(190,231,194,0.40);
-  --bs-btn-hover-bg: rgba(190,231,194,0.10);
-  --bs-btn-hover-border-color: rgba(190,231,194,0.55);
-  --bs-btn-hover-color: rgba(255,255,255,0.95);
+  --bs-btn-color: rgba(255,255,255,0.95);
+  --bs-btn-border-color: rgba(255,255,255,0.40);
+  --bs-btn-hover-bg: rgba(255,255,255,0.10);
+  --bs-btn-hover-color: #fff;
 }
 
 /* Hero art = simulator panel */
@@ -266,14 +228,10 @@ const modules = [
   position:relative;
   overflow:hidden;
 
-  background:
-    radial-gradient(700px 260px at 30% 20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 60%),
-    radial-gradient(800px 320px at 80% 80%, rgba(15,18,16,0.35), rgba(15,18,16,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
-  border: 1px solid rgba(190,231,194,0.22);
-  box-shadow: 0 26px 70px rgba(15,18,16,0.34);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: none;
+  
 }
 
 /* HUD label */
@@ -282,10 +240,10 @@ const modules = [
   top:14px;
   left:14px;
   padding: 6px 10px;
-  border-radius: 12px;
-  background: rgba(15,18,16,0.22);
-  border: 1px solid rgba(190,231,194,0.22);
-  color: rgba(190,231,194,0.90);
+  border-radius: 0;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.80);
   font-weight: 900;
   letter-spacing: .14em;
   font-size: .72rem;
@@ -295,16 +253,15 @@ const modules = [
 .phone-card{
   position:absolute; right:18px; bottom:18px; width:250px; border-radius:16px;
   background: rgba(15,18,16,0.28);
-  border: 1px solid rgba(190,231,194,0.22);
+  border: 1px solid rgba(255,255,255,0.14);
   box-shadow:0 20px 60px rgba(15,18,16,.40);
   overflow:hidden;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  
 }
 .phone-header{
   display:flex; gap:6px; padding:10px 12px;
   background: rgba(15,18,16,0.40);
-  border-bottom: 1px solid rgba(190,231,194,0.18);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
 }
 .phone-header .dot{
   width:8px; height:8px; border-radius:3px;
@@ -315,7 +272,7 @@ const modules = [
 .phone-body .line{
   height:10px;
   background: rgba(190,231,194,0.14);
-  border-radius: 8px;
+  border-radius: 0;
   margin:.45rem 0;
 }
 .phone-body .chart{
@@ -338,8 +295,7 @@ const modules = [
   background: rgba(15,18,16,0.18);
   border: 1px solid rgba(190,231,194,0.18);
   box-shadow:0 18px 46px rgba(15,18,16,.30);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  
 }
 .card-1{ left:18px; top:22px; width:170px; height:120px; }
 .card-2{ left:72px; bottom:62px; width:130px; height:90px; }
@@ -348,19 +304,13 @@ const modules = [
 .grid{ padding:56px 0; background:#fff; }
 .card-feature{
   border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 16px;
+  border-radius: 0;
   overflow:hidden;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
 }
 .card-art{
   height:180px;
-  background:
-    linear-gradient(rgba(190,231,194,0.10) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(190,231,194,0.10) 1px, transparent 1px),
-    radial-gradient(520px 220px at 20% 20%, rgba(90,107,78,0.30), rgba(90,107,78,0) 60%),
-    radial-gradient(420px 190px at 80% 60%, rgba(196,106,42,0.20), rgba(196,106,42,0) 60%),
-    #f8faf8;
-  background-size: 22px 22px, 22px 22px, auto, auto, auto;
+  background: #f5f5f5;
 }
 
 /* ---- MODULES ---- */
@@ -368,17 +318,17 @@ const modules = [
 .module{
   padding:16px;
   border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 16px;
+  border-radius: 0;
   background:#fff;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
 }
 .module-icon{
   font-size:1.5rem;
-  color: var(--r-accent);
+  color: #000;
 }
 
 /* ---- DEVICES STRIP ---- */
-.devices{ padding:40px 0; background:#f7f5f2; }
+.devices{ padding:40px 0; background: #f5f5f5; }
 .device-pill{
   display:inline-block;
   padding:8px 14px;

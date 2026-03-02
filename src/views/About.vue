@@ -200,10 +200,7 @@ const values = [
   color: var(--r-white);
   padding: 72px 0;
 
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
 }
 .eyebrow{
   text-transform:uppercase;
@@ -220,25 +217,21 @@ const values = [
 .hero-art{
   height: 320px;
   position: relative;
-  border-radius: 16px;
+  border-radius: 0;
   overflow:hidden;
 
-  background:
-    radial-gradient(700px 260px at 30% 20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 60%),
-    radial-gradient(800px 320px at 80% 80%, rgba(15,18,16,0.35), rgba(15,18,16,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 26px 70px rgba(15,18,16,0.34);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: none;
+  
 }
 .hero-card{
   position:absolute;
   inset: 18px;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 18px;
   background: rgba(15,18,16,0.18);
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 .hero-card-title{
   font-weight: 900;
@@ -257,9 +250,9 @@ const values = [
 .pill{
   display:inline-flex;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 0;
   background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.12);
   color: rgba(255,255,255,0.86);
   font-weight: 700;
   font-size: .78rem;
@@ -270,10 +263,10 @@ const values = [
 .mission-card{
   background:#fff;
   border:1px solid rgba(15,18,16,0.10);
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
 }
 .mission-card .bi{
-  color: var(--r-accent);
+  color: #000;
   font-size:1.1rem;
   margin-top:.15rem;
 }
@@ -293,11 +286,11 @@ const values = [
 .team-card{
   background:#fff;
   border:1px solid rgba(15,18,16,0.10);
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
 }
 .team-card .avatar{
   height:120px;
-  background: linear-gradient(135deg, rgba(90,107,78,0.18), rgba(196,106,42,0.14));
+  background: #f5f5f5;
 }
 
 /* CTA band */
@@ -305,19 +298,19 @@ const values = [
 .mini-card{
   background:#fff;
   border:1px solid rgba(15,18,16,0.10);
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  box-shadow: none;
 }
 .mini-card.highlight{
-  border-color: rgba(196,106,42,0.35);
-  box-shadow: 0 20px 60px rgba(196,106,42,0.12);
+  border-color: #000;
+  box-shadow: none;
 }
 
 /* Buttons (RUNNIT accent) */
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(255,255,255,0.12);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
 }
 .btn-outline-light{
   --bs-btn-color: rgba(255,255,255,0.92);

@@ -234,8 +234,8 @@ const onSocial = (provider) => {
 .logo-circle {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  border-radius: 0;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,12 +248,12 @@ const onSocial = (provider) => {
   font-size: 24px;
   font-weight: 900;
   letter-spacing: 0.08em;
-  color: var(--r-olive-deep);
+  color: #000;
 }
 
 /* Typography */
 .register-page h1 {
-  color: var(--r-olive-deep);
+  color: #000;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
@@ -274,7 +274,7 @@ const onSocial = (provider) => {
   width: 100%;
   height: 48px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   background: white;
   color: #1F2937;
   font-weight: 600;
@@ -325,7 +325,7 @@ const onSocial = (provider) => {
 .form-control {
   height: 48px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   padding: 0 16px;
   font-size: 15px;
   transition: all 0.2s ease;
@@ -337,8 +337,8 @@ const onSocial = (provider) => {
 
 .form-control:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+  border-color: #000;
+  box-shadow: none;
 }
 
 /* Password Input with Toggle */
@@ -369,13 +369,13 @@ const onSocial = (provider) => {
   width: 18px;
   height: 18px;
   border: 2px solid #D1D5DB;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
 }
 
 .form-check-input:checked {
-  background-color: var(--r-accent);
-  border-color: var(--r-accent);
+  background-color: #000;
+  border-color: #000;
 }
 
 .form-check-label {
@@ -386,7 +386,7 @@ const onSocial = (provider) => {
 
 /* Links */
 .link {
-  color: var(--r-accent);
+  color: #000;
   text-decoration: none;
   font-weight: 600;
 }
@@ -398,9 +398,9 @@ const onSocial = (provider) => {
 /* Primary Button */
 .btn-primary {
   height: 48px;
-  background: var(--r-accent);
+  background: #000;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   color: white;
   font-weight: 600;
   font-size: 15px;
@@ -409,9 +409,9 @@ const onSocial = (provider) => {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #a85722;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196, 106, 42, 0.3);
+  background: #333;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-primary:disabled {
@@ -423,7 +423,7 @@ const onSocial = (provider) => {
 .alert-danger {
   background: #FEF2F2;
   border: 1px solid #FCA5A5;
-  border-radius: 8px;
+  border-radius: 0;
   color: #DC2626;
   font-size: 14px;
 }
@@ -431,7 +431,7 @@ const onSocial = (provider) => {
 /* ===== RIGHT SIDE: Visual ===== */
 .visual-side {
   position: relative;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -498,9 +498,9 @@ const onSocial = (provider) => {
 .stat-card {
   position: absolute;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
+  border-radius: 0;
   padding: 20px 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
   text-align: center;
   backdrop-filter: blur(10px);
   min-width: 120px;
@@ -539,7 +539,7 @@ const onSocial = (provider) => {
 .stat-value {
   font-size: 32px;
   font-weight: 800;
-  color: var(--r-olive-deep);
+  color: #000;
   line-height: 1;
   margin-bottom: 4px;
 }

@@ -147,26 +147,24 @@ onMounted(async () => {
 
 <style scoped>
 .achievements-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
+  --r-olive: #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent: #B85C20;
+  --r-offwhite: #FFFFFF;
+  --r-border: rgba(15,18,16,0.10);
   --bronze: #CD7F32;
   --silver: #A8A9AD;
   --gold: #FFD700;
   --special: #7C3AED;
   min-height: 100vh;
   padding-top: 72px;
-  background: var(--r-offwhite);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
 /* HERO */
 .hero {
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: white;
   padding: 56px 24px 48px;
 }
@@ -195,15 +193,15 @@ onMounted(async () => {
 .hero-progress-bar {
   height: 8px;
   background: rgba(255,255,255,0.20);
-  border-radius: 999px;
+  border-radius: 0;
   max-width: 400px;
   margin: 0 auto;
   overflow: hidden;
 }
 .hero-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--r-accent), #e8953a);
-  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.70), rgba(255,255,255,0.90));
+  border-radius: 0;
   transition: width 0.5s ease;
 }
 
@@ -244,14 +242,14 @@ onMounted(async () => {
   gap: 7px;
 }
 .tab-btn:hover { color: rgba(15,18,16,0.80); }
-.tab-btn.active { color: var(--r-accent); border-bottom-color: var(--r-accent); }
+.tab-btn.active { color: #767676; border-bottom-color: #000; }
 .tab-count {
   background: rgba(15,18,16,0.08);
-  border-radius: 999px;
+  border-radius: 0;
   padding: 2px 8px;
   font-size: 0.75rem;
 }
-.tab-btn.active .tab-count { background: rgba(196,106,42,0.15); color: var(--r-accent); }
+.tab-btn.active .tab-count { background: #f0f0f0; color: #767676; }
 
 /* GRID */
 .grid-section {
@@ -285,7 +283,7 @@ onMounted(async () => {
 /* BADGE CARD */
 .badge-card {
   background: white;
-  border-radius: 20px;
+  border-radius: 0;
   border: 1.5px solid rgba(15,18,16,0.09);
   padding: 24px 18px 20px;
   display: flex;
@@ -302,13 +300,14 @@ onMounted(async () => {
   opacity: 0.75;
 }
 .badge-card.earned {
-  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  box-shadow: none;
+  border-color: #000;
 }
-.badge-card.earned.tier-bronze { box-shadow: 0 0 0 2px var(--bronze), 0 6px 24px rgba(205,127,50,0.22); }
-.badge-card.earned.tier-silver { box-shadow: 0 0 0 2px var(--silver), 0 6px 24px rgba(168,169,173,0.28); }
-.badge-card.earned.tier-gold { box-shadow: 0 0 0 2px var(--gold), 0 6px 24px rgba(255,215,0,0.28); }
-.badge-card.earned.tier-special { box-shadow: 0 0 0 2px var(--special), 0 6px 24px rgba(124,58,237,0.22); }
-.badge-card:hover { transform: translateY(-3px); }
+.badge-card.earned.tier-bronze { border-color: #000; }
+.badge-card.earned.tier-silver { border-color: #000; }
+.badge-card.earned.tier-gold { border-color: #000; }
+.badge-card.earned.tier-special { border-color: #000; }
+.badge-card:hover { transform: none; }
 .badge-card.locked:hover { transform: none; }
 
 .badge-icon-wrap {
@@ -328,7 +327,7 @@ onMounted(async () => {
 /* Tier pill */
 .badge-tier-pill {
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: 0;
   font-size: 0.68rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -350,14 +349,14 @@ onMounted(async () => {
   width: 100%;
   height: 5px;
   background: rgba(15,18,16,0.10);
-  border-radius: 999px;
+  border-radius: 0;
   overflow: hidden;
   margin-top: 4px;
 }
 .badge-progress-fill {
   height: 100%;
-  background: var(--r-accent);
-  border-radius: 999px;
+  background: #000;
+  border-radius: 0;
   transition: width 0.4s ease;
 }
 .badge-progress-text {

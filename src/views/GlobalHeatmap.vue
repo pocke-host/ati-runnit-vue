@@ -205,7 +205,7 @@
   .map{ position:absolute; inset:0; }
   .panel{
     position:absolute; top:16px; left:16px; z-index:2;
-    width: 280px; background:#fff; border-radius:12px; padding:12px;
+    width: 280px; background:#fff; border-radius:0; padding:12px;
   }
   .card{ border:1px solid #eee; }
   .form-label{ color:#444; }

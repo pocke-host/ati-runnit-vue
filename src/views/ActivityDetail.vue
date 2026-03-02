@@ -434,13 +434,15 @@ onMounted(init)
 
 <style scoped>
 .detail-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
+  --r-olive: #4A5E3F;
+  --r-olive-deep: #1E2B1A;
+  --r-accent: #B85C20;
+  --r-offwhite: #FFFFFF;
+  --r-border: rgba(15,18,16,0.10);
+  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
   min-height: 100vh;
   padding-top: 72px;
-  background: var(--r-offwhite);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -464,14 +466,14 @@ onMounted(init)
   align-items: center;
   gap: 16px;
   padding: 20px 32px;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: white;
 }
 .back-btn {
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
   color: white;
-  border-radius: 10px;
+  border-radius: 0;
   padding: 8px 16px;
   font-weight: 700;
   font-size: 0.9rem;
@@ -491,7 +493,7 @@ onMounted(init)
 }
 .sport-chip {
   background: rgba(255,255,255,0.18);
-  border-radius: 999px;
+  border-radius: 0;
   padding: 6px 16px;
   font-weight: 900;
   font-size: 0.9rem;
@@ -522,7 +524,7 @@ onMounted(init)
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -547,7 +549,7 @@ onMounted(init)
 /* Buttons */
 .btn {
   border: none;
-  border-radius: 12px;
+  border-radius: 0;
   height: 40px;
   padding: 0 18px;
   font-weight: 900;
@@ -600,10 +602,10 @@ onMounted(init)
 /* Cards */
 .det-card {
   background: white;
-  border: 1px solid rgba(15,18,16,0.09);
-  border-radius: 18px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(15,18,16,0.06);
+  box-shadow: none;
   margin-bottom: 20px;
 }
 .det-section-title {
@@ -621,7 +623,7 @@ onMounted(init)
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: rgba(15,18,16,0.08);
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
 }
 .stat-box {
@@ -647,7 +649,7 @@ onMounted(init)
 .map-card { padding-bottom: 20px; }
 .map-wrap {
   height: 300px;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   background: rgba(15,18,16,0.05);
 }
@@ -664,7 +666,7 @@ onMounted(init)
   gap: 8px;
   background: rgba(15,18,16,0.05);
   border: 2px solid transparent;
-  border-radius: 999px;
+  border-radius: 0;
   padding: 10px 20px;
   font-size: 1.1rem;
   font-weight: 900;
@@ -707,7 +709,7 @@ onMounted(init)
 }
 .comment-count-badge {
   background: rgba(15,18,16,0.08);
-  border-radius: 999px;
+  border-radius: 0;
   padding: 2px 10px;
   font-size: 0.75rem;
   font-weight: 900;
@@ -747,7 +749,7 @@ onMounted(init)
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -777,7 +779,7 @@ onMounted(init)
 .comment-input {
   flex: 1;
   border: 1.5px solid rgba(15,18,16,0.12);
-  border-radius: 12px;
+  border-radius: 0;
   padding: 10px 14px;
   font-size: 0.9rem;
   font-family: inherit;
@@ -790,7 +792,7 @@ onMounted(init)
 .comment-submit {
   width: 42px;
   height: 42px;
-  border-radius: 12px;
+  border-radius: 0;
   background: var(--r-accent);
   border: none;
   color: white;
@@ -826,7 +828,7 @@ onMounted(init)
   align-items: center;
   background: rgba(22,163,74,0.12);
   border: 1px solid rgba(22,163,74,0.25);
-  border-radius: 999px;
+  border-radius: 0;
   padding: 6px 14px;
   font-size: 0.82rem;
   font-weight: 900;

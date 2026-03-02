@@ -228,10 +228,7 @@ onMounted(() => {
 /* HERO */
 .hero{
   padding: 64px 0;
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.10), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+  background: #000;
   color: var(--r-white);
 }
 .eyebrow{
@@ -249,9 +246,9 @@ onMounted(() => {
   font-variant-numeric: tabular-nums;
   letter-spacing: .06em;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: 0;
   background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.20);
 }
 
 /* Hero art becomes premium glass panel (no “sim” visuals) */
@@ -260,25 +257,21 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
 
-  background:
-    radial-gradient(700px 260px at 30% 20%, rgba(255,255,255,0.14), rgba(255,255,255,0) 60%),
-    radial-gradient(800px 320px at 80% 80%, rgba(15,18,16,0.35), rgba(15,18,16,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 26px 70px rgba(15,18,16,0.34);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: none;
+  
 }
 
 .hero-icon{
   width: 72px;
   height: 72px;
-  border-radius: 18px;
+  border-radius: 0;
   display: grid;
   place-items: center;
   background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 18px 46px rgba(15,18,16,.26);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: none;
   margin-right: 14px;
 }
 .hero-icon i{
@@ -307,9 +300,9 @@ onMounted(() => {
 .billing .save{
   margin-left: 6px;
   padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(196,106,42,0.18);
-  border: 1px solid rgba(196,106,42,0.28);
+  border-radius: 0;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.20);
   color: rgba(255,255,255,0.92);
   font-weight: 800;
 }
@@ -318,12 +311,12 @@ onMounted(() => {
   position: relative;
   width: 56px;
   height: 28px;
-  border-radius: 999px;
+  border-radius: 0;
   border: 1px solid rgba(255,255,255,0.22);
   background: rgba(255,255,255,0.10);
   padding: 0;
   cursor: pointer;
-  box-shadow: 0 16px 34px rgba(15,18,16,0.22);
+  box-shadow: none;
 }
 .knob{
   position: absolute;
@@ -331,8 +324,8 @@ onMounted(() => {
   left: 3px;
   width: 22px;
   height: 22px;
-  border-radius: 50%;
-  background: var(--r-accent);
+  border-radius: 0;
+  background: #fff;
   transition: transform .2s ease;
 }
 .knob.annual{ transform: translateX(26px); }
@@ -341,27 +334,27 @@ onMounted(() => {
 .pricing{ padding: 56px 0; }
 .price-card{
   border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  border-radius: 0;
+  box-shadow: none;
 }
-.price-card.highlight{
-  border-color: rgba(196,106,42,0.55);
-  box-shadow: 0 20px 60px rgba(196,106,42,0.14);
+.price-card.highlight {
+  border-color: #000;
+  box-shadow: none;
 }
 .badge.best{
-  background: rgba(196,106,42,1);
+  background: #000;
   color: #fff;
   font-weight: 900;
   letter-spacing: .08em;
   text-transform: uppercase;
-  border-radius: 999px;
+  border-radius: 0;
   padding: 8px 12px;
   width: fit-content;
 }
 
 /* WHY PREMIUM */
 .why-premium{ padding: 56px 0; background: #fff; border-top: 1px solid rgba(15,18,16,0.08); }
-.why-icon{ color: var(--r-accent); }
+.why-icon{ color: #000; }
 
 /* TESTIMONIALS */
 .testimonials{ padding: 56px 0; background: #fff; }
@@ -372,9 +365,9 @@ onMounted(() => {
 
 /* Brand button */
 .btn-primary{
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: rgba(255,255,255,0.12);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: rgba(255,255,255,0.12);
+  --bs-btn-bg: #000;
+  --bs-btn-border-color: #000;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
 }
 </style>

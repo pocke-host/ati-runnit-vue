@@ -1,5 +1,5 @@
 /* src/assets/base.css
-   RUNNIT Global Theme (olive + glass + burnt orange accent)
+   RUNNIT Global Theme — lululemon aesthetic
 */
 
 @tailwind base;
@@ -7,44 +7,47 @@
 @tailwind utilities;
 
 :root {
-  /* Navbar height — used to offset page content below fixed nav */
+  /* Layout */
   --nav-h: 64px;
+  --tab-h: 64px; /* bottom tab bar height (mobile) */
 
-  /* RUNNIT brand */
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-black: #0F1210;
+  /* RUNNIT palette — black/white editorial */
+  --r-olive: #4A5E3F;        /* kept for active/accent states only */
+  --r-olive-deep: #1E2B1A;   /* kept for avatar bg */
+  --r-accent: #B85C20;       /* used very sparingly */
+  --r-black: #000000;
+  --r-gray-mid: #767676;
   --r-stone: #A3A69F;
-  --r-offwhite: #F5F6F3;
+  --r-warm-gray: #767676;
+  --r-offwhite: #FFFFFF;
   --r-white: #FFFFFF;
+  --r-border: #E5E5E5;
 
-  /* Accent (pick ONE) */
-  --r-accent: #C46A2A; /* burnt orange */
-
-  /* Glass tokens */
-  --r-glass: rgba(255, 255, 255, 0.10);
-  --r-glass-border: rgba(255, 255, 255, 0.18);
-  --r-shadow: 0 24px 60px rgba(15, 18, 16, 0.30);
+  /* Shadows — eliminated */
+  --r-shadow-sm: none;
+  --r-shadow: none;
+  --r-shadow-lg: none;
 
   /* Bootstrap global overrides */
-  --bs-body-bg: var(--r-offwhite);
-  --bs-body-color: var(--r-black);
+  --bs-body-bg: #FFFFFF;
+  --bs-body-color: #000000;
 
-  --bs-primary: var(--r-accent);
-  --bs-primary-rgb: 196, 106, 42;
+  --bs-primary: #000000;
+  --bs-primary-rgb: 0, 0, 0;
 
-  --bs-link-color: var(--r-accent);
-  --bs-link-hover-color: #a85722;
+  --bs-link-color: #000000;
+  --bs-link-hover-color: #333333;
 
-  --bs-border-color: rgba(15, 18, 16, 0.10);
+  --bs-border-color: #E5E5E5;
 
-  /* Buttons rounding */
-  --bs-border-radius: 0.9rem;
-  --bs-border-radius-lg: 999px;
-  --bs-border-radius-pill: 999px;
+  /* Rectangular everywhere */
+  --bs-border-radius: 0;
+  --bs-border-radius-sm: 0;
+  --bs-border-radius-lg: 0;
+  --bs-border-radius-pill: 0;
 }
 
-/* Futura-first vibe everywhere */
+/* Futura-first typography */
 html, body, #app {
   height: 100%;
   width: 100%;
@@ -54,101 +57,67 @@ html, body, #app {
 
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  background: var(--r-offwhite);
-  color: var(--r-black);
+  background: #FFFFFF;
+  color: #000000;
+  line-height: 1.6;
 }
 
 a { color: inherit; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* ===== Global helpers you can use anywhere ===== */
+/* ===== Global helpers ===== */
 
-/* Glass surface */
-.runnit-glass {
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.14), rgba(255,255,255,0) 60%),
-    radial-gradient(900px 420px at 85% 30%, rgba(196,106,42,0.12), rgba(196,106,42,0) 60%),
-    linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
-  border: 1px solid var(--r-glass-border);
-  box-shadow: var(--r-shadow);
-}
-
-/* Light premium card */
+/* Clean white card — editorial, no chrome */
 .runnit-card {
   background: #fff;
-  border: 1px solid rgba(15,18,16,0.08);
-  border-radius: 1rem;
-  box-shadow: 0 12px 30px rgba(15,18,16,0.06);
+  border-bottom: 1px solid #E5E5E5;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* Muted text */
-.runnit-muted { color: var(--r-stone) !important; }
+.runnit-muted { color: #767676 !important; }
 
-/* Pills */
-.runnit-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 999px;
+/* Section overline label — lululemon style */
+.runnit-overline {
+  font-size: 0.65rem;
   font-weight: 600;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.90);
-}
-
-/* Navbar (global) */
-.runnit-nav {
-  background:
-    radial-gradient(900px 420px at 18% 18%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
-    linear-gradient(135deg, rgba(90,107,78,0.96), rgba(44,55,38,0.96));
-  border-bottom: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.runnit-nav .navbar-brand {
-  color: var(--r-white) !important;
   letter-spacing: 0.16em;
-  font-weight: 800;
+  text-transform: uppercase;
+  color: #767676;
 }
 
-.runnit-nav .nav-link,
-.runnit-nav .dropdown-toggle {
-  color: rgba(255,255,255,0.86) !important;
-  font-weight: 600;
-}
-
-.runnit-nav .nav-link:hover,
-.runnit-nav .dropdown-toggle:hover {
-  color: rgba(255,255,255,0.96) !important;
-}
-
-/* Dropdown menu in glass theme */
-.runnit-nav .dropdown-menu {
-  border-radius: 16px;
-  border: 1px solid rgba(15,18,16,0.08);
-  box-shadow: 0 18px 46px rgba(15,18,16,0.18);
-}
-
-/* Make Bootstrap primary buttons match the accent (everywhere) */
+/* Primary button — black rectangle, uppercase */
 .btn-primary {
-  --bs-btn-bg: var(--r-accent);
-  --bs-btn-border-color: var(--r-accent);
-  --bs-btn-hover-bg: #a85722;
-  --bs-btn-hover-border-color: #a85722;
+  --bs-btn-bg: #000000;
+  --bs-btn-border-color: #000000;
+  --bs-btn-hover-bg: #333333;
+  --bs-btn-hover-border-color: #333333;
+  --bs-btn-color: #fff;
+  --bs-btn-active-bg: #111111;
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
-/* Outline buttons look more premium */
+/* Outline buttons */
 .btn-outline-dark {
-  border-radius: 999px;
+  border-radius: 0;
 }
 
-/* Inputs: slightly softer */
+/* Inputs — rectangular, solid border */
 .form-control, .form-select {
-  border-radius: 14px;
-  border-color: rgba(15,18,16,0.12);
+  border-radius: 0;
+  border-color: #E5E5E5;
 }
 .form-control:focus, .form-select:focus {
-  border-color: rgba(196,106,42,0.45);
-  box-shadow: 0 0 0 0.25rem rgba(196,106,42,0.18);
+  border-color: #000000;
+  box-shadow: none;
+}
+
+/* Mobile bottom padding — prevents content hiding behind BottomNav */
+@media (max-width: 768px) {
+  body { padding-bottom: var(--tab-h, 64px); }
 }

@@ -222,8 +222,8 @@ const handleGoogleSignIn = () => {
 .logo-circle {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  border-radius: 0;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,12 +236,12 @@ const handleGoogleSignIn = () => {
   font-size: 24px;
   font-weight: 900;
   letter-spacing: 0.08em;
-  color: var(--r-olive-deep);
+  color: #000;
 }
 
 /* Typography */
 .login-page h1 {
-  color: var(--r-olive-deep);
+  color: #000;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
@@ -262,7 +262,7 @@ const handleGoogleSignIn = () => {
   width: 100%;
   height: 48px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   background: white;
   color: #1F2937;
   font-weight: 600;
@@ -314,7 +314,7 @@ const handleGoogleSignIn = () => {
 .form-control {
   height: 48px;
   border: 1px solid #E5E7EB;
-  border-radius: 10px;
+  border-radius: 0;
   padding: 0 16px;
   font-size: 15px;
   transition: all 0.2s ease;
@@ -326,8 +326,8 @@ const handleGoogleSignIn = () => {
 
 .form-control:focus {
   outline: none;
-  border-color: var(--r-accent);
-  box-shadow: 0 0 0 3px rgba(196, 106, 42, 0.1);
+  border-color: #000;
+  box-shadow: none;
 }
 
 /* Password Input */
@@ -373,17 +373,17 @@ const handleGoogleSignIn = () => {
   width: 18px;
   height: 18px;
   border: 2px solid #D1D5DB;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
 }
 
 .remember-label input[type="checkbox"]:checked {
-  accent-color: var(--r-accent);
+  accent-color: #000;
 }
 
 .forgot-link {
   font-size: 14px;
-  color: var(--r-accent);
+  color: #000;
   text-decoration: none;
   font-weight: 600;
 }
@@ -394,7 +394,7 @@ const handleGoogleSignIn = () => {
 
 /* Links */
 .link {
-  color: var(--r-accent);
+  color: #000;
   text-decoration: none;
   font-weight: 600;
 }
@@ -406,9 +406,9 @@ const handleGoogleSignIn = () => {
 /* Primary Button */
 .btn-primary {
   height: 48px;
-  background: var(--r-accent);
+  background: #000;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   color: white;
   font-weight: 600;
   font-size: 15px;
@@ -417,9 +417,9 @@ const handleGoogleSignIn = () => {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #a85722;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196, 106, 42, 0.3);
+  background: #333;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-primary:disabled {
@@ -431,7 +431,7 @@ const handleGoogleSignIn = () => {
 .alert-danger {
   background: #FEF2F2;
   border: 1px solid #FCA5A5;
-  border-radius: 8px;
+  border-radius: 0;
   color: #DC2626;
   font-size: 14px;
 }
@@ -439,7 +439,7 @@ const handleGoogleSignIn = () => {
 /* ===== RIGHT SIDE: Visual ===== */
 .visual-side {
   position: relative;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -486,8 +486,8 @@ const handleGoogleSignIn = () => {
   gap: 24px;
   padding: 32px;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border-radius: 0;
+  box-shadow: none;
   backdrop-filter: blur(10px);
 }
 
@@ -499,7 +499,7 @@ const handleGoogleSignIn = () => {
 .stat-number {
   font-size: 32px;
   font-weight: 800;
-  color: var(--r-olive-deep);
+  color: #000;
   line-height: 1;
   margin-bottom: 6px;
 }
@@ -545,7 +545,7 @@ const handleGoogleSignIn = () => {
   padding: 28px 32px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
+  border-radius: 0;
   backdrop-filter: blur(10px);
 }
 
