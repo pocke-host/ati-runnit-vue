@@ -158,7 +158,7 @@
   
           map.value = new mapboxgl.Map({
             container: liveMapContainer.value,
-            style: 'mapbox://styles/quinn-runnit/cmm9rrbrb000a01rd0lvbap5i',
+            style: 'mapbox://styles/quinn-runnit/cmm9si8k3000e01rdhkf4gokf',
             center: [longitude, latitude],
             zoom: 15
           })

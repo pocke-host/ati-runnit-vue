@@ -94,7 +94,7 @@
   const currentStyle = ref('runnit')
 
   const mapStyles = {
-    'runnit': 'mapbox://styles/quinn-runnit/cmm9rrbrb000a01rd0lvbap5i',
+    'runnit': 'mapbox://styles/quinn-runnit/cmm9si8k3000e01rdhkf4gokf',
     'outdoors-v12': 'mapbox://styles/mapbox/outdoors-v12',
     'streets-v12': 'mapbox://styles/mapbox/streets-v12',
     'satellite-v9': 'mapbox://styles/mapbox/satellite-v9',
