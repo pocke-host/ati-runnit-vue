@@ -70,23 +70,27 @@
       }
     },
     {
-      "id": "hillshade",
+      "id": "hillshade-highlight",
       "type": "fill",
       "source": "composite",
       "source-layer": "hillshade",
+      "filter": ["==", ["get", "class"], "highlight"],
       "paint": {
         "fill-antialias": false,
-        "fill-color": [
-          "match", ["get", "level"],
-          89, "#FFFFFF",
-          78, "#F4F4F4",
-          67, "#EBEBEB",
-          56, "#E2E2E2",
-          22, "#D5D5D5",
-          11, "#C8C8C8",
-          "#FFFFFF"
-        ],
-        "fill-opacity": 0.4
+        "fill-color": "#FFFFFF",
+        "fill-opacity": 0.08
+      }
+    },
+    {
+      "id": "hillshade-shadow",
+      "type": "fill",
+      "source": "composite",
+      "source-layer": "hillshade",
+      "filter": ["==", ["get", "class"], "shadow"],
+      "paint": {
+        "fill-antialias": false,
+        "fill-color": "#000000",
+        "fill-opacity": 0.06
       }
     },
     {
@@ -95,10 +99,11 @@
       "source": "composite",
       "source-layer": "contour",
       "minzoom": 11,
+      "filter": ["==", ["get", "index"], 0],
       "paint": {
-        "line-color": "#DEDEDE",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.4, 16, 0.8],
-        "line-opacity": 0.55
+        "line-color": "#E0E0E0",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.3, 16, 0.7],
+        "line-opacity": 0.5
       }
     },
     {
@@ -107,7 +112,7 @@
       "source": "composite",
       "source-layer": "contour",
       "minzoom": 11,
-      "filter": ["match", ["get", "index"], [5, 10], true, false],
+      "filter": ["!=", ["get", "index"], 0],
       "paint": {
         "line-color": "#C8C8C8",
         "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.6, 16, 1.2],
@@ -129,10 +134,13 @@
       "source": "composite",
       "source-layer": "waterway",
       "minzoom": 8,
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
       "paint": {
         "line-color": "#BFCFD8",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.5, 12, 2, 18, 6],
-        "line-cap": "round"
+        "line-width": ["interpolate", ["linear"], ["zoom"], 8, 0.5, 12, 2, 18, 6]
       }
     },
     {
@@ -271,7 +279,7 @@
       "type": "line",
       "source": "composite",
       "source-layer": "admin",
-      "filter": ["all", ["==", ["get", "admin_level"], 4], ["==", ["get", "maritime"], "false"]],
+      "filter": ["all", ["==", ["get", "admin_level"], 4], ["==", ["get", "maritime"], false]],
       "paint": {
         "line-color": "#CCCCCC",
         "line-width": 0.75,
@@ -283,7 +291,7 @@
       "type": "line",
       "source": "composite",
       "source-layer": "admin",
-      "filter": ["all", ["==", ["get", "admin_level"], 2], ["==", ["get", "maritime"], "false"]],
+      "filter": ["all", ["==", ["get", "admin_level"], 2], ["==", ["get", "maritime"], false]],
       "paint": {
         "line-color": "#999999",
         "line-width": 1.5
