@@ -92,7 +92,7 @@
     <!-- PRICING / CTA -->
     <section class="cta">
       <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-2">Ready to run the loop?</h2>
+        <h2 class="fw-bold mb-2">Ready to start the loop?</h2>
         <p class="text-muted mb-4">Create an account, post your first Moment, and start stacking days.</p>
         <router-link to="/signup" class="btn btn-primary btn-lg">Enter Simulation</router-link>
         <p class="small text-muted mt-3 mb-0">By continuing you agree to our Terms and Privacy Policy.</p>

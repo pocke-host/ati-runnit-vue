@@ -6,7 +6,7 @@
       <div class="hero-inner container-xxl">
         <p class="hero-overline">Movement, redefined</p>
         <h1 class="hero-headline">
-          Run further.<br>
+          Move further.<br>
           Train smarter.<br>
           Go together.
         </h1>
@@ -98,7 +98,7 @@
             <span class="cap-icon"><i class="bi bi-camera-reels-fill"></i></span>
             <div class="cap-content">
               <div class="cap-name">Daily Moments</div>
-              <div class="cap-desc">One photo, one song. Share your run without the scroll trap.</div>
+              <div class="cap-desc">One photo, one song. Share your workout without the scroll trap.</div>
             </div>
           </div>
           <div class="cap-item">
@@ -130,7 +130,7 @@
     <section class="final-cta">
       <div class="container-xxl text-center">
         <p class="section-overline" style="color:rgba(255,255,255,0.45)">Get started</p>
-        <h2 class="cta-title">Your next run<br>starts here.</h2>
+        <h2 class="cta-title">Your next session<br>starts here.</h2>
         <router-link to="/signup" class="btn-cta btn-cta-light">
           Join RUNNIT — Free
         </router-link>

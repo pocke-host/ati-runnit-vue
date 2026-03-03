@@ -10,7 +10,7 @@
         </div>
 
         <h1 class="h2 fw-bold mb-2">Create your account</h1>
-        <p class="text-muted mb-4">Track every workout. Train smarter. Connect with runners.</p>
+        <p class="text-muted mb-4">Track every workout. Train smarter. Connect with athletes.</p>
 
         <!-- Social Buttons (Simplified) -->
         <div class="social-buttons mb-4">
@@ -138,9 +138,9 @@
         <!-- Main Message (centered) -->
         <div class="visual-message">
           <h2 class="visual-title">
-            Track every mile.<br>
+            Track every session.<br>
             Train with AI.<br>
-            Connect with runners.
+            Connect with athletes.
           </h2>
           <p class="visual-subtitle">Join thousands who've simplified their training.</p>
         </div>
