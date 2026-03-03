@@ -9,7 +9,7 @@
         <div class="col-6 col-md-2 mb-3">
           <h6 class="fw-bold">Explore</h6>
           <ul class="list-unstyled">
-            <li><router-link to="/features" class="footer-link">Features</router-link></li>
+            <!-- <li><router-link to="/features" class="footer-link">Features</router-link></li> -->
             <li><router-link to="/maps" class="footer-link">Maps</router-link></li>
             <li><router-link to="/challenges" class="footer-link">Challenges</router-link></li>
             <li><router-link to="/subscribe" class="footer-link">Subscription</router-link></li>
@@ -18,7 +18,7 @@
         <div class="col-6 col-md-2 mb-3">
           <h6 class="fw-bold">Community</h6>
           <ul class="list-unstyled">
-            <li><router-link to="/feed" class="footer-link">Athletes</router-link></li>
+            <!-- <li><router-link to="/feed" class="footer-link">Athletes</router-link></li> -->
             <li><router-link to="/clubs" class="footer-link">Clubs</router-link></li>
             <li><router-link to="/races" class="footer-link">Events</router-link></li>
             <li><router-link to="/support" class="footer-link">Support</router-link></li>
@@ -29,7 +29,7 @@
           <ul class="list-unstyled">
             <li><router-link to="/about" class="footer-link">About</router-link></li>
             <li><router-link to="/careers" class="footer-link">Careers</router-link></li>
-            <li><router-link to="/press" class="footer-link">Press</router-link></li>
+            <!-- <li><router-link to="/press" class="footer-link">Press</router-link></li> -->
             <li><router-link to="/blog" class="footer-link">Blog</router-link></li>
           </ul>
         </div>
@@ -45,7 +45,7 @@
       <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
         <p class="small mb-0">© 2026 RUNNIT. All rights reserved.</p>
         <div>
-          <a href="https://www.tiktok.com/@RUNNIT.app" class="footer-link me-3" target="_blank" rel="noopener">TikTok</a>
+          <!-- <a href="https://www.tiktok.com/@RUNNIT.app" class="footer-link me-3" target="_blank" rel="noopener">TikTok</a> -->
           <a href="https://www.instagram.com/runnit.co" class="footer-link me-3" target="_blank" rel="noopener">Instagram</a>
         </div>
       </div>

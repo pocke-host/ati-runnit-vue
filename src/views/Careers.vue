@@ -10,7 +10,7 @@
 
     <section class="ep-section">
       <div class="ep-content">
-        <h2 class="ep-section-title">Open Roles</h2>
+        <!-- <h2 class="ep-section-title">Open Roles</h2> -->
         <div class="role-list">
           <div class="role-card" v-for="role in roles" :key="role.title">
             <div class="role-top">
@@ -18,7 +18,7 @@
                 <div class="role-title">{{ role.title }}</div>
                 <div class="role-meta">{{ role.dept }} · {{ role.type }} · {{ role.location }}</div>
               </div>
-              <a href="mailto:careers@runnit.co" class="btn-apply">Apply</a>
+              <a href="mailto:quinnhuynh1126@gmail.com" class="btn-apply">Apply</a>
             </div>
             <p class="role-desc">{{ role.desc }}</p>
           </div>
@@ -26,7 +26,7 @@
 
         <div class="open-app">
           <h3>Don't see your role?</h3>
-          <p>We always want to meet exceptional people. Send your resume and a note to <a href="mailto:careers@runnit.co">careers@runnit.co</a>.</p>
+          <p>Check out our LinkedIn page for more updates. <a href="https://www.linkedin.com/company/runnit-app/">Runnit LinkedIn Page</a>.</p>
         </div>
       </div>
     </section>
@@ -47,34 +47,20 @@
 
 <script setup>
 const roles = [
-  {
-    title: 'Senior iOS Engineer',
-    dept: 'Engineering',
-    type: 'Full-time',
-    location: 'Remote (US)',
-    desc: 'Own the iOS app from GPS tracking to social features. We use Swift, SwiftUI, and MapboxMaps SDK. You\'ll work directly with the founders and ship fast.'
-  },
-  {
-    title: 'Backend Engineer — Java/Spring',
-    dept: 'Engineering',
-    type: 'Full-time',
-    location: 'Remote (US / Europe)',
-    desc: 'Build and scale our Spring Boot API: activity ingestion, training load algorithms, real-time features. Strong Java fundamentals required.'
-  },
-  {
-    title: 'Product Designer',
-    dept: 'Design',
-    type: 'Full-time',
-    location: 'Remote',
-    desc: 'Shape every surface of the Runnit experience — from onboarding to activity detail. We care deeply about typography, motion, and athlete-first UX.'
-  },
-  {
-    title: 'Community & Growth Lead',
-    dept: 'Growth',
-    type: 'Full-time',
-    location: 'Remote',
-    desc: 'Grow and nurture our athlete community. Run ambassador programs, social channels, and local event partnerships. You run (or ride, or swim).'
-  }
+  // {
+  //   title: 'UI/UX Designer',
+  //   dept: 'Creative',
+  //   type: 'Contract',
+  //   location: 'Remote (US)',
+  //   desc: 'Own the user experience of Runnit.'
+  // },
+  // {
+  //   title: 'Community & Growth Lead',
+  //   dept: 'Growth',
+  //   type: 'Contract',
+  //   location: 'Remote',
+  //   desc: 'Grow and nurture our app community. Run ambassador programs, social channels, and local event partnerships.'
+  // }
 ]
 
 const values = [

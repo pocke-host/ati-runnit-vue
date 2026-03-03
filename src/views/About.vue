@@ -111,6 +111,16 @@
         </div>
 
         <div class="row g-4">
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="team-card rounded-4 p-3">
+              <div class="avatar rounded-3 mb-3"></div>
+              <div class="fw-semibold">Quinn</div>
+              <div class="text-muted small">CEO</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="row g-4">
           <div class="col-6 col-md-4 col-lg-3" v-for="n in 6" :key="n">
             <div class="team-card rounded-4 p-3">
               <div class="avatar rounded-3 mb-3"></div>
@@ -118,7 +128,7 @@
               <div class="text-muted small">Role title</div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </section>
 
@@ -137,7 +147,7 @@
             <div class="mini-card rounded-4 p-4 h-100">
               <h5 class="fw-bold mb-2">Contact</h5>
               <p class="text-muted mb-3">We’d love to hear from you. Say hello.</p>
-              <a href="#" class="btn btn-outline-dark">Get in touch</a>
+              <a href="/support" class="btn btn-outline-dark">Get in touch</a>
             </div>
           </div>
           <div class="col-12 col-lg-4">

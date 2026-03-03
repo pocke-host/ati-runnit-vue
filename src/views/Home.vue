@@ -64,7 +64,7 @@
       <div class="container-xxl">
         <div class="statement-inner">
           <blockquote class="statement-quote">
-            "Every mile has a story.<br>
+            "Every distance has a story.<br>
             Yours deserves to be told."
           </blockquote>
           <router-link to="/signup" class="btn-cta">Start your story</router-link>
@@ -83,7 +83,7 @@
           <div class="cap-item">
             <span class="cap-icon"><i class="bi bi-robot"></i></span>
             <div class="cap-content">
-              <div class="cap-name">AI Training Plans</div>
+              <div class="cap-name">AI and Coach Training Plans</div>
               <div class="cap-desc">Adapts to your fitness, schedule, and fatigue — not a generic template.</div>
             </div>
           </div>
@@ -91,34 +91,34 @@
             <span class="cap-icon"><i class="bi bi-activity"></i></span>
             <div class="cap-content">
               <div class="cap-name">Live Activity Tracker</div>
-              <div class="cap-desc">GPS tracking with real-time pace, heart rate, and route mapping.</div>
+              <div class="cap-desc">GPS tracking with real-time pace, heart rate, route mapping and personal safety.</div>
             </div>
           </div>
           <div class="cap-item">
             <span class="cap-icon"><i class="bi bi-camera-reels-fill"></i></span>
             <div class="cap-content">
               <div class="cap-name">Daily Moments</div>
-              <div class="cap-desc">One photo, one song. Share your workout without the scroll trap.</div>
+              <div class="cap-desc">One photo, one song. Share your workout or thoughts.</div>
             </div>
           </div>
           <div class="cap-item">
             <span class="cap-icon"><i class="bi bi-people-fill"></i></span>
             <div class="cap-content">
               <div class="cap-name">Clubs & Challenges</div>
-              <div class="cap-desc">Find your crew. Weekly leaderboards, group goals, group chat.</div>
+              <div class="cap-desc">Find your crew. Weekly meet-ups, group goals, and group chat.</div>
             </div>
           </div>
           <div class="cap-item">
             <span class="cap-icon"><i class="bi bi-trophy-fill"></i></span>
             <div class="cap-content">
               <div class="cap-name">Personal Records</div>
-              <div class="cap-desc">PRs automatically detected across 5K, 10K, half, and marathon distances.</div>
+              <div class="cap-desc">PRs automatically detected across all distances.</div>
             </div>
           </div>
           <div class="cap-item">
             <span class="cap-icon"><i class="bi bi-smartwatch"></i></span>
             <div class="cap-content">
-              <div class="cap-name">Device Sync</div>
+              <div class="cap-name">Device Compability</div>
               <div class="cap-desc">Connects with Garmin, Apple Watch, and COROS seamlessly.</div>
             </div>
           </div>
@@ -134,7 +134,7 @@
         <router-link to="/signup" class="btn-cta btn-cta-light">
           Join RUNNIT — Free
         </router-link>
-        <p class="cta-fine">Free forever. No credit card. No catch.</p>
+        <p class="cta-fine">Free to use. No credit card needed.</p>
       </div>
     </section>
 

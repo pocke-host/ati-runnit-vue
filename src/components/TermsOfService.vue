@@ -146,7 +146,7 @@ const sections = [
     title: '6. Third-Party Integrations',
     blocks: [
       {
-        text: 'RUNNIT integrates with third-party services such as Garmin, Strava, Apple Health, COROS, and Spotify. Your use of those integrations is subject to the respective third-party\'s terms and privacy policies.'
+        text: 'RUNNIT integrates with third-party services such as Garmin, Apple Health, COROS, and Spotify. Your use of those integrations is subject to the respective third-party\'s terms and privacy policies.'
       },
       {
         text: 'We are not responsible for the availability, accuracy, or practices of any third-party service. Disconnecting a third-party integration through your account settings will stop future data syncing, but may not delete data already imported.'
