@@ -146,9 +146,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { role } = storeToRefs(authStore)
 
 const email = ref('')
 const password = ref('')
@@ -168,7 +170,7 @@ const onSubmit = async (e) => {
     }
 
     await authStore.login(email.value, password.value)
-    router.push('/dashboard')
+    router.push(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
   } catch (err) {
     error.value = err?.response?.data?.message || err?.message || 'Login failed. Please check your credentials.'
   } finally {

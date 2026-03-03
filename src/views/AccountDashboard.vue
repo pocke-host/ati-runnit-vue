@@ -200,6 +200,18 @@
               </button>
             </div>
 
+            <!-- Coach Widget -->
+            <div v-if="myCoach" class="coach-widget">
+              <div class="coach-widget-label">YOUR COACH</div>
+              <div class="coach-widget-row">
+                <div class="coach-avatar-sm">{{ (myCoach.displayName || '?')[0].toUpperCase() }}</div>
+                <div class="coach-name">{{ myCoach.displayName }}</div>
+              </div>
+            </div>
+            <div v-else-if="!myCoach && myCoachLoaded" class="find-coach-cta">
+              <router-link to="/coaches">Find a Coach →</router-link>
+            </div>
+
             <!-- Subscription CTA -->
             <div v-if="subscriptionTier === 'free'" class="upgrade-banner">
               <div class="upgrade-label">UPGRADE TO PREMIUM</div>
@@ -666,6 +678,7 @@ import { useUnits } from '@/composables/useUnits'
 import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
+import { useAthleteStore } from '@/stores/athlete'
 
 Chart.register(...registerables)
 
@@ -685,9 +698,12 @@ const { uploading: momentLoading, progress: uploadProgress } = storeToRefs(uploa
 const planStore = usePlanStore()
 const achievementStore = useAchievementStore()
 const prStore = usePRStore()
+const athleteStore = useAthleteStore()
 const { activePlan } = storeToRefs(planStore)
 const { latestEarned } = storeToRefs(achievementStore)
 const { topPRs } = storeToRefs(prStore)
+const { myCoach } = storeToRefs(athleteStore)
+const myCoachLoaded = ref(false)
 const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
 
 const showActivityModal = ref(false)
@@ -1280,7 +1296,8 @@ onMounted(async () => {
     await Promise.all([
       planStore.fetchPlans(),
       achievementStore.fetchAchievements(activities.value),
-      prStore.fetchPRs(activities.value)
+      prStore.fetchPRs(activities.value),
+      athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
     ])
     await nextTick()
     updateCharts()
@@ -1548,6 +1565,14 @@ onMounted(async () => {
 .action-btn:hover{background:rgba(255,255,255,0.95);transform:none}
 .action-btn-danger{color:#dc3545;border-color:rgba(220,53,69,0.20)}
 .action-btn-danger:hover{background:rgba(220,53,69,0.05)}
+.coach-widget{margin-top:16px;padding:16px;border:1px solid #E5E5E5}
+.coach-widget-label{font-size:0.62rem;font-weight:700;letter-spacing:0.14em;color:#767676;text-transform:uppercase;margin-bottom:10px}
+.coach-widget-row{display:flex;align-items:center;gap:10px}
+.coach-avatar-sm{width:34px;height:34px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
+.coach-name{font-weight:700;font-size:0.88rem}
+.find-coach-cta{margin-top:12px;padding:4px 0}
+.find-coach-cta a{font-size:0.82rem;font-weight:600;color:#000;text-decoration:none}
+.find-coach-cta a:hover{text-decoration:underline}
 .upgrade-banner{margin-top:16px;padding:20px;background:#000;border-radius:0}
 .upgrade-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.55);margin-bottom:8px}
 .upgrade-desc{font-size:0.82rem;color:rgba(255,255,255,0.70);margin:0 0 16px;line-height:1.5}

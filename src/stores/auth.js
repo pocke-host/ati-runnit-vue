@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const onboardingComplete = ref(localStorage.getItem('onboarding_complete') === 'true')
   const subscriptionTier = ref(localStorage.getItem('subscriptionTier') || 'free')
   const subscriptionStatus = ref(null)
+  const role = ref(user.value?.role || localStorage.getItem('userRole') || 'athlete')
 
   const isAuthenticated = computed(() => !!token.value)
 
@@ -24,23 +25,27 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('onboarding_complete', 'true')
     onboardingComplete.value = true
   }
-  
+
   async function login(email, password) {
     const { data } = await axios.post(`${API_URL}/auth/login`, { email, password })
     setAuth(data.token, data.user)
   }
-  
-  async function register(email, password, displayName) {
-    const { data } = await axios.post(`${API_URL}/auth/register`, { 
-      email, password, displayName 
+
+  async function register(email, password, displayName, userRole = 'athlete') {
+    const { data } = await axios.post(`${API_URL}/auth/register`, {
+      email, password, displayName, role: userRole
     })
     setAuth(data.token, data.user)
   }
-  
+
   async function fetchCurrentUser() {
     const { data } = await axios.get(`${API_URL}/auth/me`)
     user.value = data
     localStorage.setItem('user', JSON.stringify(data))
+    if (data.role) {
+      role.value = data.role
+      localStorage.setItem('userRole', data.role)
+    }
     if (data.subscriptionTier) {
       subscriptionTier.value = data.subscriptionTier
       localStorage.setItem('subscriptionTier', data.subscriptionTier)
@@ -48,19 +53,30 @@ export const useAuthStore = defineStore('auth', () => {
     if (data.subscriptionStatus) {
       subscriptionStatus.value = data.subscriptionStatus
     }
+    if (data.onboardingComplete === true) {
+      completeOnboarding()
+    }
   }
-  
+
   function setAuth(newToken, newUser) {
     token.value = newToken
     user.value = newUser
     localStorage.setItem('token', newToken)
     localStorage.setItem('user', JSON.stringify(newUser))
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+    if (newUser?.role) {
+      role.value = newUser.role
+      localStorage.setItem('userRole', newUser.role)
+    }
+    if (newUser?.onboardingComplete === true) {
+      completeOnboarding()
+    }
   }
-  
+
   function logout() {
     token.value = null
     user.value = null
+    role.value = 'athlete'
     onboardingComplete.value = false
     subscriptionTier.value = 'free'
     subscriptionStatus.value = null
@@ -68,16 +84,18 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user')
     localStorage.removeItem('onboarding_complete')
     localStorage.removeItem('subscriptionTier')
+    localStorage.removeItem('userRole')
     delete axios.defaults.headers.common['Authorization']
   }
-  
+
   // Initialize axios header on store creation
   if (token.value) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
   }
-  
+
   return {
-    token, user, isAuthenticated, unitSystem, onboardingComplete, subscriptionTier, subscriptionStatus,
+    token, user, isAuthenticated, unitSystem, onboardingComplete,
+    subscriptionTier, subscriptionStatus, role,
     login, register, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding
   }
 })
