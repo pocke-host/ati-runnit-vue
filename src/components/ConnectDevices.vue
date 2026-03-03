@@ -1,288 +1,453 @@
 <!-- ========== ConnectDevices.vue ========== -->
 <template>
-    <div class="connect-devices">
-      <h2>Connect Your Devices</h2>
-      <p>Automatically sync your workouts from your favorite fitness platforms</p>
-  
-      <!-- Status Banner -->
+  <div class="connect-devices">
+    <h2>Connect Your Devices</h2>
+    <p>Automatically sync your workouts from your favorite fitness platforms</p>
+
+    <!-- Status Banner -->
     <div v-if="statusMessage" :class="['status-banner', statusType]">
       <i :class="statusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
       {{ statusMessage }}
     </div>
 
     <div class="devices-grid">
-        <!-- Garmin -->
-        <div class="device-card">
-          <div class="device-icon">🏃</div>
-          <h3>Garmin</h3>
-          <p>Sync runs, rides, and more</p>
-          
-          <button 
-            v-if="!garminConnected" 
-            class="btn btn-primary"
-            @click="connectGarmin"
-            :disabled="loading"
-          >
+      <!-- Garmin -->
+      <div class="device-card">
+        <div class="device-icon">🏃</div>
+        <h3>Garmin</h3>
+        <p>Sync runs, rides, and more from your Garmin device</p>
+
+        <template v-if="!garminConnected">
+          <button class="btn btn-primary" @click="connectGarmin" :disabled="loading">
             Connect Garmin
           </button>
-          <button 
-            v-else 
-            class="btn btn-outline"
-            @click="disconnectGarmin"
-          >
-            <i class="bi bi-check-circle me-2"></i>Connected
+        </template>
+        <template v-else>
+          <div class="connected-state">
+            <div class="connected-chip">
+              <span class="green-dot"></span>
+              CONNECTED
+            </div>
+            <div class="last-sync-label">
+              Last synced: {{ relativeTime(garminLastSync) }}
+            </div>
+            <button class="btn btn-primary" @click="syncNow" :disabled="syncing">
+              <span v-if="syncing" class="spinner"></span>
+              {{ syncing ? 'Syncing…' : 'Sync Now' }}
+            </button>
+            <button class="btn-disconnect" @click="disconnectGarmin">Disconnect</button>
+          </div>
+        </template>
+      </div>
+
+      <!-- Zwift -->
+      <div class="device-card">
+        <div class="device-icon">🚴</div>
+        <h3>Zwift</h3>
+        <p>Sync rides and runs from Zwift</p>
+
+        <template v-if="!zwiftConnected">
+          <button class="btn btn-primary" @click="connectZwift" :disabled="loading">
+            Connect Zwift
           </button>
-        </div>
-  
-        <!-- Strava -->
-        <div class="device-card">
-          <div class="device-icon">🚴</div>
-          <h3>Strava</h3>
-          <p>Sync activities from Strava</p>
-          
-          <button 
-            v-if="!stravaConnected" 
-            class="btn btn-primary"
-            @click="connectStrava"
-            :disabled="loading"
-          >
-            Connect Strava
-          </button>
-          <button 
-            v-else 
-            class="btn btn-outline"
-            @click="disconnectStrava"
-          >
-            <i class="bi bi-check-circle me-2"></i>Connected
-          </button>
-        </div>
-  
-        <!-- Apple Watch (Coming Soon) -->
-        <div class="device-card device-disabled">
-          <div class="device-icon">⌚</div>
-          <h3>Apple Watch</h3>
-          <p>Coming soon</p>
-          <button class="btn btn-outline" disabled>
-            Coming Soon
-          </button>
-        </div>
+        </template>
+        <template v-else>
+          <div class="connected-state">
+            <div class="connected-chip">
+              <span class="green-dot"></span>
+              CONNECTED
+            </div>
+            <button class="btn btn-outline" @click="disconnectZwift">
+              <i class="bi bi-check-circle me-2"></i>Disconnect
+            </button>
+          </div>
+        </template>
+      </div>
+
+      <!-- Apple Watch -->
+      <div class="device-card">
+        <div class="device-icon">⌚</div>
+        <h3>Apple Watch</h3>
+        <p>Requires the RUNNIT iOS app. Apple Watch syncs automatically once you install and grant HealthKit access.</p>
+        <a href="#" class="btn btn-outline">Get iOS App →</a>
+      </div>
+
+      <!-- COROS (Coming Soon) -->
+      <div class="device-card device-coming-soon">
+        <div class="device-icon">⌚</div>
+        <h3>COROS</h3>
+        <p>Sync workouts from COROS watches</p>
+        <div class="coming-soon-badge">COMING SOON</div>
+      </div>
+
+      <!-- Wahoo (Coming Soon) -->
+      <div class="device-card device-coming-soon">
+        <div class="device-icon">🚲</div>
+        <h3>Wahoo</h3>
+        <p>Sync rides and workouts from Wahoo</p>
+        <div class="coming-soon-badge">COMING SOON</div>
+      </div>
+
+      <!-- Fitbit (Coming Soon) -->
+      <div class="device-card device-coming-soon">
+        <div class="device-icon">📊</div>
+        <h3>Fitbit</h3>
+        <p>Sync steps, runs, and wellness data</p>
+        <div class="coming-soon-badge">COMING SOON</div>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-  
-  const garminConnected = ref(false)
-  const stravaConnected = ref(false)
-  const loading = ref(false)
-  const statusMessage = ref('')
-  const statusType = ref('success')
+  </div>
+</template>
 
-  const showStatus = (message, type = 'success') => {
-    statusMessage.value = message
-    statusType.value = type
-    setTimeout(() => { statusMessage.value = '' }, 4000)
+<script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+const garminConnected = ref(false)
+const garminLastSync = ref(null)
+const zwiftConnected = ref(false)
+const loading = ref(false)
+const syncing = ref(false)
+const statusMessage = ref('')
+const statusType = ref('success')
+
+const showStatus = (message, type = 'success') => {
+  statusMessage.value = message
+  statusType.value = type
+  setTimeout(() => { statusMessage.value = '' }, 4000)
+}
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+const relativeTime = (iso) => {
+  if (!iso) return 'Never'
+  const diff = Date.now() - new Date(iso)
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
+}
+
+const checkConnectionStatus = async () => {
+  try {
+    const [garminRes, zwiftRes] = await Promise.all([
+      axios.get(`${API_URL}/integrations/garmin/status`, { headers: getAuthHeaders() }),
+      axios.get(`${API_URL}/integrations/zwift/status`, { headers: getAuthHeaders() })
+    ])
+
+    garminConnected.value = garminRes.data.connected
+    garminLastSync.value = garminRes.data.lastSync || null
+    zwiftConnected.value = zwiftRes.data.connected
+  } catch (err) {
+    console.error('Failed to check connection status:', err)
   }
-  
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token')
-    return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+const connectGarmin = async () => {
+  loading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/garmin/connect`, {
+      headers: getAuthHeaders()
+    })
+    window.location.href = data.authorizationUrl
+  } catch {
+    showStatus('Failed to connect Garmin. Please try again.', 'error')
+  } finally {
+    loading.value = false
   }
-  
-  const checkConnectionStatus = async () => {
-    try {
-      const [garminRes, stravaRes] = await Promise.all([
-        axios.get(`${API_URL}/integrations/garmin/status`, { headers: getAuthHeaders() }),
-        axios.get(`${API_URL}/integrations/strava/status`, { headers: getAuthHeaders() })
-      ])
-      
-      garminConnected.value = garminRes.data.connected
-      stravaConnected.value = stravaRes.data.connected
-    } catch (err) {
-      console.error('Failed to check connection status:', err)
-    }
+}
+
+const disconnectGarmin = async () => {
+  if (!confirm('Are you sure you want to disconnect Garmin?')) return
+  try {
+    await axios.delete(`${API_URL}/integrations/garmin/disconnect`, {
+      headers: getAuthHeaders()
+    })
+    garminConnected.value = false
+    garminLastSync.value = null
+    showStatus('Garmin disconnected.')
+  } catch {
+    showStatus('Failed to disconnect Garmin.', 'error')
   }
-  
-  const connectGarmin = async () => {
-    loading.value = true
-    try {
-      const { data } = await axios.get(`${API_URL}/integrations/garmin/connect`, {
-        headers: getAuthHeaders()
-      })
-      
-      // Redirect to Garmin authorization page
-      window.location.href = data.authorizationUrl
-    } catch (err) {
-      console.error('Failed to connect Garmin:', err)
-      showStatus('Failed to connect Garmin. Please try again.', 'error')
-    } finally {
-      loading.value = false
-    }
+}
+
+const syncNow = async () => {
+  syncing.value = true
+  try {
+    await axios.post(`${API_URL}/integrations/garmin/sync`, {}, { headers: getAuthHeaders() })
+    showStatus('Sync triggered — activities will appear shortly.')
+    await checkConnectionStatus()
+  } catch {
+    showStatus('Sync failed. Please try again.', 'error')
+  } finally {
+    syncing.value = false
+  }
+}
+
+const connectZwift = async () => {
+  loading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/zwift/connect`, {
+      headers: getAuthHeaders()
+    })
+    window.location.href = data.authorizationUrl
+  } catch {
+    showStatus('Failed to connect Zwift. Please try again.', 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+const disconnectZwift = async () => {
+  if (!confirm('Are you sure you want to disconnect Zwift?')) return
+  try {
+    await axios.delete(`${API_URL}/integrations/zwift/disconnect`, {
+      headers: getAuthHeaders()
+    })
+    zwiftConnected.value = false
+    showStatus('Zwift disconnected.')
+  } catch {
+    showStatus('Failed to disconnect Zwift.', 'error')
+  }
+}
+
+onMounted(() => {
+  checkConnectionStatus()
+
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('garmin') === 'connected') {
+    garminConnected.value = true
+    showStatus('Garmin connected successfully!')
+  } else if (params.get('zwift') === 'connected') {
+    zwiftConnected.value = true
+    showStatus('Zwift connected successfully!')
+  } else if (params.get('error')) {
+    showStatus('Connection failed. Please try again.', 'error')
   }
 
-  const disconnectGarmin = async () => {
-    if (!confirm('Are you sure you want to disconnect Garmin?')) return
+  if (params.has('garmin') || params.has('zwift') || params.has('error')) {
+    history.replaceState({}, '', window.location.pathname)
+  }
+})
+</script>
 
-    try {
-      await axios.delete(`${API_URL}/integrations/garmin/disconnect`, {
-        headers: getAuthHeaders()
-      })
-      garminConnected.value = false
-      showStatus('Garmin disconnected.')
-    } catch (err) {
-      console.error('Failed to disconnect Garmin:', err)
-      showStatus('Failed to disconnect Garmin.', 'error')
-    }
-  }
+<style scoped>
+.connect-devices {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
 
-  const connectStrava = async () => {
-    loading.value = true
-    try {
-      const { data } = await axios.get(`${API_URL}/integrations/strava/connect`, {
-        headers: getAuthHeaders()
-      })
+.connect-devices h2 {
+  font-weight: 900;
+  font-size: 2rem;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
 
-      // Redirect to Strava authorization page
-      window.location.href = data.authorizationUrl
-    } catch (err) {
-      console.error('Failed to connect Strava:', err)
-      showStatus('Failed to connect Strava. Please try again.', 'error')
-    } finally {
-      loading.value = false
-    }
-  }
+.connect-devices > p {
+  color: rgba(15,18,16,0.55);
+  margin-bottom: 40px;
+  font-size: 0.95rem;
+}
 
-  const disconnectStrava = async () => {
-    if (!confirm('Are you sure you want to disconnect Strava?')) return
+/* Status Banner */
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  border-radius: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
 
-    try {
-      await axios.delete(`${API_URL}/integrations/strava/disconnect`, {
-        headers: getAuthHeaders()
-      })
-      stravaConnected.value = false
-      showStatus('Strava disconnected.')
-    } catch (err) {
-      console.error('Failed to disconnect Strava:', err)
-      showStatus('Failed to disconnect Strava.', 'error')
-    }
-  }
+.status-banner.success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
 
-  onMounted(() => {
-    checkConnectionStatus()
+.status-banner.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
 
-    // Check for connection success/error from OAuth callback
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('garmin') === 'connected') {
-      garminConnected.value = true
-      showStatus('Garmin connected successfully!')
-    } else if (params.get('strava') === 'connected') {
-      stravaConnected.value = true
-      showStatus('Strava connected successfully!')
-    } else if (params.get('error')) {
-      showStatus('Connection failed. Please try again.', 'error')
-    }
-  })
-  </script>
-  
-  <style scoped>
-  .connect-devices {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
-  }
-  
-  .connect-devices h2 {
-    font-weight: 900;
-    font-size: 2rem;
-    margin-bottom: 12px;
-  }
-  
-  .connect-devices > p {
-    color: rgba(15,18,16,0.60);
-    margin-bottom: 40px;
-  }
-  
-  .devices-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-  }
-  
-  .device-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92));
-    border: 1px solid rgba(15,18,16,0.10);
-    border-radius: 20px;
-    padding: 32px;
-    text-align: center;
-    transition: all 0.3s;
-    box-shadow: 0 8px 32px rgba(15,18,16,0.08);
-  }
-  
-  .device-card:hover:not(.device-disabled) {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 48px rgba(15,18,16,0.15);
-  }
-  
-  .device-disabled {
-    opacity: 0.6;
-  }
-  
-  .device-icon {
-    font-size: 4rem;
-    margin-bottom: 16px;
-  }
-  
-  .device-card h3 {
-    font-weight: 900;
-    font-size: 1.3rem;
-    margin-bottom: 8px;
-  }
-  
-  .device-card p {
-    color: rgba(15,18,16,0.60);
-    margin-bottom: 24px;
-  }
-  
-  .btn {
-    width: 100%;
-    height: 48px;
-    border-radius: 14px;
-    font-weight: 900;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid;
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, #C46A2A, #a85722);
-    border-color: #C46A2A;
-    color: white;
-  }
-  
-  .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #a85722, #914a1e);
-  }
-  
-  .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .btn-outline {
-    background: transparent;
-    border-color: rgba(15,18,16,0.20);
-    color: rgba(15,18,16,0.80);
-  }
-  
-  .btn-outline:hover:not(:disabled) {
-    background: rgba(15,18,16,0.05);
-  }
-  </style>
+/* Grid */
+.devices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Card */
+.device-card {
+  background: #fff;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: none;
+  transition: border-color 0.15s;
+}
+
+.device-card:hover:not(.device-coming-soon) {
+  border-color: #ccc;
+}
+
+.device-coming-soon {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.device-icon {
+  font-size: 3rem;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.device-card h3 {
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.device-card p {
+  color: rgba(15,18,16,0.55);
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 0;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-primary {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #222;
+  border-color: #222;
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: #E5E5E5;
+  color: rgba(15,18,16,0.80);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+/* Connected state */
+.connected-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.connected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #166534;
+}
+
+.green-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+}
+
+.last-sync-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(15,18,16,0.45);
+}
+
+.btn-disconnect {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  color: rgba(15,18,16,0.45);
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+}
+
+.btn-disconnect:hover {
+  color: rgba(15,18,16,0.75);
+}
+
+/* Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Coming soon badge */
+.coming-soon-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid #E5E5E5;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(15,18,16,0.40);
+}
+</style>

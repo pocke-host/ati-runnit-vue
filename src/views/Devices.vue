@@ -19,7 +19,7 @@
   <style scoped>
   .page-container {
     min-height: 100vh;
-    padding: 100px 20px 40px;
+    padding: var(--nav-h, 64px) 0 80px;
     max-width: 1200px;
     margin: 0 auto;
   }
@@ -47,7 +47,6 @@
   
   .btn-back:hover {
     background: white;
-    transform: translateX(-2px);
   }
   
   .page-header h1 {

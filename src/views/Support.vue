@@ -167,7 +167,6 @@ const articles = [
   padding-inline: 18px;
 }
 
-/* Keep “outline” neutral, not Strava-ish */
 .btn-outline-dark{
   --bs-btn-color: rgba(15,18,16,0.82);
   --bs-btn-border-color: rgba(15,18,16,0.22);

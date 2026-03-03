@@ -36,7 +36,7 @@
             <div class="pillar-num">01</div>
             <div class="pillar-body">
               <h3 class="pillar-title">Track</h3>
-              <p class="pillar-desc">Log every run, ride, swim, or hike. GPS routes, splits, heart rate — all in one place. Syncs with Garmin, Apple Watch, and Strava.</p>
+              <p class="pillar-desc">Log every run, ride, swim, or hike. GPS routes, splits, heart rate — all in one place. Syncs with Garmin, Apple Watch and Coros.</p>
             </div>
           </div>
           <div class="pillar-divider"></div>
@@ -119,7 +119,7 @@
             <span class="cap-icon"><i class="bi bi-smartwatch"></i></span>
             <div class="cap-content">
               <div class="cap-name">Device Sync</div>
-              <div class="cap-desc">Connects with Garmin, Apple Watch, COROS, and Strava seamlessly.</div>
+              <div class="cap-desc">Connects with Garmin, Apple Watch, and COROS seamlessly.</div>
             </div>
           </div>
         </div>
