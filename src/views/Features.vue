@@ -1,350 +1,550 @@
-<!-- src/pages/Features.vue -->
+<!-- src/views/Features.vue -->
 <template>
   <main class="features-page">
+
     <!-- HERO -->
     <section class="hero">
-      <div class="container-xxl">
-        <div class="row align-items-center g-4">
-          <div class="col-12 col-lg-6">
-            <p class="eyebrow text-uppercase fw-semibold mb-2">Simulation mode: ON</p>
-            <h1 class="display-5 fw-bold mb-3">Systems that build the habit.</h1>
-            <p class="lead text-muted mb-4">
-              RUNNIT isn’t just tracking. It turns training into a “Workout Moment” — the route, the photo,
-              and the reason you showed up. Progress feels like leveling up.
-            </p>
-            <div class="d-flex gap-3">
-              <router-link to="/signup" class="btn btn-primary btn-lg">Start Your Moment</router-link>
-              <router-link to="/join-us" class="btn btn-outline-dark btn-lg">See It In Action</router-link>
+      <div class="hero-inner">
+        <div class="hero-kicker">RUNNIT // PLATFORM</div>
+        <h1 class="hero-headline">Everything you need<br>to train, connect,<br>and improve.</h1>
+        <p class="hero-sub">
+          Activity tracking. Training plans. Coaching. Community. All in one place — built for athletes who show up.
+        </p>
+        <div class="hero-ctas">
+          <router-link to="/signup" class="btn-cta-primary">Get Started Free</router-link>
+          <router-link to="/join-us" class="btn-cta-ghost">Sign In</router-link>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE GRID: Core -->
+    <section class="feature-section">
+      <div class="section-inner">
+        <div class="section-kicker">CORE FEATURES</div>
+        <h2 class="section-headline">Built for how you actually train.</h2>
+        <div class="feature-grid">
+          <div v-for="f in coreFeatures" :key="f.title" class="feature-card">
+            <div class="feature-icon-wrap">
+              <i :class="f.icon + ' feature-icon'"></i>
+            </div>
+            <div class="feature-body">
+              <h3 class="feature-title">{{ f.title }}</h3>
+              <p class="feature-desc">{{ f.desc }}</p>
             </div>
           </div>
-          <div class="col-12 col-lg-6">
-            <div class="hero-art rounded-4">
-              <div class="hud-label">MODULE PREVIEW</div>
+        </div>
+      </div>
+    </section>
 
-              <div class="phone-card">
-                <div class="phone-header">
-                  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                </div>
-                <div class="phone-body">
-                  <div class="line w-75"></div>
-                  <div class="line w-50"></div>
-                  <div class="chart"></div>
-                  <div class="line w-100"></div>
-                  <div class="line w-60"></div>
+    <!-- EDITORIAL STRIP: Live Tracker -->
+    <section class="editorial-strip editorial-strip--dark">
+      <div class="editorial-inner">
+        <div class="editorial-text">
+          <div class="editorial-kicker">LIVE TRACKING</div>
+          <h2 class="editorial-headline">GPS tracking that stays out of the way.</h2>
+          <p class="editorial-body">
+            Start a run, ride, swim, or hike — and RUNNIT records every split, elevation change, and heart rate beat in real time. Auto-pauses, live pacing, and GPS route maps included.
+          </p>
+          <ul class="editorial-list">
+            <li>GPS route recording with elevation profile</li>
+            <li>Real-time pace, distance, and duration</li>
+            <li>Multi-sport: Running, Cycling, Swimming, Hiking</li>
+            <li>Auto-sync to your activity feed on save</li>
+          </ul>
+        </div>
+        <div class="editorial-visual">
+          <div class="tracker-mock">
+            <div class="tracker-mock-kicker">LIVE</div>
+            <div class="tracker-stat-row">
+              <div class="tracker-stat">
+                <div class="tracker-val">3.2</div>
+                <div class="tracker-label">MILES</div>
+              </div>
+              <div class="tracker-stat">
+                <div class="tracker-val">8:42</div>
+                <div class="tracker-label">PACE</div>
+              </div>
+              <div class="tracker-stat">
+                <div class="tracker-val">24:10</div>
+                <div class="tracker-label">TIME</div>
+              </div>
+            </div>
+            <div class="tracker-route-preview">
+              <div class="route-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITORIAL STRIP: Training Plans -->
+    <section class="editorial-strip editorial-strip--light">
+      <div class="editorial-inner editorial-inner--reversed">
+        <div class="editorial-text">
+          <div class="editorial-kicker">TRAINING PLANS</div>
+          <h2 class="editorial-headline">Week-by-week plans built for your goal.</h2>
+          <p class="editorial-body">
+            Choose a plan by sport, level, and goal. Each plan breaks your training into structured weeks with daily workouts, distance targets, and recovery days. Follow your coach's plan or pick from the library.
+          </p>
+          <ul class="editorial-list">
+            <li>Plans for running, cycling, swimming, and triathlon</li>
+            <li>Beginner to advanced levels</li>
+            <li>Week-by-week workout schedule</li>
+            <li>Coach-assigned plans with inline editing</li>
+          </ul>
+        </div>
+        <div class="editorial-visual">
+          <div class="plan-mock">
+            <div class="plan-mock-header">
+              <span class="plan-mock-title">5K Race Plan</span>
+              <span class="plan-mock-badge">WEEK 3 / 8</span>
+            </div>
+            <div class="plan-mock-bar-wrap">
+              <div class="plan-mock-bar">
+                <div class="plan-mock-fill" style="width: 37%"></div>
+              </div>
+              <span class="plan-mock-pct">37%</span>
+            </div>
+            <div class="plan-mock-workouts">
+              <div v-for="w in planPreview" :key="w.day" class="plan-mock-row">
+                <span class="plan-mock-day">{{ w.day }}</span>
+                <span class="plan-mock-workout">{{ w.workout }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE GRID: Social -->
+    <section class="feature-section feature-section--gray">
+      <div class="section-inner">
+        <div class="section-kicker">COMMUNITY</div>
+        <h2 class="section-headline">Train with people who get it.</h2>
+        <div class="feature-grid feature-grid--2">
+          <div v-for="f in communityFeatures" :key="f.title" class="feature-card feature-card--large">
+            <div class="feature-icon-wrap">
+              <i :class="f.icon + ' feature-icon'"></i>
+            </div>
+            <div class="feature-body">
+              <h3 class="feature-title">{{ f.title }}</h3>
+              <p class="feature-desc">{{ f.desc }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITORIAL STRIP: Coaching -->
+    <section class="editorial-strip editorial-strip--dark">
+      <div class="editorial-inner">
+        <div class="editorial-text">
+          <div class="editorial-kicker">COACHING</div>
+          <h2 class="editorial-headline">Coach and athlete, in one platform.</h2>
+          <p class="editorial-body">
+            Coaches get a full dashboard to manage their roster, review athlete progress, build and assign custom training plans, and message athletes directly. Athletes can browse the coach directory and request to join.
+          </p>
+          <ul class="editorial-list">
+            <li>Coach dashboard with athlete roster</li>
+            <li>Inline plan editor — edit workouts by week</li>
+            <li>Approve/reject athlete requests</li>
+            <li>Direct messaging between coach and athlete</li>
+          </ul>
+        </div>
+        <div class="editorial-visual">
+          <div class="coaching-mock">
+            <div class="coaching-mock-label">COACHING HUB</div>
+            <div class="coaching-mock-stats">
+              <div class="coaching-stat">
+                <div class="coaching-val">12</div>
+                <div class="coaching-stat-label">Athletes</div>
+              </div>
+              <div class="coaching-stat">
+                <div class="coaching-val">3</div>
+                <div class="coaching-stat-label">Pending</div>
+              </div>
+              <div class="coaching-stat">
+                <div class="coaching-val">9</div>
+                <div class="coaching-stat-label">Plans</div>
+              </div>
+            </div>
+            <div class="coaching-roster">
+              <div v-for="a in coachPreview" :key="a.name" class="coaching-athlete">
+                <div class="coaching-avatar">{{ a.name[0] }}</div>
+                <div class="coaching-info">
+                  <div class="coaching-name">{{ a.name }}</div>
+                  <div class="coaching-plan">{{ a.plan }}</div>
                 </div>
               </div>
-
-              <div class="floating-card card-1"></div>
-              <div class="floating-card card-2"></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- BIG CARD GRID -->
-    <section class="grid">
-      <div class="container-xxl">
-        <div class="row g-4">
-          <div v-for="(f, i) in bigGrid" :key="i" class="col-12 col-md-6">
-            <div class="card h-100 card-feature">
-              <div class="card-art rounded-top"></div>
-              <div class="card-body">
-                <h3 class="h4 fw-bold mb-2">{{ f.title }}</h3>
-                <p class="text-muted mb-0">{{ f.body }}</p>
-              </div>
+    <!-- STATS + ACHIEVEMENTS -->
+    <section class="feature-section">
+      <div class="section-inner">
+        <div class="section-kicker">STATS & ACHIEVEMENTS</div>
+        <h2 class="section-headline">See exactly where you're growing.</h2>
+        <div class="feature-grid">
+          <div v-for="f in statsFeatures" :key="f.title" class="feature-card">
+            <div class="feature-icon-wrap">
+              <i :class="f.icon + ' feature-icon'"></i>
+            </div>
+            <div class="feature-body">
+              <h3 class="feature-title">{{ f.title }}</h3>
+              <p class="feature-desc">{{ f.desc }}</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ICON LIST / MODULES -->
-    <section class="modules">
-      <div class="container-xxl">
-        <h2 class="fw-bold text-center mb-4">Your whole loop, in one place</h2>
-        <div class="row g-4">
-          <div v-for="(m, i) in modules" :key="i" class="col-12 col-sm-6 col-lg-4">
-            <div class="module h-100">
-              <i :class="m.icon + ' module-icon'"></i>
-              <h5 class="fw-semibold mt-2 mb-1">{{ m.title }}</h5>
-              <p class="text-muted mb-0">{{ m.body }}</p>
-            </div>
-          </div>
+    <!-- COMPATIBLE DEVICES -->
+    <section class="devices-strip">
+      <div class="devices-inner">
+        <div class="devices-label">COMPATIBLE DEVICES</div>
+        <div class="devices-list">
+          <span v-for="d in devices" :key="d" class="device-pill">{{ d }}</span>
         </div>
       </div>
     </section>
 
-    <!-- COMPATIBLE DEVICES STRIP -->
-    <section class="devices">
-      <div class="container-xxl">
-        <div class="d-flex flex-wrap justify-content-center align-items-center gap-4">
-          <span class="device-pill">Garmin</span>
-          <span class="device-pill">Apple Watch</span>
-          <span class="device-pill">COROS</span>
-          <span class="device-pill">Wahoo</span>
-          <span class="device-pill">Suunto</span>
-          <span class="device-pill">Fitbit</span>
-        </div>
+    <!-- FINAL CTA -->
+    <section class="cta-section">
+      <div class="cta-inner">
+        <h2 class="cta-headline">Ready to start training?</h2>
+        <p class="cta-sub">Create your account. Log your first activity. Build the habit.</p>
+        <router-link to="/signup" class="btn-cta-primary">Create Free Account</router-link>
+        <p class="cta-fine">No credit card required. Free to get started.</p>
       </div>
     </section>
 
-    <!-- PRICING / CTA -->
-    <section class="cta">
-      <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-2">Ready to start the loop?</h2>
-        <p class="text-muted mb-4">Create an account, post your first Moment, and start stacking days.</p>
-        <router-link to="/signup" class="btn btn-primary btn-lg">Enter Simulation</router-link>
-        <p class="small text-muted mt-3 mb-0">By continuing you agree to our Terms and Privacy Policy.</p>
-      </div>
-    </section>
   </main>
 </template>
 
 <script setup>
-const bigGrid = [
+const coreFeatures = [
   {
+    icon: 'bi bi-activity',
+    title: 'Activity Tracking',
+    desc: 'Log runs, rides, swims, and hikes. Track distance, pace, elevation, heart rate, and calories in one place.',
+  },
+  {
+    icon: 'bi bi-map',
+    title: 'GPS Route Maps',
+    desc: 'Every workout records a GPS route. View your path, elevation profile, and split breakdowns after each session.',
+  },
+  {
+    icon: 'bi bi-camera-fill',
     title: 'Workout Moments',
-    body: 'Capture the daily moment: photo + route + a line about why you showed up. Training becomes memory, not noise.',
+    desc: 'Capture the moment — photo, song, and a note about why you showed up. Share to your feed or keep it private.',
   },
   {
-    title: 'Streaks & Challenges',
-    body: 'Consistency is the game. Stack days, complete weekly missions, and keep the loop alive.',
+    icon: 'bi bi-calendar3',
+    title: 'Training Plans',
+    desc: 'Structured week-by-week plans for every sport and level. Follow a library plan or get one assigned by your coach.',
   },
   {
-    title: 'Progress Systems',
-    body: 'Track your trends without drowning in dashboards. See what’s improving and what needs recovery.',
+    icon: 'bi bi-bar-chart-line-fill',
+    title: 'Stats & Analytics',
+    desc: 'Weekly distance charts, activity breakdowns by sport, monthly progress, and all your key metrics in one view.',
   },
   {
-    title: 'Community Signal',
-    body: 'Follow the people who motivate you. Celebrate discipline, not perfection.',
-  },
-  {
-    title: 'Adaptive Plans (Coming Soon)',
-    body: 'Plans that adjust to your schedule and fitness — designed to keep you progressing without burning out.',
+    icon: 'bi bi-trophy-fill',
+    title: 'Achievements',
+    desc: 'Earn 20+ badges as you hit milestones — first run, century ride, streak goals, and sport-specific records.',
   },
 ]
 
-const modules = [
-  { icon: 'bi bi-camera',            title: 'Moments',        body: 'Post the workout moment with a photo + route snapshot.' },
-  { icon: 'bi bi-map',               title: 'Route Snapshots', body: 'Save routes, elevation, and surfaces — simple and clean.' },
-  { icon: 'bi bi-lightning-charge',  title: 'Streaks',        body: 'Keep your loop alive. Breakthroughs come from showing up.' },
-  { icon: 'bi bi-trophy',            title: 'Challenges',     body: 'Weekly missions that build consistency and mental toughness.' },
-  { icon: 'bi bi-people',            title: 'Community',      body: 'Clubs + friends that push you forward without the noise.' },
-  { icon: 'bi bi-shield-lock',       title: 'Privacy',        body: 'Control what’s visible and where. Your data stays yours.' },
+const communityFeatures = [
+  {
+    icon: 'bi bi-people-fill',
+    title: 'Clubs',
+    desc: 'Join sport-specific clubs with group chat, member rosters, and invite links. Train with people who share your goals.',
+  },
+  {
+    icon: 'bi bi-flag-fill',
+    title: 'Challenges',
+    desc: 'Enter monthly challenges — distance targets, streak goals, elevation climbs. Leaderboards show where you rank.',
+  },
+  {
+    icon: 'bi bi-collection-fill',
+    title: 'Social Feed',
+    desc: 'Follow athletes you respect and see their activities and moments in a clean, chronological feed. No algorithmic noise.',
+  },
+  {
+    icon: 'bi bi-chat-dots-fill',
+    title: 'Direct Messages',
+    desc: 'Message teammates, coaches, or anyone you follow directly in the app. Stay connected without leaving RUNNIT.',
+  },
 ]
+
+const statsFeatures = [
+  {
+    icon: 'bi bi-lightning-charge-fill',
+    title: 'Personal Records',
+    desc: 'Automatically tracks your fastest 5K, 10K, half marathon, marathon, and more across every activity you log.',
+  },
+  {
+    icon: 'bi bi-fire',
+    title: 'Streaks',
+    desc: 'Track your daily training streak. Consistency is the edge — see how many days in a row you\'ve shown up.',
+  },
+  {
+    icon: 'bi bi-graph-up-arrow',
+    title: 'Monthly Progress',
+    desc: 'Distance, duration, and activity count tracked month over month. See your training volume trend at a glance.',
+  },
+  {
+    icon: 'bi bi-smartwatch',
+    title: 'Device Sync',
+    desc: 'Connect Garmin, Zwift, Apple Watch, and more to automatically import your workouts without manual logging.',
+  },
+]
+
+const planPreview = [
+  { day: 'MON', workout: 'Easy Run — 3 mi' },
+  { day: 'WED', workout: 'Tempo — 4 mi' },
+  { day: 'SAT', workout: 'Long Run — 7 mi' },
+]
+
+const coachPreview = [
+  { name: 'Sarah Chen', plan: '10K Peak Plan' },
+  { name: 'Marcus R.', plan: 'Base Builder 12W' },
+  { name: 'Priya K.', plan: 'Marathon Prep' },
+]
+
+const devices = ['Garmin', 'Apple Watch', 'COROS', 'Wahoo', 'Suunto', 'Zwift', 'Fitbit']
 </script>
 
 <style scoped>
-/* =========================
-   RUNNIT Retro Simulation HUD Skin (Features page)
-   Layout unchanged — just vibe + copy.
-   ========================= */
-
-/* Page baseline */
-.features-page{
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-black: #0F1210;
-  --r-stone: #A3A69F;
-  --r-offwhite: #F5F6F3;
-  --r-white: #FFFFFF;
-  --r-accent: #C46A2A;
-
-  --hud-green: #BEE7C2;
-  --hud-line: rgba(190,231,194,0.22);
-
-  min-height:100vh;
-  width:100%;
-  background: var(--r-offwhite);
-  overflow-x:hidden;
-
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+.features-page {
+  min-height: 100vh;
+  background: #fff;
+  font-family: "Futura PT", Futura, "Century Gothic", "Trebuchet MS", system-ui, sans-serif;
+  overflow-x: hidden;
 }
 
-/* ---- HERO ---- */
-.hero{
-  --nav-h:72px;
-  --footer-h:40px;
-  min-height:calc(100vh - var(--nav-h) - var(--footer-h));
-  display:flex;
-  align-items:center;
-  padding:64px 0;
-  position:relative;
-  overflow:hidden;
-
+/* ── HERO ── */
+.hero {
   background: #000;
+  color: #fff;
+  padding: calc(var(--nav-h, 64px) + 64px) 24px 80px;
 }
-
-/* Pixel grid removed */
-
-/* Scanlines removed */
-
-.eyebrow{
-  letter-spacing:.18em;
-  color: rgba(255,255,255,0.75);
-  
+.hero-inner { max-width: 760px; margin: 0 auto; }
+.hero-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
   text-transform: uppercase;
+  margin-bottom: 20px;
 }
-
-.hero :deep(h1){
-  color: var(--r-white);
-  
-}
-
-.hero :deep(.lead),
-.hero :deep(.text-muted){
-  color: rgba(255,255,255,0.74) !important;
-}
-
-/* Buttons = game UI */
-.btn{
-  border-radius: 0;
-  font-weight: 800;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  padding: 0.9rem 1.15rem;
-  box-shadow: 0 12px 34px rgba(15,18,16,0.25);
-}
-.btn-primary{
-  --bs-btn-bg: #000;
-  --bs-btn-border-color: #000;
-  --bs-btn-hover-bg: #333;
-  --bs-btn-hover-border-color: #333;
-  position: relative;
-}
-
-.hero :deep(.btn-outline-dark){
-  --bs-btn-color: rgba(255,255,255,0.95);
-  --bs-btn-border-color: rgba(255,255,255,0.40);
-  --bs-btn-hover-bg: rgba(255,255,255,0.10);
-  --bs-btn-hover-color: #fff;
-}
-
-/* Hero art = simulator panel */
-.hero-art{
-  height:360px;
-  position:relative;
-  overflow:hidden;
-
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: none;
-  
-}
-
-/* HUD label */
-.hud-label{
-  position:absolute;
-  top:14px;
-  left:14px;
-  padding: 6px 10px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: rgba(255,255,255,0.80);
+.hero-headline {
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
   font-weight: 900;
-  letter-spacing: .14em;
-  font-size: .72rem;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 24px;
+}
+.hero-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.65);
+  max-width: 520px;
+  line-height: 1.6;
+  margin: 0 0 36px;
+}
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-cta-primary {
+  display: inline-block;
+  padding: 14px 28px;
+  background: #fff; color: #000;
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none; border: none; cursor: pointer;
+}
+.btn-cta-primary:hover { background: #e5e5e5; }
+.btn-cta-ghost {
+  display: inline-block;
+  padding: 14px 28px;
+  background: transparent; color: rgba(255,255,255,0.75);
+  font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  text-decoration: none; border: 1px solid rgba(255,255,255,0.25);
+}
+.btn-cta-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.6); }
+
+/* ── SECTION BASE ── */
+.feature-section { padding: 80px 24px; background: #fff; }
+.feature-section--gray { background: #f5f5f5; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-kicker {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.20em;
+  color: #767676; text-transform: uppercase; margin-bottom: 12px;
+}
+.section-headline {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 900; letter-spacing: -0.02em;
+  color: #000; margin: 0 0 48px;
 }
 
-/* Phone card (reuse from home vibe) */
-.phone-card{
-  position:absolute; right:18px; bottom:18px; width:250px; border-radius:16px;
-  background: rgba(15,18,16,0.28);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow:0 20px 60px rgba(15,18,16,.40);
-  overflow:hidden;
-  
+/* ── FEATURE GRID ── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
 }
-.phone-header{
-  display:flex; gap:6px; padding:10px 12px;
-  background: rgba(15,18,16,0.40);
-  border-bottom: 1px solid rgba(255,255,255,0.10);
+.feature-grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
 }
-.phone-header .dot{
-  width:8px; height:8px; border-radius:3px;
-  background: rgba(190,231,194,0.35);
-  box-shadow: 0 0 10px rgba(190,231,194,0.18);
+.feature-card {
+  display: flex; gap: 20px; padding: 28px 24px;
+  background: #fff;
 }
-.phone-body{ padding:14px; }
-.phone-body .line{
-  height:10px;
-  background: rgba(190,231,194,0.14);
-  border-radius: 0;
-  margin:.45rem 0;
+.feature-card--large { padding: 32px 28px; }
+.feature-icon-wrap {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
-.phone-body .chart{
-  height:110px;
-  border-radius:12px;
-  border: 1px solid rgba(190,231,194,0.18);
-  background:
-    linear-gradient(rgba(190,231,194,0.10) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(190,231,194,0.10) 1px, transparent 1px),
-    radial-gradient(400px 160px at 20% 20%, rgba(196,106,42,0.18), rgba(196,106,42,0) 60%),
-    rgba(15,18,16,0.18);
-  background-size: 18px 18px, 18px 18px, auto, auto;
-  margin:10px 0 14px;
+.feature-icon { font-size: 1.4rem; color: #000; }
+.feature-body { flex: 1; }
+.feature-title { font-size: 0.95rem; font-weight: 700; color: #000; margin: 0 0 6px; }
+.feature-desc { font-size: 0.85rem; color: #767676; line-height: 1.55; margin: 0; }
+
+/* ── EDITORIAL STRIPS ── */
+.editorial-strip { padding: 80px 24px; }
+.editorial-strip--dark { background: #000; color: #fff; }
+.editorial-strip--light { background: #fff; color: #000; }
+.editorial-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.editorial-inner--reversed { direction: rtl; }
+.editorial-inner--reversed > * { direction: ltr; }
+.editorial-kicker {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.20em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.editorial-strip--dark .editorial-kicker { color: rgba(255,255,255,0.45); }
+.editorial-strip--light .editorial-kicker { color: #767676; }
+.editorial-headline {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 20px;
+}
+.editorial-body {
+  font-size: 0.95rem; line-height: 1.65; margin: 0 0 24px;
+}
+.editorial-strip--dark .editorial-body { color: rgba(255,255,255,0.65); }
+.editorial-strip--light .editorial-body { color: #767676; }
+.editorial-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.editorial-list li {
+  font-size: 0.88rem; padding-left: 16px; position: relative;
+}
+.editorial-list li::before {
+  content: "—"; position: absolute; left: 0; font-weight: 700;
+}
+.editorial-strip--dark .editorial-list li { color: rgba(255,255,255,0.75); }
+.editorial-strip--dark .editorial-list li::before { color: rgba(255,255,255,0.35); }
+.editorial-strip--light .editorial-list li { color: #555; }
+.editorial-strip--light .editorial-list li::before { color: #BDBDBD; }
+
+/* ── TRACKER MOCK ── */
+.editorial-visual { display: flex; align-items: center; justify-content: center; }
+.tracker-mock {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 28px;
+  width: 100%; max-width: 380px;
+}
+.tracker-mock-kicker {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.20em;
+  color: #4ade80; margin-bottom: 24px;
+}
+.tracker-stat-row { display: flex; gap: 0; margin-bottom: 24px; }
+.tracker-stat {
+  flex: 1; padding: 0 16px 0 0;
+  border-right: 1px solid rgba(255,255,255,0.10);
+}
+.tracker-stat:last-child { border-right: none; padding-right: 0; padding-left: 16px; }
+.tracker-stat:first-child { padding-left: 0; }
+.tracker-val { font-size: 2rem; font-weight: 900; color: #fff; line-height: 1; }
+.tracker-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.tracker-route-preview { height: 80px; position: relative; overflow: hidden; background: rgba(255,255,255,0.03); }
+.route-line {
+  position: absolute; top: 40%; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.2);
+}
+.route-line::before {
+  content: "";
+  position: absolute; top: -15px; left: 20%; right: 20%; height: 32px;
+  border: 2px solid rgba(255,255,255,0.35); border-radius: 50% 50% 0 0; border-bottom: none;
 }
 
-/* Floating modules */
-.floating-card{
-  position:absolute;
-  border-radius:14px;
-  background: rgba(15,18,16,0.18);
-  border: 1px solid rgba(190,231,194,0.18);
-  box-shadow:0 18px 46px rgba(15,18,16,.30);
-  
+/* ── PLAN MOCK ── */
+.plan-mock {
+  background: #fff; border: 1px solid #E5E5E5; padding: 24px; width: 100%; max-width: 380px;
 }
-.card-1{ left:18px; top:22px; width:170px; height:120px; }
-.card-2{ left:72px; bottom:62px; width:130px; height:90px; }
+.plan-mock-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.plan-mock-title { font-size: 0.9rem; font-weight: 700; color: #000; }
+.plan-mock-badge { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.10em; color: #767676; text-transform: uppercase; }
+.plan-mock-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.plan-mock-bar { flex: 1; height: 2px; background: #E5E5E5; }
+.plan-mock-fill { height: 100%; background: #000; }
+.plan-mock-pct { font-size: 0.72rem; font-weight: 700; color: #767676; }
+.plan-mock-workouts { display: flex; flex-direction: column; gap: 10px; }
+.plan-mock-row { display: flex; align-items: center; gap: 12px; padding: 10px; background: #f9f9f9; }
+.plan-mock-day { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; color: #767676; width: 32px; flex-shrink: 0; }
+.plan-mock-workout { font-size: 0.82rem; font-weight: 600; color: #000; }
 
-/* ---- BIG CARD GRID ---- */
-.grid{ padding:56px 0; background:#fff; }
-.card-feature{
-  border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 0;
-  overflow:hidden;
-  box-shadow: none;
+/* ── COACHING MOCK ── */
+.coaching-mock {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  padding: 28px; width: 100%; max-width: 380px;
 }
-.card-art{
-  height:180px;
-  background: #f5f5f5;
-}
+.coaching-mock-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.20em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 20px; }
+.coaching-mock-stats { display: flex; gap: 24px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+.coaching-stat { }
+.coaching-val { font-size: 1.8rem; font-weight: 900; color: #fff; line-height: 1; }
+.coaching-stat-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.10em; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.coaching-roster { display: flex; flex-direction: column; gap: 12px; }
+.coaching-athlete { display: flex; align-items: center; gap: 12px; }
+.coaching-avatar { width: 32px; height: 32px; background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+.coaching-name { font-size: 0.82rem; font-weight: 600; color: #fff; }
+.coaching-plan { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 1px; }
 
-/* ---- MODULES ---- */
-.modules{ padding:56px 0; background:#fff; }
-.module{
-  padding:16px;
-  border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 0;
-  background:#fff;
-  box-shadow: none;
-}
-.module-icon{
-  font-size:1.5rem;
-  color: #000;
-}
-
-/* ---- DEVICES STRIP ---- */
-.devices{ padding:40px 0; background: #f5f5f5; }
-.device-pill{
-  display:inline-block;
-  padding:8px 14px;
-  border-radius:12px;
-  background:#fff;
-  border:1px solid rgba(15,18,16,0.10);
-  font-weight:800;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+/* ── DEVICES STRIP ── */
+.devices-strip { background: #f5f5f5; padding: 40px 24px; }
+.devices-inner { max-width: 1100px; margin: 0 auto; }
+.devices-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.20em; color: #767676; text-transform: uppercase; margin-bottom: 16px; }
+.devices-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.device-pill {
+  display: inline-block; padding: 7px 16px;
+  background: #fff; border: 1px solid #E5E5E5;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #000;
 }
 
-/* ---- CTA ---- */
-.cta{
-  padding:64px 0 80px;
-  background:#fff;
-  border-top:1px solid rgba(15,18,16,0.08);
-  text-align:center;
+/* ── CTA ── */
+.cta-section { background: #000; color: #fff; padding: 100px 24px; text-align: center; }
+.cta-inner { max-width: 560px; margin: 0 auto; }
+.cta-headline { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; letter-spacing: -0.02em; margin: 0 0 16px; }
+.cta-sub { font-size: 1rem; color: rgba(255,255,255,0.65); margin: 0 0 36px; line-height: 1.5; }
+.cta-fine { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 16px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .editorial-inner { grid-template-columns: 1fr; gap: 40px; }
+  .editorial-inner--reversed { direction: ltr; }
+  .editorial-visual { order: -1; }
+  .tracker-mock, .plan-mock, .coaching-mock { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  .feature-grid, .feature-grid--2 { grid-template-columns: 1fr; }
+  .hero { padding-top: calc(var(--nav-h, 64px) + 40px); }
+  .tracker-stat-row { gap: 0; }
 }
 </style>

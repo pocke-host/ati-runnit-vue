@@ -211,36 +211,32 @@ const sections = [
 </script>
 
 <style scoped>
-/* ===== Design Tokens ===== */
 .privacy-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
-  --r-white: #FFFFFF;
-
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: var(--r-offwhite);
+  font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  background: #fff;
   min-height: 100vh;
-  padding-top: 57px;
+  padding-top: var(--nav-h, 64px);
 }
 
 /* ===== HERO ===== */
 .hero {
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
-  color: white;
+  background: #000;
+  color: #fff;
   padding: 80px 0 60px;
 }
 
 .hero h1 {
-  color: white;
+  color: #fff;
+  font-weight: 900;
   letter-spacing: -0.02em;
 }
 
 .hero .lead {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
   font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* ===== CONTENT LAYOUT ===== */
@@ -262,11 +258,11 @@ const sections = [
 }
 
 .toc-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #9CA3AF;
+  letter-spacing: 0.12em;
+  color: #767676;
   margin-bottom: 12px;
 }
 
@@ -276,37 +272,37 @@ const sections = [
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .toc-link {
   display: block;
   padding: 7px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #6B7280;
+  border-radius: 0;
+  font-size: 13px;
+  color: #767676;
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: color 0.15s, background 0.15s;
 }
 
 .toc-link:hover {
-  background: rgba(90, 107, 78, 0.08);
-  color: var(--r-olive-deep);
+  background: #f5f5f5;
+  color: #000;
 }
 
 /* ===== POLICY BODY ===== */
 .policy-body {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #E5E7EB;
+  background: #fff;
+  border-radius: 0;
+  border: 1px solid #E5E5E5;
   padding: 48px;
 }
 
 .policy-section {
   padding-bottom: 40px;
   margin-bottom: 40px;
-  border-bottom: 1px solid #F3F4F6;
+  border-bottom: 1px solid #E5E5E5;
 }
 
 .policy-section:last-of-type {
@@ -316,24 +312,27 @@ const sections = [
 }
 
 .section-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--r-olive-deep);
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
   margin-bottom: 20px;
   letter-spacing: -0.01em;
+  text-transform: uppercase;
 }
 
 .block-heading {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   margin-top: 20px;
   margin-bottom: 8px;
 }
 
 .block-text {
   font-size: 15px;
-  color: #4B5563;
+  color: #555;
   line-height: 1.7;
   margin-bottom: 12px;
 }
@@ -349,7 +348,7 @@ const sections = [
 
 .block-list li {
   font-size: 15px;
-  color: #4B5563;
+  color: #555;
   line-height: 1.6;
   padding-left: 20px;
   position: relative;
@@ -359,49 +358,52 @@ const sections = [
   content: "–";
   position: absolute;
   left: 0;
-  color: var(--r-accent);
+  color: #000;
   font-weight: 700;
 }
 
 /* ===== CONTACT BOX ===== */
 .contact-box {
   margin-top: 48px;
-  padding: 32px;
-  background: linear-gradient(135deg, var(--r-olive) 0%, var(--r-olive-deep) 100%);
-  border-radius: 16px;
+  padding: 40px 32px;
+  background: #000;
+  border-radius: 0;
   text-align: center;
 }
 
 .contact-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   margin-bottom: 12px;
 }
 
 .contact-text {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 24px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.60);
+  margin-bottom: 28px;
   line-height: 1.6;
 }
 
 .btn-contact {
   display: inline-block;
-  padding: 12px 32px;
-  background: var(--r-accent);
-  color: white;
+  padding: 14px 36px;
+  background: #fff;
+  color: #000;
   text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 15px;
-  transition: all 0.2s ease;
+  border-radius: 0;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  transition: background 0.15s, color 0.15s;
 }
 
 .btn-contact:hover {
-  background: #a85722;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196, 106, 42, 0.3);
+  background: #e5e5e5;
+  color: #000;
 }
 
 /* ===== RESPONSIVE ===== */
