@@ -124,9 +124,85 @@ export const usePlanStore = defineStore('plan', () => {
     }
   }
 
+  async function fetchAthletePlans(athleteId) {
+    loading.value = true
+    error.value = null
+    try {
+      const { data } = await axios.get(`${API_URL}/plans`, { params: { athleteId }, headers: getAuthHeaders() })
+      return Array.isArray(data) ? data : (data.content || [])
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to fetch athlete plans'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createPlanForAthlete(athleteId, planData) {
+    loading.value = true
+    error.value = null
+    try {
+      const { data } = await axios.post(`${API_URL}/plans`, { ...planData, athleteId }, { headers: getAuthHeaders() })
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to create plan'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updatePlan(planId, updates) {
+    try {
+      const { data } = await axios.patch(`${API_URL}/plans/${planId}`, updates, { headers: getAuthHeaders() })
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to update plan'
+      throw err
+    }
+  }
+
+  async function addWorkout(planId, weekNum, workout) {
+    try {
+      const { data } = await axios.post(
+        `${API_URL}/plans/${planId}/weeks/${weekNum}/workouts`,
+        workout,
+        { headers: getAuthHeaders() }
+      )
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to add workout'
+      throw err
+    }
+  }
+
+  async function updateWorkout(planId, workoutId, updates) {
+    try {
+      const { data } = await axios.patch(
+        `${API_URL}/plans/${planId}/workouts/${workoutId}`,
+        updates,
+        { headers: getAuthHeaders() }
+      )
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to update workout'
+      throw err
+    }
+  }
+
+  async function deleteWorkout(planId, workoutId) {
+    try {
+      await axios.delete(`${API_URL}/plans/${planId}/workouts/${workoutId}`, { headers: getAuthHeaders() })
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to delete workout'
+      throw err
+    }
+  }
+
   return {
     plans, activePlan, loading, error,
     fetchPlans, fetchPlan, createPlan, setActivePlan,
-    deletePlan, completeWorkout, uncompleteWorkout, suggestPlan
+    deletePlan, completeWorkout, uncompleteWorkout, suggestPlan,
+    fetchAthletePlans, createPlanForAthlete, updatePlan, addWorkout, updateWorkout, deleteWorkout
   }
 })

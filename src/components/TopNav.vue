@@ -7,21 +7,41 @@
       </router-link>
 
       <div class="navbar-menu" v-if="isAuthenticated">
-        <router-link to="/dashboard" class="nav-link">
-          <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
-        </router-link>
-        <router-link to="/feed" class="nav-link">
-          <i class="bi bi-collection me-2"></i>Feed
-        </router-link>
-        <router-link to="/track" class="nav-link nav-link-primary">
-          <i class="bi bi-play-circle-fill me-2"></i>Track
-        </router-link>
-        <router-link to="/devices" class="nav-link">
-          <i class="bi bi-smartwatch me-2"></i>Devices
-        </router-link>
-        <router-link to="/stats" class="nav-link">
-          <i class="bi bi-bar-chart-line-fill me-2"></i>Stats
-        </router-link>
+        <!-- Coach nav links -->
+        <template v-if="role === 'coach'">
+          <router-link to="/coach/dashboard" class="nav-link">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
+          </router-link>
+          <router-link to="/coach/athletes" class="nav-link">
+            <i class="bi bi-people me-2"></i>Roster
+          </router-link>
+        </template>
+        <!-- Athlete nav links -->
+        <template v-else>
+          <router-link to="/dashboard" class="nav-link">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
+          </router-link>
+          <router-link to="/feed" class="nav-link">
+            <i class="bi bi-collection me-2"></i>Feed
+          </router-link>
+          <router-link to="/track" class="nav-link nav-link-primary">
+            <i class="bi bi-play-circle-fill me-2"></i>Track
+          </router-link>
+          <router-link to="/devices" class="nav-link">
+            <i class="bi bi-smartwatch me-2"></i>Devices
+          </router-link>
+          <router-link to="/stats" class="nav-link">
+            <i class="bi bi-bar-chart-line-fill me-2"></i>Stats
+          </router-link>
+        </template>
+
+        <!-- DM button -->
+        <div class="notif-wrap">
+          <button class="nav-icon-btn" @click="dmStore.open()" title="Messages">
+            <i class="bi bi-chat-dots-fill"></i>
+            <span v-if="dmStore.unreadCount > 0" class="notif-badge">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
+          </button>
+        </div>
 
         <!-- Notification Bell -->
         <div class="notif-wrap" ref="notifRef">
@@ -102,6 +122,9 @@
 
   </nav>
 
+  <!-- DM Drawer -->
+  <DMDrawer />
+
   <!-- Teleport drawer outside navbar to avoid backdrop-filter stacking context clipping -->
   <Teleport to="body">
     <Transition name="drawer-fade">
@@ -129,33 +152,51 @@
           </div>
 
           <nav class="drawer-nav">
-            <router-link to="/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-grid-3x3-gap"></i> Dashboard
-            </router-link>
-            <router-link to="/feed" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-collection"></i> Feed
-            </router-link>
-            <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
-              <i class="bi bi-play-circle-fill"></i> Track Activity
-            </router-link>
-            <router-link to="/stats" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-bar-chart-line-fill"></i> Stats
-            </router-link>
-            <router-link to="/achievements" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-trophy"></i> Achievements
-            </router-link>
-            <router-link to="/clubs" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-people"></i> Clubs
-            </router-link>
-            <router-link to="/challenges" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-flag"></i> Challenges
-            </router-link>
-            <router-link to="/plans" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-calendar3"></i> Training Plans
-            </router-link>
-            <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-smartwatch"></i> Devices
-            </router-link>
+            <!-- Coach drawer links -->
+            <template v-if="role === 'coach'">
+              <router-link to="/coach/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-grid-3x3-gap"></i> Dashboard
+              </router-link>
+              <router-link to="/coach/athletes" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-people"></i> Athletes
+              </router-link>
+              <router-link to="/coaches" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-person-badge"></i> Coach Directory
+              </router-link>
+            </template>
+            <!-- Athlete drawer links -->
+            <template v-else>
+              <router-link to="/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-grid-3x3-gap"></i> Dashboard
+              </router-link>
+              <router-link to="/feed" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-collection"></i> Feed
+              </router-link>
+              <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
+                <i class="bi bi-play-circle-fill"></i> Track Activity
+              </router-link>
+              <router-link to="/stats" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-bar-chart-line-fill"></i> Stats
+              </router-link>
+              <router-link to="/achievements" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-trophy"></i> Achievements
+              </router-link>
+              <router-link to="/clubs" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-people"></i> Clubs
+              </router-link>
+              <router-link to="/challenges" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-flag"></i> Challenges
+              </router-link>
+              <router-link to="/plans" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-calendar3"></i> Training Plans
+              </router-link>
+              <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-smartwatch"></i> Devices
+              </router-link>
+              <router-link to="/coaches" class="drawer-link" @click="mobileMenuOpen = false">
+                <i class="bi bi-person-badge"></i> Find a Coach
+              </router-link>
+            </template>
           </nav>
 
           <div class="drawer-footer">
@@ -164,6 +205,22 @@
             </router-link>
             <router-link to="/settings" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-gear"></i> Settings
+            </router-link>
+            <router-link
+              v-if="subscriptionTier !== 'free'"
+              to="/billing"
+              class="drawer-link"
+              @click="mobileMenuOpen = false"
+            >
+              <i class="bi bi-credit-card"></i> Manage Billing
+            </router-link>
+            <router-link
+              v-else
+              to="/subscribe"
+              class="drawer-link drawer-link-primary"
+              @click="mobileMenuOpen = false"
+            >
+              <i class="bi bi-star"></i> Upgrade to Premium
             </router-link>
             <button class="drawer-link drawer-link-danger" @click="handleLogout">
               <i class="bi bi-box-arrow-right"></i> Logout
@@ -203,13 +260,16 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
+import { useDMStore } from '@/stores/dm'
 import { storeToRefs } from 'pinia'
+import DMDrawer from '@/components/DMDrawer.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const notifStore = useNotificationStore()
+const dmStore = useDMStore()
 
-const { user, isAuthenticated } = storeToRefs(authStore)
+const { user, isAuthenticated, subscriptionTier, role } = storeToRefs(authStore)
 const { notifications, unreadCount, loading: notifLoading } = storeToRefs(notifStore)
 
 const mobileMenuOpen = ref(false)

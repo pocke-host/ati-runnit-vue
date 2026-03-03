@@ -12,7 +12,10 @@ const routes = [
   { path: '/signup',         name: 'Signup',        component: () => import('@/views/AccountRegister.vue') },
   { path: '/features',       name: 'Features',      component: () => import('@/views/Features.vue') },
   { path: '/about',          name: 'About',         component: () => import('@/views/About.vue') },
-  { path: '/subscribe',      name: 'Subscribe',     component: () => import('@/views/Subscribe.vue') },
+  { path: '/subscribe',         name: 'Subscribe',       component: () => import('@/views/Subscribe.vue') },
+  { path: '/subscribe/success', name: 'CheckoutSuccess', component: () => import('@/views/CheckoutSuccess.vue') },
+  { path: '/subscribe/cancel',  name: 'CheckoutCancel',  component: () => import('@/views/CheckoutCancel.vue') },
+  { path: '/billing',           name: 'Billing',         component: () => import('@/views/Billing.vue'), meta: { requiresAuth: true } },
   { path: '/maps',           name: 'Map',           component: () => import('@/views/GlobalHeatmap.vue') },
   { path: '/races',          name: 'Races',         component: () => import('@/views/Races.vue') },
   { path: '/support',        name: 'Support',       component: () => import('@/views/Support.vue') },
@@ -46,6 +49,12 @@ const routes = [
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },
   { path: '/onboard',             name: 'Onboard',        component: () => import('@/views/Onboarding.vue'),       meta: { requiresAuth: true } },
 
+  // Coach routes
+  { path: '/coach/dashboard', name: 'CoachDashboard', component: () => import('@/views/CoachDashboard.vue'), meta: { requiresAuth: true, requiresCoach: true } },
+  { path: '/coach/athletes',  name: 'CoachAthletes',  component: () => import('@/views/CoachAthletes.vue'),  meta: { requiresAuth: true, requiresCoach: true } },
+  { path: '/coach/plans/:planId/edit', name: 'CoachPlanEditor', component: () => import('@/views/CoachPlanEditor.vue'), meta: { requiresAuth: true, requiresCoach: true } },
+  { path: '/coaches',         name: 'FindCoaches',    component: () => import('@/views/FindCoaches.vue'),    meta: { requiresAuth: true } },
+
   // Catch-all
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFound.vue') },
 ]
@@ -62,12 +71,18 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const onboardingDone = localStorage.getItem('onboarding_complete') === 'true'
+  const userRole = localStorage.getItem('userRole') || 'athlete'
 
   if (to.meta.requiresAuth && !token) return next('/join-us')
 
   // New authenticated users must complete onboarding first
   if (token && !onboardingDone && to.meta.requiresAuth && to.path !== '/onboard') {
     return next('/onboard')
+  }
+
+  // Coach-only routes — redirect athletes to their dashboard
+  if (to.meta.requiresCoach && userRole !== 'coach') {
+    return next('/dashboard')
   }
 
   next()

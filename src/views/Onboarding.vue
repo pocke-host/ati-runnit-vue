@@ -5,11 +5,17 @@
       <div class="progress-bar-fill" :style="{ width: progressWidth }"></div>
     </div>
 
-    <!-- Header row (steps 2–6) -->
-    <div class="onboard-header" v-if="step >= 2 && step <= 6">
+    <!-- Header row (steps 2–6, athlete only) -->
+    <div class="onboard-header" v-if="!isCoach && step >= 2 && step <= 6">
       <button class="btn-back" @click="back" v-if="step > 2">← Back</button>
       <span v-else></span>
       <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 05</span>
+    </div>
+    <!-- Header row for coach steps -->
+    <div class="onboard-header" v-if="isCoach && step >= 2 && step <= 3">
+      <button class="btn-back" @click="back" v-if="step > 2">← Back</button>
+      <span v-else></span>
+      <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 02</span>
     </div>
 
     <!-- ── Step 1: Welcome ── -->
@@ -20,9 +26,66 @@
           <span class="brand-name">RUNNIT</span>
         </div>
         <h1 class="welcome-headline">Welcome,<br>{{ firstName }}.</h1>
-        <p class="welcome-sub">Let's set you up in under a minute.</p>
+        <p class="welcome-sub" v-if="isCoach">Let's set up your coaching profile in under a minute.</p>
+        <p class="welcome-sub" v-else>Let's set you up in under a minute.</p>
         <button class="btn-cta" @click="step = 2">Get started</button>
       </div>
+    </div>
+
+    <!-- ── Coach Step C1: Sports coached ── -->
+    <div v-else-if="step === 2 && isCoach" class="step-container">
+      <h2 class="step-question">What sports<br>do you coach?</h2>
+      <div class="tile-grid">
+        <button
+          v-for="opt in coachSportOptions"
+          :key="opt.value"
+          class="tile"
+          :class="{ selected: coachSelections.sports.includes(opt.value) }"
+          @click="toggleCoachSport(opt.value)"
+        >
+          <span class="tile-emoji">{{ opt.emoji }}</span>
+          <span class="tile-label">{{ opt.label }}</span>
+        </button>
+      </div>
+      <button class="btn-cta mt-auto" :disabled="coachSelections.sports.length === 0" @click="step = 3">Continue</button>
+    </div>
+
+    <!-- ── Coach Step C2: Athlete count ── -->
+    <div v-else-if="step === 3 && isCoach" class="step-container">
+      <button class="btn-back standalone" @click="back">← Back</button>
+      <h2 class="step-question">How many<br>athletes?</h2>
+      <div class="tile-grid tile-grid--4">
+        <button
+          v-for="opt in athleteCountOptions"
+          :key="opt.value"
+          class="tile tile--compact"
+          :class="{ selected: coachSelections.athleteCount === opt.value }"
+          @click="coachSelections.athleteCount = opt.value"
+        >
+          <span class="tile-label">{{ opt.label }}</span>
+        </button>
+      </div>
+      <button class="btn-cta mt-auto" :disabled="!coachSelections.athleteCount" @click="finishCoach">Continue</button>
+    </div>
+
+    <!-- ── Coach Done ── -->
+    <div v-else-if="step === 4 && isCoach" class="step-container step-done">
+      <div class="done-sport-emoji">🏆</div>
+      <h2 class="done-headline">You're set up.</h2>
+      <div class="done-summary">
+        <div class="summary-row">
+          <span class="summary-label">Sports coached</span>
+          <span class="summary-value">{{ coachSelections.sports.join(', ') }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Athletes</span>
+          <span class="summary-value">{{ coachSelections.athleteCount }}</span>
+        </div>
+      </div>
+      <button class="btn-cta" :disabled="saving" @click="goToCoachDashboard">
+        <span v-if="!saving">Open Coaching Hub</span>
+        <span v-else><span class="spinner-border spinner-border-sm me-2"></span>Saving...</span>
+      </button>
     </div>
 
     <!-- ── Step 2: Sport ── -->
@@ -169,7 +232,7 @@ import axios from 'axios'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
+const { user, role } = storeToRefs(authStore)
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -177,12 +240,19 @@ const step = ref(1)
 const TOTAL_STEPS = 5
 const saving = ref(false)
 
+const isCoach = computed(() => role.value === 'coach')
+
 const selections = reactive({
   sport: '',
   goal: '',
   level: '',
   days: '',
   units: 'imperial'
+})
+
+const coachSelections = reactive({
+  sports: [],
+  athleteCount: ''
 })
 
 const firstName = computed(() => {
@@ -224,6 +294,27 @@ const daysOptions = [
   { value: 'daily', label: 'Daily' },
 ]
 
+const coachSportOptions = [
+  { value: 'running',   emoji: '🏃', label: 'Running' },
+  { value: 'cycling',   emoji: '🚴', label: 'Cycling' },
+  { value: 'swimming',  emoji: '🏊', label: 'Swimming' },
+  { value: 'triathlon', emoji: '🏅', label: 'Triathlon' },
+  { value: 'other',     emoji: '⚡', label: 'Other' },
+]
+
+const athleteCountOptions = [
+  { value: '1-5',   label: '1–5' },
+  { value: '6-15',  label: '6–15' },
+  { value: '16-30', label: '16–30' },
+  { value: '30+',   label: '30+' },
+]
+
+function toggleCoachSport(value) {
+  const idx = coachSelections.sports.indexOf(value)
+  if (idx === -1) coachSelections.sports.push(value)
+  else coachSelections.sports.splice(idx, 1)
+}
+
 const selectedSportEmoji = computed(() =>
   sportOptions.find(o => o.value === selections.sport)?.emoji || '🏃'
 )
@@ -247,6 +338,20 @@ function back() {
 
 function finish() {
   step.value = 7
+}
+
+function finishCoach() {
+  step.value = 4
+}
+
+async function goToCoachDashboard() {
+  saving.value = true
+  axios.patch(`${API_URL}/users/me/preferences`, {
+    sportsCoached: coachSelections.sports,
+    athleteCount: coachSelections.athleteCount,
+  }).catch(() => {})
+  authStore.completeOnboarding()
+  router.push('/coach/dashboard')
 }
 
 async function goToDashboard() {

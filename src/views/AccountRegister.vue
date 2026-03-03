@@ -90,6 +90,33 @@
             </label>
           </div>
 
+          <!-- Role Selector -->
+          <div class="role-selector mb-3">
+            <div class="role-label">I am joining as</div>
+            <div class="role-tiles">
+              <button
+                type="button"
+                class="role-tile"
+                :class="{ 'role-tile--selected': role === 'athlete' }"
+                @click="role = 'athlete'"
+              >
+                <i class="bi bi-person-running role-tile-icon"></i>
+                <div class="role-tile-name">I'm an Athlete</div>
+                <div class="role-tile-sub">Track workouts and follow plans</div>
+              </button>
+              <button
+                type="button"
+                class="role-tile"
+                :class="{ 'role-tile--selected': role === 'coach' }"
+                @click="role = 'coach'"
+              >
+                <i class="bi bi-clipboard2-pulse-fill role-tile-icon"></i>
+                <div class="role-tile-name">I'm a Coach</div>
+                <div class="role-tile-sub">Manage athletes and build plans</div>
+              </button>
+            </div>
+          </div>
+
           <div v-if="error" class="alert alert-danger py-2 mb-3" role="alert">
             {{ error }}
           </div>
@@ -164,6 +191,7 @@ const agree = ref(false)
 const showPwd = ref(false)
 const loading = ref(false)
 const error = ref('')
+const role = ref('athlete')
 
 const canSubmit = computed(() =>
   displayName.value && 
@@ -179,7 +207,7 @@ const submit = async () => {
   error.value = ''
   
   try {
-    await authStore.register(email.value, password.value, displayName.value)
+    await authStore.register(email.value, password.value, displayName.value, role.value)
     router.push('/onboard')
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
@@ -418,6 +446,31 @@ const onSocial = (provider) => {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Role Selector */
+.role-selector { display: flex; flex-direction: column; gap: 8px; }
+.role-label { font-size: 13px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; }
+.role-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.role-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 0;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.role-tile:hover:not(.role-tile--selected) { border-color: #000; }
+.role-tile--selected { background: #000; border-color: #000; color: #fff; }
+.role-tile-icon { font-size: 20px; margin-bottom: 2px; }
+.role-tile--selected .role-tile-icon { color: #fff; }
+.role-tile-name { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+.role-tile-sub { font-size: 11px; color: #9CA3AF; line-height: 1.3; }
+.role-tile--selected .role-tile-sub { color: rgba(255,255,255,0.65); }
 
 /* Alert */
 .alert-danger {
