@@ -290,8 +290,10 @@ const fetchEvents = async () => {
 }
 
 /* ── Filtering + sorting ── */
+const today = new Date(); today.setHours(0, 0, 0, 0)
+
 const filteredEvents = computed(() => {
-  let r = events.value.slice()
+  let r = events.value.filter(e => !e.date || new Date(e.date) >= today)
 
   if (selectedSport.value !== 'all') {
     r = r.filter(e => e.sport === selectedSport.value)
