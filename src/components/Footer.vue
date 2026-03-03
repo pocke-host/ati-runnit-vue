@@ -28,9 +28,9 @@
           <h6 class="fw-bold">Company</h6>
           <ul class="list-unstyled">
             <li><router-link to="/about" class="footer-link">About</router-link></li>
-            <li><a href="#" class="footer-link">Careers</a></li>
-            <li><a href="#" class="footer-link">Press</a></li>
-            <li><a href="#" class="footer-link">Blog</a></li>
+            <li><router-link to="/careers" class="footer-link">Careers</router-link></li>
+            <li><router-link to="/press" class="footer-link">Press</router-link></li>
+            <li><router-link to="/blog" class="footer-link">Blog</router-link></li>
           </ul>
         </div>
         <div class="col-6 col-md-3 mb-3">

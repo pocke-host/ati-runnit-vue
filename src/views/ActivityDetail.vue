@@ -67,7 +67,10 @@
 
           <!-- Stats -->
           <div class="det-card">
-            <h3 class="det-section-title">Stats</h3>
+            <div class="det-card-top">
+              <h3 class="det-section-title">Stats</h3>
+              <div v-if="activity.workoutType" class="workout-type-chip">{{ activity.workoutType }}</div>
+            </div>
             <div class="stats-grid">
               <div class="stat-box">
                 <div class="stat-label">Distance</div>
@@ -78,7 +81,7 @@
                 <div class="stat-val">{{ formatDuration(activity.durationSeconds) }}</div>
               </div>
               <div class="stat-box">
-                <div class="stat-label">Pace</div>
+                <div class="stat-label">Avg Pace</div>
                 <div class="stat-val">{{ computedPace }}</div>
               </div>
               <div class="stat-box">
@@ -90,9 +93,30 @@
                 <div class="stat-val">{{ activity.avgHeartRate ? activity.avgHeartRate + ' bpm' : '—' }}</div>
               </div>
               <div class="stat-box">
+                <div class="stat-label">Max HR</div>
+                <div class="stat-val">{{ activity.maxHeartRate ? activity.maxHeartRate + ' bpm' : '—' }}</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Cadence</div>
+                <div class="stat-val">{{ activity.cadence ? activity.cadence + ' spm' : '—' }}</div>
+              </div>
+              <div class="stat-box">
                 <div class="stat-label">Calories</div>
                 <div class="stat-val">{{ activity.calories ? activity.calories + ' kcal' : '—' }}</div>
               </div>
+            </div>
+
+            <!-- Gear row -->
+            <div v-if="activity.gear" class="gear-row">
+              <i class="bi bi-shoe me-2"></i>
+              <span class="gear-label">Gear:</span>
+              <span class="gear-value">{{ activity.gear }}</span>
+            </div>
+
+            <!-- Notes -->
+            <div v-if="activity.notes" class="notes-row">
+              <div class="notes-label">Notes</div>
+              <p class="notes-text">{{ activity.notes }}</p>
             </div>
           </div>
 
@@ -643,6 +667,55 @@ onMounted(init)
   font-weight: 900;
   font-size: 1.15rem;
   color: rgba(15,18,16,0.90);
+}
+
+/* Stats card extras */
+.det-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.det-card-top .det-section-title { margin: 0; }
+.workout-type-chip {
+  font-size: 0.70rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #000;
+  color: #fff;
+  padding: 4px 10px;
+}
+.gear-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E5E5;
+  font-size: 0.9rem;
+  color: rgba(15,18,16,0.70);
+}
+.gear-label { font-weight: 700; margin-right: 4px; }
+.gear-value { color: rgba(15,18,16,0.85); }
+.notes-row {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E5E5;
+}
+.notes-label {
+  font-size: 0.70rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(15,18,16,0.45);
+  margin-bottom: 6px;
+}
+.notes-text {
+  font-size: 0.95rem;
+  color: rgba(15,18,16,0.80);
+  line-height: 1.55;
+  margin: 0;
 }
 
 /* Map */

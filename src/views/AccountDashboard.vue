@@ -439,9 +439,9 @@
       </div>
     </div>
 
-    <!-- LOG ACTIVITY MODAL (keeping existing) -->
+    <!-- LOG ACTIVITY MODAL -->
     <div v-if="showActivityModal" class="modal-overlay" @click="closeActivityModal">
-      <div class="modal-card" @click.stop>
+      <div class="modal-card modal-large" @click.stop>
         <div class="modal-header">
           <h3>Log Activity</h3>
           <button class="modal-close" @click="closeActivityModal">
@@ -450,41 +450,95 @@
         </div>
 
         <form @submit.prevent="handleActivitySubmit" class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Sport Type *</label>
-            <select v-model="activityForm.sportType" class="form-control" required>
-              <option value="">Choose sport...</option>
-              <option value="RUN">🏃 Run</option>
-              <option value="BIKE">🚴 Bike</option>
-              <option value="SWIM">🏊 Swim</option>
-              <option value="HIKE">🥾 Hike</option>
-              <option value="WALK">🚶 Walk</option>
-              <option value="OTHER">🏋️ Other</option>
-            </select>
+
+          <!-- Row 1: Sport + Workout Type -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Sport *</label>
+              <select v-model="activityForm.sportType" class="form-control" required>
+                <option value="">Choose sport…</option>
+                <option value="RUN">🏃 Run</option>
+                <option value="BIKE">🚴 Bike</option>
+                <option value="SWIM">🏊 Swim</option>
+                <option value="HIKE">🥾 Hike</option>
+                <option value="WALK">🚶 Walk</option>
+                <option value="OTHER">🏋️ Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Workout Type <span class="optional">(optional)</span></label>
+              <select v-model="activityForm.workoutType" class="form-control" :disabled="!activityForm.sportType">
+                <option value="">Select type…</option>
+                <option v-for="wt in workoutTypeOptions" :key="wt" :value="wt">{{ wt }}</option>
+              </select>
+            </div>
           </div>
 
+          <!-- Title -->
           <div class="form-group">
-            <label class="form-label">Duration (minutes) *</label>
-            <input 
-              v-model.number="activityForm.durationMinutes" 
-              type="number" 
-              class="form-control"
-              placeholder="e.g., 30"
-              min="1"
-              required 
-            />
+            <label class="form-label">Title <span class="optional">(optional)</span></label>
+            <input v-model="activityForm.title" type="text" class="form-control" placeholder="e.g., Morning Run" />
           </div>
 
+          <!-- Row 2: Duration -->
           <div class="form-group">
-            <label class="form-label">Distance (km) <span class="optional">(optional)</span></label>
-            <input 
-              v-model.number="activityForm.distanceKm" 
-              type="number" 
-              class="form-control"
-              placeholder="e.g., 5.2"
-              step="0.1"
-              min="0"
-            />
+            <label class="form-label">Duration *</label>
+            <div class="duration-inputs">
+              <div class="duration-field">
+                <input v-model.number="activityForm.durationMinutes" type="number" class="form-control" placeholder="0" min="0" required />
+                <span class="duration-unit">min</span>
+              </div>
+              <div class="duration-field">
+                <input v-model.number="activityForm.durationSeconds" type="number" class="form-control" placeholder="0" min="0" max="59" />
+                <span class="duration-unit">sec</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Distance + Elevation -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Distance <span class="optional">({{ distanceLabel }})</span></label>
+              <input v-model.number="activityForm.distance" type="number" class="form-control" :placeholder="isImperial ? 'e.g., 3.1' : 'e.g., 5.0'" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Elevation Gain <span class="optional">({{ elevationLabel }})</span></label>
+              <input v-model.number="activityForm.elevationGain" type="number" class="form-control" :placeholder="isImperial ? 'e.g., 250' : 'e.g., 76'" min="0" />
+            </div>
+          </div>
+
+          <!-- Row 4: HR + Cadence + Calories -->
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Avg HR <span class="optional">(bpm)</span></label>
+              <input v-model.number="activityForm.avgHeartRate" type="number" class="form-control" placeholder="e.g., 152" min="40" max="220" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Max HR <span class="optional">(bpm)</span></label>
+              <input v-model.number="activityForm.maxHeartRate" type="number" class="form-control" placeholder="e.g., 178" min="40" max="220" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cadence <span class="optional">(spm)</span></label>
+              <input v-model.number="activityForm.cadence" type="number" class="form-control" placeholder="e.g., 172" min="0" />
+            </div>
+          </div>
+
+          <!-- Calories -->
+          <div class="form-group">
+            <label class="form-label">Calories <span class="optional">(kcal, optional)</span></label>
+            <input v-model.number="activityForm.calories" type="number" class="form-control" placeholder="e.g., 420" min="0" />
+          </div>
+
+          <!-- Gear -->
+          <div class="form-group">
+            <label class="form-label">Gear <span class="optional">(optional)</span></label>
+            <input v-model="activityForm.gear" type="text" class="form-control" :placeholder="gearPlaceholder" />
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label class="form-label">Notes <span class="optional">(optional)</span></label>
+            <textarea v-model="activityForm.notes" class="form-control" rows="2" placeholder="How did it feel?"></textarea>
           </div>
 
           <div v-if="activityError" class="alert alert-danger">
@@ -492,12 +546,10 @@
           </div>
 
           <div class="modal-actions">
-            <button type="button" class="btn btn-outline" @click="closeActivityModal">
-              Cancel
-            </button>
+            <button type="button" class="btn btn-outline" @click="closeActivityModal">Cancel</button>
             <button type="submit" class="btn btn-primary" :disabled="activityLoading">
               <span v-if="activityLoading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ activityLoading ? 'Saving...' : 'Save Activity' }}
+              {{ activityLoading ? 'Saving…' : 'Save Activity' }}
             </button>
           </div>
         </form>
@@ -624,7 +676,7 @@ const prStore = usePRStore()
 const { activePlan } = storeToRefs(planStore)
 const { latestEarned } = storeToRefs(achievementStore)
 const { topPRs } = storeToRefs(prStore)
-const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, metersToDisplay } = useUnits()
+const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
@@ -632,8 +684,18 @@ const showFriendsModal = ref(false)
 
 const activityForm = ref({
   sportType: '',
+  title: '',
+  workoutType: '',
   durationMinutes: null,
-  distanceKm: null
+  durationSeconds: null,
+  distance: null,
+  gear: '',
+  avgHeartRate: null,
+  maxHeartRate: null,
+  cadence: null,
+  elevationGain: null,
+  calories: null,
+  notes: ''
 })
 const activityLoading = ref(false)
 const activityError = ref('')
@@ -848,9 +910,32 @@ const openActivityModal = () => {
 
 const closeActivityModal = () => {
   showActivityModal.value = false
-  activityForm.value = { sportType: '', durationMinutes: null, distanceKm: null }
+  activityForm.value = {
+    sportType: '', title: '', workoutType: '', durationMinutes: null, durationSeconds: null,
+    distance: null, gear: '', avgHeartRate: null, maxHeartRate: null,
+    cadence: null, elevationGain: null, calories: null, notes: ''
+  }
   activityError.value = ''
 }
+
+const workoutTypeOptions = computed(() => {
+  const s = activityForm.value.sportType
+  if (s === 'RUN')  return ['Easy', 'Long Run', 'Tempo', 'Interval', 'Fartlek', 'Race', 'Recovery', 'Trail']
+  if (s === 'BIKE') return ['Endurance', 'Hill', 'Interval', 'Race', 'Recovery', 'Commute']
+  if (s === 'SWIM') return ['Easy', 'Drill', 'Interval', 'Open Water', 'Race']
+  if (s === 'HIKE') return ['Trail', 'Mountain', 'Backpacking', 'Urban']
+  if (s === 'WALK') return ['Easy', 'Brisk', 'Trail', 'Race Walk']
+  return ['General', 'Strength', 'Cross Training', 'HIIT', 'Flexibility']
+})
+
+const gearPlaceholder = computed(() => {
+  const s = activityForm.value.sportType
+  if (s === 'RUN')  return 'e.g., Nike Vaporfly 3'
+  if (s === 'BIKE') return 'e.g., Trek Domane SL 6'
+  if (s === 'SWIM') return 'e.g., Speedo Fastskin'
+  if (s === 'HIKE') return 'e.g., Salomon X Ultra 4'
+  return 'e.g., Equipment name'
+})
 
 const openMomentModal = () => {
   showMomentModal.value = true
@@ -880,10 +965,28 @@ const handleActivitySubmit = async () => {
   activityError.value = ''
 
   try {
+    const f = activityForm.value
+    const totalSeconds = (f.durationMinutes || 0) * 60 + (f.durationSeconds || 0)
+    const distanceMeters = f.distance
+      ? Math.round(f.distance * (isImperial.value ? 1609.34 : 1000))
+      : null
+    const elevationMeters = f.elevationGain
+      ? isImperial.value ? f.elevationGain / 3.28084 : f.elevationGain
+      : null
+
     await activityStore.createActivity({
-      sportType: activityForm.value.sportType,
-      durationSeconds: activityForm.value.durationMinutes * 60,
-      distanceMeters: activityForm.value.distanceKm ? Math.round(activityForm.value.distanceKm * 1000) : null
+      sportType: f.sportType,
+      title: f.title || null,
+      workoutType: f.workoutType || null,
+      durationSeconds: totalSeconds,
+      distanceMeters,
+      gear: f.gear || null,
+      avgHeartRate: f.avgHeartRate || null,
+      maxHeartRate: f.maxHeartRate || null,
+      cadence: f.cadence || null,
+      elevationGain: elevationMeters ? Math.round(elevationMeters) : null,
+      calories: f.calories || null,
+      notes: f.notes || null,
     })
 
     closeActivityModal()
@@ -1501,6 +1604,14 @@ onMounted(async () => {
 .alert-danger{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.30);color:#991b1b;font-weight:600}
 .modal-actions{display:flex;gap:12px;margin-top:24px}
 .modal-actions .btn{flex:1}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.duration-inputs{display:flex;gap:12px}
+.duration-field{display:flex;align-items:center;gap:8px;flex:1}
+.duration-field .form-control{flex:1}
+.duration-unit{font-size:0.85rem;font-weight:700;color:rgba(15,18,16,0.50);white-space:nowrap}
+textarea.form-control{resize:vertical;min-height:72px}
+@media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
 @media (max-width:768px){.hero-stats{grid-template-columns:1fr}.topbar{flex-direction:column;align-items:flex-start}.top-actions{width:100%}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
 </style>
