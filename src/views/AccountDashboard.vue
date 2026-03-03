@@ -199,6 +199,18 @@
                 <i class="bi bi-box-arrow-right me-2"></i>Logout
               </button>
             </div>
+
+            <!-- Subscription CTA -->
+            <div v-if="subscriptionTier === 'free'" class="upgrade-banner">
+              <div class="upgrade-label">UPGRADE TO PREMIUM</div>
+              <p class="upgrade-desc">Route planning, goal tracking, and pace insights.</p>
+              <router-link to="/subscribe" class="upgrade-btn">See Plans →</router-link>
+            </div>
+            <div v-else class="manage-sub-link">
+              <router-link to="/billing">
+                <i class="bi bi-credit-card me-2"></i>Manage Subscription →
+              </router-link>
+            </div>
           </aside>
 
           <!-- Recent Activities -->
@@ -666,7 +678,7 @@ const momentStore = useMomentStore()
 const uploadStore = useUploadStore()
 const followStore = useFollowStore()
 
-const { user } = storeToRefs(authStore)
+const { user, subscriptionTier } = storeToRefs(authStore)
 const { activities, loading } = storeToRefs(activityStore)
 const { uploading: momentLoading, progress: uploadProgress } = storeToRefs(uploadStore)
 
@@ -1536,6 +1548,14 @@ onMounted(async () => {
 .action-btn:hover{background:rgba(255,255,255,0.95);transform:none}
 .action-btn-danger{color:#dc3545;border-color:rgba(220,53,69,0.20)}
 .action-btn-danger:hover{background:rgba(220,53,69,0.05)}
+.upgrade-banner{margin-top:16px;padding:20px;background:#000;border-radius:0}
+.upgrade-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.55);margin-bottom:8px}
+.upgrade-desc{font-size:0.82rem;color:rgba(255,255,255,0.70);margin:0 0 16px;line-height:1.5}
+.upgrade-btn{display:inline-block;background:#fff;color:#000;font-weight:700;font-size:0.75rem;letter-spacing:0.10em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:0;transition:background 0.15s}
+.upgrade-btn:hover{background:#e5e5e5}
+.manage-sub-link{margin-top:16px;padding:12px 0}
+.manage-sub-link a{font-size:0.82rem;color:#767676;text-decoration:none;display:flex;align-items:center;transition:color 0.15s}
+.manage-sub-link a:hover{color:#000}
 .recent-activities{background:#fff;border:1px solid #E5E5E5;border-radius:0;padding:24px;box-shadow:none}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .section-title{font-size:1.1rem;font-weight:900;margin:0}

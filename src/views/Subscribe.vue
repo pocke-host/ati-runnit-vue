@@ -91,9 +91,20 @@
                   <li class="mb-2"><i class="bi bi-shield-check me-2 text-success"></i> Safety tools & live sharing</li>
                 </ul>
 
-                <router-link to="/signup" class="btn btn-primary w-100 mt-auto">
+                <!-- Unauthenticated: route to signup -->
+                <router-link v-if="!isAuthenticated" to="/signup" class="btn btn-primary w-100 mt-auto">
                   Start Free Trial
                 </router-link>
+                <!-- Authenticated: trigger Stripe checkout -->
+                <button
+                  v-else
+                  class="btn btn-primary w-100 mt-auto"
+                  @click="handleCheckout('premium')"
+                  :disabled="checkoutLoading === 'premium'"
+                >
+                  <span v-if="checkoutLoading === 'premium'" class="btn-spinner me-2"></span>
+                  {{ checkoutLoading === 'premium' ? 'Redirecting…' : 'Start Free Trial' }}
+                </button>
               </div>
             </div>
           </div>
@@ -112,9 +123,20 @@
                   <li class="mb-2"><i class="bi bi-star me-2 text-success"></i> All Premium systems</li>
                   <li class="mb-2"><i class="bi bi-envelope-open me-2 text-success"></i> Simple invite & manage</li>
                 </ul>
-                <router-link to="/signup" class="btn btn-outline-dark w-100 mt-auto">
+                <!-- Unauthenticated: route to signup -->
+                <router-link v-if="!isAuthenticated" to="/signup" class="btn btn-outline-dark w-100 mt-auto">
                   Choose Duo
                 </router-link>
+                <!-- Authenticated: trigger Stripe checkout -->
+                <button
+                  v-else
+                  class="btn btn-outline-dark w-100 mt-auto"
+                  @click="handleCheckout('duo')"
+                  :disabled="checkoutLoading === 'duo'"
+                >
+                  <span v-if="checkoutLoading === 'duo'" class="btn-spinner me-2"></span>
+                  {{ checkoutLoading === 'duo' ? 'Redirecting…' : 'Choose Duo' }}
+                </button>
               </div>
             </div>
           </div>
@@ -123,6 +145,7 @@
         <p class="small text-muted mt-3 mb-0">
           Prices shown are examples. Taxes may apply. Cancel anytime during the trial.
         </p>
+        <p v-if="checkoutError" class="small text-danger mt-2 mb-0">{{ checkoutError }}</p>
       </div>
     </section>
 
@@ -183,7 +206,16 @@
       <div class="container-xxl text-center">
         <h2 class="fw-bold mb-2">Upgrade your next 30 days.</h2>
         <p class="text-muted mb-4">Start the trial. Keep the loop alive.</p>
-        <router-link to="/signup" class="btn btn-primary btn-lg">Start Free Trial</router-link>
+        <router-link v-if="!isAuthenticated" to="/signup" class="btn btn-primary btn-lg">Start Free Trial</router-link>
+        <button
+          v-else
+          class="btn btn-primary btn-lg"
+          @click="handleCheckout('premium')"
+          :disabled="checkoutLoading === 'premium'"
+        >
+          <span v-if="checkoutLoading === 'premium'" class="btn-spinner me-2"></span>
+          {{ checkoutLoading === 'premium' ? 'Redirecting…' : 'Start Free Trial' }}
+        </button>
       </div>
     </section>
   </main>
@@ -191,6 +223,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useStripe } from '@/composables/useStripe'
+import { storeToRefs } from 'pinia'
+
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
+const { redirectToCheckout } = useStripe()
 
 const billing = ref('annual')
 const toggleBilling = () => (billing.value = billing.value === 'annual' ? 'monthly' : 'annual')
@@ -202,6 +241,21 @@ const annualTotal = '$95.88'
 const duoMonthly = '$19.99'
 const duoAnnual = '$15.99'
 const savePct = computed(() => 33)
+
+// Checkout state
+const checkoutLoading = ref('')  // 'premium' | 'duo' | ''
+const checkoutError = ref('')
+
+const handleCheckout = async (tier) => {
+  checkoutLoading.value = tier
+  checkoutError.value = ''
+  try {
+    await redirectToCheckout(tier, billing.value)
+  } catch {
+    checkoutError.value = 'Something went wrong. Please try again.'
+    checkoutLoading.value = ''
+  }
+}
 
 // Fake live workout stat
 const liveWorkouts = ref(0)
@@ -370,4 +424,21 @@ onMounted(() => {
   --bs-btn-hover-bg: #333;
   --bs-btn-hover-border-color: #333;
 }
+
+/* Inline spinner for checkout redirect */
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+.btn-outline-dark .btn-spinner {
+  border-color: rgba(0,0,0,0.25);
+  border-top-color: #000;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
 </style>

@@ -10,6 +10,8 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
   const unitSystem = ref(localStorage.getItem('unitSystem') || 'imperial')
   const onboardingComplete = ref(localStorage.getItem('onboarding_complete') === 'true')
+  const subscriptionTier = ref(localStorage.getItem('subscriptionTier') || 'free')
+  const subscriptionStatus = ref(null)
 
   const isAuthenticated = computed(() => !!token.value)
 
@@ -39,6 +41,13 @@ export const useAuthStore = defineStore('auth', () => {
     const { data } = await axios.get(`${API_URL}/auth/me`)
     user.value = data
     localStorage.setItem('user', JSON.stringify(data))
+    if (data.subscriptionTier) {
+      subscriptionTier.value = data.subscriptionTier
+      localStorage.setItem('subscriptionTier', data.subscriptionTier)
+    }
+    if (data.subscriptionStatus) {
+      subscriptionStatus.value = data.subscriptionStatus
+    }
   }
   
   function setAuth(newToken, newUser) {
@@ -53,9 +62,12 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     user.value = null
     onboardingComplete.value = false
+    subscriptionTier.value = 'free'
+    subscriptionStatus.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     localStorage.removeItem('onboarding_complete')
+    localStorage.removeItem('subscriptionTier')
     delete axios.defaults.headers.common['Authorization']
   }
   
@@ -65,7 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   
   return {
-    token, user, isAuthenticated, unitSystem, onboardingComplete,
+    token, user, isAuthenticated, unitSystem, onboardingComplete, subscriptionTier, subscriptionStatus,
     login, register, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding
   }
 })

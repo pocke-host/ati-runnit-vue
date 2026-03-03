@@ -23,6 +23,14 @@
           <i class="bi bi-bar-chart-line-fill me-2"></i>Stats
         </router-link>
 
+        <!-- DM button -->
+        <div class="notif-wrap">
+          <button class="nav-icon-btn" @click="dmStore.open()" title="Messages">
+            <i class="bi bi-chat-dots-fill"></i>
+            <span v-if="dmStore.unreadCount > 0" class="notif-badge">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
+          </button>
+        </div>
+
         <!-- Notification Bell -->
         <div class="notif-wrap" ref="notifRef">
           <button class="nav-icon-btn" @click="toggleNotifDropdown" title="Notifications">
@@ -102,6 +110,9 @@
 
   </nav>
 
+  <!-- DM Drawer -->
+  <DMDrawer />
+
   <!-- Teleport drawer outside navbar to avoid backdrop-filter stacking context clipping -->
   <Teleport to="body">
     <Transition name="drawer-fade">
@@ -165,6 +176,22 @@
             <router-link to="/settings" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-gear"></i> Settings
             </router-link>
+            <router-link
+              v-if="subscriptionTier !== 'free'"
+              to="/billing"
+              class="drawer-link"
+              @click="mobileMenuOpen = false"
+            >
+              <i class="bi bi-credit-card"></i> Manage Billing
+            </router-link>
+            <router-link
+              v-else
+              to="/subscribe"
+              class="drawer-link drawer-link-primary"
+              @click="mobileMenuOpen = false"
+            >
+              <i class="bi bi-star"></i> Upgrade to Premium
+            </router-link>
             <button class="drawer-link drawer-link-danger" @click="handleLogout">
               <i class="bi bi-box-arrow-right"></i> Logout
             </button>
@@ -203,13 +230,16 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
+import { useDMStore } from '@/stores/dm'
 import { storeToRefs } from 'pinia'
+import DMDrawer from '@/components/DMDrawer.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const notifStore = useNotificationStore()
+const dmStore = useDMStore()
 
-const { user, isAuthenticated } = storeToRefs(authStore)
+const { user, isAuthenticated, subscriptionTier } = storeToRefs(authStore)
 const { notifications, unreadCount, loading: notifLoading } = storeToRefs(notifStore)
 
 const mobileMenuOpen = ref(false)
