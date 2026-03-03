@@ -22,16 +22,6 @@
           </div>
         </div>
 
-        <h2 class="ep-section-title" style="margin-top:48px;">Brand Assets</h2>
-        <div class="asset-grid">
-          <div class="asset-card" v-for="asset in assets" :key="asset.label">
-            <div class="asset-preview" :style="{ background: asset.bg, color: asset.color }">
-              <span class="asset-wordmark">RUNNIT</span>
-            </div>
-            <div class="asset-label">{{ asset.label }}</div>
-            <a href="mailto:press@runnit.co" class="asset-download">Request →</a>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -55,12 +45,6 @@ const coverage = [
   { pub: 'TechCrunch', headline: '"Runnit Raises Seed Round to Build the Athlete OS"', date: 'January 2026' },
   { pub: 'Outside Magazine', headline: '"5 Apps Changing How Athletes Train in 2026"', date: 'December 2025' },
   { pub: 'The Verge', headline: '"Runnit\'s GPS Tracker Is Eerily Good"', date: 'November 2025' }
-]
-
-const assets = [
-  { label: 'Logo — Light', bg: '#000', color: '#fff' },
-  { label: 'Logo — Dark', bg: '#fff', color: '#000' },
-  { label: 'Logo — Wordmark', bg: '#F5F5F5', color: '#000' }
 ]
 
 const facts = [
@@ -165,42 +149,6 @@ const facts = [
   white-space: nowrap;
 }
 
-/* Asset grid */
-.asset-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.asset-card {
-  border: 1px solid #E5E5E5;
-}
-.asset-preview {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.asset-wordmark {
-  font-weight: 900;
-  font-size: 1.4rem;
-  letter-spacing: 0.15em;
-}
-.asset-label {
-  padding: 10px 12px 4px;
-  font-size: 0.80rem;
-  font-weight: 700;
-  color: rgba(15,18,16,0.60);
-}
-.asset-download {
-  display: block;
-  padding: 0 12px 12px;
-  font-size: 0.80rem;
-  font-weight: 700;
-  color: #000;
-  text-decoration: none;
-}
-.asset-download:hover { text-decoration: underline; }
-
 /* Facts */
 .facts-grid {
   display: grid;
@@ -230,7 +178,6 @@ const facts = [
 @media (max-width: 700px) {
   .press-item { grid-template-columns: 1fr; gap: 4px; }
   .press-date { display: none; }
-  .asset-grid { grid-template-columns: 1fr 1fr; }
   .facts-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
