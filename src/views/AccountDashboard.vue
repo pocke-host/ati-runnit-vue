@@ -477,7 +477,7 @@
           <!-- Title -->
           <div class="form-group">
             <label class="form-label">Title <span class="optional">(optional)</span></label>
-            <input v-model="activityForm.title" type="text" class="form-control" placeholder="e.g., Morning Run" />
+            <input v-model="activityForm.title" type="text" class="form-control" placeholder="e.g., Morning Workout" />
           </div>
 
           <!-- Row 2: Duration -->

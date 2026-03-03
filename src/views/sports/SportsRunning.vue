@@ -50,7 +50,7 @@
                 <div class="hud-bar">
                   <span class="hud-fill"></span>
                 </div>
-                <div class="hud-sub">Set your plan. Hit the run. Sync the win.</div>
+                <div class="hud-sub">Set your plan. Hit your mark. Sync the win.</div>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
       <div class="container-xxl">
         <div class="row align-items-center g-5">
           <div class="col-12 col-lg-5">
-            <h2 class="fw-bold mb-3">Why runners choose RUNNIT</h2>
+            <h2 class="fw-bold mb-3">Why athletes choose RUNNIT</h2>
             <p class="text-muted mb-4">
               We’re not here for noise — we’re here for repeatable progress.
               Clear data, clean motivation, and a community that keeps you moving.
@@ -94,7 +94,7 @@
     <!-- FEATURE CARDS -->
     <section class="features">
       <div class="container-xxl">
-        <h2 class="fw-bold text-center mb-4">Features for runners</h2>
+        <h2 class="fw-bold text-center mb-4">Built for every stride</h2>
         <div class="row g-4">
           <div class="col-12 col-md-6 col-lg-4" v-for="(f, i) in featureList" :key="i">
             <div class="card h-100 feature-card">
@@ -128,7 +128,7 @@
     <!-- CTA BAND -->
     <section class="cta">
       <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-3">Ready to run with us?</h2>
+        <h2 class="fw-bold mb-3">Ready to train with us?</h2>
         <p class="text-muted mb-4">Create a free account and start tracking today.</p>
         <router-link to="/signup" class="btn btn-primary btn-lg">Get Started</router-link>
       </div>

@@ -171,7 +171,7 @@
           <div class="col-md-4">
             <blockquote class="blockquote">
               <p>“Routes + goals made training feel simple again.”</p>
-              <footer class="blockquote-footer">Sam, Runner</footer>
+              <footer class="blockquote-footer">Sam, Cyclist</footer>
             </blockquote>
           </div>
         </div>

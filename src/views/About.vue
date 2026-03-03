@@ -86,7 +86,7 @@
               We wanted a place where training feels meaningful, not noisy.
             </p>
             <p class="text-muted mb-0">
-              Whether you’re chasing your first 5K or a new marathon PR, RUNNIT is designed to help you
+              Whether you’re chasing your first finish line or a new PR, RUNNIT is designed to help you
               keep the loop alive: show up, log the moment, and build momentum.
             </p>
           </div>
