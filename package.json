@@ -19,6 +19,7 @@
     "@capacitor/core": "^6.0.0",
     "@capacitor/ios": "^6.0.0",
     "@stripe/stripe-js": "^8.9.0",
+    "@vercel/analytics": "^1.6.1",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
