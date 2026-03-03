@@ -1,114 +1,146 @@
 <template>
     <main class="heatmap-page">
-      <div id="map" class="map"></div>
-  
+      <div ref="mapContainer" class="map"></div>
+
       <!-- Controls -->
-      <div class="panel card shadow-sm">
+      <div class="panel">
+        <div class="panel-title">GLOBAL HEATMAP</div>
         <div class="row g-2">
           <div class="col-6">
             <label class="form-label small mb-1">Sport</label>
             <select v-model="sport" class="form-select form-select-sm" @change="applyFilters">
-              <option value="All">All</option>
+              <option value="All">All Sports</option>
               <option>Running</option>
               <option>Cycling</option>
               <option>Walking</option>
               <option>Hiking</option>
+              <option>Swimming</option>
               <option>Other</option>
             </select>
           </div>
-  
+
           <div class="col-6">
-            <label class="form-label small mb-1">Opacity {{ heatOpacity }}%</label>
+            <label class="form-label small mb-1">Intensity {{ heatOpacity }}%</label>
             <input type="range" min="10" max="100" step="5" v-model.number="heatOpacity"
                    class="form-range" @input="updateHeatmapPaint" />
           </div>
-  
+
           <div class="col-12">
             <label class="form-label small mb-1">Color theme</label>
             <select v-model="colorTheme" class="form-select form-select-sm" @change="updateHeatmapPaint">
-              <option value="purple">RUNNIT Purple</option>
               <option value="fire">Fire</option>
-              <option value="mobileblue">Mobile Blue</option>
+              <option value="purple">Purple</option>
+              <option value="mobileblue">Blue</option>
               <option value="viridis">Viridis</option>
             </select>
           </div>
-  
+
           <div class="col-12">
-            <div class="form-check mt-1">
-              <input id="useStatic" class="form-check-input" type="checkbox" v-model="useStaticFile"
-                     @change="loadData" />
-              <label class="form-check-label small" for="useStatic">
-                Load from <code>/data/activities.geojson</code> (if present)
-              </label>
-            </div>
+            <label class="form-label small mb-1">Map style</label>
+            <select v-model="mapStyle" class="form-select form-select-sm" @change="switchStyle">
+              <option value="dark-v11">Dark (recommended)</option>
+              <option value="light-v11">Light</option>
+              <option value="satellite-v9">Satellite</option>
+              <option value="outdoors-v12">Outdoors</option>
+            </select>
           </div>
         </div>
       </div>
     </main>
   </template>
-  
+
   <script setup>
-  import 'maplibre-gl/dist/maplibre-gl.css'
-  import maplibregl from 'maplibre-gl'
+  import mapboxgl from 'mapbox-gl'
+  import 'mapbox-gl/dist/mapbox-gl.css'
   import { onMounted, onBeforeUnmount, ref } from 'vue'
-  
+
+  mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || ''
+
+  const mapContainer = ref(null)
   const sport = ref('All')
-  const heatOpacity = ref(100)
-  const colorTheme = ref('purple')
-  const useStaticFile = ref(false)   // toggle between demo/random vs static file
-  
+  const heatOpacity = ref(80)
+  const colorTheme = ref('fire')
+  const mapStyle = ref('dark-v11')
+  const useStaticFile = ref(false)
+
   let map
   const sourceId = 'runnit-geojson'
   const heatLayerId = 'runnit-heat'
   const pointLayerId = 'runnit-points'
-  
+
+  const styleUrl = (name) => `mapbox://styles/mapbox/${name}`
+
   // init
   onMounted(() => {
-    map = new maplibregl.Map({
-      container: 'map',
-      style: 'https://demotiles.maplibre.org/style.json', // free MapLibre basemap
-      center: [-122.4194, 37.7749], // SF
-      zoom: 9,
-      attributionControl: true
+    map = new mapboxgl.Map({
+      container: mapContainer.value,
+      style: styleUrl(mapStyle.value),
+      center: [-98.5795, 39.8283], // continental US center
+      zoom: 4,
     })
-    map.addControl(new maplibregl.NavigationControl(), 'top-right')
-  
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left')
+
     map.on('load', async () => {
       map.addSource(sourceId, { type: 'geojson', data: emptyFC() })
-  
+
       map.addLayer({
         id: heatLayerId,
         type: 'heatmap',
         source: sourceId,
         maxzoom: 15,
         paint: {
-          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 16, 13, 26],
-          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.7, 13, 1.4],
+          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 18, 13, 30],
+          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 13, 1.6],
           'heatmap-color': themeColors(colorTheme.value),
           'heatmap-opacity': heatOpacity.value / 100
         }
       })
-  
+
       map.addLayer({
         id: pointLayerId,
         type: 'circle',
         source: sourceId,
         minzoom: 13,
         paint: {
-          'circle-radius': 2,
+          'circle-radius': 2.5,
           'circle-color': '#fff',
           'circle-stroke-color': '#000',
           'circle-stroke-width': 0.5,
-          'circle-opacity': 0.4
+          'circle-opacity': 0.5
         }
       })
-  
+
       await loadData()
-      map.on('moveend', applyFilters) // keep same data; just filter in client
     })
   })
-  
+
   onBeforeUnmount(() => { if (map) map.remove() })
+
+  function switchStyle() {
+    if (!map) return
+    map.setStyle(styleUrl(mapStyle.value))
+    map.once('style.load', () => {
+      // Re-add source + layers after style swap
+      map.addSource(sourceId, { type: 'geojson', data: map.__RAW_FILTERED__ || emptyFC() })
+      map.addLayer({
+        id: heatLayerId, type: 'heatmap', source: sourceId, maxzoom: 15,
+        paint: {
+          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 9, 18, 13, 30],
+          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 13, 1.6],
+          'heatmap-color': themeColors(colorTheme.value),
+          'heatmap-opacity': heatOpacity.value / 100
+        }
+      })
+      map.addLayer({
+        id: pointLayerId, type: 'circle', source: sourceId, minzoom: 13,
+        paint: {
+          'circle-radius': 2.5, 'circle-color': '#fff',
+          'circle-stroke-color': '#000', 'circle-stroke-width': 0.5, 'circle-opacity': 0.5
+        }
+      })
+    })
+  }
   
   function emptyFC(){ return { type: 'FeatureCollection', features: [] } }
   
