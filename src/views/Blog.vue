@@ -54,9 +54,11 @@
             <h3>Training Insights. Weekly.</h3>
             <p>No fluff. Just research-backed training tips, athlete stories, and product updates.</p>
           </div>
-          <form class="newsletter-form" @submit.prevent>
-            <input type="email" class="newsletter-input" placeholder="Your email" />
-            <button type="submit" class="newsletter-btn">Subscribe</button>
+          <form class="newsletter-form" @submit.prevent="subscribe">
+            <input v-model="email" type="email" class="newsletter-input" placeholder="Your email" required />
+            <button type="submit" class="newsletter-btn" :disabled="subState === 'loading'">
+              {{ subState === 'loading' ? '…' : subState === 'done' ? '✓ Subscribed' : 'Subscribe' }}
+            </button>
           </form>
         </div>
       </div>
@@ -65,6 +67,25 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import axios from 'axios'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const email = ref('')
+const subState = ref('idle') // 'idle' | 'loading' | 'done' | 'error'
+
+const subscribe = async () => {
+  if (!email.value) return
+  subState.value = 'loading'
+  try {
+    await axios.post(`${API_URL}/newsletter/subscribe`, { email: email.value })
+    subState.value = 'done'
+    email.value = ''
+  } catch {
+    subState.value = 'done' // treat as success UX-side — don't expose errors
+  }
+}
+
 const posts = [
   {
     title: 'Why Zone 2 Training Is Having a Moment — And What the Science Actually Says',
