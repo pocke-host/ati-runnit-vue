@@ -3,24 +3,15 @@
   <nav class="navbar">
     <div class="navbar-content">
 
-      <!-- LEFT: hamburger (mobile, unauth) -->
-      <div class="nav-left">
-        <button
-          v-if="!isAuthenticated"
-          class="mobile-menu-toggle"
-          @click="mobileMenuOpen = !mobileMenuOpen"
-          :aria-expanded="mobileMenuOpen"
-        >
-          <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
-        </button>
-      </div>
+      <!-- LEFT: spacer (keeps brand centered on mobile) -->
+      <div class="nav-left"></div>
 
       <!-- CENTER: brand -->
       <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
         <span class="brand-text">RUNNIT</span>
       </router-link>
 
-      <!-- RIGHT: desktop nav links + action icons -->
+      <!-- RIGHT: desktop nav links + action icons + hamburger -->
       <div class="nav-right">
 
         <!-- Desktop-only text nav links -->
@@ -126,6 +117,16 @@
             </div>
           </div>
         </template>
+
+        <!-- Hamburger (mobile only, unauthenticated) -->
+        <button
+          v-if="!isAuthenticated"
+          class="mobile-menu-toggle"
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          :aria-expanded="mobileMenuOpen"
+        >
+          <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
+        </button>
 
       </div>
     </div>
