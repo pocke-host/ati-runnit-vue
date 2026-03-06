@@ -108,13 +108,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useActivityStore } from '@/stores/activity'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 const router = useRouter()
+const activityStore = useActivityStore()
 const { formatDistance, formatPace, formatElevation, formatDurationClock } = useUnits()
 
 const sports = [
@@ -165,11 +165,15 @@ const initializeMap = () => {
 
   mapboxgl.accessToken = MAPBOX_TOKEN
 
+  // Use last known position from localStorage, fall back to continental US center
+  const savedLng = parseFloat(localStorage.getItem('lastLng') || '-98.5')
+  const savedLat = parseFloat(localStorage.getItem('lastLat') || '39.5')
+
   map.value = new mapboxgl.Map({
     container: liveMapContainer.value,
     style: 'mapbox://styles/quinn-runnit/cmm9si8k3000e01rdhkf4gokf',
-    zoom: 15,
-    center: [0, 0],       // GeolocateControl will re-center immediately
+    zoom: savedLng === -98.5 ? 3.5 : 13,
+    center: [savedLng, savedLat],
     attributionControl: false,
   })
 
@@ -223,8 +227,7 @@ const initializeMap = () => {
       },
     })
 
-    // Auto-trigger GPS so map centers on user immediately
-    geo.trigger()
+    // Don't auto-trigger GPS — user must click Start to enable tracking
   })
 }
 
@@ -272,7 +275,10 @@ const handlePositionUpdate = (position) => {
       updateRouteOnMap()
     }
   } else {
-    // First point — drop the start marker
+    // First point — persist location for next session map center
+    localStorage.setItem('lastLng', longitude)
+    localStorage.setItem('lastLat', latitude)
+    // Drop the start marker
     routeCoordinates.value.push(newCoord)
     if (map.value && map.value.getSource('start-point')) {
       map.value.getSource('start-point').setData({
@@ -337,18 +343,13 @@ const stopTracking = async () => {
   saveError.value = ''
 
   try {
-    const token = localStorage.getItem('token')
-    await axios.post(
-      `${API_URL}/activities`,
-      {
-        sportType: selectedSport.value,
-        durationSeconds: elapsedTime.value,
-        distanceMeters: Math.round(totalDistance.value),
-        elevationGain: Math.round(elevationGain.value),
-        routePolyline: routeCoordinates.value.length ? encodePolyline(routeCoordinates.value) : null,
-      },
-      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-    )
+    await activityStore.createActivity({
+      sportType: selectedSport.value,
+      durationSeconds: elapsedTime.value,
+      distanceMeters: Math.round(totalDistance.value),
+      elevationGain: Math.round(elevationGain.value),
+      routePolyline: routeCoordinates.value.length ? encodePolyline(routeCoordinates.value) : null,
+    })
     router.push('/dashboard')
   } catch (err) {
     console.error('Save failed:', err)

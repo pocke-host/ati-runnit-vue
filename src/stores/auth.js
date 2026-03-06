@@ -5,7 +5,28 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
+// Decode JWT exp without a library — returns true if expired or unreadable
+const isJWTExpired = (t) => {
+  try {
+    const payload = JSON.parse(atob(t.split('.')[1]))
+    return payload.exp * 1000 < Date.now()
+  } catch { return true }
+}
+
+const clearLocalAuth = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('onboarding_complete')
+  localStorage.removeItem('userRole')
+  localStorage.removeItem('subscriptionTier')
+  delete axios.defaults.headers.common['Authorization']
+}
+
 export const useAuthStore = defineStore('auth', () => {
+  // Evict expired token before any reactive state is read
+  const storedToken = localStorage.getItem('token')
+  if (storedToken && isJWTExpired(storedToken)) clearLocalAuth()
+
   const token = ref(localStorage.getItem('token'))
   const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
   const unitSystem = ref(localStorage.getItem('unitSystem') || 'imperial')

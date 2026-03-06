@@ -134,18 +134,20 @@ const relativeTime = (iso) => {
   return `${Math.floor(hrs / 24)}d ago`
 }
 
-const checkConnectionStatus = async () => {
-  try {
-    const [garminRes, zwiftRes] = await Promise.all([
-      axios.get(`${API_URL}/integrations/garmin/status`, { headers: getAuthHeaders() }),
-      axios.get(`${API_URL}/integrations/zwift/status`, { headers: getAuthHeaders() })
-    ])
+const safeFetch = (url) =>
+  axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
+const checkConnectionStatus = async () => {
+  const [garminRes, zwiftRes] = await Promise.all([
+    safeFetch(`${API_URL}/integrations/garmin/status`),
+    safeFetch(`${API_URL}/integrations/zwift/status`),
+  ])
+  if (garminRes) {
     garminConnected.value = garminRes.data.connected
     garminLastSync.value = garminRes.data.lastSync || null
+  }
+  if (zwiftRes) {
     zwiftConnected.value = zwiftRes.data.connected
-  } catch (err) {
-    console.error('Failed to check connection status:', err)
   }
 }
 

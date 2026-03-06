@@ -10,12 +10,14 @@ const getHeaders = () => {
 
 export const useDMStore = defineStore('dm', () => {
   const isOpen = ref(false)
-  const view = ref('list')           // 'list' | 'thread'
+  const view = ref('list')           // 'list' | 'thread' | 'compose'
   const conversations = ref([])
   const activeUserId = ref(null)
   const activeUserName = ref('')
   const messages = ref([])
   const loading = ref(false)
+  const composeResults = ref([])
+  const composeLoading = ref(false)
   const unreadCount = computed(() => conversations.value.filter(c => c.unread).length)
 
   const open = () => { isOpen.value = true; fetchConversations() }
@@ -61,10 +63,35 @@ export const useDMStore = defineStore('dm', () => {
     activeUserId.value = null
     activeUserName.value = ''
     messages.value = []
+    composeResults.value = []
+  }
+
+  const openCompose = () => {
+    view.value = 'compose'
+    composeResults.value = []
+  }
+
+  const searchUsers = async (q) => {
+    if (!q.trim()) { composeResults.value = []; return }
+    composeLoading.value = true
+    try {
+      const { data } = await axios.get(`${API_URL}/users/search?q=${encodeURIComponent(q)}`, { headers: getHeaders() })
+      composeResults.value = data
+    } catch {
+      // Fall back to following list if search endpoint unavailable
+      try {
+        const { data } = await axios.get(`${API_URL}/follow/following`, { headers: getHeaders() })
+        const lower = q.toLowerCase()
+        composeResults.value = data.filter(u => (u.displayName || '').toLowerCase().includes(lower))
+      } catch { composeResults.value = [] }
+    } finally {
+      composeLoading.value = false
+    }
   }
 
   return {
-    isOpen, view, conversations, activeUserId, activeUserName, messages, loading, unreadCount,
-    open, close, fetchConversations, openThread, sendMessage, backToList
+    isOpen, view, conversations, activeUserId, activeUserName, messages, loading,
+    composeResults, composeLoading, unreadCount,
+    open, close, fetchConversations, openThread, sendMessage, backToList, openCompose, searchUsers
   }
 })

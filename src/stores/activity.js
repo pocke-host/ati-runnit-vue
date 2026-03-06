@@ -10,8 +10,17 @@ export const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+const CACHE_KEY = 'runnit_activities_cache'
+
+const loadCache = () => {
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] }
+}
+const saveCache = (list) => {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(list)) } catch {}
+}
+
 export const useActivityStore = defineStore('activity', () => {
-  const activities = ref([])
+  const activities = ref(loadCache())
   const loading = ref(false)
   const error = ref(null)
 
@@ -23,6 +32,7 @@ export const useActivityStore = defineStore('activity', () => {
         headers: getAuthHeaders()
       })
       activities.value.unshift(response.data)
+      saveCache(activities.value)
       return response.data
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to create activity'
@@ -39,15 +49,21 @@ export const useActivityStore = defineStore('activity', () => {
       const { data } = await axios.get(`${API_URL}/activities?page=${page}`, {
         headers: getAuthHeaders()
       })
-      activities.value = Array.isArray(data) ? data : (data.content || [])
+      const result = Array.isArray(data) ? data : (data.content || [])
+      if (result.length > 0) {
+        activities.value = result
+        saveCache(result)
+      } else if (activities.value.length === 0) {
+        activities.value = result
+      }
       return activities.value
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch activities'
-      activities.value = []
-      throw err
+      // Keep cached data visible on network failure
     } finally {
       loading.value = false
     }
+    return activities.value
   }
 
   async function fetchActivity(id) {
@@ -62,6 +78,7 @@ export const useActivityStore = defineStore('activity', () => {
       headers: getAuthHeaders()
     })
     activities.value = activities.value.filter(a => String(a.id) !== String(id))
+    saveCache(activities.value)
   }
 
   async function fetchFeed() {

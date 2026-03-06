@@ -44,6 +44,7 @@ const routes = [
   { path: '/plans',               name: 'Plans',          component: () => import('@/views/TrainingPlans.vue'),    meta: { requiresAuth: true } },
   { path: '/plans/:id',           name: 'PlanDetail',     component: () => import('@/views/PlanDetail.vue'),       meta: { requiresAuth: true } },
   { path: '/activities/:id',      name: 'ActivityDetail', component: () => import('@/views/ActivityDetail.vue'),   meta: { requiresAuth: true } },
+  { path: '/profile/edit',        name: 'ProfileEdit',    component: () => import('@/views/ProfileEdit.vue'),      meta: { requiresAuth: true } },
   { path: '/profile/:id',         name: 'UserProfile',    component: () => import('@/views/UserProfile.vue'),      meta: { requiresAuth: true } },
   { path: '/achievements',        name: 'Achievements',   component: () => import('@/views/Achievements.vue'),     meta: { requiresAuth: true } },
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },
@@ -72,8 +73,12 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const onboardingDone = localStorage.getItem('onboarding_complete') === 'true'
   const userRole = localStorage.getItem('userRole') || 'athlete'
+  const homeDash = userRole === 'coach' ? '/coach/dashboard' : '/dashboard'
 
   if (to.meta.requiresAuth && !token) return next('/join-us')
+
+  // Already-onboarded users must not be able to revisit /onboard
+  if (to.path === '/onboard' && token && onboardingDone) return next(homeDash)
 
   // New authenticated users must complete onboarding first
   if (token && !onboardingDone && to.meta.requiresAuth && to.path !== '/onboard') {
@@ -81,9 +86,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Coach-only routes — redirect athletes to their dashboard
-  if (to.meta.requiresCoach && userRole !== 'coach') {
-    return next('/dashboard')
-  }
+  if (to.meta.requiresCoach && userRole !== 'coach') return next('/dashboard')
 
   next()
 })

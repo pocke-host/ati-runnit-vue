@@ -9,12 +9,15 @@
       <div v-if="dmStore.isOpen" class="dm-drawer" @click.stop>
         <!-- Header -->
         <div class="dm-header">
-          <button v-if="dmStore.view === 'thread'" class="dm-back" @click="dmStore.backToList()" title="Back">
+          <button v-if="dmStore.view !== 'list'" class="dm-back" @click="dmStore.backToList()" title="Back">
             <i class="bi bi-arrow-left"></i>
           </button>
           <span class="dm-title">
-            {{ dmStore.view === 'thread' ? dmStore.activeUserName : 'MESSAGES' }}
+            {{ dmStore.view === 'thread' ? dmStore.activeUserName : dmStore.view === 'compose' ? 'NEW MESSAGE' : 'MESSAGES' }}
           </span>
+          <button v-if="dmStore.view === 'list'" class="dm-compose-btn" @click="dmStore.openCompose()" title="New message">
+            <i class="bi bi-pencil-square"></i>
+          </button>
           <button class="dm-close" @click="dmStore.close()" title="Close">
             <i class="bi bi-x-lg"></i>
           </button>
@@ -30,7 +33,7 @@
           <div v-else-if="dmStore.conversations.length === 0" class="dm-empty">
             <i class="bi bi-chat-dots"></i>
             <p>No conversations yet.</p>
-            <p class="dm-empty-sub">Message someone from their profile.</p>
+            <p class="dm-empty-sub">Tap the pencil icon to start one.</p>
           </div>
 
           <div v-else class="dm-list">
@@ -49,6 +52,46 @@
                 <div class="dm-conv-preview">{{ c.lastMessage }}</div>
               </div>
               <div v-if="c.unread" class="dm-unread-dot"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- COMPOSE VIEW -->
+        <div v-else-if="dmStore.view === 'compose'" class="dm-body">
+          <div class="dm-compose-search">
+            <div class="dm-search-wrap">
+              <i class="bi bi-search dm-search-icon"></i>
+              <input
+                v-model="composeQuery"
+                class="dm-search-input"
+                placeholder="Search people…"
+                autocomplete="off"
+                @input="onComposeSearch"
+              />
+            </div>
+          </div>
+
+          <div v-if="dmStore.composeLoading" class="dm-loading">
+            <div class="dm-spinner"></div>
+          </div>
+
+          <div v-else-if="composeQuery && dmStore.composeResults.length === 0" class="dm-empty">
+            <i class="bi bi-person-x"></i>
+            <p>No users found.</p>
+          </div>
+
+          <div v-else class="dm-list">
+            <button
+              v-for="u in dmStore.composeResults"
+              :key="u.id"
+              class="dm-conv-item"
+              @click="dmStore.openThread(u.id, u.displayName)"
+            >
+              <div class="dm-avatar">{{ u.displayName?.charAt(0).toUpperCase() || '?' }}</div>
+              <div class="dm-conv-info">
+                <div class="dm-conv-name">{{ u.displayName }}</div>
+                <div class="dm-conv-preview">{{ u.email || '' }}</div>
+              </div>
             </button>
           </div>
         </div>
@@ -105,6 +148,13 @@ const { user } = storeToRefs(authStore)
 
 const draftText = ref('')
 const messagesEl = ref(null)
+const composeQuery = ref('')
+let composeDebounce = null
+
+const onComposeSearch = () => {
+  clearTimeout(composeDebounce)
+  composeDebounce = setTimeout(() => dmStore.searchUsers(composeQuery.value), 300)
+}
 
 const isSent = (msg) => msg.senderId === user.value?.id
 
@@ -227,6 +277,77 @@ watch(() => dmStore.messages.length, async () => {
   text-align: center;
 }
 .dm-empty i { font-size: 2.5rem; margin-bottom: 16px; }
+.dm-empty-sub { font-size: 0.78rem; color: #9ca3af; margin: 0; }
+
+/* Compose button in header */
+.dm-compose-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #767676;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 0;
+  transition: color 0.15s;
+  margin-left: auto;
+}
+.dm-compose-btn:hover { color: #000; }
+
+/* New conversation button in empty state */
+.dm-new-btn {
+  margin-top: 16px;
+  height: 40px;
+  padding: 0 20px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.dm-new-btn:hover { background: #222; }
+
+/* Compose search */
+.dm-compose-search {
+  padding: 16px 20px 8px;
+  border-bottom: 1px solid #E5E5E5;
+}
+.dm-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.dm-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #767676;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+.dm-search-input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 0 12px 0 36px;
+  font-size: 0.88rem;
+  color: #000;
+  outline: none;
+  background: #f9f9f9;
+  font-family: inherit;
+}
+.dm-search-input:focus { border-color: #000; background: #fff; }
 .dm-empty p { margin: 0 0 4px; font-size: 0.9rem; font-weight: 500; color: #000; }
 .dm-empty-sub { font-size: 0.8rem !important; font-weight: 400 !important; color: #767676 !important; }
 

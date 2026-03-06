@@ -231,10 +231,55 @@
         <div class="cta-content">
           <h2 class="cta-title">Start your own club</h2>
           <p class="cta-text">Bring athletes together, create events, and build community.</p>
-          <button class="btn-cta">Create a Club</button>
+          <button class="btn-cta" @click="createModalOpen = true">Create a Club</button>
         </div>
       </div>
     </section>
+
+    <!-- CREATE CLUB MODAL -->
+    <transition name="fade">
+      <div v-if="createModalOpen" class="chat-overlay" @click.self="createModalOpen = false"></div>
+    </transition>
+    <transition name="slide-up">
+      <div v-if="createModalOpen" class="create-modal">
+        <div class="create-modal-header">
+          <span class="create-modal-title">CREATE CLUB</span>
+          <button class="chat-close" @click="createModalOpen = false"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div v-if="createError" class="create-error">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>{{ createError }}
+        </div>
+
+        <form class="create-form" @submit.prevent="submitCreateClub">
+          <div class="create-field">
+            <label class="create-label">Club Name *</label>
+            <input v-model.trim="newClub.name" class="create-input" placeholder="e.g. Morning Milers" maxlength="60" required />
+          </div>
+
+          <div class="create-field">
+            <label class="create-label">Sport</label>
+            <select v-model="newClub.sport" class="create-input create-select">
+              <option value="">General</option>
+              <option v-for="s in sports" :key="s" :value="s">{{ s }}</option>
+            </select>
+          </div>
+
+          <div class="create-field">
+            <label class="create-label">Description</label>
+            <textarea v-model.trim="newClub.description" class="create-input create-textarea" placeholder="What's your club about?" maxlength="300" rows="3"></textarea>
+          </div>
+
+          <div class="create-actions">
+            <button type="button" class="btn-cancel" @click="createModalOpen = false">Cancel</button>
+            <button type="submit" class="btn-create" :disabled="creating || !newClub.name">
+              <span v-if="creating" class="spinner-border spinner-border-sm me-1"></span>
+              {{ creating ? 'Creating…' : 'Create Club' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </transition>
 
     <!-- CHAT OVERLAY -->
     <transition name="fade">
@@ -353,6 +398,12 @@ const messagesRef = ref(null)
 // Invite tab
 const copiedId = ref(null)
 
+// Create club modal
+const createModalOpen = ref(false)
+const creating = ref(false)
+const createError = ref('')
+const newClub = ref({ name: '', sport: '', description: '' })
+
 // ── Computed ───────────────────────────────────────────────────────────────
 const filtered = computed(() => {
   let list = allClubs.value.slice()
@@ -375,6 +426,35 @@ const filtered = computed(() => {
 })
 
 // ── API calls ──────────────────────────────────────────────────────────────
+async function submitCreateClub() {
+  if (!newClub.value.name.trim()) return
+  creating.value = true
+  createError.value = ''
+  try {
+    const res = await fetch(`${API_URL}/clubs`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newClub.value.name,
+        sport: newClub.value.sport || 'General',
+        description: newClub.value.description
+      })
+    })
+    if (!res.ok) throw new Error('Failed to create club')
+    const created = await res.json()
+    // Add to all clubs + my clubs and open My Clubs tab
+    allClubs.value.unshift(created)
+    myClubs.value.unshift(created)
+    newClub.value = { name: '', sport: '', description: '' }
+    createModalOpen.value = false
+    activeTab.value = 'my'
+  } catch (e) {
+    createError.value = 'Could not create club. Please try again.'
+  } finally {
+    creating.value = false
+  }
+}
+
 async function fetchClubs() {
   loading.value = true
   try {
@@ -1249,4 +1329,137 @@ onMounted(() => {
     font-size: 13px;
   }
 }
+
+/* ===== CREATE CLUB MODAL ===== */
+.create-modal {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, 100vw);
+  background: #fff;
+  border-top: 1px solid #E5E5E5;
+  border-left: 1px solid #E5E5E5;
+  border-right: 1px solid #E5E5E5;
+  z-index: 10000;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+}
+
+.create-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #E5E5E5;
+}
+.create-modal-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.create-error {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 0.83rem;
+}
+
+.create-form { padding: 20px; }
+
+.create-field { margin-bottom: 16px; }
+
+.create-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 6px;
+}
+
+.create-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  color: #000;
+  background: #fff;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.create-input:focus { border-color: #000; }
+
+.create-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.create-textarea {
+  height: auto;
+  padding: 12px 14px;
+  resize: none;
+  line-height: 1.5;
+}
+
+.create-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid #E5E5E5;
+  background: #fff;
+  color: #767676;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border-radius: 0;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-cancel:hover { background: #f5f5f5; color: #000; }
+
+.btn-create {
+  height: 44px;
+  padding: 0 28px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.btn-create:hover:not(:disabled) { background: #222; }
+.btn-create:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* slide-up transition for modal */
+.slide-up-enter-active, .slide-up-leave-active { transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
+.slide-up-enter-from, .slide-up-leave-to { transform: translateX(-50%) translateY(100%); }
 </style>
