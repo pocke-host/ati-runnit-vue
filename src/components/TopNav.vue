@@ -2,7 +2,7 @@
 <template>
   <nav class="navbar">
     <div class="navbar-content">
-      <router-link to="/" class="navbar-brand">
+      <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
         <span class="brand-text">RUNNIT</span>
       </router-link>
 
@@ -18,21 +18,11 @@
         </template>
         <!-- Athlete nav links -->
         <template v-else>
-          <router-link to="/dashboard" class="nav-link">
-            <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
+          <router-link to="/feed" class="nav-link">Feed</router-link>
+          <router-link to="/track" class="nav-link nav-link-track">
+            <i class="bi bi-play-circle-fill"></i> Track
           </router-link>
-          <router-link to="/feed" class="nav-link">
-            <i class="bi bi-collection me-2"></i>Feed
-          </router-link>
-          <router-link to="/track" class="nav-link nav-link-primary">
-            <i class="bi bi-play-circle-fill me-2"></i>Track
-          </router-link>
-          <router-link to="/devices" class="nav-link">
-            <i class="bi bi-smartwatch me-2"></i>Devices
-          </router-link>
-          <router-link to="/stats" class="nav-link">
-            <i class="bi bi-bar-chart-line-fill me-2"></i>Stats
-          </router-link>
+          <router-link to="/stats" class="nav-link">Stats</router-link>
         </template>
 
         <!-- DM button -->
@@ -91,19 +81,31 @@
           </div>
         </div>
 
-        <!-- Profile avatar -->
-        <router-link
-          v-if="userId"
-          :to="`/profile/${userId}`"
-          class="nav-avatar"
-          :title="`View profile`"
-        >
-          {{ userInitial }}
-        </router-link>
-
-        <button class="nav-link" @click="handleLogout">
-          <i class="bi bi-box-arrow-right me-2"></i>Logout
-        </button>
+        <!-- Profile avatar dropdown -->
+        <div class="avatar-wrap" ref="avatarRef">
+          <button class="nav-avatar" @click="toggleAvatarDropdown" :title="user?.displayName">
+            {{ userInitial }}
+          </button>
+          <div v-if="avatarOpen" class="avatar-dropdown">
+            <div class="avd-header">
+              <div class="avd-name">{{ user?.displayName }}</div>
+              <div class="avd-email">{{ user?.email }}</div>
+            </div>
+            <router-link to="/dashboard" class="avd-link" @click="avatarOpen = false">
+              <i class="bi bi-grid-3x3-gap"></i> Dashboard
+            </router-link>
+            <router-link to="/profile/edit" class="avd-link" @click="avatarOpen = false">
+              <i class="bi bi-person-circle"></i> Edit Profile
+            </router-link>
+            <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
+              <i class="bi bi-gear"></i> Settings
+            </router-link>
+            <div class="avd-divider"></div>
+            <button class="avd-link avd-link-danger" @click="handleLogout">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="navbar-menu" v-else>
@@ -193,15 +195,18 @@
               <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
                 <i class="bi bi-smartwatch"></i> Devices
               </router-link>
-              <router-link to="/coaches" class="drawer-link" @click="mobileMenuOpen = false">
+              <router-link v-if="role !== 'coach'" to="/coaches" class="drawer-link" @click="mobileMenuOpen = false">
                 <i class="bi bi-person-badge"></i> Find a Coach
               </router-link>
             </template>
           </nav>
 
           <div class="drawer-footer">
-            <router-link v-if="userId" :to="`/profile/${userId}`" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-person-circle"></i> My Profile
+            <router-link to="/profile/edit" class="drawer-link" @click="mobileMenuOpen = false">
+              <i class="bi bi-person-circle"></i> Edit Profile
+            </router-link>
+            <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
+              <i class="bi bi-smartwatch"></i> Devices
             </router-link>
             <router-link to="/settings" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-gear"></i> Settings
@@ -275,8 +280,15 @@ const { notifications, unreadCount, loading: notifLoading } = storeToRefs(notifS
 const mobileMenuOpen = ref(false)
 const notifOpen = ref(false)
 const notifRef = ref(null)
+const avatarOpen = ref(false)
+const avatarRef = ref(null)
 const userId = computed(() => user.value?.id)
 const userInitial = computed(() => user.value?.displayName?.charAt(0).toUpperCase() || '?')
+
+const toggleAvatarDropdown = () => {
+  avatarOpen.value = !avatarOpen.value
+  if (avatarOpen.value) notifOpen.value = false
+}
 
 const toggleNotifDropdown = () => {
   notifOpen.value = !notifOpen.value
@@ -332,9 +344,8 @@ const handleNotifClick = async (n) => {
 }
 
 const handleOutsideClick = (e) => {
-  if (notifRef.value && !notifRef.value.contains(e.target)) {
-    notifOpen.value = false
-  }
+  if (notifRef.value && !notifRef.value.contains(e.target)) notifOpen.value = false
+  if (avatarRef.value && !avatarRef.value.contains(e.target)) avatarOpen.value = false
 }
 
 const handleLogout = () => {
@@ -410,17 +421,20 @@ onUnmounted(() => {
   transition: color 0.15s;
 }
 .nav-link:hover { background: transparent; color: white; }
-.nav-link-primary {
+.nav-link.router-link-active { color: white; }
+
+.nav-link-track {
   background: white;
-  color: #000;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  color: #000 !important;
+  font-weight: 700;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   padding: 8px 18px;
-  margin-left: 8px;
+  margin-left: 6px;
+  gap: 7px;
 }
-.nav-link-primary:hover { background: #e5e5e5; color: #000; }
+.nav-link-track:hover { background: #e5e5e5 !important; color: #000 !important; }
 
 /* Notification bell */
 .notif-wrap { position: relative; }
@@ -570,7 +584,9 @@ onUnmounted(() => {
   border-top: 1px solid #E5E5E5;
 }
 
-/* Profile avatar — keep circular for faces */
+/* Profile avatar dropdown */
+.avatar-wrap { position: relative; }
+
 .nav-avatar {
   width: 32px;
   height: 32px;
@@ -584,10 +600,76 @@ onUnmounted(() => {
   font-size: 0.8rem;
   color: white;
   text-decoration: none;
+  cursor: pointer;
   transition: opacity 0.15s;
   flex-shrink: 0;
 }
 .nav-avatar:hover { opacity: 0.8; }
+
+.avatar-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: white;
+  border: 1px solid #E5E5E5;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  border-radius: 0;
+  overflow: hidden;
+  animation: dropIn 0.15s ease;
+  z-index: 2000;
+}
+
+.avd-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #E5E5E5;
+}
+.avd-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.avd-email {
+  font-size: 0.72rem;
+  color: #767676;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avd-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  font-size: 0.83rem;
+  color: #000;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.avd-link i { width: 16px; text-align: center; color: #767676; font-size: 0.9rem; }
+.avd-link:hover { background: #f5f5f5; }
+
+.avd-divider {
+  border: none;
+  border-top: 1px solid #E5E5E5;
+  margin: 4px 0;
+}
+
+.avd-link-danger { color: #dc2626; }
+.avd-link-danger i { color: #dc2626; }
+.avd-link-danger:hover { background: #fef2f2; }
 
 /* Mobile toggle */
 .mobile-menu-toggle {
@@ -613,8 +695,8 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .navbar-menu { display: none; }
-  .mobile-menu-toggle { display: flex; }
-  .navbar-content { padding: 0 16px; }
+  .mobile-menu-toggle { display: flex; margin-left: auto; }
+  .navbar-content { padding: 0 20px; }
   .brand-text { font-size: 1rem; }
 }
 </style>

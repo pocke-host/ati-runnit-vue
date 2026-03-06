@@ -165,11 +165,15 @@ const initializeMap = () => {
 
   mapboxgl.accessToken = MAPBOX_TOKEN
 
+  // Use last known position from localStorage, fall back to continental US center
+  const savedLng = parseFloat(localStorage.getItem('lastLng') || '-98.5')
+  const savedLat = parseFloat(localStorage.getItem('lastLat') || '39.5')
+
   map.value = new mapboxgl.Map({
     container: liveMapContainer.value,
     style: 'mapbox://styles/quinn-runnit/cmm9si8k3000e01rdhkf4gokf',
-    zoom: 15,
-    center: [0, 0],       // GeolocateControl will re-center immediately
+    zoom: savedLng === -98.5 ? 3.5 : 13,
+    center: [savedLng, savedLat],
     attributionControl: false,
   })
 
@@ -223,8 +227,7 @@ const initializeMap = () => {
       },
     })
 
-    // Auto-trigger GPS so map centers on user immediately
-    geo.trigger()
+    // Don't auto-trigger GPS — user must click Start to enable tracking
   })
 }
 
@@ -272,7 +275,10 @@ const handlePositionUpdate = (position) => {
       updateRouteOnMap()
     }
   } else {
-    // First point — drop the start marker
+    // First point — persist location for next session map center
+    localStorage.setItem('lastLng', longitude)
+    localStorage.setItem('lastLat', latitude)
+    // Drop the start marker
     routeCoordinates.value.push(newCoord)
     if (map.value && map.value.getSource('start-point')) {
       map.value.getSource('start-point').setData({

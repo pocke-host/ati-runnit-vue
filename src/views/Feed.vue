@@ -4,9 +4,6 @@
     <header class="feed-header">
       <div class="feed-header-content">
         <h1 class="feed-title">Feed</h1>
-        <button class="btn btn-primary" @click="goToDashboard">
-          <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
-        </button>
       </div>
     </header>
 
@@ -459,13 +456,23 @@ const formatTimeFull = (dateString) => {
 const fetchFeed = async () => {
   loading.value = true
   try {
-    const [momentsRes, activitiesRes] = await Promise.all([
+    const [momentsRes, activitiesRes, ownActivitiesRes] = await Promise.all([
       axios.get(`${API_URL}/moments/feed`, { headers: getAuthHeaders() }),
-      axios.get(`${API_URL}/activities/feed`, { headers: getAuthHeaders() })
+      axios.get(`${API_URL}/activities/feed`, { headers: getAuthHeaders() }),
+      axios.get(`${API_URL}/activities?page=0&size=30`, { headers: getAuthHeaders() })
     ])
-    
+
     moments.value = momentsRes.data.content || momentsRes.data
-    activities.value = activitiesRes.data.content || activitiesRes.data
+
+    // Merge own activities with friends' activities, deduplicate by ID
+    const feedActs = activitiesRes.data.content || activitiesRes.data
+    const ownActs  = ownActivitiesRes.data.content || ownActivitiesRes.data || []
+    const seen = new Set(feedActs.map(a => a.id))
+    const merged = [...feedActs]
+    for (const a of ownActs) {
+      if (!seen.has(a.id)) { seen.add(a.id); merged.push(a) }
+    }
+    activities.value = merged
   } catch (err) {
     console.error('Failed to fetch feed:', err)
   } finally {
