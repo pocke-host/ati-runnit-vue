@@ -23,22 +23,22 @@
       <div class="container-xxl">
         <div class="stats-grid">
           <div class="stat-item">
-            <div class="stat-num">14,000+</div>
+            <div class="stat-num">{{ statsLoading ? '—' : fmt(stats.athleteCount) }}</div>
             <div class="stat-label">Athletes training</div>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <div class="stat-num">3.2M</div>
+            <div class="stat-num">{{ statsLoading ? '—' : fmtMiles(stats.totalMilesLogged) }}</div>
             <div class="stat-label">Miles logged</div>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <div class="stat-num">89,000+</div>
+            <div class="stat-num">{{ statsLoading ? '—' : fmt(stats.totalPRs) }}</div>
             <div class="stat-label">PRs broken</div>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <div class="stat-num">4.8 / 5</div>
+            <div class="stat-num">{{ statsLoading ? '—' : (stats.avgRating?.toFixed(1) + ' / 5') }}</div>
             <div class="stat-label">Average rating</div>
           </div>
         </div>
@@ -230,55 +230,6 @@
       </div>
     </section>
 
-    <!-- ── PRICING ── -->
-    <section class="pricing">
-      <div class="container-xxl">
-        <div class="pricing-header">
-          <p class="section-overline">Pricing</p>
-          <h2 class="pricing-title">Start free.<br>Upgrade when you're ready.</h2>
-        </div>
-        <div class="pricing-grid">
-
-          <!-- Free -->
-          <div class="pricing-card">
-            <div class="pricing-tier">Free</div>
-            <div class="pricing-price">$0<span class="pricing-per">/month</span></div>
-            <p class="pricing-tagline">Everything you need to get moving.</p>
-            <ul class="pricing-features">
-              <li><i class="bi bi-check2"></i> GPS activity tracking</li>
-              <li><i class="bi bi-check2"></i> Activity history & stats</li>
-              <li><i class="bi bi-check2"></i> Community feed & clubs</li>
-              <li><i class="bi bi-check2"></i> Challenges & leaderboards</li>
-              <li><i class="bi bi-check2"></i> Personal records tracking</li>
-              <li><i class="bi bi-check2"></i> Device sync (Garmin, Apple Watch)</li>
-              <li><i class="bi bi-check2"></i> Daily Moments</li>
-            </ul>
-            <router-link to="/signup" class="pricing-btn pricing-btn-outline">Get started free</router-link>
-          </div>
-
-          <!-- Pro -->
-          <div class="pricing-card pricing-card-pro">
-            <div class="pricing-badge">MOST POPULAR</div>
-            <div class="pricing-tier">Pro</div>
-            <div class="pricing-price">$9.99<span class="pricing-per">/month</span></div>
-            <p class="pricing-tagline">For athletes who are serious about improvement.</p>
-            <ul class="pricing-features">
-              <li><i class="bi bi-check2"></i> Everything in Free</li>
-              <li><i class="bi bi-check2"></i> AI-powered training plans</li>
-              <li><i class="bi bi-check2"></i> Coach access & DMs</li>
-              <li><i class="bi bi-check2"></i> Advanced analytics & load tracking</li>
-              <li><i class="bi bi-check2"></i> Race predictor & goal pacing</li>
-              <li><i class="bi bi-check2"></i> Weekly performance reports</li>
-              <li><i class="bi bi-check2"></i> Priority support</li>
-            </ul>
-            <router-link to="/signup" class="pricing-btn pricing-btn-primary">Start Pro — 14 days free</router-link>
-            <p class="pricing-fine">No credit card required to try.</p>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
     <!-- ── FINAL CTA ── -->
     <section class="final-cta">
       <div class="container-xxl text-center">
@@ -295,7 +246,38 @@
 </template>
 
 <script setup>
-// Static content — no data needed
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+const statsLoading = ref(true)
+const stats = ref({ athleteCount: 0, totalMilesLogged: 0, totalPRs: 0, avgRating: 0 })
+
+// Format a raw integer with commas + "+" suffix (e.g. 14235 → "14,235+")
+const fmt = (n) => {
+  if (!n) return '0'
+  return n.toLocaleString('en-US') + '+'
+}
+
+// Compact miles formatter: ≥1M → "X.XM", ≥1K → "XXK", else raw
+const fmtMiles = (n) => {
+  if (!n) return '0'
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
+  if (n >= 1_000)     return Math.round(n / 1_000) + 'K'
+  return n.toLocaleString('en-US')
+}
+
+onMounted(async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/stats`)
+    stats.value = data
+  } catch {
+    // leave zeros — stats bar stays hidden behind "—" placeholders gracefully
+  } finally {
+    statsLoading.value = false
+  }
+})
 </script>
 
 <style scoped>
@@ -752,165 +734,6 @@
   letter-spacing: 0.04em;
 }
 
-/* ── PRICING ── */
-.pricing {
-  padding: 100px 0;
-  background: #F5F5F5;
-  border-bottom: 1px solid #E5E5E5;
-}
-
-.pricing-header {
-  margin-bottom: 64px;
-}
-
-.pricing-title {
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: #000;
-  margin: 0;
-}
-
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  max-width: 860px;
-}
-
-.pricing-card {
-  background: #fff;
-  border: 1px solid #E5E5E5;
-  padding: 44px 40px;
-  position: relative;
-}
-
-.pricing-card-pro {
-  border-color: #000;
-}
-
-.pricing-badge {
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  background: #000;
-  color: #fff;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 5px 12px;
-}
-
-.pricing-tier {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  color: #767676;
-  margin-bottom: 16px;
-  margin-top: 12px;
-}
-
-.pricing-card-pro .pricing-tier {
-  margin-top: 28px;
-}
-
-.pricing-price {
-  font-size: 3rem;
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  color: #000;
-  line-height: 1;
-  margin-bottom: 12px;
-}
-
-.pricing-per {
-  font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  color: #767676;
-}
-
-.pricing-tagline {
-  font-size: 0.85rem;
-  color: #767676;
-  margin-bottom: 32px;
-  line-height: 1.5;
-}
-
-.pricing-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-top: 1px solid #E5E5E5;
-  padding-top: 28px;
-}
-
-.pricing-features li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: #000;
-  font-weight: 400;
-}
-
-.pricing-features li i {
-  color: #000;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.pricing-btn {
-  display: block;
-  width: 100%;
-  padding: 15px 24px;
-  text-align: center;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border: 2px solid #000;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-
-.pricing-btn-primary {
-  background: #000;
-  color: #fff;
-}
-.pricing-btn-primary:hover {
-  background: #333;
-  border-color: #333;
-  color: #fff;
-  text-decoration: none;
-}
-
-.pricing-btn-outline {
-  background: transparent;
-  color: #000;
-}
-.pricing-btn-outline:hover {
-  background: #000;
-  color: #fff;
-  text-decoration: none;
-}
-
-.pricing-fine {
-  font-size: 0.68rem;
-  color: #767676;
-  margin-top: 12px;
-  margin-bottom: 0;
-  text-align: center;
-  letter-spacing: 0.04em;
-}
-
 /* ── FINAL CTA ── */
 .final-cta {
   padding: 140px 0;
@@ -951,7 +774,6 @@
   .hiw-connector { display: none; }
   .hiw-step { padding-right: 0; }
   .testi-grid { grid-template-columns: 1fr; }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 480px; }
 }
 
 @media (max-width: 768px) {
