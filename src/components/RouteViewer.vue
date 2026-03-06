@@ -85,7 +85,7 @@
     }
   })
   
-  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoicnVubml0IiwiYSI6ImNsZjR...'
+  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
   
   const mapContainer = ref(null)
   const map = ref(null)

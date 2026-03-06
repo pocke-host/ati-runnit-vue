@@ -1,181 +1,231 @@
-<!-- src/pages/Support.vue -->
 <template>
   <main class="support-page">
-    <!-- Header -->
-    <section class="hero">
-      <div class="container-xxl text-center">
-        <p class="kicker mb-2">Help center</p>
-        <h1 class="display-5 fw-bold mb-2">Support</h1>
-        <p class="lead m-0">Find answers, or tap us in when you need backup.</p>
+
+    <!-- HERO -->
+    <section class="ep-hero">
+      <div class="ep-hero-inner">
+        <div class="ep-kicker">RUNNIT // SUPPORT</div>
+        <h1 class="ep-headline">Help Center.</h1>
+        <p class="ep-sub">Find answers, or tap us in when you need backup.</p>
       </div>
     </section>
 
-    <!-- Featured Articles -->
-    <section class="help-list">
-      <div class="container-xxl">
-        <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
-          <h2 class="h4 m-0">Featured help topics</h2>
-          <router-link to="/request" class="btn btn-outline-dark btn-sm">Submit a request</router-link>
+    <!-- ARTICLES -->
+    <section class="ep-section">
+      <div class="ep-content">
+        <div class="section-header">
+          <h2 class="section-title">Featured help topics</h2>
+          <router-link to="/request" class="section-action">Submit a request →</router-link>
         </div>
 
-        <ul class="list-unstyled row g-3 m-0">
-          <li class="col-md-6" v-for="item in articles" :key="item.title">
-            <a href="#" class="help-link d-flex align-items-start gap-3 p-3 rounded-4">
-              <div class="icon-wrap">
-                <i class="bi bi-file-earmark-text"></i>
-              </div>
-              <div class="flex-grow-1">
-                <div class="help-title">{{ item.title }}</div>
-                <p class="small mb-0 help-sub">{{ item.subtitle }}</p>
-              </div>
-              <i class="bi bi-chevron-right chevron"></i>
-            </a>
-          </li>
-        </ul>
+        <div class="articles-grid">
+          <a href="#" class="article-card" v-for="item in articles" :key="item.title">
+            <div class="article-icon">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+            <div class="article-body">
+              <div class="article-title">{{ item.title }}</div>
+              <div class="article-sub">{{ item.subtitle }}</div>
+            </div>
+            <i class="bi bi-arrow-right article-arrow"></i>
+          </a>
+        </div>
+
+        <!-- CONTACT CTA -->
+        <div class="contact-band">
+          <div class="contact-band-text">
+            <h3 class="contact-band-title">Still stuck?</h3>
+            <p class="contact-band-sub">Send us a request — we'll get you moving again.</p>
+          </div>
+          <router-link to="/request" class="contact-btn">Submit a Request</router-link>
+        </div>
       </div>
     </section>
 
-    <!-- Footer CTA -->
-    <section class="cta">
-      <div class="container-xxl text-center">
-        <h2 class="h4 fw-bold mb-2">Still stuck?</h2>
-        <p class="text-muted mb-3">Send a request — we’ll get you moving again.</p>
-        <router-link to="/request" class="btn btn-primary">Submit a Request</router-link>
-      </div>
-    </section>
   </main>
 </template>
 
 <script setup>
 const articles = [
-  { title: 'Login Problems on iOS?', subtitle: 'Known issue for app version 4.25' },
-  { title: 'How are distances calculated?', subtitle: 'Understand how we measure activity distance' },
-  { title: 'How to cancel your subscription', subtitle: 'Steps to cancel or manage billing' },
-  { title: 'Data and privacy', subtitle: 'Your choices and our commitments' }
+  { title: 'Login Problems on iOS?',            subtitle: 'Known issue for app version 4.25' },
+  { title: 'How are distances calculated?',     subtitle: 'Understand how we measure activity distance' },
+  { title: 'How to cancel your subscription',  subtitle: 'Steps to cancel or manage billing' },
+  { title: 'Data and privacy',                  subtitle: 'Your choices and our commitments' },
+  { title: 'Connecting a Garmin device',        subtitle: 'Sync your Garmin to import workouts automatically' },
+  { title: 'What counts as a PR?',              subtitle: 'How personal records are detected and stored' },
 ]
 </script>
 
 <style scoped>
-/* ===== RUNNIT Brand Tokens (page-local) ===== */
-.support-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
-  --nav-h: 72px;
-  --footer-h: 40px;
-
-  padding-top: var(--nav-h);
-  min-height: calc(100vh - var(--nav-h) - var(--footer-h));
-  background: var(--r-offwhite);
+.support-page {
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  padding-top: var(--nav-h, 64px);
+  min-height: 100vh;
 }
 
-/* ===== HERO: cinematic + subtle “system” vibe ===== */
-.hero{
-  padding: 52px 0 44px;
-  color: var(--r-white);
-  border-bottom: 1px solid rgba(255,255,255,0.10);
+/* HERO */
+.ep-hero {
   background: #000;
+  color: #fff;
+  padding: 72px 24px 64px;
 }
-.kicker{
-  letter-spacing: .18em;
+.ep-hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.ep-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+  margin-bottom: 24px;
+}
+.ep-headline {
+  font-size: clamp(2.4rem, 7vw, 4.5rem);
   font-weight: 900;
-  font-size: .78rem;
-  color: rgba(255,255,255,0.82);
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  margin: 0 0 20px;
 }
-.hero :deep(.lead){
-  color: rgba(255,255,255,0.78) !important;
+.ep-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.60);
+  line-height: 1.65;
+  max-width: 440px;
+  margin: 0;
 }
 
-/* ===== LIST ===== */
-.help-list{
-  padding: 34px 0 26px;
+/* SECTION */
+.ep-section {
+  padding: 56px 24px 80px;
+}
+.ep-content {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-/* Each item feels like a “module” tile (not pixel art) */
-.help-link{
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.section-title {
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(15,18,16,0.45);
+  margin: 0;
+}
+.section-action {
+  font-size: 0.80rem;
+  font-weight: 700;
+  color: #000;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+.section-action:hover { opacity: 0.55; }
+
+/* ARTICLES */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+  margin-bottom: 40px;
+}
+.article-card {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
   text-decoration: none;
   color: inherit;
-  background:
-    radial-gradient(700px 220px at 30% 0%, rgba(90,107,78,0.12), rgba(90,107,78,0) 60%),
-    linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.56));
-  border: 1px solid rgba(15,18,16,0.12);
-  box-shadow: none;
-  
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-  position: relative;
-  overflow: hidden;
+  transition: background 0.12s;
 }
-.help-link::after{ display: none; }
-.help-link:hover{
-  transform: none;
-  border-color: #000;
-  box-shadow: 0 18px 44px rgba(15,18,16,0.10);
-}
-.help-link:hover::after{ opacity: 1; }
+.article-card:hover { background: #F7F7F7; }
 
-.icon-wrap{
-  width: 44px;
-  height: 44px;
-  border-radius: 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: #f5f5f5;
-  border: 1px solid rgba(15,18,16,0.10);
+.article-icon {
+  width: 40px;
+  height: 40px;
+  background: #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
-.icon-wrap .bi{
-  font-size: 1.25rem;
-  color: rgba(15,18,16,0.75);
+.article-icon .bi {
+  font-size: 1.1rem;
+  color: rgba(15,18,16,0.60);
 }
 
-.help-title{
+.article-body { flex: 1; }
+.article-title {
+  font-size: 0.90rem;
   font-weight: 900;
-  letter-spacing: .01em;
-  color: rgba(15,18,16,0.90);
+  color: #000;
+  line-height: 1.3;
+  margin-bottom: 3px;
 }
-.help-sub{
-  color: rgba(15,18,16,0.60) !important;
-}
-
-.chevron{
-  color: rgba(15,18,16,0.35);
-  margin-top: 2px;
+.article-sub {
+  font-size: 0.78rem;
+  color: rgba(15,18,16,0.50);
+  line-height: 1.4;
 }
 
-/* ===== CTA ===== */
-.cta{
-  padding: 40px 0 64px;
+.article-arrow {
+  color: rgba(15,18,16,0.25);
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
-/* Buttons */
-.btn-primary{
-  --bs-btn-bg: #000;
-  --bs-btn-border-color: #000;
-  --bs-btn-hover-bg: #333;
-  --bs-btn-hover-border-color: #333;
+/* CONTACT BAND */
+.contact-band {
+  background: #000;
+  color: #fff;
+  padding: 36px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.contact-band-title {
+  font-size: 1.1rem;
   font-weight: 900;
-  height: 46px;
-  border-radius: 0;
-  padding-inline: 18px;
+  margin: 0 0 6px;
 }
-
-.btn-outline-dark{
-  --bs-btn-color: rgba(15,18,16,0.82);
-  --bs-btn-border-color: rgba(15,18,16,0.22);
-  --bs-btn-hover-bg: rgba(15,18,16,0.06);
-  --bs-btn-hover-border-color: rgba(15,18,16,0.26);
+.contact-band-sub {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
 }
+.contact-btn {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  padding: 12px 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.contact-btn:hover { opacity: 0.85; }
 
-/* Small */
-@media (max-width: 576px){
-  .help-link{ border-radius: 0; }
+@media (max-width: 640px) {
+  .articles-grid { grid-template-columns: 1fr; }
+  .contact-band { flex-direction: column; align-items: flex-start; padding: 28px 24px; }
 }
 </style>

@@ -1,60 +1,38 @@
-<!-- src/pages/About.vue -->
 <template>
   <main class="about-page">
+
     <!-- HERO -->
-    <section class="hero">
-      <div class="container-xxl">
-        <div class="row align-items-center g-4">
-          <div class="col-12 col-lg-7">
-            <p class="eyebrow">About RUNNIT</p>
-            <h1 class="display-5 fw-bold mb-3">Movement with purpose.</h1>
-            <p class="lead mb-4">
-              RUNNIT is built for the people who show up — even when motivation isn’t loud.
-              We turn daily training into a moment you can feel, track, and share.
-            </p>
-            <div class="d-flex gap-3">
-              <router-link to="/signup" class="btn btn-primary btn-lg">Join RUNNIT</router-link>
-              <router-link to="/features" class="btn btn-outline-light btn-lg">Explore Features</router-link>
-            </div>
-          </div>
-          <div class="col-12 col-lg-5">
-            <div class="hero-art rounded-4">
-              <div class="hero-card">
-                <div class="hero-card-title">A mirror for growth</div>
-                <div class="hero-card-sub">
-                  Train → capture the moment → build momentum.
-                </div>
-                <div class="hero-card-pills">
-                  <span class="pill">Moments</span>
-                  <span class="pill">Streaks</span>
-                  <span class="pill">Community</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <section class="ep-hero">
+      <div class="ep-hero-inner">
+        <div class="ep-kicker">RUNNIT // ABOUT</div>
+        <h1 class="ep-headline">Movement<br>with purpose.</h1>
+        <p class="ep-sub">
+          RUNNIT is built for the people who show up — even when motivation isn't loud.
+          We turn daily training into a moment you can feel, track, and share.
+        </p>
+        <div class="ep-actions">
+          <router-link to="/signup" class="ep-btn">Join RUNNIT</router-link>
+          <router-link to="/features" class="ep-btn-ghost">Explore Features →</router-link>
         </div>
       </div>
     </section>
 
     <!-- MISSION -->
-    <section class="mission">
-      <div class="container-xxl">
-        <div class="row g-5 align-items-center">
-          <div class="col-12 col-lg-6">
-            <h2 class="fw-bold mb-3">Our mission</h2>
-            <p class="fs-5 text-muted mb-0">
-              Make consistency easier than motivation. RUNNIT blends community, structure, and reflection
-              so training becomes a habit you can sustain — and a story you’re proud of.
+    <section class="ep-section">
+      <div class="ep-content">
+        <div class="about-split">
+          <div class="about-split-text">
+            <div class="section-label">Our Mission</div>
+            <h2 class="about-h2">Make consistency easier than motivation.</h2>
+            <p class="about-p">
+              RUNNIT blends community, structure, and reflection so training becomes a habit
+              you can sustain — and a story you're proud of.
             </p>
           </div>
-          <div class="col-12 col-lg-6">
-            <div class="mission-card rounded-4 p-4">
-              <ul class="list-unstyled m-0">
-                <li class="d-flex align-items-start gap-3 mb-3" v-for="(point, i) in missionPoints" :key="i">
-                  <i class="bi bi-check-circle-fill"></i>
-                  <div class="small">{{ point }}</div>
-                </li>
-              </ul>
+          <div class="mission-list">
+            <div class="mission-item" v-for="(point, i) in missionPoints" :key="i">
+              <i class="bi bi-check2"></i>
+              <span>{{ point }}</span>
             </div>
           </div>
         </div>
@@ -62,104 +40,87 @@
     </section>
 
     <!-- STATS -->
-    <section class="stats">
-      <div class="container-xxl">
-        <div class="row text-center g-4">
-          <div class="col-6 col-md-3" v-for="(s, i) in stats" :key="i">
-            <div class="stat">
-              <div class="value">{{ s.value }}</div>
-              <div class="label">{{ s.label }}</div>
-            </div>
+    <section class="stats-band">
+      <div class="ep-content">
+        <div class="stats-grid">
+          <div class="stat-item" v-for="s in stats" :key="s.label">
+            <div class="stat-value">{{ s.value }}</div>
+            <div class="stat-label">{{ s.label }}</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- STORY / VALUES -->
-    <section class="story">
-      <div class="container-xxl">
-        <div class="row g-5">
-          <div class="col-12 col-lg-6">
-            <h2 class="fw-bold mb-3">Our story</h2>
-            <p class="text-muted">
+    <!-- STORY + VALUES -->
+    <section class="ep-section ep-section--gray">
+      <div class="ep-content">
+        <div class="about-split">
+          <div>
+            <div class="section-label">Our Story</div>
+            <h2 class="about-h2">Progress built in quiet reps.</h2>
+            <p class="about-p">
               RUNNIT started from one belief: progress is built in quiet reps — not highlight reels.
               We wanted a place where training feels meaningful, not noisy.
             </p>
-            <p class="text-muted mb-0">
-              Whether you’re chasing your first finish line or a new PR, RUNNIT is designed to help you
+            <p class="about-p">
+              Whether you're chasing your first finish line or a new PR, RUNNIT is designed to help you
               keep the loop alive: show up, log the moment, and build momentum.
             </p>
           </div>
-          <div class="col-12 col-lg-6">
-            <h2 class="fw-bold mb-3">Our values</h2>
-            <ul class="list-unstyled values m-0">
-              <li v-for="(v, i) in values" :key="i" class="value-item">
-                <h6 class="mb-1">{{ v.title }}</h6>
-                <p class="text-muted small mb-0">{{ v.body }}</p>
-              </li>
-            </ul>
+          <div>
+            <div class="section-label">Our Values</div>
+            <div class="values-list">
+              <div class="value-row" v-for="(v, i) in values" :key="i">
+                <div class="value-title">{{ v.title }}</div>
+                <div class="value-body">{{ v.body }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- TEAM -->
-    <section class="team">
-      <div class="container-xxl">
-        <div class="d-flex align-items-end justify-content-between mb-3">
-          <h2 class="fw-bold m-0">Meet the team</h2>
-        </div>
-
-        <div class="row g-4">
-          <div class="col-6 col-md-4 col-lg-3">
-            <div class="team-card rounded-4 p-3">
-              <div class="avatar rounded-3 mb-3"></div>
-              <div class="fw-semibold">Quinn</div>
-              <div class="text-muted small">CEO</div>
-            </div>
+    <section class="ep-section">
+      <div class="ep-content">
+        <div class="section-label">Team</div>
+        <h2 class="about-h2">Meet the people behind it.</h2>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">Q</div>
+            <div class="team-name">Quinn</div>
+            <div class="team-role">Founder & CEO</div>
           </div>
         </div>
-
-        <!-- <div class="row g-4">
-          <div class="col-6 col-md-4 col-lg-3" v-for="n in 6" :key="n">
-            <div class="team-card rounded-4 p-3">
-              <div class="avatar rounded-3 mb-3"></div>
-              <div class="fw-semibold">Teammate {{ n }}</div>
-              <div class="text-muted small">Role title</div>
-            </div>
-          </div>
-        </div> -->
       </div>
     </section>
 
-    <!-- PRESS / CONTACT / CAREERS -->
+    <!-- CTA BAND -->
     <section class="cta-band">
-      <div class="container-xxl">
-        <div class="row g-4">
-          <div class="col-12 col-lg-4">
-            <div class="mini-card rounded-4 p-4 h-100">
-              <h5 class="fw-bold mb-2">Press</h5>
-              <p class="text-muted mb-3">Media kit, logos, and story inquiries.</p>
-              <a href="#" class="btn btn-outline-dark">Press resources</a>
-            </div>
+      <div class="ep-content">
+        <div class="cta-grid">
+          <div class="cta-card">
+            <div class="cta-label">Press</div>
+            <div class="cta-title">Media & press</div>
+            <p class="cta-body">Media kit, logos, and story inquiries.</p>
+            <router-link to="/press" class="cta-link">Press resources →</router-link>
           </div>
-          <div class="col-12 col-lg-4">
-            <div class="mini-card rounded-4 p-4 h-100">
-              <h5 class="fw-bold mb-2">Contact</h5>
-              <p class="text-muted mb-3">We’d love to hear from you. Say hello.</p>
-              <a href="/support" class="btn btn-outline-dark">Get in touch</a>
-            </div>
+          <div class="cta-card">
+            <div class="cta-label">Contact</div>
+            <div class="cta-title">Get in touch</div>
+            <p class="cta-body">We'd love to hear from you. Say hello.</p>
+            <router-link to="/support" class="cta-link">Contact us →</router-link>
           </div>
-          <div class="col-12 col-lg-4">
-            <div class="mini-card rounded-4 p-4 h-100 highlight">
-              <h5 class="fw-bold mb-2">Careers</h5>
-              <p class="text-muted mb-3">Join a small team with big energy.</p>
-              <router-link to="/careers" class="btn btn-primary">See open roles</router-link>
-            </div>
+          <div class="cta-card cta-card--dark">
+            <div class="cta-label" style="color:rgba(255,255,255,0.40)">Careers</div>
+            <div class="cta-title" style="color:#fff">Join the team</div>
+            <p class="cta-body" style="color:rgba(255,255,255,0.60)">Small team. Big energy. Meaningful work.</p>
+            <router-link to="/careers" class="cta-link" style="color:#fff">See open roles →</router-link>
           </div>
         </div>
       </div>
     </section>
+
   </main>
 </template>
 
@@ -171,7 +132,6 @@ const missionPoints = [
   'Device-friendly: bring Garmin, Apple Watch, COROS, and more.',
 ]
 
-// stats should be dynamic
 const stats = [
   { value: '100M+', label: 'Moments captured' },
   { value: '30B+',  label: 'Miles tracked' },
@@ -180,159 +140,304 @@ const stats = [
 ]
 
 const values = [
-  { title: 'Build the habit', body: 'Consistency beats intensity you can’t repeat.' },
-  { title: 'Earned confidence', body: 'Progress is proof — stack the days.' },
-  { title: 'Better together', body: 'Community makes hard things easier.' },
-  { title: 'Trust always', body: 'Clear controls and no surprises with your data.' },
+  { title: 'Build the habit',     body: 'Consistency beats intensity you can't repeat.' },
+  { title: 'Earned confidence',   body: 'Progress is proof — stack the days.' },
+  { title: 'Better together',     body: 'Community makes hard things easier.' },
+  { title: 'Trust always',        body: 'Clear controls and no surprises with your data.' },
 ]
 </script>
 
 <style scoped>
-.about-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
-  background: var(--r-offwhite);
+.about-page {
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  padding-top: var(--nav-h, 64px);
 }
 
 /* HERO */
-.hero{
-  min-height: calc(100vh - 72px);
-  display:flex;
-  align-items:center;
-  color: var(--r-white);
-  padding: 72px 0;
-
+.ep-hero {
   background: #000;
+  color: #fff;
+  padding: 88px 24px 80px;
 }
-.eyebrow{
-  text-transform:uppercase;
-  letter-spacing:.14em;
-  opacity:.9;
-  margin-bottom:.5rem;
-  color: rgba(255,255,255,0.82);
+.ep-hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
 }
-.hero :deep(.lead){
-  color: rgba(255,255,255,0.76) !important;
+.ep-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.40);
+  margin-bottom: 28px;
 }
-
-/* Hero art = premium glass */
-.hero-art{
-  height: 320px;
-  position: relative;
-  border-radius: 0;
-  overflow:hidden;
-
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: none;
-  
-}
-.hero-card{
-  position:absolute;
-  inset: 18px;
-  border-radius: 0;
-  padding: 18px;
-  background: rgba(15,18,16,0.18);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-.hero-card-title{
+.ep-headline {
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
   font-weight: 900;
-  letter-spacing: .06em;
-  margin-bottom: 6px;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  margin: 0 0 28px;
 }
-.hero-card-sub{
-  color: rgba(255,255,255,0.78);
-  margin-bottom: 14px;
+.ep-sub {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0 0 36px;
 }
-.hero-card-pills{
-  display:flex;
-  gap: 8px;
+.ep-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   flex-wrap: wrap;
 }
-.pill{
-  display:inline-flex;
-  padding: 6px 10px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.86);
+.ep-btn {
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  padding: 14px 28px;
+  font-size: 0.78rem;
   font-weight: 700;
-  font-size: .78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.15s;
+}
+.ep-btn:hover { opacity: 0.85; }
+.ep-btn-ghost {
+  color: rgba(255,255,255,0.72);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+.ep-btn-ghost:hover { color: #fff; }
+
+/* SECTIONS */
+.ep-section {
+  padding: 72px 24px;
+  background: #fff;
+}
+.ep-section--gray {
+  background: #F7F7F7;
+}
+.ep-content {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-/* MISSION */
-.mission{ padding: 64px 0; background:#fff; }
-.mission-card{
-  background:#fff;
-  border:1px solid rgba(15,18,16,0.10);
-  box-shadow: none;
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(15,18,16,0.35);
+  margin-bottom: 16px;
 }
-.mission-card .bi{
+.about-h2 {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0 0 20px;
+}
+.about-p {
+  font-size: 0.97rem;
+  color: rgba(15,18,16,0.62);
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+.about-p:last-child { margin-bottom: 0; }
+
+/* SPLIT LAYOUT */
+.about-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+/* MISSION CHECKLIST */
+.mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 4px;
+}
+.mission-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.92rem;
+  color: rgba(15,18,16,0.75);
+  line-height: 1.5;
+}
+.mission-item .bi {
+  font-size: 1rem;
   color: #000;
-  font-size:1.1rem;
-  margin-top:.15rem;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 /* STATS */
-.stats{ padding: 40px 0; background:#fff; border-top:1px solid rgba(15,18,16,0.06); border-bottom:1px solid rgba(15,18,16,0.06); }
-.stat .value{ font-size: 32px; font-weight: 900; color: var(--r-black); }
-.stat .label{ color:#6b7280; }
+.stats-band {
+  padding: 40px 24px;
+  border-top: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+  background: #fff;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+.stat-item {
+  text-align: center;
+  padding: 24px 16px;
+  border-right: 1px solid #E5E5E5;
+}
+.stat-item:last-child { border-right: none; }
+.stat-value {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #000;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: rgba(15,18,16,0.45);
+  letter-spacing: 0.04em;
+}
 
-/* STORY / VALUES */
-.story{ padding: 64px 0; background:#fff; }
-.values .value-item{ padding:12px 0; border-bottom:1px solid rgba(15,18,16,0.06); }
-.values .value-item:last-child{ border-bottom:0; }
+/* VALUES */
+.values-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.value-row {
+  padding: 16px 0;
+  border-bottom: 1px solid #E5E5E5;
+}
+.value-row:last-child { border-bottom: none; }
+.value-title {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #000;
+  margin-bottom: 4px;
+}
+.value-body {
+  font-size: 0.83rem;
+  color: rgba(15,18,16,0.55);
+  line-height: 1.5;
+}
 
 /* TEAM */
-.team{ padding: 64px 0; background:#fff; }
-.team-card{
-  background:#fff;
-  border:1px solid rgba(15,18,16,0.10);
-  box-shadow: none;
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+  margin-top: 32px;
 }
-.team-card .avatar{
-  height:120px;
-  background: #f5f5f5;
+.team-card {
+  background: #fff;
+  padding: 24px 20px;
 }
-
-/* CTA band */
-.cta-band{ padding: 56px 0 72px; background:#fff; border-top:1px solid rgba(15,18,16,0.08); }
-.mini-card{
-  background:#fff;
-  border:1px solid rgba(15,18,16,0.10);
-  box-shadow: none;
+.team-avatar {
+  width: 56px;
+  height: 56px;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 900;
+  margin-bottom: 14px;
 }
-.mini-card.highlight{
-  border-color: #000;
-  box-shadow: none;
+.team-name {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #000;
+  margin-bottom: 2px;
 }
-
-/* Buttons (RUNNIT accent) */
-.btn-primary{
-  --bs-btn-bg: #000;
-  --bs-btn-border-color: #000;
-  --bs-btn-hover-bg: #333;
-  --bs-btn-hover-border-color: #333;
-}
-.btn-outline-light{
-  --bs-btn-color: rgba(255,255,255,0.92);
-  --bs-btn-border-color: rgba(255,255,255,0.32);
-  --bs-btn-hover-bg: rgba(255,255,255,0.10);
-  --bs-btn-hover-border-color: rgba(255,255,255,0.40);
-  --bs-btn-hover-color: rgba(255,255,255,0.96);
+.team-role {
+  font-size: 0.78rem;
+  color: rgba(15,18,16,0.45);
+  letter-spacing: 0.04em;
 }
 
-/* Responsive tweaks */
-@media (max-width: 992px){
-  .hero{ min-height: 70vh; padding: 48px 0; }
-  .hero-art{ height:220px; }
+/* CTA BAND */
+.cta-band {
+  padding: 72px 24px;
+  background: #fff;
+  border-top: 1px solid #E5E5E5;
+}
+.cta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+}
+.cta-card {
+  background: #fff;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.cta-card--dark {
+  background: #000;
+}
+.cta-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(15,18,16,0.35);
+  margin-bottom: 10px;
+}
+.cta-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #000;
+  margin-bottom: 8px;
+}
+.cta-body {
+  font-size: 0.85rem;
+  color: rgba(15,18,16,0.55);
+  line-height: 1.6;
+  margin: 0 0 20px;
+  flex: 1;
+}
+.cta-link {
+  font-size: 0.80rem;
+  font-weight: 700;
+  color: #000;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+.cta-link:hover { opacity: 0.65; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .about-split { grid-template-columns: 1fr; gap: 40px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-item:nth-child(2) { border-right: none; }
+  .stat-item:nth-child(3) { border-right: 1px solid #E5E5E5; }
+  .stat-item:nth-child(4) { border-right: none; }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .cta-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
