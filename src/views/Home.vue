@@ -191,45 +191,6 @@
       </div>
     </section>
 
-    <!-- ── TESTIMONIALS ── -->
-    <section class="testimonials">
-      <div class="container-xxl">
-        <p class="section-overline">What athletes say</p>
-        <div class="testi-grid">
-          <div class="testi-card">
-            <p class="testi-quote">"Finally an app that adapts to me — not the other way around. My 5K dropped 90 seconds in 8 weeks."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">S</div>
-              <div>
-                <div class="testi-name">Sarah K.</div>
-                <div class="testi-role">Marathon Runner · Boston Qualifier</div>
-              </div>
-            </div>
-          </div>
-          <div class="testi-card">
-            <p class="testi-quote">"I coach a squad of 12 athletes. RUNNIT is the only platform where I can track everyone's load and write their plans in one place."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">M</div>
-              <div>
-                <div class="testi-name">Marcus T.</div>
-                <div class="testi-role">Triathlon Coach · USAT Certified</div>
-              </div>
-            </div>
-          </div>
-          <div class="testi-card">
-            <p class="testi-quote">"Hit my first sub-20 5K following a RUNNIT plan. The weekly analytics showed exactly where I was leaving time on the table."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">J</div>
-              <div>
-                <div class="testi-name">Jordan L.</div>
-                <div class="testi-role">Track & Field · 5K Specialist</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ── FINAL CTA ── -->
     <section class="final-cta">
       <div class="container-xxl text-center">
@@ -666,74 +627,6 @@ onMounted(async () => {
   margin: 0;
 }
 
-/* ── TESTIMONIALS ── */
-.testimonials {
-  padding: 100px 0;
-  background: #fff;
-  border-bottom: 1px solid #E5E5E5;
-}
-
-.testi-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: #E5E5E5;
-  border: 1px solid #E5E5E5;
-  margin-top: 48px;
-}
-
-.testi-card {
-  background: #fff;
-  padding: 40px 36px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 28px;
-}
-
-.testi-quote {
-  font-size: 1rem;
-  font-weight: 300;
-  color: #000;
-  line-height: 1.65;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.testi-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.testi-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #000;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.testi-name {
-  font-size: 0.83rem;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: 0.02em;
-}
-
-.testi-role {
-  font-size: 0.72rem;
-  color: #767676;
-  margin-top: 2px;
-  letter-spacing: 0.04em;
-}
-
 /* ── FINAL CTA ── */
 .final-cta {
   padding: 140px 0;
@@ -773,7 +666,6 @@ onMounted(async () => {
   .hiw-steps { flex-direction: column; gap: 32px; }
   .hiw-connector { display: none; }
   .hiw-step { padding-right: 0; }
-  .testi-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
