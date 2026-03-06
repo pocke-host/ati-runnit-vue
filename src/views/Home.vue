@@ -18,6 +18,33 @@
       </div>
     </section>
 
+    <!-- ── SOCIAL PROOF STATS ── -->
+    <section class="stats-bar">
+      <div class="container-xxl">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-num">14,000+</div>
+            <div class="stat-label">Athletes training</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-num">3.2M</div>
+            <div class="stat-label">Miles logged</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-num">89,000+</div>
+            <div class="stat-label">PRs broken</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-num">4.8 / 5</div>
+            <div class="stat-label">Average rating</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ── MANIFESTO STRIP ── -->
     <section class="manifesto">
       <div class="container-xxl">
@@ -55,6 +82,44 @@
               <p class="pillar-desc">Join clubs, enter challenges, follow athletes you admire. Share a daily moment — one photo, one song. Community without the noise.</p>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── HOW IT WORKS ── -->
+    <section class="how-it-works">
+      <div class="container-xxl">
+        <div class="hiw-header">
+          <p class="section-overline">Getting started</p>
+          <h2 class="hiw-title">Up and running<br>in 3 minutes.</h2>
+        </div>
+        <div class="hiw-steps">
+          <div class="hiw-step">
+            <div class="hiw-step-num">01</div>
+            <div class="hiw-step-body">
+              <h3 class="hiw-step-title">Create your free account</h3>
+              <p class="hiw-step-desc">Sign up in under a minute. No credit card, no commitment. Pick your sport, set your goal, and you're in.</p>
+            </div>
+          </div>
+          <div class="hiw-connector"><i class="bi bi-arrow-right"></i></div>
+          <div class="hiw-step">
+            <div class="hiw-step-num">02</div>
+            <div class="hiw-step-body">
+              <h3 class="hiw-step-title">Connect your device</h3>
+              <p class="hiw-step-desc">Sync Garmin, Apple Watch, or COROS. Your workouts appear automatically — no manual logging.</p>
+            </div>
+          </div>
+          <div class="hiw-connector"><i class="bi bi-arrow-right"></i></div>
+          <div class="hiw-step">
+            <div class="hiw-step-num">03</div>
+            <div class="hiw-step-body">
+              <h3 class="hiw-step-title">Train with a plan</h3>
+              <p class="hiw-step-desc">Get an AI-built training plan or connect with a real coach. Every session adapts to your progress.</p>
+            </div>
+          </div>
+        </div>
+        <div class="hiw-cta">
+          <router-link to="/signup" class="btn-cta">Create free account</router-link>
         </div>
       </div>
     </section>
@@ -122,6 +187,94 @@
               <div class="cap-desc">Connects with Garmin, Apple Watch, and COROS seamlessly.</div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TESTIMONIALS ── -->
+    <section class="testimonials">
+      <div class="container-xxl">
+        <p class="section-overline">What athletes say</p>
+        <div class="testi-grid">
+          <div class="testi-card">
+            <p class="testi-quote">"Finally an app that adapts to me — not the other way around. My 5K dropped 90 seconds in 8 weeks."</p>
+            <div class="testi-author">
+              <div class="testi-avatar">S</div>
+              <div>
+                <div class="testi-name">Sarah K.</div>
+                <div class="testi-role">Marathon Runner · Boston Qualifier</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi-card">
+            <p class="testi-quote">"I coach a squad of 12 athletes. RUNNIT is the only platform where I can track everyone's load and write their plans in one place."</p>
+            <div class="testi-author">
+              <div class="testi-avatar">M</div>
+              <div>
+                <div class="testi-name">Marcus T.</div>
+                <div class="testi-role">Triathlon Coach · USAT Certified</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi-card">
+            <p class="testi-quote">"Hit my first sub-20 5K following a RUNNIT plan. The weekly analytics showed exactly where I was leaving time on the table."</p>
+            <div class="testi-author">
+              <div class="testi-avatar">J</div>
+              <div>
+                <div class="testi-name">Jordan L.</div>
+                <div class="testi-role">Track & Field · 5K Specialist</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRICING ── -->
+    <section class="pricing">
+      <div class="container-xxl">
+        <div class="pricing-header">
+          <p class="section-overline">Pricing</p>
+          <h2 class="pricing-title">Start free.<br>Upgrade when you're ready.</h2>
+        </div>
+        <div class="pricing-grid">
+
+          <!-- Free -->
+          <div class="pricing-card">
+            <div class="pricing-tier">Free</div>
+            <div class="pricing-price">$0<span class="pricing-per">/month</span></div>
+            <p class="pricing-tagline">Everything you need to get moving.</p>
+            <ul class="pricing-features">
+              <li><i class="bi bi-check2"></i> GPS activity tracking</li>
+              <li><i class="bi bi-check2"></i> Activity history & stats</li>
+              <li><i class="bi bi-check2"></i> Community feed & clubs</li>
+              <li><i class="bi bi-check2"></i> Challenges & leaderboards</li>
+              <li><i class="bi bi-check2"></i> Personal records tracking</li>
+              <li><i class="bi bi-check2"></i> Device sync (Garmin, Apple Watch)</li>
+              <li><i class="bi bi-check2"></i> Daily Moments</li>
+            </ul>
+            <router-link to="/signup" class="pricing-btn pricing-btn-outline">Get started free</router-link>
+          </div>
+
+          <!-- Pro -->
+          <div class="pricing-card pricing-card-pro">
+            <div class="pricing-badge">MOST POPULAR</div>
+            <div class="pricing-tier">Pro</div>
+            <div class="pricing-price">$9.99<span class="pricing-per">/month</span></div>
+            <p class="pricing-tagline">For athletes who are serious about improvement.</p>
+            <ul class="pricing-features">
+              <li><i class="bi bi-check2"></i> Everything in Free</li>
+              <li><i class="bi bi-check2"></i> AI-powered training plans</li>
+              <li><i class="bi bi-check2"></i> Coach access & DMs</li>
+              <li><i class="bi bi-check2"></i> Advanced analytics & load tracking</li>
+              <li><i class="bi bi-check2"></i> Race predictor & goal pacing</li>
+              <li><i class="bi bi-check2"></i> Weekly performance reports</li>
+              <li><i class="bi bi-check2"></i> Priority support</li>
+            </ul>
+            <router-link to="/signup" class="pricing-btn pricing-btn-primary">Start Pro — 14 days free</router-link>
+            <p class="pricing-fine">No credit card required to try.</p>
+          </div>
+
         </div>
       </div>
     </section>
@@ -252,6 +405,50 @@
   color: #000;
 }
 
+/* ── STATS BAR ── */
+.stats-bar {
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 56px 0;
+}
+
+.stats-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 0 32px;
+}
+
+.stat-num {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #000;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #767676;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 48px;
+  background: #E5E5E5;
+  flex-shrink: 0;
+}
+
 /* ── MANIFESTO STRIP ── */
 .manifesto {
   background: #000;
@@ -320,6 +517,76 @@
   color: #767676;
   line-height: 1.7;
   margin: 0;
+}
+
+/* ── HOW IT WORKS ── */
+.how-it-works {
+  padding: 100px 0;
+  background: #F5F5F5;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.hiw-header {
+  margin-bottom: 64px;
+}
+
+.hiw-title {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: #000;
+  margin: 0;
+}
+
+.hiw-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 56px;
+}
+
+.hiw-step {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.hiw-connector {
+  font-size: 1.2rem;
+  color: #C5C5C5;
+  padding: 0 16px;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.hiw-step-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #C5C5C5;
+  margin-bottom: 16px;
+}
+
+.hiw-step-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000;
+  margin-bottom: 12px;
+}
+
+.hiw-step-desc {
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: #767676;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.hiw-cta {
+  display: flex;
+  justify-content: flex-start;
 }
 
 /* ── STATEMENT ── */
@@ -417,6 +684,233 @@
   margin: 0;
 }
 
+/* ── TESTIMONIALS ── */
+.testimonials {
+  padding: 100px 0;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.testi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+  margin-top: 48px;
+}
+
+.testi-card {
+  background: #fff;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.testi-quote {
+  font-size: 1rem;
+  font-weight: 300;
+  color: #000;
+  line-height: 1.65;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.testi-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testi-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.testi-name {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.02em;
+}
+
+.testi-role {
+  font-size: 0.72rem;
+  color: #767676;
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+}
+
+/* ── PRICING ── */
+.pricing {
+  padding: 100px 0;
+  background: #F5F5F5;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.pricing-header {
+  margin-bottom: 64px;
+}
+
+.pricing-title {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: #000;
+  margin: 0;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 860px;
+}
+
+.pricing-card {
+  background: #fff;
+  border: 1px solid #E5E5E5;
+  padding: 44px 40px;
+  position: relative;
+}
+
+.pricing-card-pro {
+  border-color: #000;
+}
+
+.pricing-badge {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  background: #000;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+}
+
+.pricing-tier {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 16px;
+  margin-top: 12px;
+}
+
+.pricing-card-pro .pricing-tier {
+  margin-top: 28px;
+}
+
+.pricing-price {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: #000;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.pricing-per {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #767676;
+}
+
+.pricing-tagline {
+  font-size: 0.85rem;
+  color: #767676;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid #E5E5E5;
+  padding-top: 28px;
+}
+
+.pricing-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #000;
+  font-weight: 400;
+}
+
+.pricing-features li i {
+  color: #000;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.pricing-btn {
+  display: block;
+  width: 100%;
+  padding: 15px 24px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid #000;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pricing-btn-primary {
+  background: #000;
+  color: #fff;
+}
+.pricing-btn-primary:hover {
+  background: #333;
+  border-color: #333;
+  color: #fff;
+  text-decoration: none;
+}
+
+.pricing-btn-outline {
+  background: transparent;
+  color: #000;
+}
+.pricing-btn-outline:hover {
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+}
+
+.pricing-fine {
+  font-size: 0.68rem;
+  color: #767676;
+  margin-top: 12px;
+  margin-bottom: 0;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
 /* ── FINAL CTA ── */
 .final-cta {
   padding: 140px 0;
@@ -453,6 +947,11 @@
   .cap-list { grid-template-columns: repeat(2, 1fr); }
   .cap-item:nth-child(3n) { border-right: 1px solid #E5E5E5; }
   .cap-item:nth-child(2n) { border-right: none; }
+  .hiw-steps { flex-direction: column; gap: 32px; }
+  .hiw-connector { display: none; }
+  .hiw-step { padding-right: 0; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 480px; }
 }
 
 @media (max-width: 768px) {
@@ -467,6 +966,12 @@
   .cap-item { border-right: none !important; }
   .final-cta { padding: 80px 0; }
   .cta-title { font-size: 3rem; }
+  .stats-grid { flex-wrap: wrap; gap: 32px; }
+  .stat-divider { display: none; }
+  .stat-item { flex: 0 0 calc(50% - 16px); }
+  .how-it-works { padding: 64px 0; }
+  .testimonials { padding: 64px 0; }
+  .pricing { padding: 64px 0; }
 }
 
 @media (max-width: 480px) {
@@ -477,5 +982,9 @@
   .manifesto-text { font-size: 1.2rem; }
   .final-cta { padding: 64px 0; }
   .cta-title { font-size: 2.4rem; }
+  .stat-item { flex: 0 0 100%; }
+  .stat-num { font-size: 2.2rem; }
+  .pricing-card { padding: 32px 24px; }
+  .testi-card { padding: 28px 24px; }
 }
 </style>
