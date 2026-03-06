@@ -33,9 +33,7 @@
           <div v-else-if="dmStore.conversations.length === 0" class="dm-empty">
             <i class="bi bi-chat-dots"></i>
             <p>No conversations yet.</p>
-            <button class="dm-new-btn" @click="dmStore.openCompose()">
-              <i class="bi bi-pencil-square me-2"></i>Start a conversation
-            </button>
+            <p class="dm-empty-sub">Tap the pencil icon to start one.</p>
           </div>
 
           <div v-else class="dm-list">

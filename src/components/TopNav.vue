@@ -695,8 +695,8 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .navbar-menu { display: none; }
+  .navbar-content { padding: 0 20px; justify-content: flex-start; }
   .mobile-menu-toggle { display: flex; margin-left: auto; }
-  .navbar-content { padding: 0 20px; }
   .brand-text { font-size: 1rem; }
 }
 </style>

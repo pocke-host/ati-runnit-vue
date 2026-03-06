@@ -108,13 +108,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useActivityStore } from '@/stores/activity'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 const router = useRouter()
+const activityStore = useActivityStore()
 const { formatDistance, formatPace, formatElevation, formatDurationClock } = useUnits()
 
 const sports = [
@@ -343,18 +343,13 @@ const stopTracking = async () => {
   saveError.value = ''
 
   try {
-    const token = localStorage.getItem('token')
-    await axios.post(
-      `${API_URL}/activities`,
-      {
-        sportType: selectedSport.value,
-        durationSeconds: elapsedTime.value,
-        distanceMeters: Math.round(totalDistance.value),
-        elevationGain: Math.round(elevationGain.value),
-        routePolyline: routeCoordinates.value.length ? encodePolyline(routeCoordinates.value) : null,
-      },
-      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-    )
+    await activityStore.createActivity({
+      sportType: selectedSport.value,
+      durationSeconds: elapsedTime.value,
+      distanceMeters: Math.round(totalDistance.value),
+      elevationGain: Math.round(elevationGain.value),
+      routePolyline: routeCoordinates.value.length ? encodePolyline(routeCoordinates.value) : null,
+    })
     router.push('/dashboard')
   } catch (err) {
     console.error('Save failed:', err)
