@@ -35,7 +35,7 @@
         <div class="navbar-links" v-else>
           <router-link to="/features" class="nav-link">Features</router-link>
           <router-link to="/about" class="nav-link">About</router-link>
-          <router-link to="/support" class="nav-link">Support</router-link>
+          <router-link to="/blog" class="nav-link">Blog</router-link>
           <router-link to="/join-us" class="nav-link">Login</router-link>
           <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
         </div>
@@ -250,8 +250,8 @@
             <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-info-circle"></i> About
             </router-link>
-            <router-link to="/support" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-question-circle"></i> Support
+            <router-link to="/blog" class="drawer-link" @click="mobileMenuOpen = false">
+              <i class="bi bi-pencil-square"></i> Blog
             </router-link>
           </nav>
           <div class="drawer-footer">
