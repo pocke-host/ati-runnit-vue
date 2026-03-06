@@ -453,19 +453,22 @@ const formatTimeFull = (dateString) => {
   })
 }
 
+const safeFetch = (url) =>
+  axios.get(url, { headers: getAuthHeaders() }).catch(() => ({ data: [] }))
+
 const fetchFeed = async () => {
   loading.value = true
   try {
     const [momentsRes, activitiesRes, ownActivitiesRes] = await Promise.all([
-      axios.get(`${API_URL}/moments/feed`, { headers: getAuthHeaders() }),
-      axios.get(`${API_URL}/activities/feed`, { headers: getAuthHeaders() }),
-      axios.get(`${API_URL}/activities?page=0&size=30`, { headers: getAuthHeaders() })
+      safeFetch(`${API_URL}/moments/feed`),
+      safeFetch(`${API_URL}/activities/feed`),
+      safeFetch(`${API_URL}/activities?page=0&size=30`),
     ])
 
-    moments.value = momentsRes.data.content || momentsRes.data
+    moments.value = momentsRes.data.content || momentsRes.data || []
 
     // Merge own activities with friends' activities, deduplicate by ID
-    const feedActs = activitiesRes.data.content || activitiesRes.data
+    const feedActs = activitiesRes.data.content || activitiesRes.data || []
     const ownActs  = ownActivitiesRes.data.content || ownActivitiesRes.data || []
     const seen = new Set(feedActs.map(a => a.id))
     const merged = [...feedActs]
@@ -473,8 +476,6 @@ const fetchFeed = async () => {
       if (!seen.has(a.id)) { seen.add(a.id); merged.push(a) }
     }
     activities.value = merged
-  } catch (err) {
-    console.error('Failed to fetch feed:', err)
   } finally {
     loading.value = false
   }
