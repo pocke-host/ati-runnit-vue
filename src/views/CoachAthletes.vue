@@ -94,15 +94,54 @@
         </div>
       </template>
     </div>
+
+    <!-- Create Plan Modal -->
+    <Teleport to="body">
+      <div v-if="createModal.open" class="modal-overlay" @click.self="createModal.open = false">
+        <div class="modal-panel">
+          <div class="modal-header">
+            <span class="modal-title">NEW PLAN</span>
+            <button class="modal-close" @click="createModal.open = false"><i class="bi bi-x-lg"></i></button>
+          </div>
+          <form @submit.prevent="submitCreatePlan" class="modal-body">
+            <div class="field-row">
+              <label class="field-label">PLAN NAME</label>
+              <input v-model="createModal.name" type="text" class="field-input" placeholder="e.g. 12-Week 5K Plan" required />
+            </div>
+            <div class="field-row">
+              <label class="field-label">SPORT</label>
+              <select v-model="createModal.sport" class="field-input">
+                <option value="Running">Running</option>
+                <option value="Cycling">Cycling</option>
+                <option value="Swimming">Swimming</option>
+                <option value="Triathlon">Triathlon</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label">DURATION (WEEKS)</label>
+              <input v-model.number="createModal.durationWeeks" type="number" min="1" max="52" class="field-input" placeholder="12" required />
+            </div>
+            <div v-if="createModal.error" class="modal-error">{{ createModal.error }}</div>
+            <button type="submit" class="btn-create" :disabled="createModal.loading">
+              <span v-if="createModal.loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ createModal.loading ? 'Creating…' : 'Create Plan' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </Teleport>
   </main>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { useCoachStore } from '@/stores/coach'
 import { usePlanStore } from '@/stores/plan'
 
+const router = useRouter()
 const coachStore = useCoachStore()
 const planStore = usePlanStore()
 const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
@@ -110,6 +149,16 @@ const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
 const tab = ref('roster')
 const expanded = ref([])
 const athletePlans = ref({})
+
+const createModal = reactive({
+  open: false,
+  athleteId: null,
+  name: '',
+  sport: 'Running',
+  durationWeeks: 12,
+  loading: false,
+  error: ''
+})
 
 const toggleAthlete = async (athleteId) => {
   const idx = expanded.value.indexOf(athleteId)
@@ -143,8 +192,33 @@ const decline = async (reqId) => {
 }
 
 const openCreatePlan = (athleteId) => {
-  // TODO: open plan creation modal with athleteId context
-  console.log('Create plan for athlete:', athleteId)
+  createModal.athleteId = athleteId
+  createModal.name = ''
+  createModal.sport = 'Running'
+  createModal.durationWeeks = 12
+  createModal.error = ''
+  createModal.open = true
+}
+
+const submitCreatePlan = async () => {
+  createModal.loading = true
+  createModal.error = ''
+  try {
+    const plan = await planStore.createPlanForAthlete(createModal.athleteId, {
+      name: createModal.name,
+      sport: createModal.sport,
+      durationWeeks: createModal.durationWeeks,
+    })
+    createModal.open = false
+    // Refresh this athlete's plan list
+    athletePlans.value[createModal.athleteId] = await planStore.fetchAthletePlans(createModal.athleteId)
+    // Navigate directly to the editor
+    if (plan?.id) router.push(`/coach/plans/${plan.id}/edit`)
+  } catch (e) {
+    createModal.error = e?.response?.data?.message || 'Failed to create plan. Try again.'
+  } finally {
+    createModal.loading = false
+  }
 }
 
 onMounted(() => {
@@ -244,4 +318,47 @@ onMounted(() => {
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 .me-2 { margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Create Plan Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-panel {
+  background: #fff;
+  width: 100%; max-width: 440px;
+  border: 1px solid #E5E5E5;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #E5E5E5;
+}
+.modal-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; color: #000; }
+.modal-close { background: none; border: none; font-size: 1rem; color: #767676; cursor: pointer; }
+.modal-close:hover { color: #000; }
+.modal-body { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.field-row { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; color: #767676; text-transform: uppercase; }
+.field-input {
+  height: 44px; padding: 0 12px;
+  border: 1px solid #E5E5E5; background: #fff;
+  font-size: 0.9rem; color: #000;
+  outline: none; width: 100%;
+  font-family: inherit;
+}
+.field-input:focus { border-color: #000; }
+select.field-input { cursor: pointer; }
+.modal-error { font-size: 0.82rem; color: #dc2626; }
+.btn-create {
+  height: 48px; background: #000; color: #fff; border: none;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-create:hover:not(:disabled) { background: #222; }
+.btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
