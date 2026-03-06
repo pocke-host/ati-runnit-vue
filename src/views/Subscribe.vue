@@ -1,228 +1,160 @@
-<!-- src/pages/Subscribe.vue -->
 <template>
   <main class="subscribe-page">
+
     <!-- HERO -->
     <section class="hero">
-      <div class="container-xxl">
-        <div class="row align-items-center g-4">
-          <div class="col-12 col-lg-7">
-            <p class="eyebrow text-uppercase fw-semibold mb-2">Upgrade your loop.</p>
-            <h1 class="display-5 fw-bold mb-3">Unlock Premium systems for consistency.</h1>
-            <p class="lead text-muted mb-4">
-              Better planning, deeper insights, and tools that keep you showing up — so progress feels inevitable.
-            </p>
+      <div class="hero-inner">
+        <p class="hero-kicker">RUNNIT PRO</p>
+        <h1 class="hero-headline">Train without limits.</h1>
+        <p class="hero-sub">AI plans, coach access, advanced analytics, and more — starting at $7.99/mo.</p>
+        <div class="billing-toggle">
+          <button :class="['toggle-opt', { active: billing === 'monthly' }]" @click="billing = 'monthly'">Monthly</button>
+          <button :class="['toggle-opt', { active: billing === 'annual' }]" @click="billing = 'annual'">
+            Annual <span class="save-badge">Save 33%</span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-            <!-- Live stat counter -->
-            <p class="fw-semibold text-dark mb-4">
-              <span class="stat">{{ liveWorkouts }}</span> moments logged today
-            </p>
+    <!-- PRICING GRID -->
+    <section class="pricing-section">
+      <div class="pricing-inner">
 
-            <!-- Billing toggle -->
-            <div class="billing d-inline-flex align-items-center gap-3">
-              <span :class="['label', { muted: billing !== 'monthly' }]">Monthly</span>
-              <button class="toggle" @click="toggleBilling" :aria-pressed="billing === 'annual'">
-                <span :class="['knob', billing]"></span>
-              </button>
-              <span :class="['label', { muted: billing !== 'annual' }]">
-                Annual <small class="save">Save {{ savePct }}%</small>
-              </span>
-            </div>
+        <!-- Free -->
+        <div class="plan-card">
+          <div class="plan-tier">Free</div>
+          <div class="plan-price">$0<span class="plan-per">/month</span></div>
+          <p class="plan-tagline">Everything you need to get moving.</p>
+          <ul class="plan-features">
+            <li><i class="bi bi-check2"></i> GPS activity tracking</li>
+            <li><i class="bi bi-check2"></i> Activity history &amp; basic stats</li>
+            <li><i class="bi bi-check2"></i> Community feed &amp; clubs</li>
+            <li><i class="bi bi-check2"></i> Challenges &amp; leaderboards</li>
+            <li><i class="bi bi-check2"></i> Personal records</li>
+            <li><i class="bi bi-check2"></i> Device sync (Garmin, Apple Watch)</li>
+            <li><i class="bi bi-check2"></i> Daily Moments</li>
+          </ul>
+          <router-link to="/signup" class="plan-btn plan-btn-outline">Get started free</router-link>
+        </div>
+
+        <!-- Pro (highlighted) -->
+        <div class="plan-card plan-card-pro">
+          <div class="plan-badge">MOST POPULAR</div>
+          <div class="plan-tier">Pro</div>
+          <div class="plan-price">
+            {{ billing === 'monthly' ? '$11.99' : '$7.99' }}<span class="plan-per">/month</span>
           </div>
-          <div class="col-12 col-lg-5">
-            <div class="hero-art rounded-4 d-flex align-items-center justify-content-center">
-              <div class="hero-icon">
-                <i class="bi bi-lock-fill"></i>
-              </div>
-              <div class="hero-copy">
-                <div class="hero-kicker">PREMIUM UNLOCK</div>
-                <div class="hero-line">Plans • Insights • Safety</div>
-              </div>
-            </div>
+          <p class="plan-tagline-sub" v-if="billing === 'annual'">Billed $95.88 annually</p>
+          <p class="plan-tagline">For athletes serious about improvement.</p>
+          <ul class="plan-features">
+            <li><i class="bi bi-check2"></i> Everything in Free</li>
+            <li><i class="bi bi-check2"></i> AI-powered training plans</li>
+            <li><i class="bi bi-check2"></i> Coach access &amp; DMs</li>
+            <li><i class="bi bi-check2"></i> Advanced analytics &amp; load tracking</li>
+            <li><i class="bi bi-check2"></i> Race predictor &amp; goal pacing</li>
+            <li><i class="bi bi-check2"></i> Weekly performance reports</li>
+            <li><i class="bi bi-check2"></i> Priority support</li>
+          </ul>
+          <router-link v-if="!isAuthenticated" to="/signup" class="plan-btn plan-btn-primary">
+            Start free trial
+          </router-link>
+          <button
+            v-else
+            class="plan-btn plan-btn-primary"
+            @click="handleCheckout('premium')"
+            :disabled="checkoutLoading === 'premium'"
+          >
+            <span v-if="checkoutLoading === 'premium'" class="btn-spinner"></span>
+            <span v-else>Start free trial — 14 days</span>
+          </button>
+          <p class="plan-fine">No credit card required to start.</p>
+        </div>
+
+        <!-- Duo -->
+        <div class="plan-card">
+          <div class="plan-tier">Duo</div>
+          <div class="plan-price">
+            {{ billing === 'monthly' ? '$19.99' : '$15.99' }}<span class="plan-per">/month</span>
+          </div>
+          <p class="plan-tagline">Two Pro accounts under one plan.</p>
+          <ul class="plan-features">
+            <li><i class="bi bi-check2"></i> Two full Pro seats</li>
+            <li><i class="bi bi-check2"></i> All Pro features</li>
+            <li><i class="bi bi-check2"></i> Shared challenges &amp; goals</li>
+            <li><i class="bi bi-check2"></i> Simple invite &amp; manage</li>
+            <li><i class="bi bi-check2"></i> Shared billing dashboard</li>
+          </ul>
+          <router-link v-if="!isAuthenticated" to="/signup" class="plan-btn plan-btn-outline">
+            Choose Duo
+          </router-link>
+          <button
+            v-else
+            class="plan-btn plan-btn-outline"
+            @click="handleCheckout('duo')"
+            :disabled="checkoutLoading === 'duo'"
+          >
+            <span v-if="checkoutLoading === 'duo'" class="btn-spinner btn-spinner-dark"></span>
+            <span v-else>Choose Duo</span>
+          </button>
+        </div>
+
+      </div>
+
+      <p v-if="checkoutError" class="checkout-error">{{ checkoutError }}</p>
+    </section>
+
+    <!-- WHY PRO -->
+    <section class="why-section">
+      <div class="why-inner">
+        <p class="section-kicker">Why athletes upgrade</p>
+        <div class="why-grid">
+          <div class="why-item">
+            <i class="bi bi-robot why-icon"></i>
+            <div class="why-name">AI Training Plans</div>
+            <div class="why-desc">Plans that adapt to your fitness, schedule, and fatigue. Not a generic template.</div>
+          </div>
+          <div class="why-item">
+            <i class="bi bi-graph-up-arrow why-icon"></i>
+            <div class="why-name">Deep Analytics</div>
+            <div class="why-desc">Weekly load tracking, pace trends, and performance reports that show where you're leaving gains.</div>
+          </div>
+          <div class="why-item">
+            <i class="bi bi-person-badge why-icon"></i>
+            <div class="why-name">Real Coach Access</div>
+            <div class="why-desc">Connect with a certified coach, get custom plans, and message them directly.</div>
+          </div>
+          <div class="why-item">
+            <i class="bi bi-bullseye why-icon"></i>
+            <div class="why-name">Race Predictor</div>
+            <div class="why-desc">See your projected finish time for any race distance based on your current fitness.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PRICING CARDS -->
-    <section class="pricing">
-      <div class="container-xxl">
-        <div class="row g-4">
-          <!-- Free -->
-          <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 price-card">
-              <div class="card-body d-flex flex-column">
-                <h3 class="h4 fw-bold mb-2">Free</h3>
-                <p class="text-muted">Log workouts, post moments, and join the community.</p>
-                <div class="display-6 fw-bold mb-3">$0</div>
-                <ul class="list-unstyled small flex-grow-1">
-                  <li class="mb-2"><i class="bi bi-check2-circle me-2 text-success"></i> Record & upload workouts</li>
-                  <li class="mb-2"><i class="bi bi-check2-circle me-2 text-success"></i> Basic trends & history</li>
-                  <li class="mb-2"><i class="bi bi-check2-circle me-2 text-success"></i> Challenges & community</li>
-                </ul>
-                <router-link to="/signup" class="btn btn-outline-dark w-100 mt-auto">Create Free Account</router-link>
-              </div>
-            </div>
-          </div>
-
-          <!-- Premium -->
-          <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 price-card highlight">
-              <div class="card-body d-flex flex-column">
-                <div class="badge best mb-2">Best Value</div>
-                <h3 class="h4 fw-bold mb-1">Premium</h3>
-                <p class="text-muted">Unlock systems that accelerate your progress.</p>
-
-                <div class="price mb-1">
-                  <span class="display-6 fw-bold">
-                    {{ billing === 'monthly' ? priceMonthly : priceAnnual }}
-                  </span>
-                  <span class="text-muted">/ {{ billing }}</span>
-                </div>
-                <p class="small text-muted mb-3" v-if="billing === 'annual'">
-                  Billed annually at {{ annualTotal }} total
-                </p>
-
-                <!-- Unique perks w/ icons -->
-                <ul class="list-unstyled small flex-grow-1">
-                  <li class="mb-2"><i class="bi bi-map me-2 text-success"></i> Route planning & saved routes</li>
-                  <li class="mb-2"><i class="bi bi-bullseye me-2 text-success"></i> Structured goals & plans</li>
-                  <li class="mb-2"><i class="bi bi-graph-up-arrow me-2 text-success"></i> Deeper pace/power insights</li>
-                  <li class="mb-2"><i class="bi bi-trophy me-2 text-success"></i> Competitive segments (coming soon)</li>
-                  <li class="mb-2"><i class="bi bi-shield-check me-2 text-success"></i> Safety tools & live sharing</li>
-                </ul>
-
-                <!-- Unauthenticated: route to signup -->
-                <router-link v-if="!isAuthenticated" to="/signup" class="btn btn-primary w-100 mt-auto">
-                  Start Free Trial
-                </router-link>
-                <!-- Authenticated: trigger Stripe checkout -->
-                <button
-                  v-else
-                  class="btn btn-primary w-100 mt-auto"
-                  @click="handleCheckout('premium')"
-                  :disabled="checkoutLoading === 'premium'"
-                >
-                  <span v-if="checkoutLoading === 'premium'" class="btn-spinner me-2"></span>
-                  {{ checkoutLoading === 'premium' ? 'Redirecting…' : 'Start Free Trial' }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Duo -->
-          <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 price-card">
-              <div class="card-body d-flex flex-column">
-                <h3 class="h4 fw-bold mb-2">Duo</h3>
-                <p class="text-muted">Two Premium accounts under one plan.</p>
-                <div class="display-6 fw-bold mb-3">
-                  {{ billing === 'monthly' ? duoMonthly : duoAnnual }}
-                </div>
-                <ul class="list-unstyled small flex-grow-1">
-                  <li class="mb-2"><i class="bi bi-people me-2 text-success"></i> Two Premium seats</li>
-                  <li class="mb-2"><i class="bi bi-star me-2 text-success"></i> All Premium systems</li>
-                  <li class="mb-2"><i class="bi bi-envelope-open me-2 text-success"></i> Simple invite & manage</li>
-                </ul>
-                <!-- Unauthenticated: route to signup -->
-                <router-link v-if="!isAuthenticated" to="/signup" class="btn btn-outline-dark w-100 mt-auto">
-                  Choose Duo
-                </router-link>
-                <!-- Authenticated: trigger Stripe checkout -->
-                <button
-                  v-else
-                  class="btn btn-outline-dark w-100 mt-auto"
-                  @click="handleCheckout('duo')"
-                  :disabled="checkoutLoading === 'duo'"
-                >
-                  <span v-if="checkoutLoading === 'duo'" class="btn-spinner me-2"></span>
-                  {{ checkoutLoading === 'duo' ? 'Redirecting…' : 'Choose Duo' }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <p class="small text-muted mt-3 mb-0">
-          Prices shown are examples. Taxes may apply. Cancel anytime during the trial.
-        </p>
-        <p v-if="checkoutError" class="small text-danger mt-2 mb-0">{{ checkoutError }}</p>
-      </div>
-    </section>
-
-    <!-- WHY PREMIUM (icon grid) -->
-    <section class="why-premium">
-      <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-4">Why people upgrade</h2>
-        <div class="row g-4">
-          <div class="col-6 col-md-3">
-            <i class="bi bi-map display-5 why-icon"></i>
-            <p class="fw-semibold mt-2">Smarter planning</p>
-          </div>
-          <div class="col-6 col-md-3">
-            <i class="bi bi-bullseye display-5 why-icon"></i>
-            <p class="fw-semibold mt-2">Clear goals</p>
-          </div>
-          <div class="col-6 col-md-3">
-            <i class="bi bi-graph-up-arrow display-5 why-icon"></i>
-            <p class="fw-semibold mt-2">Deeper insights</p>
-          </div>
-          <div class="col-6 col-md-3">
-            <i class="bi bi-shield-check display-5 why-icon"></i>
-            <p class="fw-semibold mt-2">More control</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TESTIMONIALS -->
-    <section class="testimonials">
-      <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-4">Used by people who stay consistent</h2>
-        <div class="row g-4">
-          <div class="col-md-4">
-            <blockquote class="blockquote">
-              <p>“Premium helped me build a routine that actually stuck.”</p>
-              <footer class="blockquote-footer">Maya, Triathlete</footer>
-            </blockquote>
-          </div>
-          <div class="col-md-4">
-            <blockquote class="blockquote">
-              <p>“The insights made it obvious when to push and when to recover.”</p>
-              <footer class="blockquote-footer">Alex, Cyclist</footer>
-            </blockquote>
-          </div>
-          <div class="col-md-4">
-            <blockquote class="blockquote">
-              <p>“Routes + goals made training feel simple again.”</p>
-              <footer class="blockquote-footer">Sam, Cyclist</footer>
-            </blockquote>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta">
-      <div class="container-xxl text-center">
-        <h2 class="fw-bold mb-2">Upgrade your next 30 days.</h2>
-        <p class="text-muted mb-4">Start the trial. Keep the loop alive.</p>
-        <router-link v-if="!isAuthenticated" to="/signup" class="btn btn-primary btn-lg">Start Free Trial</router-link>
+    <!-- FINAL CTA -->
+    <section class="final-cta">
+      <div class="cta-inner">
+        <h2 class="cta-headline">Your next PR starts here.</h2>
+        <router-link v-if="!isAuthenticated" to="/signup" class="cta-btn">Start free — no card needed</router-link>
         <button
           v-else
-          class="btn btn-primary btn-lg"
+          class="cta-btn"
           @click="handleCheckout('premium')"
           :disabled="checkoutLoading === 'premium'"
         >
-          <span v-if="checkoutLoading === 'premium'" class="btn-spinner me-2"></span>
-          {{ checkoutLoading === 'premium' ? 'Redirecting…' : 'Start Free Trial' }}
+          <span v-if="checkoutLoading === 'premium'" class="btn-spinner"></span>
+          <span v-else>Start Pro trial — 14 days free</span>
         </button>
+        <p class="cta-fine">Cancel anytime. No commitment.</p>
       </div>
     </section>
+
   </main>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useStripe } from '@/composables/useStripe'
 import { storeToRefs } from 'pinia'
@@ -232,18 +164,7 @@ const { isAuthenticated } = storeToRefs(authStore)
 const { redirectToCheckout } = useStripe()
 
 const billing = ref('annual')
-const toggleBilling = () => (billing.value = billing.value === 'annual' ? 'monthly' : 'annual')
-
-// Example prices
-const priceMonthly = '$11.99'
-const priceAnnual = '$7.99'
-const annualTotal = '$95.88'
-const duoMonthly = '$19.99'
-const duoAnnual = '$15.99'
-const savePct = computed(() => 33)
-
-// Checkout state
-const checkoutLoading = ref('')  // 'premium' | 'duo' | ''
+const checkoutLoading = ref('')
 const checkoutError = ref('')
 
 const handleCheckout = async (tier) => {
@@ -256,189 +177,342 @@ const handleCheckout = async (tier) => {
     checkoutLoading.value = ''
   }
 }
-
-// Fake live workout stat
-const liveWorkouts = ref(0)
-onMounted(() => {
-  liveWorkouts.value = (12000 + Math.floor(Math.random() * 500)).toLocaleString()
-})
 </script>
 
 <style scoped>
-.subscribe-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
-  background: var(--r-offwhite);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+.subscribe-page {
+  min-height: 100vh;
+  background: #fff;
+  padding-top: var(--nav-h, 64px);
+  font-family: Futura, 'Avenir Next', system-ui, sans-serif;
+  color: #000;
 }
 
 /* HERO */
-.hero{
-  padding: 64px 0;
+.hero {
   background: #000;
-  color: var(--r-white);
+  color: #fff;
+  padding: 80px 24px 72px;
+  border-bottom: 1px solid #111;
 }
-.eyebrow{
-  letter-spacing:.16em;
-  color: rgba(255,255,255,0.82);
-}
-.hero :deep(.lead),
-.hero :deep(.text-muted){
-  color: rgba(255,255,255,0.76) !important;
-}
-.hero :deep(.text-dark){
-  color: rgba(255,255,255,0.92) !important;
-}
-.stat{
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .06em;
-  padding: 4px 10px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.20);
-}
-
-/* Hero art becomes premium glass panel (no “sim” visuals) */
-.hero-art{
-  height: 340px;
-  position: relative;
-  overflow: hidden;
-
-  background: #111;
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: none;
-  
-}
-
-.hero-icon{
-  width: 72px;
-  height: 72px;
-  border-radius: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: none;
-  margin-right: 14px;
-}
-.hero-icon i{
-  font-size: 1.8rem;
-  color: rgba(255,255,255,0.92);
-}
-.hero-copy{
-  display:flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.hero-kicker{
-  font-weight: 900;
-  letter-spacing: .18em;
-  font-size: .78rem;
-  color: rgba(255,255,255,0.86);
-}
-.hero-line{
+.hero-inner { max-width: 700px; margin: 0 auto; }
+.hero-kicker {
+  font-size: 0.7rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.78);
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 20px;
+}
+.hero-headline {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.97;
+  margin: 0 0 20px;
+}
+.hero-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.55;
+  margin: 0 0 40px;
+  max-width: 520px;
 }
 
 /* Billing toggle */
-.billing .label{ font-weight: 700; color: rgba(255,255,255,0.92); }
-.billing .label.muted{ color: rgba(255,255,255,0.55); }
-.billing .save{
-  margin-left: 6px;
-  padding: 2px 8px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.20);
-  color: rgba(255,255,255,0.92);
-  font-weight: 800;
+.billing-toggle {
+  display: inline-flex;
+  border: 1px solid rgba(255,255,255,0.18);
 }
-
-.toggle{
-  position: relative;
-  width: 56px;
-  height: 28px;
-  border-radius: 0;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.10);
-  padding: 0;
+.toggle-opt {
+  padding: 10px 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.50);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   cursor: pointer;
-  box-shadow: none;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.knob{
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 0;
+.toggle-opt.active {
   background: #fff;
-  transition: transform .2s ease;
+  color: #000;
 }
-.knob.annual{ transform: translateX(26px); }
-
-/* PRICING */
-.pricing{ padding: 56px 0; }
-.price-card{
-  border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 0;
-  box-shadow: none;
-}
-.price-card.highlight {
-  border-color: #000;
-  box-shadow: none;
-}
-.badge.best{
+.save-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   background: #000;
   color: #fff;
-  font-weight: 900;
-  letter-spacing: .08em;
+  padding: 2px 7px;
+}
+.toggle-opt.active .save-badge {
+  background: #000;
+  color: #fff;
+}
+
+/* PRICING */
+.pricing-section {
+  padding: 64px 24px;
+  background: #F5F5F5;
+  border-bottom: 1px solid #E5E5E5;
+}
+.pricing-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+}
+
+.plan-card {
+  background: #fff;
+  padding: 40px 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.plan-card-pro {
+  border: 2px solid #000;
+  margin: -1px;
+  z-index: 1;
+}
+
+.plan-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #000;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  border-radius: 0;
-  padding: 8px 12px;
-  width: fit-content;
+  padding: 5px 12px;
+}
+.plan-tier {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 12px;
+  margin-top: 20px;
+}
+.plan-card-pro .plan-tier { margin-top: 28px; }
+
+.plan-price {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.plan-per {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #767676;
+}
+.plan-tagline-sub {
+  font-size: 0.72rem;
+  color: #767676;
+  margin: 0 0 6px;
+}
+.plan-tagline {
+  font-size: 0.85rem;
+  color: #767676;
+  margin-bottom: 24px;
+  line-height: 1.5;
 }
 
-/* WHY PREMIUM */
-.why-premium{ padding: 56px 0; background: #fff; border-top: 1px solid rgba(15,18,16,0.08); }
-.why-icon{ color: #000; }
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  border-top: 1px solid #E5E5E5;
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.plan-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #000;
+}
+.plan-features li i { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
 
-/* TESTIMONIALS */
-.testimonials{ padding: 56px 0; background: #fff; }
-.blockquote{ font-size: 1rem; font-style: italic; }
+.plan-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid #000;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.plan-btn-primary { background: #000; color: #fff; }
+.plan-btn-primary:hover:not(:disabled) { background: #333; border-color: #333; color: #fff; text-decoration: none; }
+.plan-btn-outline { background: #fff; color: #000; }
+.plan-btn-outline:hover:not(:disabled) { background: #000; color: #fff; text-decoration: none; }
+.plan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* CTA */
-.cta{ padding: 64px 0 80px; border-top: 1px solid rgba(15,18,16,0.08); background:#fff; }
-
-/* Brand button */
-.btn-primary{
-  --bs-btn-bg: #000;
-  --bs-btn-border-color: #000;
-  --bs-btn-hover-bg: #333;
-  --bs-btn-hover-border-color: #333;
+.plan-fine {
+  font-size: 0.68rem;
+  color: #767676;
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+  letter-spacing: 0.04em;
 }
 
-/* Inline spinner for checkout redirect */
+.checkout-error {
+  max-width: 1000px;
+  margin: 16px auto 0;
+  font-size: 0.85rem;
+  color: #dc2626;
+  text-align: center;
+}
+
+/* WHY PRO */
+.why-section {
+  padding: 80px 24px;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+}
+.why-inner { max-width: 960px; margin: 0 auto; }
+.section-kicker {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 48px;
+}
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid #E5E5E5;
+}
+.why-item {
+  padding: 32px 28px;
+  border-right: 1px solid #E5E5E5;
+}
+.why-item:last-child { border-right: none; }
+.why-icon {
+  font-size: 1.4rem;
+  color: #000;
+  display: block;
+  margin-bottom: 16px;
+}
+.why-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.why-desc {
+  font-size: 0.83rem;
+  color: #767676;
+  line-height: 1.65;
+}
+
+/* FINAL CTA */
+.final-cta {
+  background: #000;
+  padding: 100px 24px;
+  text-align: center;
+}
+.cta-inner { max-width: 600px; margin: 0 auto; }
+.cta-headline {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 40px;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 48px;
+  background: #fff;
+  color: #000;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cta-btn:hover:not(:disabled) { background: #e5e5e5; border-color: #e5e5e5; color: #000; text-decoration: none; }
+.cta-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.cta-fine {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 16px;
+  margin-bottom: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Spinners */
 .btn-spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255,255,255,0.35);
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.30);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: btn-spin 0.7s linear infinite;
-  vertical-align: middle;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
 }
-.btn-outline-dark .btn-spinner {
-  border-color: rgba(0,0,0,0.25);
+.btn-spinner-dark {
+  border-color: rgba(0,0,0,0.15);
   border-top-color: #000;
 }
-@keyframes btn-spin { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .pricing-inner { grid-template-columns: 1fr; }
+  .plan-card-pro { margin: 0; border-width: 2px; }
+  .why-grid { grid-template-columns: repeat(2, 1fr); }
+  .why-item:nth-child(2) { border-right: none; }
+  .why-item:nth-child(3) { border-right: 1px solid #E5E5E5; }
+  .why-item { border-bottom: 1px solid #E5E5E5; }
+  .why-item:nth-child(3), .why-item:nth-child(4) { border-bottom: none; }
+}
+@media (max-width: 560px) {
+  .hero { padding: 56px 24px 48px; }
+  .why-grid { grid-template-columns: 1fr; }
+  .why-item { border-right: none !important; border-bottom: 1px solid #E5E5E5; }
+  .why-item:last-child { border-bottom: none; }
+  .billing-toggle { width: 100%; }
+  .toggle-opt { flex: 1; justify-content: center; }
+}
 </style>
