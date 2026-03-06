@@ -2,126 +2,133 @@
 <template>
   <nav class="navbar">
     <div class="navbar-content">
+
+      <!-- LEFT: hamburger (mobile, unauth) -->
+      <div class="nav-left">
+        <button
+          v-if="!isAuthenticated"
+          class="mobile-menu-toggle"
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          :aria-expanded="mobileMenuOpen"
+        >
+          <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
+        </button>
+      </div>
+
+      <!-- CENTER: brand -->
       <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
         <span class="brand-text">RUNNIT</span>
       </router-link>
 
-      <div class="navbar-menu" v-if="isAuthenticated">
-        <!-- Coach nav links -->
-        <template v-if="role === 'coach'">
-          <router-link to="/coach/dashboard" class="nav-link">
-            <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
-          </router-link>
-          <router-link to="/coach/athletes" class="nav-link">
-            <i class="bi bi-people me-2"></i>Roster
-          </router-link>
-        </template>
-        <!-- Athlete nav links -->
-        <template v-else>
-          <router-link to="/feed" class="nav-link">Feed</router-link>
-          <router-link to="/track" class="nav-link nav-link-track">
-            <i class="bi bi-play-circle-fill"></i> Track
-          </router-link>
-          <router-link to="/stats" class="nav-link">Stats</router-link>
-        </template>
+      <!-- RIGHT: desktop nav links + action icons -->
+      <div class="nav-right">
 
-        <!-- DM button -->
-        <div class="notif-wrap">
-          <button class="nav-icon-btn" @click="dmStore.open()" title="Messages">
-            <i class="bi bi-chat-dots-fill"></i>
-            <span v-if="dmStore.unreadCount > 0" class="notif-badge">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
-          </button>
+        <!-- Desktop-only text nav links -->
+        <div class="navbar-links" v-if="isAuthenticated">
+          <template v-if="role === 'coach'">
+            <router-link to="/coach/dashboard" class="nav-link">
+              <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
+            </router-link>
+            <router-link to="/coach/athletes" class="nav-link">
+              <i class="bi bi-people me-2"></i>Roster
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link to="/feed" class="nav-link">Feed</router-link>
+            <router-link to="/track" class="nav-link nav-link-track">
+              <i class="bi bi-play-circle-fill"></i> Track
+            </router-link>
+            <router-link to="/stats" class="nav-link">Stats</router-link>
+          </template>
+        </div>
+        <div class="navbar-links" v-else>
+          <router-link to="/features" class="nav-link">Features</router-link>
+          <router-link to="/about" class="nav-link">About</router-link>
+          <router-link to="/support" class="nav-link">Support</router-link>
+          <router-link to="/join-us" class="nav-link">Login</router-link>
+          <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
         </div>
 
-        <!-- Notification Bell -->
-        <div class="notif-wrap" ref="notifRef">
-          <button class="nav-icon-btn" @click="toggleNotifDropdown" title="Notifications">
-            <i class="bi bi-bell-fill"></i>
-            <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
-          </button>
-
-          <div v-if="notifOpen" class="notif-dropdown">
-            <div class="notif-header">
-              <span class="notif-title">Notifications</span>
-              <button v-if="unreadCount > 0" class="notif-mark-all" @click="markAll">
-                Mark all read
-              </button>
-            </div>
-
-            <div v-if="notifLoading" class="notif-loading">
-              <div class="spinner-border spinner-border-sm me-2"></div>Loading…
-            </div>
-
-            <div v-else-if="notifications.length === 0" class="notif-empty">
-              <i class="bi bi-bell"></i>
-              <p>No notifications yet</p>
-            </div>
-
-            <div v-else class="notif-list">
-              <div
-                v-for="n in notifications.slice(0, 12)"
-                :key="n.id"
-                :class="['notif-item', { unread: !n.read }]"
-                @click="handleNotifClick(n)"
-              >
-                <div class="notif-icon-wrap" :class="`notif-icon-${n.type?.toLowerCase()}`">
-                  <i :class="notifIcon(n.type)"></i>
-                </div>
-                <div class="notif-body">
-                  <p class="notif-msg">{{ n.message || notifMessage(n) }}</p>
-                  <span class="notif-time">{{ formatTime(n.createdAt) }}</span>
-                </div>
-                <div v-if="!n.read" class="notif-dot"></div>
-              </div>
-            </div>
-
-            <div v-if="notifications.length > 12" class="notif-footer">
-              {{ notifications.length - 12 }} more notifications
-            </div>
-          </div>
-        </div>
-
-        <!-- Profile avatar dropdown -->
-        <div class="avatar-wrap" ref="avatarRef">
-          <button class="nav-avatar" @click="toggleAvatarDropdown" :title="user?.displayName">
-            {{ userInitial }}
-          </button>
-          <div v-if="avatarOpen" class="avatar-dropdown">
-            <div class="avd-header">
-              <div class="avd-name">{{ user?.displayName }}</div>
-              <div class="avd-email">{{ user?.email }}</div>
-            </div>
-            <router-link to="/dashboard" class="avd-link" @click="avatarOpen = false">
-              <i class="bi bi-grid-3x3-gap"></i> Dashboard
-            </router-link>
-            <router-link to="/profile/edit" class="avd-link" @click="avatarOpen = false">
-              <i class="bi bi-person-circle"></i> Edit Profile
-            </router-link>
-            <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
-              <i class="bi bi-gear"></i> Settings
-            </router-link>
-            <div class="avd-divider"></div>
-            <button class="avd-link avd-link-danger" @click="handleLogout">
-              <i class="bi bi-box-arrow-right"></i> Logout
+        <!-- Auth icons: always visible (desktop + mobile) -->
+        <template v-if="isAuthenticated">
+          <!-- DM -->
+          <div class="notif-wrap">
+            <button class="nav-icon-btn" @click="dmStore.open()" title="Messages">
+              <i class="bi bi-chat-dots-fill"></i>
+              <span v-if="dmStore.unreadCount > 0" class="notif-badge">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
             </button>
           </div>
-        </div>
-      </div>
 
-      <div class="navbar-menu" v-else>
-        <router-link to="/features" class="nav-link">Features</router-link>
-        <router-link to="/about" class="nav-link">About</router-link>
-        <router-link to="/support" class="nav-link">Support</router-link>
-        <router-link to="/join-us" class="nav-link">Login</router-link>
-        <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
-      </div>
+          <!-- Bell -->
+          <div class="notif-wrap" ref="notifRef">
+            <button class="nav-icon-btn" @click="toggleNotifDropdown" title="Notifications">
+              <i class="bi bi-bell-fill"></i>
+              <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+            </button>
+            <div v-if="notifOpen" class="notif-dropdown">
+              <div class="notif-header">
+                <span class="notif-title">Notifications</span>
+                <button v-if="unreadCount > 0" class="notif-mark-all" @click="markAll">Mark all read</button>
+              </div>
+              <div v-if="notifLoading" class="notif-loading">
+                <div class="spinner-border spinner-border-sm me-2"></div>Loading…
+              </div>
+              <div v-else-if="notifications.length === 0" class="notif-empty">
+                <i class="bi bi-bell"></i>
+                <p>No notifications yet</p>
+              </div>
+              <div v-else class="notif-list">
+                <div
+                  v-for="n in notifications.slice(0, 12)"
+                  :key="n.id"
+                  :class="['notif-item', { unread: !n.read }]"
+                  @click="handleNotifClick(n)"
+                >
+                  <div class="notif-icon-wrap" :class="`notif-icon-${n.type?.toLowerCase()}`">
+                    <i :class="notifIcon(n.type)"></i>
+                  </div>
+                  <div class="notif-body">
+                    <p class="notif-msg">{{ n.message || notifMessage(n) }}</p>
+                    <span class="notif-time">{{ formatTime(n.createdAt) }}</span>
+                  </div>
+                  <div v-if="!n.read" class="notif-dot"></div>
+                </div>
+              </div>
+              <div v-if="notifications.length > 12" class="notif-footer">
+                {{ notifications.length - 12 }} more notifications
+              </div>
+            </div>
+          </div>
 
-      <!-- Mobile Menu Toggle — unauthenticated users only (auth users use BottomNav) -->
-      <button v-if="!isAuthenticated" class="mobile-menu-toggle" @click="mobileMenuOpen = !mobileMenuOpen" :aria-expanded="mobileMenuOpen">
-        <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
-      </button>
+          <!-- Avatar -->
+          <div class="avatar-wrap" ref="avatarRef">
+            <button class="nav-avatar" @click="toggleAvatarDropdown" :title="user?.displayName">
+              {{ userInitial }}
+            </button>
+            <div v-if="avatarOpen" class="avatar-dropdown">
+              <div class="avd-header">
+                <div class="avd-name">{{ user?.displayName }}</div>
+                <div class="avd-email">{{ user?.email }}</div>
+              </div>
+              <router-link to="/dashboard" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-grid-3x3-gap"></i> Dashboard
+              </router-link>
+              <router-link to="/profile/edit" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-person-circle"></i> Edit Profile
+              </router-link>
+              <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-gear"></i> Settings
+              </router-link>
+              <div class="avd-divider"></div>
+              <button class="avd-link avd-link-danger" @click="handleLogout">
+                <i class="bi bi-box-arrow-right"></i> Logout
+              </button>
+            </div>
+          </div>
+        </template>
+
+      </div>
     </div>
-
   </nav>
 
   <!-- DM Drawer -->
@@ -387,22 +394,29 @@ onUnmounted(() => {
   height: var(--nav-h, 64px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
-.navbar-brand { text-decoration: none; }
+/* Desktop: brand left, nav-right pushed right */
+.nav-left { display: none; }
+.navbar-brand { text-decoration: none; flex-shrink: 0; }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .brand-text {
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 0.20em;
   color: white;
   text-transform: uppercase;
-}
-
-.navbar-menu {
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .nav-link {
@@ -694,9 +708,26 @@ onUnmounted(() => {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
-  .navbar-menu { display: none; }
-  .navbar-content { padding: 0 20px; }
-  .navbar-brand { flex: 1; }
+  /* 3-column grid: [hamburger] [RUNNIT] [icons] */
+  .navbar-content {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0 16px;
+  }
+  .nav-left {
+    display: flex;
+    align-items: center;
+  }
+  .navbar-brand {
+    justify-self: center;
+  }
+  .nav-right {
+    justify-self: end;
+    margin-left: 0;
+    gap: 2px;
+  }
+  /* Hide text nav links on mobile — use drawer instead */
+  .navbar-links { display: none; }
   .mobile-menu-toggle { display: flex; }
   .brand-text { font-size: 1rem; }
 }
