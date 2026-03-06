@@ -140,7 +140,7 @@ const stats = [
 ]
 
 const values = [
-  { title: 'Build the habit',     body: 'Consistency beats intensity you can't repeat.' },
+  { title: 'Build the habit',     body: "Consistency beats intensity you can't repeat." },
   { title: 'Earned confidence',   body: 'Progress is proof — stack the days.' },
   { title: 'Better together',     body: 'Community makes hard things easier.' },
   { title: 'Trust always',        body: 'Clear controls and no surprises with your data.' },
