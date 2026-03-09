@@ -244,7 +244,7 @@ onMounted(async () => {
 <style scoped>
 .home-page {
   background: #fff;
-  color: #0A1628;
+  color: #1A0A06;
   padding-top: var(--nav-h, 64px);
 }
 
@@ -297,7 +297,7 @@ onMounted(async () => {
   align-items: center;
   padding: 16px 48px;
   border-radius: 0;
-  background: #0A1628;
+  background: #1A0A06;
   color: #fff;
   font-weight: 600;
   font-size: 0.78rem;
@@ -305,12 +305,12 @@ onMounted(async () => {
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid #0A1628;
+  border: 2px solid #1A0A06;
   cursor: pointer;
 }
 .btn-cta:hover {
-  background: #1a2e4a;
-  border-color: #1a2e4a;
+  background: #2e1a10;
+  border-color: #2e1a10;
   color: #fff;
   text-decoration: none;
 }
@@ -321,31 +321,31 @@ onMounted(async () => {
   padding: 16px 48px;
   border-radius: 0;
   background: transparent;
-  color: #0A1628;
+  color: #1A0A06;
   font-weight: 600;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid #0A1628;
+  border: 2px solid #1A0A06;
   cursor: pointer;
 }
 .btn-cta-ghost:hover {
-  background: #0A1628;
+  background: #1A0A06;
   color: #fff;
   text-decoration: none;
 }
 
 .btn-cta-light {
-  background: #F5B730;
-  color: #0A1628;
-  border: 2px solid #F5B730;
+  background: #E8622A;
+  color: #fff;
+  border: 2px solid #E8622A;
 }
 .btn-cta-light:hover {
-  background: #f9d36b;
+  background: #f08458;
   border-color: #d4ff5a;
-  color: #0A1628;
+  color: #1A0A06;
 }
 
 /* ── STATS BAR ── */
@@ -394,7 +394,7 @@ onMounted(async () => {
 
 /* ── MANIFESTO STRIP ── */
 .manifesto {
-  background: #0A1628;
+  background: #1A0A06;
   padding: 80px 0;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
@@ -438,7 +438,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #F5B730;
+  color: #E8622A;
   margin-top: 4px;
   flex-shrink: 0;
 }
@@ -506,7 +506,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #F5B730;
+  color: #E8622A;
   margin-bottom: 16px;
 }
 
@@ -630,7 +630,7 @@ onMounted(async () => {
 /* ── FINAL CTA ── */
 .final-cta {
   padding: 140px 0;
-  background: #0A1628;
+  background: #1A0A06;
   color: white;
 }
 
