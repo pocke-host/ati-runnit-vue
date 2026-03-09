@@ -624,19 +624,10 @@ onMounted(() => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .clubs-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --r-white: #FFFFFF;
-  --r-warm-gray: #6B6B6B;
-  --r-border: rgba(15,18,16,0.10);
-  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
-
   font-family: Futura, "Avenir Next", system-ui, -apple-system, sans-serif;
   background: #fff;
   min-height: 100vh;
-  padding-top: 72px;
+  padding-top: var(--nav-h, 64px);
 }
 
 /* ===== HERO ===== */
@@ -1200,7 +1191,7 @@ onMounted(() => {
 
 .msg-name:hover {
   text-decoration: underline;
-  color: var(--r-accent);
+  color: #000;
 }
 
 .msg-time {

@@ -422,8 +422,6 @@
   
   <style scoped>
   .stories-viewer {
-    --r-olive: #5A6B4E;
-    --r-accent: #C46A2A;
   }
   
   /* Stories Ring */
@@ -797,8 +795,8 @@
   
   .form-control:focus {
     outline: none;
-    border-color: var(--r-accent);
-    box-shadow: 0 0 0 3px rgba(196,106,42,0.12);
+    border-color: #000;
+    box-shadow: none;
     background: rgba(255,255,255,0.95);
   }
   
@@ -813,7 +811,7 @@
   }
   
   .upload-area:hover {
-    border-color: var(--r-accent);
+    border-color: var(--rk-signal, #C2F542);
     background: rgba(196,106,42,0.08);
   }
   
@@ -885,13 +883,13 @@
   }
   
   .btn-primary {
-    background: linear-gradient(135deg, var(--r-accent), #a85722);
-    border-color: var(--r-accent);
+    background: #000;
+    border-color: #000;
     color: white;
   }
   
   .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #a85722, #914a1e);
+    background: #2a2a2a;
   }
   
   .btn-primary:disabled {

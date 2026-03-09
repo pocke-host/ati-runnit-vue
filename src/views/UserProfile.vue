@@ -498,15 +498,8 @@ onMounted(init)
 
 <style scoped>
 .profile-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --r-warm-gray: #6B6B6B;
-  --r-border: rgba(15,18,16,0.10);
-  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
   min-height: 100vh;
-  padding-top: 72px;
+  padding-top: var(--nav-h, 64px);
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
@@ -563,7 +556,7 @@ onMounted(init)
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--r-accent);
+  background: #000;
   border: 2px solid white;
   display: flex;
   align-items: center;
@@ -882,7 +875,7 @@ onMounted(init)
 .song-link {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--r-accent);
+  color: #000;
   text-decoration: none;
 }
 .song-link:hover { opacity: 0.8; }

@@ -155,14 +155,6 @@ const steps = [
 
 <style scoped>
 .sport-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
   width:100%;
   min-height:100vh;
   overflow-x:hidden;
@@ -174,7 +166,6 @@ const steps = [
 
 /* HERO fills between fixed nav/footer */
 .hero{
-  --nav-h: 72px;
   --footer-h: 40px;
   min-height: calc(100vh - var(--nav-h) - var(--footer-h));
   display:flex;

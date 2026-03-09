@@ -90,14 +90,6 @@ const feats = [
 
 <style scoped>
 .sport-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
   --nav:72px;
   --footer:40px;
 

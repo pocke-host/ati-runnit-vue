@@ -105,11 +105,11 @@ const userId = computed(() => user.value?.id)
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #000000;
+  background: var(--rk-signal, #C2F542);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--rk-void, #0C0C0C);
   font-size: 1.3rem;
   margin-top: -16px; /* rises above bar */
   box-shadow: none;

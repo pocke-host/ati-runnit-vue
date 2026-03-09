@@ -225,12 +225,6 @@ const onSocial = (provider) => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .register-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
-  --r-white: #FFFFFF;
-  
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
   display: grid;

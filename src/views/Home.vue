@@ -338,14 +338,14 @@ onMounted(async () => {
 }
 
 .btn-cta-light {
-  background: #fff;
-  color: #000;
-  border: 2px solid #fff;
+  background: var(--rk-signal, #C2F542);
+  color: var(--rk-void, #0C0C0C);
+  border: 2px solid var(--rk-signal, #C2F542);
 }
 .btn-cta-light:hover {
-  background: #e5e5e5;
-  border-color: #e5e5e5;
-  color: #000;
+  background: #d4ff5a;
+  border-color: #d4ff5a;
+  color: var(--rk-void, #0C0C0C);
 }
 
 /* ── STATS BAR ── */
@@ -438,7 +438,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #C5C5C5;
+  color: var(--rk-signal, #C2F542);
   margin-top: 4px;
   flex-shrink: 0;
 }
@@ -506,7 +506,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #C5C5C5;
+  color: var(--rk-signal, #C2F542);
   margin-bottom: 16px;
 }
 

@@ -133,15 +133,6 @@ const onSubmit = () => {
 <style scoped>
 /* ===== RUNNIT Brand Tokens (page-local) ===== */
 .request-page{
-  --r-olive:#5A6B4E;
-  --r-olive-deep:#2C3726;
-  --r-black:#0F1210;
-  --r-stone:#A3A69F;
-  --r-offwhite:#F5F6F3;
-  --r-white:#FFFFFF;
-  --r-accent:#C46A2A;
-
-  --nav-h: 72px;
   --footer-h: 40px;
 
   padding-top: var(--nav-h);

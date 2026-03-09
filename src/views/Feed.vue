@@ -635,24 +635,15 @@ onMounted(() => {
 
 <style scoped>
 .feed-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --r-warm-gray: #6B6B6B;
-  --r-border: rgba(15,18,16,0.10);
-  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
-  --r-shadow: 0 8px 32px rgba(15,18,16,0.10);
-
   min-height: 100vh;
-  padding-top: 90px;
+  padding-top: var(--nav-h, 64px);
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
 .feed-header {
   position: fixed;
-  top: 72px;
+  top: var(--nav-h, 64px);
   left: 0;
   right: 0;
   z-index: 100;

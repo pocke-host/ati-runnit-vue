@@ -158,12 +158,12 @@ const careerElevation = computed(() =>
 
 // Sport breakdown for doughnut
 const SPORT_COLORS = {
-  RUN: '#C46A2A', Running: '#C46A2A',
-  BIKE: '#5A6B4E', Cycling: '#5A6B4E',
-  SWIM: '#4A9ECC', Swimming: '#4A9ECC',
-  HIKE: '#8B7355', Hiking: '#8B7355',
-  WALK: '#A3A69F', Walking: '#A3A69F',
-  OTHER: '#6B5B95',
+  RUN: '#0C0C0C', Running: '#0C0C0C',
+  BIKE: '#404040', Cycling: '#404040',
+  SWIM: '#707070', Swimming: '#707070',
+  HIKE: '#A0A0A0', Hiking: '#A0A0A0',
+  WALK: '#C8C8C8', Walking: '#C8C8C8',
+  OTHER: '#E0E0E0',
 }
 const sportBreakdown = computed(() => {
   const map = {}
@@ -292,15 +292,8 @@ onMounted(async () => {
 
 <style scoped>
 .stats-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --r-warm-gray: #6B6B6B;
-  --r-border: rgba(15,18,16,0.10);
-  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
   min-height: 100vh;
-  padding-top: 72px;
+  padding-top: var(--nav-h, 64px);
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
@@ -405,6 +398,7 @@ onMounted(async () => {
   opacity: 1;
   box-shadow: none;
   border-color: #000;
+  border-left: 3px solid var(--rk-signal, #C2F542);
 }
 .pr-card.pr-card-set:hover { transform: none; }
 
@@ -421,8 +415,8 @@ onMounted(async () => {
   margin-bottom: 2px;
 }
 .pr-card.pr-card-set .pr-icon-wrap {
-  background: #f0f0f0;
-  color: #767676;
+  background: var(--rk-signal, #C2F542);
+  color: var(--rk-void, #0C0C0C);
 }
 .pr-label {
   font-weight: 900;

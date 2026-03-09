@@ -1481,14 +1481,14 @@ onMounted(async () => {
 }
 
 /* Keep all other existing styles */
-.dash{--r-olive:#4A5E3F;--r-olive-deep:#1E2B1A;--r-black:#0F1210;--r-stone:#A3A69F;--r-warm-gray:#6B6B6B;--r-offwhite:#FFFFFF;--r-white:#FFFFFF;--r-accent:#B85C20;--r-border:rgba(15,18,16,0.10);--r-shadow-sm:0 2px 12px rgba(15,18,16,0.06);--r-shadow:0 8px 32px rgba(15,18,16,0.10);min-height:100vh;padding-top:90px;background:#fff;font-family:Futura,"Futura PT","Futura Std","Avenir Next",Avenir,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:rgba(15,18,16,0.92)}
+.dash{min-height:100vh;padding-top:var(--nav-h,64px);background:#fff;font-family:Futura,"Futura PT","Futura Std","Avenir Next",Avenir,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:rgba(15,18,16,0.92)}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:rgba(15,18,16,0.70)}
 .dash-loader{width:32px;height:32px;border:2px solid rgba(15,18,16,0.10);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .wrap{max-width:1400px;margin:0 auto;padding:26px 20px 56px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px}
 .brandline{display:flex;align-items:center;gap:10px}
-.status-dot{width:10px;height:10px;border-radius:0;background:#000}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--rk-signal,#C2F542);flex-shrink:0}
 .kicker{letter-spacing:.18em;font-weight:900;font-size:.78rem;color:rgba(15,18,16,0.70)}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap}
 .perf-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #E5E5E5;margin-bottom:32px;background:#E5E5E5;gap:1px}
@@ -1497,7 +1497,7 @@ onMounted(async () => {
 .perf-num{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-0.03em;line-height:1;color:#000;display:flex;align-items:baseline;gap:4px}
 .perf-unit{font-size:0.9rem;font-weight:600;color:rgba(15,18,16,0.40);margin-left:4px}
 .perf-change{font-size:0.73rem;font-weight:600;color:rgba(15,18,16,0.38);margin-top:6px}
-.perf-change--up{color:#000}
+.perf-change--up{color:var(--rk-void,#0C0C0C);background:var(--rk-signal,#C2F542);padding:1px 6px;display:inline-block}
 .perf-change--down{color:rgba(15,18,16,0.45)}
 .dashboard-grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
 .charts-section{display:flex;flex-direction:column;gap:24px}
@@ -1508,7 +1508,7 @@ onMounted(async () => {
 .chart-tabs{display:flex;gap:8px}
 .tab{padding:8px 16px;border-radius:0;border:1px solid #E5E5E5;background:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
 .tab:hover{background:rgba(255,255,255,0.90)}
-.tab.active{background:#000;color:white;border-color:var(--r-black)}
+.tab.active{background:#000;color:white;border-color:#000}
 .period-select{padding:8px 12px;border-radius:0;border:1px solid rgba(15,18,16,0.12);background:rgba(255,255,255,0.80);font-weight:600;font-size:0.85rem}
 .chart-body{height:280px;position:relative}
 .chart-body-split{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center}
@@ -1558,8 +1558,8 @@ onMounted(async () => {
 .upgrade-banner{margin-top:16px;padding:20px;background:#000;border-radius:0}
 .upgrade-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.55);margin-bottom:8px}
 .upgrade-desc{font-size:0.82rem;color:rgba(255,255,255,0.70);margin:0 0 16px;line-height:1.5}
-.upgrade-btn{display:inline-block;background:#fff;color:#000;font-weight:700;font-size:0.75rem;letter-spacing:0.10em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:0;transition:background 0.15s}
-.upgrade-btn:hover{background:#e5e5e5}
+.upgrade-btn{display:inline-block;background:var(--rk-signal,#C2F542);color:var(--rk-void,#0C0C0C);font-weight:700;font-size:0.75rem;letter-spacing:0.10em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:0;transition:background 0.15s}
+.upgrade-btn:hover{background:#d4ff5a}
 .manage-sub-link{margin-top:16px;padding:12px 0}
 .manage-sub-link a{font-size:0.82rem;color:#767676;text-decoration:none;display:flex;align-items:center;transition:color 0.15s}
 .manage-sub-link a:hover{color:#000}
@@ -1569,7 +1569,7 @@ onMounted(async () => {
 .filters-compact{display:flex;gap:6px;flex-wrap:wrap}
 .filter-pill{padding:6px 12px;border-radius:0;border:1px solid rgba(15,18,16,0.12);background:rgba(255,255,255,0.70);font-weight:700;font-size:0.75rem;cursor:pointer;transition:all 0.2s}
 .filter-pill:hover{background:rgba(255,255,255,0.95)}
-.filter-pill.active{background:#000;color:white;border-color:var(--r-black)}
+.filter-pill.active{background:#000;color:white;border-color:#000}
 .activities-loading{display:flex;align-items:center;gap:12px;justify-content:center;padding:40px;color:rgba(15,18,16,0.60)}
 .activities-list{display:flex;flex-direction:column;gap:12px}
 .activity-item{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.70);border:1px solid rgba(15,18,16,0.08);border-radius:0;transition:all 0.2s}
@@ -1592,10 +1592,10 @@ onMounted(async () => {
 .goal-label{display:flex;justify-content:space-between;margin-bottom:8px;font-weight:700;font-size:0.9rem}
 .goal-progress-text{color:rgba(15,18,16,0.60);font-weight:600}
 .goal-bar{height:12px;background:rgba(15,18,16,0.08);border-radius:0;overflow:hidden}
-.goal-fill{height:100%;background:#000;border-radius:0;transition:width 0.3s}
+.goal-fill{height:100%;background:var(--rk-signal,#C2F542);border-radius:0;transition:width 0.3s}
 .btn{border:1px solid #E5E5E5;background:#fff;color:#000;border-radius:0;height:44px;padding:0 16px;font-weight:900;letter-spacing:0.02em;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all 0.2s}
 .btn:hover{transform:translateY(-1px);border-color:rgba(15,18,16,0.18);background:rgba(255,255,255,0.72)}
-.btn-primary{background:#000;border-color:var(--r-black);color:#fff}
+.btn-primary{background:#000;border-color:#000;color:#fff}
 .btn-primary:hover{background:#2a2a2a;border-color:#2a2a2a}
 .btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .btn-outline{background:rgba(255,255,255,0.50);border-color:rgba(15,18,16,0.16)}

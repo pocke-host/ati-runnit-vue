@@ -540,17 +540,8 @@ onMounted(() => {
 
 <style scoped>
 .plans-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --nav-h: 72px;
-  --r-warm-gray: #6B6B6B;
-  --r-border: rgba(15,18,16,0.10);
-  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
-
-  padding-top: var(--nav-h);
-  min-height: calc(100vh - var(--nav-h));
+  padding-top: var(--nav-h, 64px);
+  min-height: calc(100vh - var(--nav-h, 64px));
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
@@ -605,9 +596,9 @@ onMounted(() => {
   padding: 4px 10px; border-radius: 0;
   font-size: 0.72rem; font-weight: 700; text-transform: capitalize;
 }
-.plan-badge-level.beginner     { background: rgba(16,185,129,0.12); color: #047857; }
-.plan-badge-level.intermediate { background: rgba(245,158,11,0.12); color: #b45309; }
-.plan-badge-level.advanced     { background: rgba(239,68,68,0.12);  color: #b91c1c; }
+.plan-badge-level.beginner     { background: #f0f0f0; color: #555; }
+.plan-badge-level.intermediate { background: #1a1a1a; color: #fff; }
+.plan-badge-level.advanced     { background: var(--rk-void, #0C0C0C); color: var(--rk-signal, #C2F542); }
 .plan-badge-active { background: rgba(0,0,0,0.08); color: #000; }
 
 .plan-name { font-weight: 900; font-size: 1.05rem; margin: 0 0 4px; color: rgba(15,18,16,0.92); }

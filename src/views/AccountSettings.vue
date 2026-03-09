@@ -232,15 +232,6 @@ const handleLogout = () => {
 
 <style scoped>
 .settings-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --nav-h: 72px;
-  --r-warm-gray: #6B6B6B;
-  --r-border: rgba(15,18,16,0.10);
-  --r-shadow-sm: 0 2px 12px rgba(15,18,16,0.06);
-
   min-height: 100vh;
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -281,7 +272,7 @@ const handleLogout = () => {
   font-weight: 900;
   font-size: 1rem;
   letter-spacing: 0.08em;
-  color: var(--r-accent);
+  color: #000;
 }
 
 /* ── Body ── */

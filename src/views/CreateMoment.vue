@@ -174,11 +174,6 @@ const handleSubmit = async () => {
 
 <style scoped>
 .create-moment-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
-  
   min-height: 100vh;
   background: #fff;
   padding: 40px 20px;

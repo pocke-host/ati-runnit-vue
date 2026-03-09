@@ -330,12 +330,6 @@ onMounted(async () => {
 
 <style scoped>
 .plan-detail-page {
-  --r-olive: #5A6B4E;
-  --r-olive-deep: #2C3726;
-  --r-accent: #C46A2A;
-  --r-offwhite: #F5F6F3;
-  --nav-h: 72px;
-
   min-height: 100vh;
   background: var(--r-offwhite);
   padding-top: var(--nav-h);

@@ -147,17 +147,12 @@ onMounted(async () => {
 
 <style scoped>
 .achievements-page {
-  --r-olive: #4A5E3F;
-  --r-olive-deep: #1E2B1A;
-  --r-accent: #B85C20;
-  --r-offwhite: #FFFFFF;
-  --r-border: rgba(15,18,16,0.10);
   --bronze: #CD7F32;
   --silver: #A8A9AD;
   --gold: #FFD700;
   --special: #7C3AED;
   min-height: 100vh;
-  padding-top: 72px;
+  padding-top: var(--nav-h, 64px);
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }

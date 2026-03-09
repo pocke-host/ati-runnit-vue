@@ -366,8 +366,6 @@
   .route-viewer {
     position: relative;
     width: 100%;
-    --r-olive: #5A6B4E;
-    --r-accent: #C46A2A;
   }
   
   .route-loading,
@@ -483,7 +481,7 @@
   
   .control-btn:hover {
     background: white;
-    color: var(--r-accent);
+    color: #000;
     transform: scale(1.05);
   }
   
