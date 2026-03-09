@@ -48,8 +48,8 @@ const userId = computed(() => user.value?.id)
   right: 0;
   height: var(--tab-h, 64px);
   z-index: 900;
-  background: #fff;
-  border-top: 1px solid #E5E5E5;
+  background: var(--rk-surface, #FDFAF5);
+  border-top: 1px solid var(--rk-rule, #DDD7CC);
   box-shadow: none;
   align-items: center;
   justify-content: space-around;
@@ -90,9 +90,9 @@ const userId = computed(() => user.value?.id)
   line-height: 1;
 }
 
-/* Active state — black underline */
+/* Active state — deep indigo */
 .tab-active {
-  color: #000000;
+  color: var(--rk-void, #14102A);
 }
 
 /* Track center tab */
@@ -105,11 +105,11 @@ const userId = computed(() => user.value?.id)
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--rk-signal, #C2F542);
+  background: var(--rk-signal, #C8872A);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--rk-void, #0C0C0C);
+  color: var(--rk-void, #14102A);
   font-size: 1.3rem;
   margin-top: -16px; /* rises above bar */
   box-shadow: none;

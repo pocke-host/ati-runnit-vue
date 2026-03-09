@@ -294,7 +294,7 @@ onMounted(async () => {
 .stats-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -398,7 +398,7 @@ onMounted(async () => {
   opacity: 1;
   box-shadow: none;
   border-color: #000;
-  border-left: 3px solid var(--rk-signal, #C2F542);
+  border-left: 3px solid var(--rk-signal, #C8872A);
 }
 .pr-card.pr-card-set:hover { transform: none; }
 
@@ -415,8 +415,8 @@ onMounted(async () => {
   margin-bottom: 2px;
 }
 .pr-card.pr-card-set .pr-icon-wrap {
-  background: var(--rk-signal, #C2F542);
-  color: var(--rk-void, #0C0C0C);
+  background: var(--rk-signal, #C8872A);
+  color: var(--rk-void, #14102A);
 }
 .pr-label {
   font-weight: 900;

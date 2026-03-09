@@ -208,13 +208,13 @@ const initializeMap = () => {
       paint: { 'line-color': '#FFFFFF', 'line-width': 7, 'line-opacity': 1 },
     })
 
-    // Signal lime route line
+    // Copper amber route line
     map.value.addLayer({
       id: 'route',
       type: 'line',
       source: 'route',
       layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: { 'line-color': '#C2F542', 'line-width': 4 },
+      paint: { 'line-color': '#C8872A', 'line-width': 4 },
     })
 
     // Start marker circle
@@ -228,9 +228,9 @@ const initializeMap = () => {
       source: 'start-point',
       paint: {
         'circle-radius': 7,
-        'circle-color': '#C2F542',
+        'circle-color': '#C8872A',
         'circle-stroke-width': 2.5,
-        'circle-stroke-color': '#0C0C0C',
+        'circle-stroke-color': '#14102A',
       },
     })
 

@@ -471,7 +471,7 @@ onMounted(() => {
 /* ===== Design Tokens ===== */
 .challenges-page {
   font-family: Futura, 'Avenir Next', 'Avenir', system-ui, -apple-system, sans-serif;
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
 }

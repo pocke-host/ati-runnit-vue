@@ -292,7 +292,7 @@ const handleSubmit = async () => {
   padding: 14px 16px;
   border: 1px solid rgba(15,18,16,0.16);
   border-radius: 0;
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.2s;

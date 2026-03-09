@@ -243,16 +243,16 @@ onMounted(async () => {
 
 <style scoped>
 .home-page {
-  background: #fff;
-  color: #000;
+  background: var(--rk-paper, #F6F1E8);
+  color: var(--rk-void, #14102A);
   padding-top: var(--nav-h, 64px);
 }
 
 /* ── HERO ── */
 .hero {
   padding: 140px 0 120px;
-  background: #fff;
-  border-bottom: 1px solid #E5E5E5;
+  background: var(--rk-paper, #F6F1E8);
+  border-bottom: 1px solid var(--rk-rule, #DDD7CC);
 }
 
 .hero-inner { }
@@ -297,7 +297,7 @@ onMounted(async () => {
   align-items: center;
   padding: 16px 48px;
   border-radius: 0;
-  background: #000;
+  background: var(--rk-void, #14102A);
   color: #fff;
   font-weight: 600;
   font-size: 0.78rem;
@@ -305,12 +305,12 @@ onMounted(async () => {
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid #000;
+  border: 2px solid var(--rk-void, #14102A);
   cursor: pointer;
 }
 .btn-cta:hover {
-  background: #333;
-  border-color: #333;
+  background: #2C2848;
+  border-color: #2C2848;
   color: #fff;
   text-decoration: none;
 }
@@ -321,36 +321,36 @@ onMounted(async () => {
   padding: 16px 48px;
   border-radius: 0;
   background: transparent;
-  color: #000;
+  color: var(--rk-void, #14102A);
   font-weight: 600;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid #000;
+  border: 2px solid var(--rk-void, #14102A);
   cursor: pointer;
 }
 .btn-cta-ghost:hover {
-  background: #000;
+  background: var(--rk-void, #14102A);
   color: #fff;
   text-decoration: none;
 }
 
 .btn-cta-light {
-  background: var(--rk-signal, #C2F542);
-  color: var(--rk-void, #0C0C0C);
-  border: 2px solid var(--rk-signal, #C2F542);
+  background: var(--rk-signal, #C8872A);
+  color: var(--rk-void, #14102A);
+  border: 2px solid var(--rk-signal, #C8872A);
 }
 .btn-cta-light:hover {
   background: #d4ff5a;
   border-color: #d4ff5a;
-  color: var(--rk-void, #0C0C0C);
+  color: var(--rk-void, #14102A);
 }
 
 /* ── STATS BAR ── */
 .stats-bar {
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   border-bottom: 1px solid #E5E5E5;
   padding: 56px 0;
 }
@@ -394,9 +394,9 @@ onMounted(async () => {
 
 /* ── MANIFESTO STRIP ── */
 .manifesto {
-  background: #000;
+  background: var(--rk-void, #14102A);
   padding: 80px 0;
-  border-bottom: 1px solid #111;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .manifesto-text {
@@ -412,7 +412,7 @@ onMounted(async () => {
 /* ── PILLARS ── */
 .pillars {
   padding: 0;
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -438,7 +438,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--rk-signal, #C2F542);
+  color: var(--rk-signal, #C8872A);
   margin-top: 4px;
   flex-shrink: 0;
 }
@@ -506,7 +506,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--rk-signal, #C2F542);
+  color: var(--rk-signal, #C8872A);
   margin-bottom: 16px;
 }
 
@@ -534,7 +534,7 @@ onMounted(async () => {
 
 /* ── STATEMENT ── */
 .statement {
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   border-bottom: 1px solid #E5E5E5;
   padding: 100px 0;
 }
@@ -562,7 +562,7 @@ onMounted(async () => {
 /* ── CAPABILITIES ── */
 .capabilities {
   padding: 100px 0;
-  background: #fff;
+  background: var(--rk-paper, #F6F1E8);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -630,7 +630,7 @@ onMounted(async () => {
 /* ── FINAL CTA ── */
 .final-cta {
   padding: 140px 0;
-  background: #000;
+  background: var(--rk-void, #14102A);
   color: white;
 }
 

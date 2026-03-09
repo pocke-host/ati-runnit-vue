@@ -811,7 +811,7 @@
   }
   
   .upload-area:hover {
-    border-color: var(--rk-signal, #C2F542);
+    border-color: var(--rk-signal, #C8872A);
     background: rgba(196,106,42,0.08);
   }
   
