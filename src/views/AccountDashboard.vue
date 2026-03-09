@@ -2,10 +2,7 @@
   <main class="dash">
     <StoriesViewer />
     <!-- Loading State -->
-    <div v-if="!user" class="loading-screen">
-      <div class="dash-loader"></div>
-      <p>Loading dashboard...</p>
-    </div>
+    <AppSpinner v-if="!user" label="Loading dashboard…" />
 
     <!-- Dashboard Content -->
     <div v-else class="wrap">
@@ -662,6 +659,7 @@ import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
 import { useAthleteStore } from '@/stores/athlete'
+import AppSpinner from '@/components/AppSpinner.vue'
 
 Chart.register(...registerables)
 

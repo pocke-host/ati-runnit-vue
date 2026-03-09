@@ -3,18 +3,17 @@
   <div class="detail-page">
 
     <!-- Loading -->
-    <div v-if="pageLoading" class="page-center">
-      <div class="spinner-border" role="status"></div>
-      <p>Loading activity…</p>
-    </div>
+    <AppSpinner v-if="pageLoading" label="Loading activity…" />
 
-    <!-- Error -->
-    <div v-else-if="pageError" class="page-center page-error">
-      <i class="bi bi-exclamation-circle"></i>
-      <h2>Couldn't load activity</h2>
-      <p>{{ pageError }}</p>
-      <button class="btn btn-primary" @click="init">Try again</button>
-    </div>
+    <!-- Error / 404 -->
+    <EmptyState
+      v-else-if="pageError"
+      icon="bi-exclamation-circle"
+      :title="pageError.includes('404') || pageError.includes('not found') ? 'Activity not found' : 'Couldn\'t load activity'"
+      :message="pageError"
+      action-label="Try again"
+      @action="init"
+    />
 
     <template v-else-if="activity">
 
@@ -239,6 +238,8 @@ import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import RouteViewer from '@/components/RouteViewer.vue'
+import AppSpinner from '@/components/AppSpinner.vue'
+import EmptyState from '@/components/EmptyState.vue'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
 

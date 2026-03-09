@@ -180,16 +180,17 @@
         </Transition>
 
         <!-- Loading state -->
-        <div v-if="planStore.loading && !plans.length" class="loading-state">
-          <div class="spinner-border"></div>
-          <p>Loading your plans…</p>
-        </div>
+        <AppSpinner v-if="plansLoading" label="Loading plans…" />
 
-        <!-- Empty state (no plans + no goal selected yet) -->
-        <div v-if="!plans.length && !selectedGoal && !planStore.loading" class="empty-nudge">
-          <div class="empty-icon">🗓️</div>
-          <p>Pick a goal above to get started</p>
-        </div>
+        <!-- Empty state (no plans + no goal selected yet + not loading) -->
+        <EmptyState
+          v-else-if="!plans.length && !selectedGoal"
+          icon="bi-calendar3"
+          title="No plans yet"
+          message="Build a custom plan or start from a template."
+          action-label="Create Plan"
+          @action="selectedGoal = goals[0].key"
+        />
       </section>
     </div>
   </main>
@@ -202,6 +203,8 @@ import { usePlanStore } from '@/stores/plan.js'
 import { useActivityStore } from '@/stores/activity.js'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
+import AppSpinner from '@/components/AppSpinner.vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 const router = useRouter()
 const planStore = usePlanStore()
@@ -532,8 +535,15 @@ async function confirmCreate() {
   }
 }
 
-onMounted(() => {
-  planStore.fetchPlans()
+const plansLoading = ref(false)
+
+onMounted(async () => {
+  plansLoading.value = true
+  try {
+    await planStore.fetchPlans()
+  } finally {
+    plansLoading.value = false
+  }
   activityStore.fetchActivities()
 })
 </script>

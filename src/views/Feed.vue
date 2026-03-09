@@ -62,10 +62,7 @@
 
     <!-- Feed Content -->
     <div class="feed-container">
-      <div v-if="loading" class="feed-loading">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p>Loading feed...</p>
-      </div>
+      <AppSpinner v-if="loading" label="Loading feed…" />
 
       <div v-else-if="sortedFeedItems.length" class="feed-grid">
         <!-- Activity Card -->
@@ -169,6 +166,13 @@
         </article>
       </div>
 
+      <EmptyState
+        v-else-if="activeTab === 'following'"
+        icon="bi-people"
+        title="Nothing here yet"
+        message="Follow some athletes to see their workouts."
+      />
+
       <div v-else class="feed-empty">
         <i class="bi bi-collection" style="font-size: 4rem; color: rgba(15,18,16,0.30);"></i>
         <h3>No activity yet</h3>
@@ -180,9 +184,6 @@
         </p>
         <p v-else-if="activeTab === 'moments'">
           No moments have been shared yet
-        </p>
-        <p v-else-if="activeTab === 'following'">
-          Follow other athletes to see their activities here
         </p>
         <p v-else>
           Be the first to log an activity or share a moment!
@@ -342,6 +343,8 @@ import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import AppSpinner from '@/components/AppSpinner.vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 

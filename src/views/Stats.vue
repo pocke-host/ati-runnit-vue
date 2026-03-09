@@ -28,10 +28,15 @@
       <!-- PERSONAL RECORDS -->
       <section class="section">
         <h2 class="section-title">Personal Records</h2>
-        <div v-if="prStore.loading" class="loading-state">
-          <div class="spinner-border" role="status"></div>
-          <p>Loading records…</p>
-        </div>
+        <AppSpinner v-if="prStore.loading" label="Loading records…" />
+        <EmptyState
+          v-else-if="!prStore.allPRs.some(pr => pr.data)"
+          icon="bi-trophy"
+          title="No records yet"
+          message="Log your first activity to start tracking PRs."
+          action-to="/track"
+          action-label="Track a Run"
+        />
         <div v-else class="pr-grid">
           <div
             v-for="pr in prStore.allPRs"
@@ -122,6 +127,8 @@ import { usePRStore } from '@/stores/pr'
 import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
+import AppSpinner from '@/components/AppSpinner.vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 Chart.register(...registerables)
 

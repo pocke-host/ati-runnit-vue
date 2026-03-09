@@ -38,6 +38,11 @@
             <div class="pe-section-label">BASIC INFO</div>
 
             <div class="pe-field">
+              <label class="pe-label">Email</label>
+              <div class="pe-input-static">{{ user?.email }}</div>
+            </div>
+
+            <div class="pe-field">
               <label class="pe-label">Display Name</label>
               <input
                 v-model="form.displayName"
@@ -195,9 +200,13 @@ const saveProfile = async () => {
       isPublic: form.value.isPublic
     }, { headers: getAuthHeaders() })
 
-    // Update auth store with new display name
-    if (data.displayName) {
-      authStore.setUnitSystem(form.value.unitSystem)
+    authStore.setUnitSystem(form.value.unitSystem)
+    if (authStore.user) {
+      authStore.user.displayName = data.displayName || form.value.displayName
+      authStore.user.bio        = data.bio        ?? form.value.bio
+      authStore.user.location   = data.location   ?? form.value.location
+      authStore.user.primarySport = data.primarySport ?? form.value.primarySport
+      authStore.user.isPublic   = data.isPublic   ?? form.value.isPublic
     }
     saved.value = true
     setTimeout(() => { saved.value = false }, 4000)
@@ -223,7 +232,7 @@ onMounted(() => {
     form.value.location = user.value.location || ''
     form.value.primarySport = user.value.primarySport || 'running'
     form.value.unitSystem = user.value.unitSystem || localStorage.getItem('unitSystem') || 'imperial'
-    form.value.isPublic = user.value.isPublic !== false
+    form.value.isPublic = user.value.isPublic ?? true
   }
 })
 </script>
@@ -231,7 +240,7 @@ onMounted(() => {
 <style scoped>
 .profile-edit-page {
   min-height: 100vh;
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   padding-top: var(--nav-h, 64px);
   font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
 }
@@ -271,7 +280,7 @@ onMounted(() => {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: #767676;
+  color: var(--rk-signal, #8B2BE2);
   margin-bottom: 4px;
 }
 
@@ -381,7 +390,22 @@ onMounted(() => {
   box-sizing: border-box;
   font-family: inherit;
 }
-.pe-input:focus { border-color: #000; }
+.pe-input:focus { border-color: var(--rk-signal, #8B2BE2); }
+
+.pe-input-static {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  color: #767676;
+  background: #fafafa;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
 
 .pe-textarea {
   height: auto;
@@ -452,7 +476,7 @@ onMounted(() => {
 .btn-save {
   height: 48px;
   padding: 0 40px;
-  background: #000;
+  background: var(--rk-signal, #8B2BE2);
   color: #fff;
   border: none;
   border-radius: 0;
@@ -467,7 +491,7 @@ onMounted(() => {
   transition: background 0.15s;
   font-family: inherit;
 }
-.btn-save:hover:not(:disabled) { background: #222; }
+.btn-save:hover:not(:disabled) { background: #7722CC; }
 .btn-save:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-spinner {
