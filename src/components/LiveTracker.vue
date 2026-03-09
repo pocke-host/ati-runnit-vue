@@ -171,7 +171,7 @@ const initializeMap = () => {
 
   map.value = new mapboxgl.Map({
     container: liveMapContainer.value,
-    style: 'mapbox://styles/quinn-runnit/cmm9si8k3000e01rdhkf4gokf',
+    style: 'mapbox://styles/mapbox/light-v11',
     zoom: savedLng === -98.5 ? 3.5 : 13,
     center: [savedLng, savedLat],
     attributionControl: false,
@@ -193,24 +193,31 @@ const initializeMap = () => {
   })
 
   map.value.on('load', () => {
-    // Route source + layer
+    // Route source
     map.value.addSource('route', {
       type: 'geojson',
       data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } },
     })
+
+    // White halo — lifts the route off the map (Strava style)
+    map.value.addLayer({
+      id: 'route-halo',
+      type: 'line',
+      source: 'route',
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: { 'line-color': '#FFFFFF', 'line-width': 7, 'line-opacity': 1 },
+    })
+
+    // Signal lime route line
     map.value.addLayer({
       id: 'route',
       type: 'line',
       source: 'route',
       layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: {
-        'line-color': '#000000',
-        'line-width': 5,
-        'line-opacity': 0.85,
-      },
+      paint: { 'line-color': '#C2F542', 'line-width': 4 },
     })
 
-    // Start marker (added when tracking begins)
+    // Start marker circle
     map.value.addSource('start-point', {
       type: 'geojson',
       data: { type: 'FeatureCollection', features: [] },
@@ -221,9 +228,9 @@ const initializeMap = () => {
       source: 'start-point',
       paint: {
         'circle-radius': 7,
-        'circle-color': '#000000',
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#FFFFFF',
+        'circle-color': '#C2F542',
+        'circle-stroke-width': 2.5,
+        'circle-stroke-color': '#0C0C0C',
       },
     })
 
