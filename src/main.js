@@ -8,6 +8,9 @@ import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
+// Global design tokens + resets (must come after Bootstrap to override)
+import '@/assets/main.css'
+
 const app = createApp(App)
 const pinia = createPinia()
 

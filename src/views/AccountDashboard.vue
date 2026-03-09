@@ -195,10 +195,6 @@
                 <div class="coach-name">{{ myCoach.displayName }}</div>
               </div>
             </div>
-            <div v-else-if="!myCoach && myCoachLoaded" class="find-coach-cta">
-              <router-link to="/coaches">Find a Coach →</router-link>
-            </div>
-
             <!-- Subscription CTA -->
             <div v-if="subscriptionTier === 'free'" class="upgrade-banner">
               <div class="upgrade-label">UPGRADE TO PREMIUM</div>

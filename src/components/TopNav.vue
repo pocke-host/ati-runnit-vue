@@ -101,7 +101,7 @@
                 <div class="avd-name">{{ user?.displayName }}</div>
                 <div class="avd-email">{{ user?.email }}</div>
               </div>
-              <router-link to="/dashboard" class="avd-link" @click="avatarOpen = false">
+              <router-link :to="role === 'coach' ? '/coach/dashboard' : '/dashboard'" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-grid-3x3-gap"></i> Dashboard
               </router-link>
               <router-link to="/profile/edit" class="avd-link" @click="avatarOpen = false">
@@ -118,9 +118,8 @@
           </div>
         </template>
 
-        <!-- Hamburger (mobile only, unauthenticated) -->
+        <!-- Hamburger (mobile only, all users) -->
         <button
-          v-if="!isAuthenticated"
           class="mobile-menu-toggle"
           @click="mobileMenuOpen = !mobileMenuOpen"
           :aria-expanded="mobileMenuOpen"
@@ -170,9 +169,6 @@
               <router-link to="/coach/athletes" class="drawer-link" @click="mobileMenuOpen = false">
                 <i class="bi bi-people"></i> Athletes
               </router-link>
-              <router-link to="/coaches" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-person-badge"></i> Coach Directory
-              </router-link>
             </template>
             <!-- Athlete drawer links -->
             <template v-else>
@@ -203,18 +199,12 @@
               <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
                 <i class="bi bi-smartwatch"></i> Devices
               </router-link>
-              <router-link v-if="role !== 'coach'" to="/coaches" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-person-badge"></i> Find a Coach
-              </router-link>
             </template>
           </nav>
 
           <div class="drawer-footer">
             <router-link to="/profile/edit" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-person-circle"></i> Edit Profile
-            </router-link>
-            <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-smartwatch"></i> Devices
             </router-link>
             <router-link to="/settings" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-gear"></i> Settings
@@ -389,6 +379,7 @@ onUnmounted(() => {
 }
 
 .navbar-content {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
@@ -399,7 +390,9 @@ onUnmounted(() => {
 
 /* Desktop: brand left, nav-right pushed right */
 .nav-left { display: none; }
-.navbar-brand { text-decoration: none; flex-shrink: 0; }
+.mobile-menu-toggle { display: none; }
+/* Override Bootstrap's .navbar-brand margin-right: 1rem */
+.navbar-brand { text-decoration: none; flex-shrink: 0; margin-right: 0; }
 .nav-right {
   display: flex;
   align-items: center;
@@ -709,21 +702,22 @@ onUnmounted(() => {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
-  /* 3-column grid: [hamburger] [RUNNIT] [icons] */
   .navbar-content {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    align-items: center;
     padding: 0 16px;
   }
   .nav-left {
     display: flex;
     align-items: center;
+    flex: 1;
   }
   .navbar-brand {
-    justify-self: center;
+    flex: 0 0 auto;
   }
   .nav-right {
-    justify-self: end;
+    flex: 1;
+    justify-content: flex-end;
     margin-left: 0;
     gap: 2px;
   }
