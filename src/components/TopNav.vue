@@ -439,8 +439,8 @@ onUnmounted(() => {
 .nav-link.router-link-active { color: white; }
 
 .nav-link-track {
-  background: var(--rk-signal, #C2F542);
-  color: var(--rk-void, #0C0C0C) !important;
+  background: var(--rk-signal, #8B2BE2);
+  color: var(--rk-void, #0D0512) !important;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -449,7 +449,7 @@ onUnmounted(() => {
   margin-left: 6px;
   gap: 7px;
 }
-.nav-link-track:hover { background: #d4ff5a !important; color: var(--rk-void, #0C0C0C) !important; }
+.nav-link-track:hover { background: #d4ff5a !important; color: var(--rk-void, #0D0512) !important; }
 
 /* Notification bell */
 .notif-wrap { position: relative; }

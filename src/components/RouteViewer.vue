@@ -134,7 +134,7 @@ const addRouteLayers = (mapInst, coordinates) => {
   mapInst.addLayer({
     id: 'route-main', type: 'line', source: 'route',
     layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint:  { 'line-color': '#C2F542', 'line-width': 4 }
+    paint:  { 'line-color': '#8B2BE2', 'line-width': 4 }
   })
 }
 
@@ -142,7 +142,7 @@ const addRouteLayers = (mapInst, coordinates) => {
 const makeMarkerEl = (isStart) => {
   const el = document.createElement('div')
   el.style.cssText = isStart
-    ? 'width:14px;height:14px;border-radius:50%;background:#C2F542;border:3px solid #0C0C0C;box-shadow:0 1px 6px rgba(0,0,0,0.30);cursor:default'
+    ? 'width:14px;height:14px;border-radius:50%;background:#8B2BE2;border:3px solid #0D0512;box-shadow:0 1px 6px rgba(0,0,0,0.30);cursor:default'
     : 'width:14px;height:14px;border-radius:50%;background:#0C0C0C;border:3px solid #FFFFFF;box-shadow:0 1px 6px rgba(0,0,0,0.40);cursor:default'
   return el
 }

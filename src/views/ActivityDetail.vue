@@ -876,13 +876,13 @@ onMounted(init)
 
 /* PR Banner */
 .pr-banner {
-  background: var(--rk-signal, #C2F542);
-  border-color: var(--rk-signal, #C2F542) !important;
+  background: var(--rk-signal, #8B2BE2);
+  border-color: var(--rk-signal, #8B2BE2) !important;
 }
 .pr-banner-header {
   font-weight: 900;
   font-size: 1.05rem;
-  color: var(--rk-void, #0C0C0C);
+  color: var(--rk-void, #0D0512);
   margin-bottom: 12px;
 }
 .pr-pills {
@@ -899,7 +899,7 @@ onMounted(init)
   padding: 6px 14px;
   font-size: 0.82rem;
   font-weight: 900;
-  color: var(--rk-void, #0C0C0C);
+  color: var(--rk-void, #0D0512);
 }
 
 /* Utilities */

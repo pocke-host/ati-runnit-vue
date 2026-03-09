@@ -398,7 +398,7 @@ onMounted(async () => {
   opacity: 1;
   box-shadow: none;
   border-color: #000;
-  border-left: 3px solid var(--rk-signal, #C2F542);
+  border-left: 3px solid var(--rk-signal, #8B2BE2);
 }
 .pr-card.pr-card-set:hover { transform: none; }
 
@@ -415,8 +415,8 @@ onMounted(async () => {
   margin-bottom: 2px;
 }
 .pr-card.pr-card-set .pr-icon-wrap {
-  background: var(--rk-signal, #C2F542);
-  color: var(--rk-void, #0C0C0C);
+  background: var(--rk-signal, #8B2BE2);
+  color: var(--rk-void, #0D0512);
 }
 .pr-label {
   font-weight: 900;

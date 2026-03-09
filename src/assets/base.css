@@ -1,13 +1,12 @@
 /*
-  RUNNIT — KINETIC BRAND SYSTEM
-  ─────────────────────────────
+  RUNNIT — BRAND SYSTEM
+  ─────────────────────
   Philosophy: Performance data is the identity.
   One accent color. No gradients. No shadows. Data is always the hero.
 
-  Signal color — #C2F542 "Electric Lime"
-    → The color of high-visibility running gear
-    → The color of a GPS lock indicator
-    → The color of race timing boards
+  Signal color — #8B2BE2 "Electric Violet"
+    → Completely unclaimed in the running/fitness space
+    → Nike owns volt green. Strava owns orange. RUNNIT owns violet.
     → Used ONLY for: primary CTAs, active tracking state, PRs
     → Maximum ONE signal element per viewport
 */
@@ -17,10 +16,10 @@
   --nav-h: 64px;
   --tab-h: 64px;
 
-  /* ── RUNNIT Kinetic Palette ── */
-  --rk-void:    #0C0C0C;   /* near-black — richer than pure #000 */
+  /* ── RUNNIT Palette ── */
+  --rk-void:    #0D0512;   /* near-black with violet depth */
   --rk-paper:   #F8F8F6;   /* warm white — not clinical */
-  --rk-signal:  #C2F542;   /* electric lime — the ONLY accent */
+  --rk-signal:  #8B2BE2;   /* electric violet — the ONLY accent */
   --rk-carbon:  #1A1A1A;   /* dark surface (hero, nav) */
   --rk-ash:     #888888;   /* secondary text, labels */
   --rk-rule:    #E2E2E0;   /* borders, dividers */

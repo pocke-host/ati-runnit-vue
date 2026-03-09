@@ -598,7 +598,7 @@ onMounted(() => {
 }
 .plan-badge-level.beginner     { background: #f0f0f0; color: #555; }
 .plan-badge-level.intermediate { background: #1a1a1a; color: #fff; }
-.plan-badge-level.advanced     { background: var(--rk-void, #0C0C0C); color: var(--rk-signal, #C2F542); }
+.plan-badge-level.advanced     { background: var(--rk-void, #0D0512); color: var(--rk-signal, #8B2BE2); }
 .plan-badge-active { background: rgba(0,0,0,0.08); color: #000; }
 
 .plan-name { font-weight: 900; font-size: 1.05rem; margin: 0 0 4px; color: rgba(15,18,16,0.92); }

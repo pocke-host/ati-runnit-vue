@@ -244,7 +244,7 @@ onMounted(async () => {
 <style scoped>
 .home-page {
   background: #fff;
-  color: #0D0512;
+  color: var(--rk-void, #0D0512);
   padding-top: var(--nav-h, 64px);
 }
 
@@ -297,7 +297,7 @@ onMounted(async () => {
   align-items: center;
   padding: 16px 48px;
   border-radius: 0;
-  background: #0D0512;
+  background: var(--rk-void, #0D0512);
   color: #fff;
   font-weight: 600;
   font-size: 0.78rem;
@@ -305,12 +305,12 @@ onMounted(async () => {
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid #0D0512;
+  border: 2px solid var(--rk-void, #0D0512);
   cursor: pointer;
 }
 .btn-cta:hover {
-  background: #1e0a38;
-  border-color: #1e0a38;
+  background: #2a1a4a;
+  border-color: #2a1a4a;
   color: #fff;
   text-decoration: none;
 }
@@ -321,31 +321,31 @@ onMounted(async () => {
   padding: 16px 48px;
   border-radius: 0;
   background: transparent;
-  color: #0D0512;
+  color: var(--rk-void, #0D0512);
   font-weight: 600;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid #0D0512;
+  border: 2px solid var(--rk-void, #0D0512);
   cursor: pointer;
 }
 .btn-cta-ghost:hover {
-  background: #0D0512;
+  background: var(--rk-void, #0D0512);
   color: #fff;
   text-decoration: none;
 }
 
 .btn-cta-light {
-  background: #8B2BE2;
+  background: var(--rk-signal, #8B2BE2);
   color: #fff;
-  border: 2px solid #8B2BE2;
+  border: 2px solid var(--rk-signal, #8B2BE2);
 }
 .btn-cta-light:hover {
-  background: #a855f7;
+  background: var(--rk-signal, #8B2BE2);
   border-color: #d4ff5a;
-  color: #0D0512;
+  color: var(--rk-void, #0D0512);
 }
 
 /* ── STATS BAR ── */
@@ -438,7 +438,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #8B2BE2;
+  color: var(--rk-signal, #8B2BE2);
   margin-top: 4px;
   flex-shrink: 0;
 }
@@ -506,7 +506,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #8B2BE2;
+  color: var(--rk-signal, #8B2BE2);
   margin-bottom: 16px;
 }
 

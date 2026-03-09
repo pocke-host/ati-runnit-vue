@@ -214,7 +214,7 @@ const initializeMap = () => {
       type: 'line',
       source: 'route',
       layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: { 'line-color': '#C2F542', 'line-width': 4 },
+      paint: { 'line-color': '#8B2BE2', 'line-width': 4 },
     })
 
     // Start marker circle
@@ -228,9 +228,9 @@ const initializeMap = () => {
       source: 'start-point',
       paint: {
         'circle-radius': 7,
-        'circle-color': '#C2F542',
+        'circle-color': '#8B2BE2',
         'circle-stroke-width': 2.5,
-        'circle-stroke-color': '#0C0C0C',
+        'circle-stroke-color': '#0D0512',
       },
     })
 
