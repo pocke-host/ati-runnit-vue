@@ -3,7 +3,7 @@
     <StoriesViewer />
     <!-- Loading State -->
     <div v-if="!user" class="loading-screen">
-      <div class="spinner-border text-primary" role="status"></div>
+      <div class="dash-loader"></div>
       <p>Loading dashboard...</p>
     </div>
 
@@ -29,42 +29,29 @@
         </div>
       </header>
 
-      <!-- HERO STATS -->
-      <section class="hero-stats">
-        <div class="stat-card stat-card-primary">
-          <div class="stat-icon-bs"><i class="bi bi-lightning-charge-fill"></i></div>
-          <div class="stat-content">
-            <div class="stat-label">Total Distance</div>
-            <div class="stat-value">{{ formatDistance(totalStats.distance) }}</div>
-            <div v-if="monthCompare" :class="['stat-change', monthCompare.startsWith('+') ? 'positive' : 'negative']">{{ monthCompare }}</div>
+      <!-- PERF STRIP -->
+      <section class="perf-strip">
+        <div class="perf-cell">
+          <div class="perf-label">Total Distance</div>
+          <div class="perf-num">{{ formatDistance(totalStats.distance) }}</div>
+          <div class="perf-change" :class="{ 'perf-change--up': monthCompare && monthCompare.startsWith('+'), 'perf-change--down': monthCompare && !monthCompare.startsWith('+') }">
+            {{ monthCompare || 'All time' }}
           </div>
         </div>
-
-        <div class="stat-card stat-card-secondary">
-          <div class="stat-icon-bs"><i class="bi bi-clock-fill"></i></div>
-          <div class="stat-content">
-            <div class="stat-label">Total Time</div>
-            <div class="stat-value">{{ totalStats.duration }} <span class="unit">hrs</span></div>
-            <div class="stat-change positive">This month</div>
-          </div>
+        <div class="perf-cell">
+          <div class="perf-label">Total Time</div>
+          <div class="perf-num">{{ totalStats.duration }}<span class="perf-unit">hrs</span></div>
+          <div class="perf-change">All activities</div>
         </div>
-
-        <div class="stat-card stat-card-accent">
-          <div class="stat-icon-bs"><i class="bi bi-fire"></i></div>
-          <div class="stat-content">
-            <div class="stat-label">Current Streak</div>
-            <div class="stat-value">{{ totalStats.streak }} <span class="unit">days</span></div>
-            <div class="stat-change">Keep it going!</div>
-          </div>
+        <div class="perf-cell">
+          <div class="perf-label">Day Streak</div>
+          <div class="perf-num">{{ totalStats.streak }}<span class="perf-unit">days</span></div>
+          <div class="perf-change">Keep going</div>
         </div>
-
-        <div class="stat-card stat-card-info">
-          <div class="stat-icon-bs"><i class="bi bi-people-fill"></i></div>
-          <div class="stat-content">
-            <div class="stat-label">Following</div>
-            <div class="stat-value">{{ friendsCount }}</div>
-            <div class="stat-change">Friends</div>
-          </div>
+        <div class="perf-cell">
+          <div class="perf-label">Following</div>
+          <div class="perf-num">{{ friendsCount }}</div>
+          <div class="perf-change">Athletes</div>
         </div>
       </section>
 
@@ -874,12 +861,12 @@ const sportBreakdown = computed(() => {
   const acts = activities.value || []
   const breakdown = {}
   const colors = {
-    RUN: '#4A5E3F',
-    BIKE: '#1E2B1A',
-    SWIM: '#4A9ECC',
-    HIKE: '#8B7355',
-    WALK: '#A3A69F',
-    OTHER: '#6B5B95'
+    RUN: '#000000',
+    BIKE: '#404040',
+    SWIM: '#707070',
+    HIKE: '#A0A0A0',
+    WALK: '#C8C8C8',
+    OTHER: '#E0E0E0'
   }
   
   acts.forEach(a => {
@@ -1168,10 +1155,10 @@ const initWeeklyChart = () => {
       datasets: [{
         label: chartView.value === 'distance' ? `Distance (${distanceLabel.value})` : 'Duration (min)',
         data: weeklyChartData.value,
-        backgroundColor: 'rgba(196, 106, 42, 0.8)',
-        borderColor: 'rgba(196, 106, 42, 1)',
-        borderWidth: 2,
-        borderRadius: 8
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        borderColor: 'rgba(0,0,0,1)',
+        borderWidth: 1,
+        borderRadius: 0
       }]
     },
     options: {
@@ -1237,13 +1224,13 @@ const initProgressChart = () => {
       datasets: [{
         label: 'Distance',
         data: [15, 28, 42, parseFloat(monthlyDistance.value)],
-        borderColor: '#4A5E3F',
-        backgroundColor: 'rgba(74, 94, 63, 0.08)',
-        tension: 0.4,
+        borderColor: '#000',
+        backgroundColor: 'rgba(0,0,0,0.04)',
+        tension: 0.3,
         fill: true,
-        borderWidth: 3,
-        pointRadius: 5,
-        pointBackgroundColor: '#4A5E3F'
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: '#000'
       }, {
         label: 'Goal',
         data: [25, 50, 75, 100],
@@ -1496,27 +1483,22 @@ onMounted(async () => {
 /* Keep all other existing styles */
 .dash{--r-olive:#4A5E3F;--r-olive-deep:#1E2B1A;--r-black:#0F1210;--r-stone:#A3A69F;--r-warm-gray:#6B6B6B;--r-offwhite:#FFFFFF;--r-white:#FFFFFF;--r-accent:#B85C20;--r-border:rgba(15,18,16,0.10);--r-shadow-sm:0 2px 12px rgba(15,18,16,0.06);--r-shadow:0 8px 32px rgba(15,18,16,0.10);min-height:100vh;padding-top:90px;background:#fff;font-family:Futura,"Futura PT","Futura Std","Avenir Next",Avenir,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:rgba(15,18,16,0.92)}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:rgba(15,18,16,0.70)}
+.dash-loader{width:32px;height:32px;border:2px solid rgba(15,18,16,0.10);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .wrap{max-width:1400px;margin:0 auto;padding:26px 20px 56px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px}
 .brandline{display:flex;align-items:center;gap:10px}
 .status-dot{width:10px;height:10px;border-radius:0;background:#000}
 .kicker{letter-spacing:.18em;font-weight:900;font-size:.78rem;color:rgba(15,18,16,0.70)}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap}
-.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:32px}
-.stat-card{background:#fff;border:1px solid #E5E5E5;border-radius:0;padding:24px;display:flex;gap:18px;align-items:center;box-shadow:none;transition:box-shadow 0.2s,transform 0.2s}
-.stat-card:hover{transform:none;box-shadow:none}
-.stat-card-primary{border-bottom:1px solid #E5E5E5}
-.stat-card-secondary{border-bottom:1px solid #E5E5E5}
-.stat-card-accent{border-bottom:1px solid #E5E5E5}
-.stat-card-info{border-bottom:1px solid #E5E5E5}
-.stat-icon{font-size:2.5rem;line-height:1}
-.stat-icon-bs{width:44px;height:44px;border-radius:0;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#767676;font-size:1.2rem;flex-shrink:0}
-.stat-content{flex:1}
-.stat-label{font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(15,18,16,0.60);margin-bottom:6px}
-.stat-value{font-size:2.2rem;font-weight:900;line-height:1;color:rgba(15,18,16,0.92)}
-.stat-value .unit{font-size:1.2rem;font-weight:600;color:rgba(15,18,16,0.50);margin-left:4px}
-.stat-change{font-size:0.8rem;font-weight:600;margin-top:6px}
-.stat-change.positive{color:#10b981}.stat-change.negative{color:#ef4444}
+.perf-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #E5E5E5;margin-bottom:32px;background:#E5E5E5;gap:1px}
+.perf-cell{background:#fff;padding:28px 24px;display:flex;flex-direction:column}
+.perf-label{font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(15,18,16,0.40);margin-bottom:8px}
+.perf-num{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-0.03em;line-height:1;color:#000;display:flex;align-items:baseline;gap:4px}
+.perf-unit{font-size:0.9rem;font-weight:600;color:rgba(15,18,16,0.40);margin-left:4px}
+.perf-change{font-size:0.73rem;font-weight:600;color:rgba(15,18,16,0.38);margin-top:6px}
+.perf-change--up{color:#000}
+.perf-change--down{color:rgba(15,18,16,0.45)}
 .dashboard-grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
 .charts-section{display:flex;flex-direction:column;gap:24px}
 .sidebar-section{display:flex;flex-direction:column;gap:24px}
@@ -1542,7 +1524,7 @@ onMounted(async () => {
 .metric-label{font-size:0.75rem;color:rgba(15,18,16,0.60);display:block;margin-top:2px}
 .profile-card{background:#fff;border:1px solid #E5E5E5;border-radius:0;padding:24px;box-shadow:none}
 .profile-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08)}
-.avatar-large{width:64px;height:64px;border-radius:50%;background:#000;border:2px solid var(--r-border);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.7rem;color:white}
+.avatar-large{width:64px;height:64px;background:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.7rem;color:white}
 .profile-info{flex:1}
 .profile-name{font-weight:900;font-size:1.15rem;margin-bottom:4px}
 .profile-email{font-size:0.85rem;color:rgba(15,18,16,0.60)}
@@ -1656,7 +1638,7 @@ onMounted(async () => {
 .duration-field .form-control{flex:1}
 .duration-unit{font-size:0.85rem;font-weight:700;color:rgba(15,18,16,0.50);white-space:nowrap}
 textarea.form-control{resize:vertical;min-height:72px}
-@media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}}
+@media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}.perf-strip{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
-@media (max-width:768px){.hero-stats{grid-template-columns:1fr}.topbar{flex-direction:column;align-items:flex-start}.top-actions{width:100%}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
+@media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.topbar{flex-direction:column;align-items:flex-start}.top-actions{width:100%}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
 </style>
