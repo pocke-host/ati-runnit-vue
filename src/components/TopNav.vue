@@ -383,8 +383,8 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: #000000;
-  border-bottom: none;
+  background: var(--rk-void, #0D0512);
+  border-bottom: 1px solid rgba(139,43,226,0.20);
   box-shadow: none;
 }
 
@@ -449,7 +449,7 @@ onUnmounted(() => {
   margin-left: 6px;
   gap: 7px;
 }
-.nav-link-track:hover { background: #d4ff5a !important; color: var(--rk-void, #0D0512) !important; }
+.nav-link-track:hover { background: #7722CC !important; color: #fff !important; }
 
 /* Notification bell */
 .notif-wrap { position: relative; }
@@ -751,7 +751,7 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   width: min(320px, 85vw);
-  background: #000000;
+  background: var(--rk-void, #0D0512);
   z-index: 9999;
   display: flex;
   flex-direction: column;

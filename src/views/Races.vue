@@ -477,7 +477,7 @@ watch(zipcode, () => {
   --r-black: #000;
   --r-border: #E5E5E5;
   min-height: 100vh;
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   font-family: Futura, "Futura PT", "Avenir Next", system-ui, sans-serif;
 }
 

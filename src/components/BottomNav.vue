@@ -90,9 +90,9 @@ const userId = computed(() => user.value?.id)
   line-height: 1;
 }
 
-/* Active state — black underline */
+/* Active state — violet */
 .tab-active {
-  color: #000000;
+  color: var(--rk-signal, #8B2BE2);
 }
 
 /* Track center tab */
@@ -109,7 +109,7 @@ const userId = computed(() => user.value?.id)
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--rk-void, #0D0512);
+  color: #fff;
   font-size: 1.3rem;
   margin-top: -16px; /* rises above bar */
   box-shadow: none;

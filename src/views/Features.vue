@@ -322,7 +322,7 @@ const devices = ['Garmin', 'Apple Watch', 'COROS', 'Wahoo', 'Suunto', 'Zwift', '
 <style scoped>
 .features-page {
   min-height: 100vh;
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   font-family: "Futura PT", Futura, "Century Gothic", "Trebuchet MS", system-ui, sans-serif;
   overflow-x: hidden;
 }

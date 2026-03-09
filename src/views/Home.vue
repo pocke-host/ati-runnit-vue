@@ -243,7 +243,7 @@ onMounted(async () => {
 
 <style scoped>
 .home-page {
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   color: var(--rk-void, #0D0512);
   padding-top: var(--nav-h, 64px);
 }
@@ -251,7 +251,7 @@ onMounted(async () => {
 /* ── HERO ── */
 .hero {
   padding: 140px 0 120px;
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -297,7 +297,7 @@ onMounted(async () => {
   align-items: center;
   padding: 16px 48px;
   border-radius: 0;
-  background: var(--rk-void, #0D0512);
+  background: var(--rk-signal, #8B2BE2);
   color: #fff;
   font-weight: 600;
   font-size: 0.78rem;
@@ -305,12 +305,12 @@ onMounted(async () => {
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid var(--rk-void, #0D0512);
+  border: 2px solid var(--rk-signal, #8B2BE2);
   cursor: pointer;
 }
 .btn-cta:hover {
-  background: #2a1a4a;
-  border-color: #2a1a4a;
+  background: #7722CC;
+  border-color: #7722CC;
   color: #fff;
   text-decoration: none;
 }
@@ -321,18 +321,18 @@ onMounted(async () => {
   padding: 16px 48px;
   border-radius: 0;
   background: transparent;
-  color: var(--rk-void, #0D0512);
+  color: var(--rk-signal, #8B2BE2);
   font-weight: 600;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid var(--rk-void, #0D0512);
+  border: 2px solid var(--rk-signal, #8B2BE2);
   cursor: pointer;
 }
 .btn-cta-ghost:hover {
-  background: var(--rk-void, #0D0512);
+  background: var(--rk-signal, #8B2BE2);
   color: #fff;
   text-decoration: none;
 }
@@ -343,14 +343,14 @@ onMounted(async () => {
   border: 2px solid var(--rk-signal, #8B2BE2);
 }
 .btn-cta-light:hover {
-  background: var(--rk-signal, #8B2BE2);
-  border-color: #d4ff5a;
-  color: var(--rk-void, #0D0512);
+  background: #7722CC;
+  border-color: #7722CC;
+  color: #fff;
 }
 
 /* ── STATS BAR ── */
 .stats-bar {
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   border-bottom: 1px solid #E5E5E5;
   padding: 56px 0;
 }
@@ -412,7 +412,7 @@ onMounted(async () => {
 /* ── PILLARS ── */
 .pillars {
   padding: 0;
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -534,7 +534,7 @@ onMounted(async () => {
 
 /* ── STATEMENT ── */
 .statement {
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   border-bottom: 1px solid #E5E5E5;
   padding: 100px 0;
 }
@@ -562,7 +562,7 @@ onMounted(async () => {
 /* ── CAPABILITIES ── */
 .capabilities {
   padding: 100px 0;
-  background: #fff;
+  background: var(--rk-paper, #FAF8FF);
   border-bottom: 1px solid #E5E5E5;
 }
 
