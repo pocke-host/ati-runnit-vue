@@ -233,7 +233,7 @@ const handleLogout = () => {
 <style scoped>
 .settings-page {
   min-height: 100vh;
-  background: var(--rk-paper, #F6F1E8);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -399,7 +399,7 @@ const handleLogout = () => {
   padding: 10px 14px;
   border: 1px solid #E5E5E5;
   border-radius: 0;
-  background: var(--rk-paper, #F6F1E8);
+  background: #fff;
   font-family: inherit;
   font-size: 0.95rem;
   cursor: not-allowed;

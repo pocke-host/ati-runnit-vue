@@ -27,7 +27,7 @@
   
   <style scoped>
   .tracker-page {
-    background: var(--rk-paper, #F6F1E8);
+    background: #fff;
   }
   
   .page-container {

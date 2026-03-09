@@ -625,7 +625,7 @@ onMounted(() => {
 /* ===== Design Tokens ===== */
 .clubs-page {
   font-family: Futura, "Avenir Next", system-ui, -apple-system, sans-serif;
-  background: var(--rk-paper, #F6F1E8);
+  background: #fff;
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
 }

@@ -58,7 +58,7 @@ const articles = [
 
 <style scoped>
 .support-page {
-  background: var(--rk-paper, #F6F1E8);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   padding-top: var(--nav-h, 64px);

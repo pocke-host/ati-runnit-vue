@@ -383,7 +383,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--rk-void, #14102A);
+  background: #000000;
   border-bottom: none;
   box-shadow: none;
 }
@@ -439,8 +439,8 @@ onUnmounted(() => {
 .nav-link.router-link-active { color: white; }
 
 .nav-link-track {
-  background: var(--rk-signal, #C8872A);
-  color: var(--rk-void, #14102A) !important;
+  background: var(--rk-signal, #C2F542);
+  color: var(--rk-void, #0C0C0C) !important;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -449,7 +449,7 @@ onUnmounted(() => {
   margin-left: 6px;
   gap: 7px;
 }
-.nav-link-track:hover { background: #d4ff5a !important; color: var(--rk-void, #14102A) !important; }
+.nav-link-track:hover { background: #d4ff5a !important; color: var(--rk-void, #0C0C0C) !important; }
 
 /* Notification bell */
 .notif-wrap { position: relative; }
@@ -744,14 +744,14 @@ onUnmounted(() => {
   z-index: 9998;
 }
 
-/* Drawer panel — deep indigo */
+/* Drawer panel — flat black */
 .mobile-drawer {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   width: min(320px, 85vw);
-  background: var(--rk-void, #14102A);
+  background: #000000;
   z-index: 9999;
   display: flex;
   flex-direction: column;
