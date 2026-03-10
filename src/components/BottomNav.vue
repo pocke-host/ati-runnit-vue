@@ -46,14 +46,15 @@ const userId = computed(() => user.value?.id)
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--tab-h, 64px);
+  height: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 900;
   background: #fff;
   border-top: 1px solid #E5E5E5;
   box-shadow: none;
   align-items: center;
   justify-content: space-around;
-  padding: 0 8px;
+  padding: 0 8px env(safe-area-inset-bottom, 0px);
   font-family: Futura, "Avenir Next", system-ui, sans-serif;
 }
 
@@ -69,6 +70,7 @@ const userId = computed(() => user.value?.id)
   gap: 3px;
   flex: 1;
   padding: 8px 4px;
+  min-height: var(--tab-h, 64px);
   text-decoration: none;
   color: #A3A69F;
   transition: color 0.15s;
@@ -83,7 +85,7 @@ const userId = computed(() => user.value?.id)
 }
 
 .tab-label {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;

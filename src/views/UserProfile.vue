@@ -757,7 +757,7 @@ onMounted(init)
   text-align: center;
   padding: 14px 8px;
 }
-.act-stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(15,18,16,0.50); margin-bottom: 4px; }
+.act-stat-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(15,18,16,0.50); margin-bottom: 4px; }
 .act-stat-val { font-weight: 900; font-size: 1rem; color: rgba(15,18,16,0.90); }
 
 .load-more-row {
@@ -829,8 +829,8 @@ onMounted(init)
   top: 14px;
   right: 14px;
   z-index: 10;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255,255,255,0.95);
   border: 1px solid #E5E5E5;
@@ -918,11 +918,11 @@ onMounted(init)
 }
 .pbadge-icon { font-size: 1.8rem; line-height: 1; }
 .pbadge-name { font-weight: 900; font-size: 0.88rem; color: rgba(15,18,16,0.90); line-height: 1.2; }
-.pbadge-desc { font-size: 0.70rem; color: rgba(15,18,16,0.50); font-weight: 600; }
+.pbadge-desc { font-size: 0.75rem; color: rgba(15,18,16,0.50); font-weight: 600; }
 .pbadge-tier-pill {
   padding: 2px 9px;
   border-radius: 0;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -948,5 +948,14 @@ onMounted(init)
   .moment-modal-inner { grid-template-columns: 1fr; }
   .moment-modal-img { max-height: 300px; }
   .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .avatar-xl { width: 72px; height: 72px; font-size: 1.8rem; }
+  .hero-name { font-size: 1.5rem; }
+  .hero-actions { flex-direction: column; gap: 8px; width: 100%; }
+  .ctab { width: 100%; justify-content: center; }
+  .activities-grid { grid-template-columns: 1fr; }
+  .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }
 </style>

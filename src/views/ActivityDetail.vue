@@ -493,6 +493,7 @@ onMounted(init)
   border: 1px solid rgba(255,255,255,0.25);
   color: white;
   border-radius: 0;
+  min-height: 44px;
   padding: 8px 16px;
   font-weight: 700;
   font-size: 0.9rem;
@@ -651,7 +652,7 @@ onMounted(init)
   padding: 18px 12px;
 }
 .stat-label {
-  font-size: 0.70rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -673,7 +674,7 @@ onMounted(init)
 }
 .det-card-top .det-section-title { margin: 0; }
 .workout-type-chip {
-  font-size: 0.70rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -699,7 +700,7 @@ onMounted(init)
   border-top: 1px solid #E5E5E5;
 }
 .notes-label {
-  font-size: 0.70rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -834,7 +835,7 @@ onMounted(init)
   margin-bottom: 4px;
 }
 .comment-author { font-weight: 900; font-size: 0.85rem; color: rgba(15,18,16,0.85); }
-.comment-time { font-size: 0.72rem; color: rgba(15,18,16,0.45); }
+.comment-time { font-size: 0.75rem; color: rgba(15,18,16,0.45); }
 .comment-text { margin: 0; font-size: 0.88rem; color: rgba(15,18,16,0.75); line-height: 1.5; }
 
 /* Comment form */
@@ -858,8 +859,8 @@ onMounted(init)
 .comment-input:focus { border-color: #000; }
 .comment-input:disabled { opacity: 0.5; }
 .comment-submit {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 0;
   background: #000;
   border: none;
@@ -929,5 +930,12 @@ onMounted(init)
   .detail-layout { padding: 20px 16px 48px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .top-date { display: none; }
+}
+
+@media (max-width: 480px) {
+  .top-bar { padding: 12px 16px; }
+  .user-row-wrap { padding: 0 16px; }
+  .detail-layout { padding: 16px 12px 64px; }
+  .reaction-btn { padding: 10px 14px; font-size: 0.78rem; }
 }
 </style>
