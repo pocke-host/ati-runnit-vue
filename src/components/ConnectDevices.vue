@@ -40,6 +40,36 @@
         </template>
       </div>
 
+      <!-- Strava -->
+      <div class="device-card">
+        <div class="device-icon">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg" alt="Strava" class="brand-logo" />
+        </div>
+        <h3>Strava</h3>
+        <p>Automatically import every run, ride, and swim you log on Strava</p>
+
+        <template v-if="!stravaConnected">
+          <button class="btn btn-strava" @click="connectStrava" :disabled="loading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+            Connect Strava
+          </button>
+        </template>
+        <template v-else>
+          <div class="connected-state">
+            <div class="connected-chip">
+              <span class="green-dot"></span>
+              CONNECTED
+            </div>
+            <div class="last-sync-label">Last synced: {{ relativeTime(stravaLastSync) }}</div>
+            <button class="btn btn-primary" @click="syncStrava" :disabled="syncing">
+              <span v-if="syncing" class="spinner"></span>
+              {{ syncing ? 'Syncing…' : 'Sync Now' }}
+            </button>
+            <button class="btn-disconnect" @click="disconnectStrava">Disconnect</button>
+          </div>
+        </template>
+      </div>
+
       <!-- Zwift -->
       <div class="device-card">
         <div class="device-icon">🚴</div>
@@ -107,11 +137,15 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const garminConnected = ref(false)
 const garminLastSync = ref(null)
+const stravaConnected = ref(false)
+const stravaLastSync = ref(null)
 const zwiftConnected = ref(false)
 const loading = ref(false)
 const syncing = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
+
+const STRAVA_CLIENT_ID = import.meta.env.VITE_STRAVA_CLIENT_ID
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -138,13 +172,18 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, zwiftRes] = await Promise.all([
+  const [garminRes, stravaRes, zwiftRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
+    safeFetch(`${API_URL}/integrations/strava/status`),
     safeFetch(`${API_URL}/integrations/zwift/status`),
   ])
   if (garminRes) {
     garminConnected.value = garminRes.data.connected
     garminLastSync.value = garminRes.data.lastSync || null
+  }
+  if (stravaRes) {
+    stravaConnected.value = stravaRes.data.connected
+    stravaLastSync.value = stravaRes.data.lastSync || null
   }
   if (zwiftRes) {
     zwiftConnected.value = zwiftRes.data.connected
@@ -192,6 +231,43 @@ const syncNow = async () => {
   }
 }
 
+const connectStrava = () => {
+  const redirectUri = `${API_URL}/integrations/strava/callback`
+  const params = new URLSearchParams({
+    client_id: STRAVA_CLIENT_ID,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'activity:read_all',
+    approval_prompt: 'auto',
+  })
+  window.location.href = `https://www.strava.com/oauth/authorize?${params}`
+}
+
+const disconnectStrava = async () => {
+  if (!confirm('Disconnect Strava? New activities will no longer sync.')) return
+  try {
+    await axios.delete(`${API_URL}/integrations/strava/disconnect`, { headers: getAuthHeaders() })
+    stravaConnected.value = false
+    stravaLastSync.value = null
+    showStatus('Strava disconnected.')
+  } catch {
+    showStatus('Failed to disconnect Strava.', 'error')
+  }
+}
+
+const syncStrava = async () => {
+  syncing.value = true
+  try {
+    await axios.post(`${API_URL}/integrations/strava/sync`, {}, { headers: getAuthHeaders() })
+    showStatus('Strava sync triggered — activities will appear shortly.')
+    await checkConnectionStatus()
+  } catch {
+    showStatus('Sync failed. Please try again.', 'error')
+  } finally {
+    syncing.value = false
+  }
+}
+
 const connectZwift = async () => {
   loading.value = true
   try {
@@ -226,6 +302,9 @@ onMounted(() => {
   if (params.get('garmin') === 'connected') {
     garminConnected.value = true
     showStatus('Garmin connected successfully!')
+  } else if (params.get('strava') === 'connected') {
+    stravaConnected.value = true
+    showStatus('Strava connected! Your activities will sync automatically.')
   } else if (params.get('zwift') === 'connected') {
     zwiftConnected.value = true
     showStatus('Zwift connected successfully!')
@@ -233,7 +312,7 @@ onMounted(() => {
     showStatus('Connection failed. Please try again.', 'error')
   }
 
-  if (params.has('garmin') || params.has('zwift') || params.has('error')) {
+  if (params.has('garmin') || params.has('strava') || params.has('zwift') || params.has('error')) {
     history.replaceState({}, '', window.location.pathname)
   }
 })
@@ -409,6 +488,22 @@ onMounted(() => {
   letter-spacing: 0.08em;
   color: rgba(15,18,16,0.45);
 }
+
+.btn-strava {
+  background: #FC4C02;
+  border-color: #FC4C02;
+  color: #fff;
+}
+.btn-strava:hover:not(:disabled) {
+  background: #e04400;
+  border-color: #e04400;
+}
+.brand-logo {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+}
+.device-icon img { display: block; margin: 0 auto; }
 
 .btn-disconnect {
   background: none;
