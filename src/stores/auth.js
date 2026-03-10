@@ -50,6 +50,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(email, password) {
     const { data } = await axios.post(`${API_URL}/auth/login`, { email, password })
     setAuth(data.token, data.user)
+    // Restore onboarding/role/subscription state from the server profile.
+    // The login response may not include onboardingComplete, so we fetch it.
+    try { await fetchCurrentUser() } catch { /* silent — setAuth data is still valid */ }
   }
 
   async function register(email, password, displayName, userRole = 'athlete') {

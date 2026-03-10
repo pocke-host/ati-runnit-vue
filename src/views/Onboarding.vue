@@ -350,6 +350,7 @@ async function goToCoachDashboard() {
     sportsCoached: coachSelections.sports,
     athleteCount: coachSelections.athleteCount,
   }).catch(() => {})
+  sessionStorage.removeItem('needs_onboarding')
   authStore.completeOnboarding()
   router.push('/coach/dashboard')
 }
@@ -366,6 +367,7 @@ async function goToDashboard() {
     trainingDays: selections.days,
   }).catch(() => {})
 
+  sessionStorage.removeItem('needs_onboarding')
   authStore.completeOnboarding()
   router.push('/dashboard')
 }

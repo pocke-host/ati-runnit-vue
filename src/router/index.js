@@ -72,16 +72,17 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const onboardingDone = localStorage.getItem('onboarding_complete') === 'true'
+  const needsOnboarding = sessionStorage.getItem('needs_onboarding') === 'true'
   const userRole = localStorage.getItem('userRole') || 'athlete'
   const homeDash = userRole === 'coach' ? '/coach/dashboard' : '/dashboard'
 
   if (to.meta.requiresAuth && !token) return next('/join-us')
 
   // Already-onboarded users must not be able to revisit /onboard
-  if (to.path === '/onboard' && token && onboardingDone) return next(homeDash)
+  if (to.path === '/onboard' && token && !needsOnboarding) return next(homeDash)
 
-  // New authenticated users must complete onboarding first
-  if (token && !onboardingDone && to.meta.requiresAuth && to.path !== '/onboard') {
+  // Only send to onboarding if this session was started by a fresh registration
+  if (token && needsOnboarding && to.meta.requiresAuth && to.path !== '/onboard') {
     return next('/onboard')
   }
 

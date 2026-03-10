@@ -208,6 +208,7 @@ const submit = async () => {
   
   try {
     await authStore.register(email.value, password.value, displayName.value, role.value)
+    sessionStorage.setItem('needs_onboarding', 'true')
     router.push('/onboard')
   } catch (e) {
     error.value = e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
