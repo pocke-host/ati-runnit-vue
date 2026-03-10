@@ -171,7 +171,7 @@ const initializeMap = () => {
 
   map.value = new mapboxgl.Map({
     container: liveMapContainer.value,
-    style: 'mapbox://styles/mapbox/outdoors-v12',
+    style: 'mapbox://styles/quinn-runnit/cmml6ynyy000701suetifc5y0',
     zoom: savedLng === -98.5 ? 3.5 : 13,
     center: [savedLng, savedLat],
     attributionControl: false,

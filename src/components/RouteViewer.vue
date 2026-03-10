@@ -76,17 +76,16 @@ const mapContainer = ref(null)
 const map          = ref(null)
 const loading      = ref(true)
 const error        = ref(null)
-const currentStyle = ref('outdoors')
+const currentStyle = ref('runnit')
 
 // ── Style definitions ──────────────────────────────
 const MAP_STYLES = {
-  outdoors:  { url: 'mapbox://styles/mapbox/outdoors-v12',          label: 'Terrain' },
-  satellite: { url: 'mapbox://styles/mapbox/satellite-streets-v12', label: 'Satellite' },
-  navDay:    { url: 'mapbox://styles/mapbox/navigation-day-v1',     label: 'Streets' },
-  dark:      { url: 'mapbox://styles/mapbox/dark-v11',              label: 'Night' },
+  runnit:    { url: 'mapbox://styles/quinn-runnit/cmml6ynyy000701suetifc5y0', label: 'Runnit' },
+  satellite: { url: 'mapbox://styles/mapbox/satellite-streets-v12',           label: 'Satellite' },
+  dark:      { url: 'mapbox://styles/mapbox/dark-v11',                        label: 'Night' },
 }
 
-const STYLE_ORDER = ['outdoors', 'satellite', 'navDay', 'dark']
+const STYLE_ORDER = ['runnit', 'satellite', 'dark']
 
 const currentStyleLabel = computed(() => MAP_STYLES[currentStyle.value].label)
 const nextStyleLabel    = computed(() => {
