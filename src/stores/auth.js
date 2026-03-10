@@ -97,6 +97,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function updateAvatar(url) {
+    if (!user.value) return
+    user.value = { ...user.value, avatarUrl: url }
+    localStorage.setItem('user', JSON.stringify(user.value))
+  }
+
   function logout() {
     token.value = null
     user.value = null
@@ -120,6 +126,6 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token, user, isAuthenticated, unitSystem, onboardingComplete,
     subscriptionTier, subscriptionStatus, role,
-    login, register, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding
+    login, register, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding, updateAvatar
   }
 })

@@ -27,8 +27,33 @@
         <!-- Avatar section -->
         <div class="pe-card pe-avatar-card">
           <div class="pe-section-label">PHOTO</div>
-          <div class="avatar-preview">{{ initials }}</div>
-          <p class="avatar-note">Photo upload coming soon. Your initials are displayed as your avatar.</p>
+
+          <div class="avatar-upload-wrap" @click="triggerFilePicker" :title="'Change photo'">
+            <UserAvatar :src="avatarPreview || user?.avatarUrl" :name="initials" :size="80" />
+            <div class="avatar-overlay">
+              <span v-if="uploadLoading" class="upload-spinner"></span>
+              <i v-else class="bi bi-camera-fill"></i>
+            </div>
+          </div>
+
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            class="avatar-file-input"
+            @change="onFileChange"
+          />
+
+          <p v-if="uploadError" class="avatar-error">{{ uploadError }}</p>
+          <p v-else class="avatar-note">JPG, PNG or WebP · max 5 MB</p>
+
+          <button
+            v-if="user?.avatarUrl && !avatarPreview"
+            class="btn-remove-photo"
+            type="button"
+            @click.stop="removePhoto"
+            :disabled="uploadLoading"
+          >Remove photo</button>
         </div>
 
         <!-- Form -->
@@ -157,6 +182,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const router = useRouter()
@@ -166,6 +192,74 @@ const { user } = storeToRefs(authStore)
 const saving = ref(false)
 const saved = ref(false)
 const error = ref('')
+
+// Avatar upload
+const fileInput = ref(null)
+const avatarPreview = ref(null)
+const uploadLoading = ref(false)
+const uploadError = ref('')
+
+const triggerFilePicker = () => fileInput.value?.click()
+
+const onFileChange = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  uploadError.value = ''
+
+  // Validate type
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    uploadError.value = 'Please upload a JPG, PNG, or WebP image.'
+    return
+  }
+  // Validate size (5 MB)
+  if (file.size > 5 * 1024 * 1024) {
+    uploadError.value = 'Image must be under 5 MB.'
+    return
+  }
+
+  // Show preview immediately
+  const reader = new FileReader()
+  reader.onload = (ev) => { avatarPreview.value = ev.target.result }
+  reader.readAsDataURL(file)
+
+  // Upload
+  uploadLoading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const token = localStorage.getItem('token')
+    const { data } = await axios.post(`${API_URL}/users/me/avatar`, form, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      }
+    })
+    authStore.updateAvatar(data.avatarUrl)
+    avatarPreview.value = null // let the store value take over
+  } catch {
+    uploadError.value = 'Upload failed. Please try again.'
+    avatarPreview.value = null
+  } finally {
+    uploadLoading.value = false
+    e.target.value = ''
+  }
+}
+
+const removePhoto = async () => {
+  uploadLoading.value = true
+  uploadError.value = ''
+  try {
+    const token = localStorage.getItem('token')
+    await axios.delete(`${API_URL}/users/me/avatar`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+    authStore.updateAvatar(null)
+  } catch {
+    uploadError.value = 'Failed to remove photo.'
+  } finally {
+    uploadLoading.value = false
+  }
+}
 
 const form = ref({
   displayName: '',
@@ -342,6 +436,64 @@ onMounted(() => {
   font-weight: 900;
   letter-spacing: 0.04em;
   flex-shrink: 0;
+}
+
+/* Avatar upload UI */
+.avatar-upload-wrap {
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.avatar-upload-wrap:hover .avatar-overlay { opacity: 1; }
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.18s;
+  color: #fff;
+  font-size: 1.3rem;
+}
+
+.avatar-file-input {
+  display: none;
+}
+
+.upload-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn-remove-photo {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  text-decoration: underline;
+}
+.btn-remove-photo:hover { color: #991b1b; }
+.btn-remove-photo:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.avatar-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .avatar-note {

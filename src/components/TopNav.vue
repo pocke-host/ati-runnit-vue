@@ -93,8 +93,8 @@
 
           <!-- Avatar -->
           <div class="avatar-wrap" ref="avatarRef">
-            <button class="nav-avatar" @click="toggleAvatarDropdown" :title="user?.displayName">
-              {{ userInitial }}
+            <button class="nav-avatar nav-avatar-btn" @click="toggleAvatarDropdown" :title="user?.displayName">
+              <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="34" />
             </button>
             <div v-if="avatarOpen" class="avatar-dropdown">
               <div class="avd-header">
@@ -153,7 +153,7 @@
         <!-- Authenticated links -->
         <template v-if="isAuthenticated">
           <div class="drawer-user" v-if="user">
-            <div class="drawer-avatar">{{ userInitial }}</div>
+            <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="40" />
             <div class="drawer-user-info">
               <div class="drawer-user-name">{{ user.displayName }}</div>
               <div class="drawer-user-email">{{ user.email }}</div>
@@ -266,6 +266,7 @@ import { useNotificationStore } from '@/stores/notification'
 import { useDMStore } from '@/stores/dm'
 import { storeToRefs } from 'pinia'
 import DMDrawer from '@/components/DMDrawer.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -608,21 +609,17 @@ onUnmounted(() => {
 .avatar-wrap { position: relative; }
 
 .nav-avatar {
-  width: 32px;
-  height: 32px;
   border-radius: 50%;
-  background: #333;
   border: 1.5px solid rgba(255,255,255,0.40);
+  padding: 0;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: white;
-  text-decoration: none;
   cursor: pointer;
   transition: opacity 0.15s;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .nav-avatar:hover { opacity: 0.8; }
 
@@ -803,20 +800,6 @@ onUnmounted(() => {
   gap: 12px;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-}
-.drawer-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #333;
-  border: 1.5px solid rgba(255, 255, 255, 0.30);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: white;
-  flex-shrink: 0;
 }
 .drawer-user-name {
   font-weight: 600;
