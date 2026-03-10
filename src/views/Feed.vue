@@ -1521,4 +1521,10 @@ onMounted(() => {
     margin-top: 12px;
   }
 }
+
+@media (max-width: 375px) {
+  .feed-container { padding: 8px; padding-top: 168px; }
+  .feed-header { padding: 12px 0; }
+  .feed-header-content { padding: 0 8px; }
+}
 </style>

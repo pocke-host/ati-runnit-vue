@@ -1487,7 +1487,7 @@ onMounted(async () => {
 .top-actions{display:flex;gap:10px;flex-wrap:wrap}
 .perf-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #E5E5E5;margin-bottom:32px;background:#E5E5E5;gap:1px}
 .perf-cell{background:#fff;padding:28px 24px;display:flex;flex-direction:column}
-.perf-label{font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(15,18,16,0.40);margin-bottom:8px}
+.perf-label{font-size:0.72rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(15,18,16,0.40);margin-bottom:8px}
 .perf-num{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-0.03em;line-height:1;color:#000;display:flex;align-items:baseline;gap:4px}
 .perf-unit{font-size:0.9rem;font-weight:600;color:rgba(15,18,16,0.40);margin-left:4px}
 .perf-change{font-size:0.73rem;font-weight:600;color:rgba(15,18,16,0.38);margin-top:6px}
@@ -1542,7 +1542,7 @@ onMounted(async () => {
 .action-btn-danger{color:#dc3545;border-color:rgba(220,53,69,0.20)}
 .action-btn-danger:hover{background:rgba(220,53,69,0.05)}
 .coach-widget{margin-top:16px;padding:16px;border:1px solid #E5E5E5}
-.coach-widget-label{font-size:0.62rem;font-weight:700;letter-spacing:0.14em;color:#767676;text-transform:uppercase;margin-bottom:10px}
+.coach-widget-label{font-size:0.70rem;font-weight:700;letter-spacing:0.14em;color:#767676;text-transform:uppercase;margin-bottom:10px}
 .coach-widget-row{display:flex;align-items:center;gap:10px}
 .coach-avatar-sm{width:34px;height:34px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
 .coach-name{font-weight:700;font-size:0.88rem}
@@ -1550,7 +1550,7 @@ onMounted(async () => {
 .find-coach-cta a{font-size:0.82rem;font-weight:600;color:#000;text-decoration:none}
 .find-coach-cta a:hover{text-decoration:underline}
 .upgrade-banner{margin-top:16px;padding:20px;background:#000;border-radius:0}
-.upgrade-label{font-size:0.7rem;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.55);margin-bottom:8px}
+.upgrade-label{font-size:0.75rem;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.55);margin-bottom:8px}
 .upgrade-desc{font-size:0.82rem;color:rgba(255,255,255,0.70);margin:0 0 16px;line-height:1.5}
 .upgrade-btn{display:inline-block;background:var(--rk-signal,#8B2BE2);color:var(--rk-void,#0D0512);font-weight:700;font-size:0.75rem;letter-spacing:0.10em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:0;transition:background 0.15s}
 .upgrade-btn:hover{background:#d4ff5a}
@@ -1579,7 +1579,7 @@ onMounted(async () => {
 .goals-widget{background:#fff;border:1px solid #E5E5E5;border-radius:0;padding:24px;box-shadow:none}
 .goals-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .goals-title{font-size:1.1rem;font-weight:900;margin:0}
-.goals-edit{width:32px;height:32px;border-radius:50%;border:1px solid rgba(15,18,16,0.12);background:rgba(255,255,255,0.70);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
+.goals-edit{width:32px;height:32px;border-radius:50%;border:1px solid rgba(15,18,16,0.12);background:rgba(255,255,255,0.70);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;padding:6px;box-sizing:content-box}
 .goals-edit:hover{background:rgba(255,255,255,0.95)}
 .goal-item{margin-bottom:20px}
 .goal-item:last-child{margin-bottom:0}
@@ -1635,4 +1635,5 @@ textarea.form-control{resize:vertical;min-height:72px}
 @media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}.perf-strip{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
 @media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.topbar{flex-direction:column;align-items:flex-start}.top-actions{width:100%}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
+@media(max-width:375px){.perf-strip{grid-template-columns:repeat(2,1fr)}.profile-stats-mini{grid-template-columns:repeat(2,1fr)}.top-actions .btn{font-size:0.72rem;padding:10px 12px}}
 </style>
