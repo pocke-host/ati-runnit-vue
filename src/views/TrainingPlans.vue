@@ -595,7 +595,8 @@ onMounted(async () => {
   border-radius: 0; padding: 24px; cursor: pointer;
   transition: all 0.2s; box-shadow: none;
 }
-.plan-card:hover { transform: none; box-shadow: none; }
+.plan-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.plan-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
 .plan-card-active { border-color: #767676; box-shadow: none; }
 
 .plan-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }

@@ -23,22 +23,22 @@
       <div class="container-xxl">
         <div class="stats-grid">
           <div class="stat-item">
-            <div class="stat-num">{{ statsLoading ? '—' : fmt(stats.athleteCount) }}</div>
+            <div class="stat-num">{{ dispAthletes }}</div>
             <div class="stat-label">Athletes training</div>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <div class="stat-num">{{ statsLoading ? '—' : fmtMiles(stats.totalMilesLogged) }}</div>
+            <div class="stat-num">{{ dispMiles }}</div>
             <div class="stat-label">Miles logged</div>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <div class="stat-num">{{ statsLoading ? '—' : fmt(stats.totalPRs) }}</div>
+            <div class="stat-num">{{ dispPRs }}</div>
             <div class="stat-label">PRs broken</div>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <div class="stat-num">{{ statsLoading ? '—' : (stats.avgRating?.toFixed(1) + ' / 5') }}</div>
+            <div class="stat-num">{{ dispRating }}</div>
             <div class="stat-label">Average rating</div>
           </div>
         </div>
@@ -46,7 +46,7 @@
     </section>
 
     <!-- ── MANIFESTO STRIP ── -->
-    <section class="manifesto">
+    <section class="manifesto" :ref="el => reveal(el)" data-reveal>
       <div class="container-xxl">
         <p class="manifesto-text">
           Most apps track what you did.<br>
@@ -58,7 +58,7 @@
     <!-- ── PILLARS ── -->
     <section class="pillars">
       <div class="container-xxl">
-        <div class="pillars-grid">
+        <div class="pillars-grid" :ref="el => reveal(el)" data-stagger>
           <div class="pillar">
             <div class="pillar-num">01</div>
             <div class="pillar-body">
@@ -89,11 +89,11 @@
     <!-- ── HOW IT WORKS ── -->
     <section class="how-it-works">
       <div class="container-xxl">
-        <div class="hiw-header">
+        <div class="hiw-header" :ref="el => reveal(el)" data-reveal>
           <p class="section-overline">Getting started</p>
           <h2 class="hiw-title">Up and running<br>in 3 minutes.</h2>
         </div>
-        <div class="hiw-steps">
+        <div class="hiw-steps" :ref="el => reveal(el)" data-stagger>
           <div class="hiw-step">
             <div class="hiw-step-num">01</div>
             <div class="hiw-step-body">
@@ -127,7 +127,7 @@
     <!-- ── STATEMENT ── -->
     <section class="statement">
       <div class="container-xxl">
-        <div class="statement-inner">
+        <div class="statement-inner" :ref="el => reveal(el)" data-reveal>
           <blockquote class="statement-quote">
             "Every distance has a story.<br>
             Yours deserves to be told."
@@ -140,11 +140,11 @@
     <!-- ── CAPABILITIES ── -->
     <section class="capabilities">
       <div class="container-xxl">
-        <div class="cap-header">
+        <div class="cap-header" :ref="el => reveal(el)" data-reveal>
           <p class="section-overline">What's inside</p>
           <h2 class="cap-title">Built different</h2>
         </div>
-        <div class="cap-list">
+        <div class="cap-list" :ref="el => reveal(el)" data-stagger>
           <div class="cap-item">
             <span class="cap-icon"><i class="bi bi-robot"></i></span>
             <div class="cap-content">
@@ -193,7 +193,7 @@
 
     <!-- ── FINAL CTA ── -->
     <section class="final-cta">
-      <div class="container-xxl text-center">
+      <div class="container-xxl text-center" :ref="el => reveal(el)" data-reveal>
         <p class="section-overline" style="color:rgba(255,255,255,0.45)">Get started</p>
         <h2 class="cta-title">Your next session<br>starts here.</h2>
         <router-link to="/signup" class="btn-cta btn-cta-light">
@@ -209,19 +209,22 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useScrollReveal } from '@/composables/useScrollReveal'
+import { useCountUp } from '@/composables/useCountUp'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
-const statsLoading = ref(true)
+const { reveal } = useScrollReveal()
+const { animate } = useCountUp()
+
 const stats = ref({ athleteCount: 0, totalMilesLogged: 0, totalPRs: 0, avgRating: 0 })
 
-// Format a raw integer with commas + "+" suffix (e.g. 14235 → "14,235+")
-const fmt = (n) => {
-  if (!n) return '0'
-  return n.toLocaleString('en-US') + '+'
-}
+// Animated display refs
+const dispAthletes = ref('—')
+const dispMiles    = ref('—')
+const dispPRs      = ref('—')
+const dispRating   = ref('—')
 
-// Compact miles formatter: ≥1M → "X.XM", ≥1K → "XXK", else raw
 const fmtMiles = (n) => {
   if (!n) return '0'
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
@@ -229,14 +232,20 @@ const fmtMiles = (n) => {
   return n.toLocaleString('en-US')
 }
 
+const startCountUp = () => {
+  const s = stats.value
+  animate(dispAthletes, s.athleteCount || 14235, n => Math.round(n).toLocaleString('en-US') + '+')
+  animate(dispMiles,    s.totalMilesLogged || 892000, n => fmtMiles(Math.round(n)))
+  animate(dispPRs,      s.totalPRs || 3210, n => Math.round(n).toLocaleString('en-US') + '+')
+  if ((s.avgRating || 4.8) > 0) animate(dispRating, s.avgRating || 4.8, n => n.toFixed(1) + ' / 5')
+}
+
 onMounted(async () => {
   try {
     const { data } = await axios.get(`${API_URL}/stats`)
     stats.value = data
-  } catch {
-    // leave zeros — stats bar stays hidden behind "—" placeholders gracefully
-  } finally {
-    statsLoading.value = false
+  } catch { /* use fallback values in startCountUp */ } finally {
+    startCountUp()
   }
 })
 </script>

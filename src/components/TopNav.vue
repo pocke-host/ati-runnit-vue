@@ -1,6 +1,6 @@
 <!-- src/components/TopNav.vue -->
 <template>
-  <nav class="navbar">
+  <nav :class="['navbar', { 'navbar--scrolled': scrolled }]">
     <div class="navbar-content">
 
       <!-- LEFT: spacer (keeps brand centered on mobile) -->
@@ -276,6 +276,9 @@ const { user, isAuthenticated, subscriptionTier, role } = storeToRefs(authStore)
 const { notifications, unreadCount, loading: notifLoading } = storeToRefs(notifStore)
 
 const mobileMenuOpen = ref(false)
+const scrolled = ref(false)
+
+const handleScroll = () => { scrolled.value = window.scrollY > 32 }
 const notifOpen = ref(false)
 const notifRef = ref(null)
 const avatarOpen = ref(false)
@@ -355,6 +358,7 @@ const handleLogout = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleOutsideClick)
+  window.addEventListener('scroll', handleScroll, { passive: true })
   if (isAuthenticated.value) {
     notifStore.startPolling(30000)
   }
@@ -362,6 +366,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleOutsideClick)
+  window.removeEventListener('scroll', handleScroll)
   notifStore.stopPolling()
 })
 </script>
@@ -376,6 +381,13 @@ onUnmounted(() => {
   background: var(--rk-void, #0D0512);
   border-bottom: 1px solid rgba(139,43,226,0.20);
   box-shadow: none;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.navbar--scrolled {
+  background: rgba(13, 5, 18, 0.82);
+  border-bottom-color: rgba(139,43,226,0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .navbar-content {

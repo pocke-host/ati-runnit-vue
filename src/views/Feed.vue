@@ -791,14 +791,14 @@ onMounted(() => {
   border: 1px solid #E5E5E5;
   border-radius: 0;
   overflow: hidden;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
   box-shadow: none;
   position: relative;
 }
 
 .feed-card:hover {
-  transform: none;
-  box-shadow: none;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
 }
 
 /* Moment Cards */
