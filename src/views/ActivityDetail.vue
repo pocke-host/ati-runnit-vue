@@ -242,6 +242,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
+import { useNotificationStore } from '@/stores/notification'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -250,6 +251,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
 const activityStore = useActivityStore()
+const notificationStore = useNotificationStore()
 
 const { formatDistance, formatDuration, formatPace, formatElevation } = useUnits()
 
@@ -399,6 +401,12 @@ const toggleFollow = async () => {
     } else {
       await axios.post(`${API_URL}/follow/${activity.value.userId}`, {}, { headers: getAuthHeaders() })
       following.value = true
+      notificationStore.createNotification({
+        type: 'NEW_FOLLOWER',
+        targetUserId: activity.value.userId,
+        actorId: user.value?.id,
+        actorName: user.value?.displayName
+      })
     }
   } catch { /* silent */ } finally {
     followLoading.value = false

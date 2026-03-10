@@ -286,6 +286,7 @@ import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { useAchievementStore, BADGE_CATALOG, computeEarnedBadges } from '@/stores/achievement'
+import { useNotificationStore } from '@/stores/notification'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -293,6 +294,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const achievementStore = useAchievementStore()
+const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
 
 const { formatDistance, formatDuration, formatElevation } = useUnits()
@@ -442,6 +444,12 @@ const toggleFollow = async () => {
       await axios.post(`${API_URL}/follow/${profileId.value}`, {}, { headers: getAuthHeaders() })
       following.value = true
       profile.value.followerCount = (profile.value.followerCount ?? 0) + 1
+      notificationStore.createNotification({
+        type: 'NEW_FOLLOWER',
+        targetUserId: profileId.value,
+        actorId: user.value?.id,
+        actorName: user.value?.displayName
+      })
     }
   } catch { /* silent */ } finally {
     followLoading.value = false

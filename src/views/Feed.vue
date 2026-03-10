@@ -345,11 +345,13 @@ import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import { useNotificationStore } from '@/stores/notification'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
 const { formatDistance, formatDuration } = useUnits()
 
@@ -619,6 +621,12 @@ const followUser = async (userId) => {
       headers: getAuthHeaders()
     })
     followingIds.value.add(userId)
+    notificationStore.createNotification({
+      type: 'NEW_FOLLOWER',
+      targetUserId: userId,
+      actorId: user.value?.id,
+      actorName: user.value?.displayName
+    })
   } catch (err) {
     console.error('Follow failed:', err)
   } finally {

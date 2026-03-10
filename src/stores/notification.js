@@ -49,6 +49,12 @@ export const useNotificationStore = defineStore('notification', () => {
     } catch { /* silent */ }
   }
 
+  async function createNotification(payload) {
+    try {
+      await axios.post(`${API_URL}/notifications`, payload, { headers: getAuthHeaders() })
+    } catch { /* silent — backend may auto-create on follow */ }
+  }
+
   function startPolling(intervalMs = 30000) {
     stopPolling()
     fetchNotifications()
@@ -60,5 +66,5 @@ export const useNotificationStore = defineStore('notification', () => {
     pollTimer = null
   }
 
-  return { notifications, unreadCount, loading, fetchNotifications, markRead, markAllRead, startPolling, stopPolling }
+  return { notifications, unreadCount, loading, fetchNotifications, markRead, markAllRead, createNotification, startPolling, stopPolling }
 })
