@@ -484,7 +484,7 @@ onMounted(init)
 .detail-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -901,13 +901,13 @@ onMounted(init)
 
 /* PR Banner */
 .pr-banner {
-  background: var(--rk-signal, #8B2BE2);
-  border-color: var(--rk-signal, #8B2BE2) !important;
+  background: var(--rk-signal, #0052FF);
+  border-color: var(--rk-signal, #0052FF) !important;
 }
 .pr-banner-header {
   font-weight: 900;
   font-size: 1.05rem;
-  color: var(--rk-void, #0D0512);
+  color: var(--rk-void, #000000);
   margin-bottom: 12px;
 }
 .pr-pills {
@@ -924,7 +924,7 @@ onMounted(init)
   padding: 6px 14px;
   font-size: 0.82rem;
   font-weight: 900;
-  color: var(--rk-void, #0D0512);
+  color: var(--rk-void, #000000);
 }
 
 /* Utilities */

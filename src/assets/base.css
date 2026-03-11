@@ -1,12 +1,12 @@
 /*
-  RUNNIT — VIOLET BRAND SYSTEM
-  ─────────────────────────────
-  Nike owns volt. Strava owns orange. RUNNIT owns violet.
+  RUNNIT — ELECTRIC BLUE BRAND SYSTEM
+  ─────────────────────────────────────
+  Black. White. Electric Blue.
 
-  Signal color — #8B2BE2 "Electric Violet"
-    → Completely unclaimed in the running/fitness space
-    → Lives in: nav bg, all primary buttons, borders, active states,
-                page bg tint, overlines, form focus, route lines, badges
+  Signal color — #0052FF "Electric Blue"
+    → Performance, speed, technology
+    → Lives in: primary buttons, active states, borders,
+                overlines, form focus, route lines, badges
 */
 
 :root {
@@ -14,15 +14,15 @@
   --nav-h: 64px;
   --tab-h: 64px;
 
-  /* ── RUNNIT Violet Palette ── */
-  --rk-void:    #0D0512;   /* near-black with violet depth — nav, hero */
-  --rk-paper:   #FAF8FF;   /* very light violet tint — page bg */
-  --rk-signal:  #8B2BE2;   /* electric violet — the brand color */
-  --rk-signal-light: #F3EEFF; /* tinted surface — cards, alternate sections */
-  --rk-carbon:  #1E0A35;   /* deep violet surface */
-  --rk-ash:     #7B6E9A;   /* violet-tinted secondary text */
-  --rk-rule:    #E4DCFF;   /* violet-tinted borders */
-  --rk-smoke:   #F3EEFF;   /* violet alternate surface */
+  /* ── RUNNIT Electric Palette ── */
+  --rk-void:    #000000;   /* pure black — nav, hero */
+  --rk-paper:   #ffffff;   /* pure white — page bg */
+  --rk-signal:  #0052FF;   /* electric blue — the brand color */
+  --rk-signal-light: #EBF0FF; /* tinted surface — cards, alternate sections */
+  --rk-carbon:  #111111;   /* dark surface */
+  --rk-ash:     #767676;   /* secondary text */
+  --rk-rule:    #E5E5E5;   /* borders */
+  --rk-smoke:   #F5F5F5;   /* alternate surface */
 
   /* ── Legacy aliases (backward compat) ── */
   --r-black:       var(--rk-void);
@@ -34,18 +34,18 @@
   --r-shadow-sm:   none;
   --r-shadow:      none;
   --r-shadow-lg:   none;
-  --r-olive:       var(--rk-ash);
+  --r-olive:       #5A6B4E;
   --r-olive-deep:  var(--rk-void);
   --r-accent:      var(--rk-signal);
   --r-warm-gray:   var(--rk-ash);
 
   /* ── Bootstrap overrides ── */
-  --bs-body-bg:           var(--rk-paper);
-  --bs-body-color:        var(--rk-void);
+  --bs-body-bg:           #ffffff;
+  --bs-body-color:        #000000;
   --bs-primary:           var(--rk-signal);
-  --bs-primary-rgb:       139, 43, 226;
+  --bs-primary-rgb:       0, 82, 255;
   --bs-link-color:        var(--rk-signal);
-  --bs-link-hover-color:  #7722CC;
+  --bs-link-hover-color:  #003ECC;
   --bs-border-color:      var(--rk-rule);
   --bs-border-radius:     0;
   --bs-border-radius-sm:  0;
@@ -62,8 +62,8 @@ html, body, #app {
   overflow-x: hidden;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  background: var(--rk-paper, #FAF8FF);
-  color: var(--rk-void);
+  background: #ffffff;
+  color: #000000;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -88,7 +88,7 @@ a:hover { text-decoration: none; }
   letter-spacing: -0.03em;
   line-height: 1.05;
 }
-/* Overlines in violet — brand stamp on every section */
+/* Overlines in electric blue — brand stamp on every section */
 .rk-overline {
   font-size: 0.62rem;
   font-weight: 700;
@@ -106,7 +106,7 @@ a:hover { text-decoration: none; }
 .rk-body {
   font-size: 0.97rem;
   line-height: 1.7;
-  color: rgba(13,5,18,0.60);
+  color: rgba(0,0,0,0.60);
 }
 
 /* ── Signal Utility ── */
@@ -114,14 +114,14 @@ a:hover { text-decoration: none; }
 .rk-signal-bg    { background: var(--rk-signal) !important; color: #fff !important; }
 .rk-signal-left  { border-left: 3px solid var(--rk-signal) !important; }
 
-/* ── Global Button System — violet primary ── */
+/* ── Global Button System — electric blue primary ── */
 .btn-primary {
   --bs-btn-bg:                 var(--rk-signal);
   --bs-btn-border-color:       var(--rk-signal);
-  --bs-btn-hover-bg:           #7722CC;
-  --bs-btn-hover-border-color: #7722CC;
+  --bs-btn-hover-bg:           #003ECC;
+  --bs-btn-hover-border-color: #003ECC;
   --bs-btn-color:              #fff;
-  --bs-btn-active-bg:          #6518B8;
+  --bs-btn-active-bg:          #002EB8;
   border-radius: 0 !important;
   text-transform: uppercase;
   letter-spacing: 0.10em;
@@ -133,7 +133,7 @@ a:hover { text-decoration: none; }
   border-radius: 0;
 }
 
-/* ── Form Controls — violet focus ── */
+/* ── Form Controls — electric blue focus ── */
 .form-control, .form-select {
   border-radius: 0;
   border-color: var(--rk-rule);
@@ -141,7 +141,7 @@ a:hover { text-decoration: none; }
 }
 .form-control:focus, .form-select:focus {
   border-color: var(--rk-signal);
-  box-shadow: 0 0 0 2px rgba(139,43,226,0.15);
+  box-shadow: 0 0 0 2px rgba(0,82,255,0.15);
 }
 
 /* ── Utility ── */

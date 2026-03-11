@@ -392,7 +392,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--rk-void, #0D0512);
+  background: var(--rk-void, #000000);
   border-bottom: 1px solid rgba(139,43,226,0.20);
   box-shadow: none;
   transition: background 0.3s ease, border-color 0.3s ease;

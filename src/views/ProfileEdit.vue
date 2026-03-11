@@ -334,7 +334,7 @@ onMounted(() => {
 <style scoped>
 .profile-edit-page {
   min-height: 100vh;
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   padding-top: var(--nav-h, 64px);
   font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
 }
@@ -374,7 +374,7 @@ onMounted(() => {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: var(--rk-signal, #8B2BE2);
+  color: var(--rk-signal, #0052FF);
   margin-bottom: 4px;
 }
 
@@ -542,7 +542,7 @@ onMounted(() => {
   box-sizing: border-box;
   font-family: inherit;
 }
-.pe-input:focus { border-color: var(--rk-signal, #8B2BE2); }
+.pe-input:focus { border-color: var(--rk-signal, #0052FF); }
 
 .pe-input-static {
   width: 100%;
@@ -628,7 +628,7 @@ onMounted(() => {
 .btn-save {
   height: 48px;
   padding: 0 40px;
-  background: var(--rk-signal, #8B2BE2);
+  background: var(--rk-signal, #0052FF);
   color: #fff;
   border: none;
   border-radius: 0;
@@ -643,7 +643,7 @@ onMounted(() => {
   transition: background 0.15s;
   font-family: inherit;
 }
-.btn-save:hover:not(:disabled) { background: #7722CC; }
+.btn-save:hover:not(:disabled) { background: #003ECC; }
 .btn-save:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-spinner {

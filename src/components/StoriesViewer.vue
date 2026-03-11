@@ -454,7 +454,7 @@
     height: 72px;
     border-radius: 50%;
     padding: 3px;
-    background: linear-gradient(45deg, #C46A2A, #f59e0b);
+    background: linear-gradient(45deg, #0052FF, #0099FF);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -466,7 +466,7 @@
   }
   
   .ring-avatar.has-unviewed {
-    background: linear-gradient(45deg, #C46A2A, #f59e0b);
+    background: linear-gradient(45deg, #0052FF, #0099FF);
   }
   
   .ring-avatar:not(.has-unviewed) {
@@ -811,7 +811,7 @@
   }
   
   .upload-area:hover {
-    border-color: var(--rk-signal, #8B2BE2);
+    border-color: var(--rk-signal, #0052FF);
     background: rgba(196,106,42,0.08);
   }
   

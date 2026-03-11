@@ -149,7 +149,7 @@ const values = [
 
 <style scoped>
 .about-page {
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   padding-top: var(--nav-h, 64px);
