@@ -60,6 +60,14 @@
         </div>
       </header>
 
+      <!-- Phase banner -->
+      <div v-if="currentPhase" class="phase-banner" :style="{ background: phaseColors[currentPhase] }">
+        <div class="phase-banner-inner container-xxl">
+          <span class="phase-banner-label">{{ currentPhase }}</span>
+          <span class="phase-banner-sub">{{ phaseDescription }}</span>
+        </div>
+      </div>
+
       <!-- Status toast -->
       <div v-if="statusMessage" :class="['status-toast', statusType]">
         <i :class="statusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
@@ -97,7 +105,7 @@
               </span>
               <span>
                 <i class="bi bi-geo-alt me-1"></i>
-                {{ formatDistance(weekTotalDistance) }} this week
+                {{ formatDistance(weekTotalDistance) }} done · {{ formatDistance(weekPlannedDistance) }} planned
               </span>
             </div>
           </div>
@@ -134,8 +142,16 @@
                 <div class="workout-day-type">
                   <span class="workout-day">{{ workout.dayLabel }}</span>
                   <span class="workout-sep">·</span>
-                  <span :class="['workout-type', `type-${workout.type.split(' ')[0].toLowerCase()}`]">
+                  <span :class="['workout-type', `type-${(workout.type || '').split(' ')[0].toLowerCase()}`]">
                     {{ workout.type }}
+                  </span>
+                  <!-- Workout type chip -->
+                  <span
+                    v-if="workout.workoutType"
+                    class="wtype-chip"
+                    :style="{ background: typeChipColor(workout.workoutType) }"
+                  >
+                    {{ workout.workoutType.replace('_', ' ') }}
                   </span>
                 </div>
                 <div class="workout-tags">
@@ -147,6 +163,12 @@
               <div class="workout-detail-row" v-if="workout.type !== 'Rest'">
                 <span class="workout-dist">{{ formatDistance(workout.distanceMeters) }}</span>
                 <span class="workout-dur">{{ workout.durationMinutes }} min</span>
+              </div>
+
+              <!-- Pace target -->
+              <div v-if="workout.targetPaceSeconds" class="pace-target">
+                <i class="bi bi-stopwatch me-1"></i>
+                Target: {{ formatPace(workout.targetPaceSeconds) }}
               </div>
 
               <p class="workout-desc" v-if="workout.description">{{ workout.description }}</p>
@@ -162,11 +184,11 @@
           </div>
           <div class="summary-stat">
             <div class="summary-val">{{ formatDistance(weekTotalDistance) }}</div>
-            <div class="summary-key">Distance</div>
+            <div class="summary-key">Done</div>
           </div>
           <div class="summary-stat">
-            <div class="summary-val">{{ weekTotalMinutes }} min</div>
-            <div class="summary-key">Duration</div>
+            <div class="summary-val">{{ formatDistance(weekPlannedDistance) }}</div>
+            <div class="summary-key">Planned</div>
           </div>
           <div class="summary-stat">
             <div class="summary-val">{{ weekPct }}%</div>
@@ -189,11 +211,15 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usePlanStore } from '@/stores/plan.js'
 import { useUnits } from '@/composables/useUnits'
+import { useAuthStore } from '@/stores/auth.js'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const route = useRoute()
 const planStore = usePlanStore()
 const { formatDistance } = useUnits()
+const authStore = useAuthStore()
+const { unitSystem } = storeToRefs(authStore)
 
 const plan = ref(null)
 const loading = ref(false)
@@ -214,48 +240,91 @@ const showStatus = (msg, type = 'success') => {
 }
 
 const getSportIcon = (sport) => {
-  const m = { Running: '🏃', Cycling: '🚴', Swimming: '🏊', Hiking: '🥾', Walking: '🚶' }
-  return m[sport] || '🏋️'
+  return { Running: '🏃', Cycling: '🚴', Swimming: '🏊', Hiking: '🥾', Walking: '🚶' }[sport] || '🏋️'
 }
 
 const formatDateShort = (str) => {
   if (!str) return '—'
-  return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(str + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
+
+function typeChipColor(wType) {
+  return {
+    EASY: '#22c55e', TEMPO: '#f97316', INTERVAL: '#ef4444',
+    LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#9ca3af',
+  }[wType] || '#767676'
+}
+
+function formatPace(sPerKm) {
+  if (!sPerKm) return null
+  const paceSec = unitSystem.value === 'imperial'
+    ? Math.round(sPerKm * 1.609344)
+    : sPerKm
+  const mins = Math.floor(paceSec / 60)
+  const secs = paceSec % 60
+  const unit = unitSystem.value === 'imperial' ? '/mi' : '/km'
+  return `${mins}:${String(secs).padStart(2, '0')} ${unit}`
+}
+
+// ── Phase ─────────────────────────────────────────
+
+const phaseColors = {
+  BASE: '#22c55e', BUILD: '#f97316', PEAK: '#ef4444', TAPER: '#3b82f6',
+}
+
+const phaseDescriptions = {
+  BASE:  'Building your aerobic base — easy effort, consistent volume.',
+  BUILD: 'Increasing intensity — tempo + interval work enters the mix.',
+  PEAK:  'Peak training load — your hardest weeks before taper.',
+  TAPER: 'Reducing volume — arriving fresh on race day.',
+}
+
+const currentPhase = computed(() => {
+  if (!activeWeekData.value) return null
+  return activeWeekData.value.phase || null
+})
+
+const phaseDescription = computed(() => phaseDescriptions[currentPhase.value] || '')
 
 // ── Computed ─────────────────────────────────────
 
 const currentWeek = computed(() => {
   if (!plan.value?.startDate) return 1
-  const start = new Date(plan.value.startDate)
+  const start = new Date(plan.value.startDate + 'T00:00:00')
   const now = new Date()
-  const diff = Math.floor((now - start) / (7 * 24 * 3600 * 1000))
+  const diff = Math.floor((now - start) / (7 * 86400000))
   return Math.min(Math.max(diff + 1, 1), plan.value.totalWeeks)
 })
 
 const overallPct = computed(() => {
-  if (!plan.value) return 0
+  if (!plan.value?.weeks) return 0
   const allWorkouts = plan.value.weeks.flatMap(w => w.workouts)
   const done = allWorkouts.filter(w => w.completed).length
   return allWorkouts.length ? Math.round((done / allWorkouts.length) * 100) : 0
 })
 
 const activeWeekData = computed(() => {
-  if (!plan.value) return null
+  if (!plan.value?.weeks) return null
   return plan.value.weeks.find(w => w.weekNumber === selectedWeek.value)
 })
 
 const weekCompleted = computed(() => activeWeekData.value?.workouts.filter(w => w.completed).length || 0)
 const weekTotal = computed(() => activeWeekData.value?.workouts.length || 0)
-const weekTotalDistance = computed(() => activeWeekData.value?.workouts.reduce((s, w) => s + (w.completed ? (w.distanceMeters || 0) : 0), 0) || 0)
-const weekTotalMinutes = computed(() => activeWeekData.value?.workouts.reduce((s, w) => s + (w.completed ? (w.durationMinutes || 0) : 0), 0) || 0)
+const weekTotalDistance = computed(() =>
+  activeWeekData.value?.workouts.reduce((s, w) => s + (w.completed ? (w.distanceMeters || 0) : 0), 0) || 0
+)
+const weekPlannedDistance = computed(() =>
+  activeWeekData.value?.workouts.reduce((s, w) => s + (w.distanceMeters || 0), 0) || 0
+)
+const weekTotalMinutes = computed(() =>
+  activeWeekData.value?.workouts.reduce((s, w) => s + (w.completed ? (w.durationMinutes || 0) : 0), 0) || 0
+)
 const weekPct = computed(() => weekTotal.value ? Math.round((weekCompleted.value / weekTotal.value) * 100) : 0)
 
 function isToday(workout) {
   if (!plan.value?.startDate || selectedWeek.value !== currentWeek.value) return false
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-  const todayName = days[new Date().getDay()]
-  return workout.dayLabel === todayName
+  return workout.dayLabel === days[new Date().getDay()]
 }
 
 function isMissed(workout) {
@@ -340,26 +409,19 @@ onMounted(async () => {
 .page-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; color: rgba(15,18,16,0.55); }
 
 /* ── Plan Header ── */
-.plan-header {
-  background: #000;
-  color: white; padding: 24px 0 28px;
-}
+.plan-header { background: #000; color: white; padding: 24px 0 28px; }
 .plan-header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 20px; }
-
 .back-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; color: rgba(255,255,255,0.75); font-weight: 700; font-size: 0.9rem; cursor: pointer; padding: 0; font-family: inherit; transition: color 0.2s; }
 .back-btn:hover { color: white; }
-
 .plan-header-main { display: flex; align-items: center; gap: 20px; }
 .plan-sport-big { font-size: 3.5rem; }
 .plan-header-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-
 .ph-badge { padding: 4px 12px; border-radius: 0; font-size: 0.75rem; font-weight: 700; text-transform: capitalize; }
 .ph-badge-sport { background: rgba(255,255,255,0.15); color: white; }
 .ph-badge-beginner     { background: rgba(16,185,129,0.25); color: #a7f3d0; }
 .ph-badge-intermediate { background: rgba(245,158,11,0.25); color: #fde68a; }
 .ph-badge-advanced     { background: rgba(239,68,68,0.25);  color: #fecaca; }
 .ph-badge-active { background: rgba(255,255,255,0.15); color: #fff; display: inline-flex; align-items: center; }
-
 .plan-header-name { font-weight: 900; font-size: 1.6rem; margin: 0 0 4px; color: white; }
 .plan-header-meta { font-size: 0.88rem; color: rgba(255,255,255,0.70); }
 
@@ -373,13 +435,21 @@ onMounted(async () => {
 /* Header actions */
 .plan-header-actions { display: flex; gap: 10px; }
 
+/* ── Phase Banner ── */
+.phase-banner { padding: 10px 0; }
+.phase-banner-inner { display: flex; align-items: center; gap: 16px; padding: 0 24px; max-width: 1200px; margin: 0 auto; }
+.phase-banner-label {
+  font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.14em;
+  color: white; background: rgba(0,0,0,0.20); padding: 3px 10px; border-radius: 0;
+}
+.phase-banner-sub { font-size: 0.83rem; font-weight: 600; color: rgba(255,255,255,0.90); }
+
 /* Status toast */
 .status-toast {
   position: fixed; top: 90px; right: 24px; z-index: 9000;
   display: flex; align-items: center; gap: 10px;
   padding: 14px 20px; border-radius: 0;
-  font-weight: 700; font-size: 0.9rem;
-  box-shadow: none;
+  font-weight: 700; font-size: 0.9rem; box-shadow: none;
   animation: slideInRight 0.3s ease;
 }
 .status-toast.success { background: #047857; color: white; }
@@ -388,13 +458,12 @@ onMounted(async () => {
 
 /* ── Week Tabs ── */
 .week-tabs-wrapper {
-  background: rgba(255,255,255,0.95); 
+  background: rgba(255,255,255,0.95);
   border-bottom: 1px solid rgba(15,18,16,0.08);
   position: sticky; top: var(--nav-h); z-index: 50;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
 }
 .week-tabs { display: flex; padding: 0 24px; gap: 4px; min-width: max-content; }
-
 .week-tab {
   position: relative; display: flex; flex-direction: column; align-items: center;
   padding: 14px 16px; border: none; background: transparent;
@@ -409,24 +478,20 @@ onMounted(async () => {
 
 /* ── Week Content ── */
 .week-content { padding: 28px 24px 60px; }
-
 .week-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
 .week-title { font-weight: 900; font-size: 1.2rem; color: rgba(15,18,16,0.92); margin-bottom: 6px; }
-.week-stats { display: flex; gap: 16px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; }
+.week-stats { display: flex; gap: 16px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; flex-wrap: wrap; }
 .week-progress-mini { width: 120px; height: 6px; background: rgba(15,18,16,0.10); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
 .week-progress-fill { height: 100%; background: #000; border-radius: 0; transition: width 0.4s; }
 
 /* ── Workout Cards ── */
 .workouts-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-
 .workout-card {
   display: flex; gap: 16px; align-items: flex-start;
   background: white; border: 1px solid rgba(15,18,16,0.10);
-  border-radius: 0; padding: 20px;
-  transition: all 0.2s; box-shadow: none;
+  border-radius: 0; padding: 20px; transition: all 0.2s;
 }
-.workout-card:hover { box-shadow: none; }
-.workout-today { border-color: #000; box-shadow: none; }
+.workout-today { border-color: #000; }
 .workout-completed { background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.20); }
 .workout-missed { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.02); }
 
@@ -445,7 +510,7 @@ onMounted(async () => {
 /* Workout body */
 .workout-body { flex: 1; min-width: 0; }
 .workout-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
-.workout-day-type { display: flex; align-items: center; gap: 8px; }
+.workout-day-type { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .workout-day { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.50); }
 .workout-sep { color: rgba(15,18,16,0.25); }
 .workout-type { font-weight: 900; font-size: 1rem; color: rgba(15,18,16,0.90); }
@@ -458,11 +523,28 @@ onMounted(async () => {
 .type-interval               { color: #b91c1c; }
 .type-endurance              { color: #047857; }
 
+/* Workout type chip */
+.wtype-chip {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 0;
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: white;
+}
+
 .workout-tags { display: flex; gap: 6px; }
-.tag-today { background: rgba(196,106,42,0.12); color: #000; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
+.tag-today  { background: rgba(196,106,42,0.12); color: #000; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 .tag-missed { background: rgba(239,68,68,0.10); color: #dc2626; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 
-.workout-detail-row { display: flex; gap: 12px; font-size: 0.88rem; font-weight: 700; color: rgba(15,18,16,0.70); margin-bottom: 8px; }
+.workout-detail-row { display: flex; gap: 12px; font-size: 0.88rem; font-weight: 700; color: rgba(15,18,16,0.70); margin-bottom: 6px; }
+
+/* Pace target */
+.pace-target {
+  display: inline-flex; align-items: center;
+  font-size: 0.82rem; font-weight: 700; color: rgba(15,18,16,0.60);
+  background: rgba(15,18,16,0.04); padding: 3px 10px; border-radius: 0;
+  margin-bottom: 6px;
+}
+
 .workout-desc { font-size: 0.85rem; color: rgba(15,18,16,0.55); margin: 0; line-height: 1.5; font-style: italic; }
 
 /* Week summary */
@@ -470,13 +552,12 @@ onMounted(async () => {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   background: white; border: 1px solid rgba(15,18,16,0.10);
   border-radius: 0; padding: 20px 28px;
-  box-shadow: 0 2px 12px rgba(15,18,16,0.06);
 }
 .summary-stat { text-align: center; }
 .summary-val { font-size: 1.4rem; font-weight: 900; color: #000; margin-bottom: 4px; }
 .summary-key { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.50); }
 
-/* Spin animation for loading icon */
+/* Spin */
 .spin { animation: spin 0.8s linear infinite; display: inline-block; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -500,5 +581,6 @@ onMounted(async () => {
   .week-summary { grid-template-columns: repeat(2, 1fr); }
   .plan-header-main { flex-wrap: wrap; }
   .week-stats { flex-direction: column; gap: 6px; }
+  .phase-banner-sub { display: none; }
 }
 </style>

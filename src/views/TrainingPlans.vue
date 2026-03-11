@@ -6,7 +6,7 @@
       <div class="container-xxl">
         <p class="eyebrow">Train smarter.</p>
         <h1 class="fw-bold mb-2">Training Plans</h1>
-        <p class="lead m-0">Structured week-by-week plans built for your goal — refined with your data.</p>
+        <p class="lead m-0">Periodized plans powered by sport science — built around your race date and fitness.</p>
       </div>
     </section>
 
@@ -58,138 +58,262 @@
       <section class="new-plan-section">
         <div class="section-header">
           <h2 class="section-title">{{ plans.length ? 'Start Another Plan' : 'Start Your First Plan' }}</h2>
-          <p class="section-sub">Choose a goal, pick your level, and we'll build your schedule.</p>
+          <p class="section-sub">Five steps to a fully personalized, periodized training plan.</p>
         </div>
 
-        <!-- STEP 1: Goal tabs -->
-        <div class="step-block">
-          <div class="step-label">1 — What's your goal?</div>
-          <div class="goal-tabs">
-            <button
-              v-for="g in goals"
-              :key="g.key"
-              :class="['goal-tab', { active: selectedGoal === g.key }]"
-              @click="selectGoal(g.key)"
+        <!-- ── WIZARD ── -->
+        <div class="wizard">
+
+          <!-- Step indicator -->
+          <div class="wizard-steps-bar">
+            <div
+              v-for="(stepLabel, idx) in stepLabels"
+              :key="idx"
+              :class="['wsb-step', { active: wizardStep === idx + 1, done: wizardStep > idx + 1 }]"
             >
-              <span class="goal-emoji">{{ g.emoji }}</span>
-              <span class="goal-name">{{ g.label }}</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- STEP 2: Level cards (after goal selected) -->
-        <Transition name="fade-slide">
-          <div v-if="selectedGoal" class="step-block">
-            <div class="step-label">2 — Choose your level</div>
-            <div class="level-cards">
-              <button
-                v-for="lv in levels"
-                :key="lv.key"
-                :class="['level-card', { active: selectedLevel === lv.key }]"
-                @click="selectedLevel = lv.key; buildPreview()"
-              >
-                <div class="level-icon">{{ lv.icon }}</div>
-                <div class="level-name">{{ lv.label }}</div>
-                <div class="level-desc">{{ getLevelDesc(selectedGoal, lv.key) }}</div>
-              </button>
+              <div class="wsb-dot">
+                <i v-if="wizardStep > idx + 1" class="bi bi-check-lg"></i>
+                <span v-else>{{ idx + 1 }}</span>
+              </div>
+              <div class="wsb-label">{{ stepLabel }}</div>
             </div>
           </div>
-        </Transition>
 
-        <!-- STEP 3: Plan preview -->
-        <Transition name="fade-slide">
-          <div v-if="preview" class="step-block">
-            <div class="step-label">3 — Your plan preview</div>
+          <!-- Step 1: Goal -->
+          <Transition name="fade-slide" mode="out-in">
+            <div v-if="wizardStep === 1" key="s1" class="wizard-content">
+              <div class="step-label">What's your goal?</div>
+              <div class="goal-tabs">
+                <button
+                  v-for="g in goals"
+                  :key="g.key"
+                  :class="['goal-tab', { active: selectedGoal === g.key }]"
+                  @click="selectedGoal = g.key"
+                >
+                  <span class="goal-emoji">{{ g.emoji }}</span>
+                  <span class="goal-name">{{ g.label }}</span>
+                </button>
+              </div>
+              <div class="wizard-nav">
+                <button class="btn btn-primary" @click="wizardStep = 2" :disabled="!selectedGoal">
+                  Next <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
 
-            <div class="preview-card">
-              <!-- Plan summary -->
-              <div class="preview-header">
-                <div class="preview-title-row">
-                  <h3 class="preview-name">{{ preview.name }}</h3>
-                  <span v-if="aiRefined" class="ai-badge">
-                    <i class="bi bi-stars me-1"></i>AI Refined
-                  </span>
-                </div>
-                <div class="preview-meta-row">
-                  <span><i class="bi bi-calendar3 me-1"></i>{{ preview.totalWeeks }} weeks</span>
-                  <span><i class="bi bi-repeat me-1"></i>{{ preview.daysPerWeek }}x per week</span>
-                  <span><i class="bi bi-flag me-1"></i>Starts {{ formatDateShort(startDate) }}</span>
+            <!-- Step 2: Race Date -->
+            <div v-else-if="wizardStep === 2" key="s2" class="wizard-content">
+              <div class="step-label">When's your target race?</div>
+
+              <div class="fitness-toggle-row">
+                <label class="fitness-toggle">
+                  <input type="checkbox" v-model="justBuildingFitness" @change="onJustFitnessToggle" />
+                  <span class="toggle-track"></span>
+                  <span class="toggle-label">Just building fitness (no race date)</span>
+                </label>
+              </div>
+
+              <div v-if="!justBuildingFitness" class="field-group">
+                <label class="field-label">Target race date</label>
+                <input
+                  type="date"
+                  class="field-input"
+                  v-model="targetRaceDate"
+                  :min="minRaceDate"
+                />
+                <div v-if="computedTotalWeeks > 0" class="field-hint">
+                  <i class="bi bi-calendar3 me-1"></i>
+                  Plan will be approximately <strong>{{ computedTotalWeeks }} weeks</strong>
+                  <span v-if="computedTotalWeeks < 8" class="hint-warn"> (consider a longer runway)</span>
                 </div>
               </div>
 
-              <!-- Sample week -->
-              <div class="preview-week">
-                <div class="preview-week-label">Week 1 — {{ preview.weeks[0]?.theme }}</div>
-                <div class="preview-workouts">
-                  <div
-                    v-for="wo in preview.weeks[0]?.workouts"
-                    :key="wo.dayLabel"
-                    :class="['preview-workout', { 'is-rest': wo.type === 'Rest' }]"
-                  >
-                    <div class="wo-day">{{ wo.dayLabel }}</div>
-                    <div class="wo-type">{{ wo.type }}</div>
-                    <div class="wo-detail" v-if="wo.type !== 'Rest'">
-                      {{ formatDistance(wo.distanceMeters) }} · {{ wo.durationMinutes }}min
+              <div v-else class="field-hint mt-2">
+                <i class="bi bi-calendar3 me-1"></i>
+                We'll build a <strong>12-week</strong> base fitness block.
+              </div>
+
+              <div class="wizard-nav">
+                <button class="btn btn-ghost" @click="wizardStep = 1">
+                  <i class="bi bi-arrow-left me-1"></i> Back
+                </button>
+                <button class="btn btn-primary" @click="wizardStep = 3" :disabled="!targetRaceDate && !justBuildingFitness">
+                  Next <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 3: Current Fitness -->
+            <div v-else-if="wizardStep === 3" key="s3" class="wizard-content">
+              <div class="step-label">Tell us about your current fitness</div>
+
+              <div class="field-group">
+                <label class="field-label">Weekly {{ distanceUnit }} (current training)</label>
+                <div class="field-input-row">
+                  <input
+                    type="number"
+                    class="field-input"
+                    v-model.number="weeklyMileageInput"
+                    min="0"
+                    max="200"
+                    placeholder="e.g. 25"
+                    style="max-width: 160px"
+                  />
+                  <span class="field-unit">{{ distanceUnit }}/week</span>
+                </div>
+                <div class="level-derived" v-if="weeklyMileageInput > 0">
+                  <span class="level-chip" :class="derivedLevel">{{ derivedLevelLabel }}</span>
+                  level based on your mileage
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Recent 5K time <span class="optional-label">(optional — enables pace targets)</span></label>
+                <div class="field-input-row">
+                  <input
+                    type="text"
+                    class="field-input"
+                    v-model="recentRaceTimeInput"
+                    placeholder="mm:ss  e.g. 25:00"
+                    style="max-width: 160px"
+                  />
+                </div>
+                <div class="field-hint" v-if="targetSeconds">
+                  <i class="bi bi-stopwatch me-1"></i>
+                  Pace targets will be calculated for all workout types.
+                </div>
+              </div>
+
+              <div class="wizard-nav">
+                <button class="btn btn-ghost" @click="wizardStep = 2">
+                  <i class="bi bi-arrow-left me-1"></i> Back
+                </button>
+                <button class="btn btn-primary" @click="wizardStep = 4" :disabled="weeklyMileageInput <= 0">
+                  Next <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 4: Schedule -->
+            <div v-else-if="wizardStep === 4" key="s4" class="wizard-content">
+              <div class="step-label">Which days can you train?</div>
+              <div class="days-grid">
+                <button
+                  v-for="day in allDays"
+                  :key="day"
+                  :class="['day-btn', { active: availableDays.has(day) }]"
+                  @click="toggleDay(day)"
+                >
+                  <span class="day-abbr">{{ day.slice(0, 3) }}</span>
+                  <span class="day-full">{{ day }}</span>
+                </button>
+              </div>
+              <div class="field-hint mt-2" :class="{ 'hint-warn': availableDays.size < 3 }">
+                <i class="bi bi-info-circle me-1"></i>
+                {{ availableDays.size }} days selected · Minimum 3 required
+              </div>
+
+              <div class="wizard-nav">
+                <button class="btn btn-ghost" @click="wizardStep = 3">
+                  <i class="bi bi-arrow-left me-1"></i> Back
+                </button>
+                <button class="btn btn-primary" @click="goToPreview" :disabled="availableDays.size < 3">
+                  Preview Plan <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 5: Preview -->
+            <div v-else-if="wizardStep === 5 && preview" key="s5" class="wizard-content">
+              <div class="step-label">Your personalized plan</div>
+
+              <div class="preview-card">
+                <!-- Plan header -->
+                <div class="preview-header">
+                  <div class="preview-title-row">
+                    <h3 class="preview-name">{{ preview.name }}</h3>
+                    <span class="engine-badge">
+                      <i class="bi bi-graph-up me-1"></i>Periodized
+                    </span>
+                  </div>
+                  <div class="preview-meta-row">
+                    <span><i class="bi bi-calendar3 me-1"></i>{{ preview.totalWeeks }} weeks</span>
+                    <span><i class="bi bi-repeat me-1"></i>{{ availableDays.size }}x per week</span>
+                    <span><i class="bi bi-flag me-1"></i>Starts {{ formatDateShort(startDate) }}</span>
+                  </div>
+                </div>
+
+                <!-- Phase breakdown -->
+                <div class="phase-breakdown">
+                  <div class="phase-strip" title="Base phase" style="background:#22c55e">
+                    <span class="phase-strip-label">Base</span>
+                    <span class="phase-strip-weeks">{{ preview.phaseBreakdown.base }}w</span>
+                  </div>
+                  <div class="phase-strip" title="Build phase" style="background:#f97316">
+                    <span class="phase-strip-label">Build</span>
+                    <span class="phase-strip-weeks">{{ preview.phaseBreakdown.build }}w</span>
+                  </div>
+                  <div class="phase-strip" title="Peak phase" style="background:#ef4444">
+                    <span class="phase-strip-label">Peak</span>
+                    <span class="phase-strip-weeks">{{ preview.phaseBreakdown.peak }}w</span>
+                  </div>
+                  <div v-if="preview.phaseBreakdown.taper > 0" class="phase-strip" title="Taper" style="background:#3b82f6">
+                    <span class="phase-strip-label">Taper</span>
+                    <span class="phase-strip-weeks">{{ preview.phaseBreakdown.taper }}w</span>
+                  </div>
+                </div>
+
+                <!-- Sample week 1 -->
+                <div class="preview-week">
+                  <div class="preview-week-label">Week 1 — {{ preview.weeks[0]?.theme }}</div>
+                  <div class="preview-workouts">
+                    <div
+                      v-for="wo in preview.weeks[0]?.workouts"
+                      :key="wo.dayLabel"
+                      :class="['preview-workout', { 'is-rest': wo.workoutType === 'REST' }]"
+                    >
+                      <div class="wo-day">{{ wo.dayLabel }}</div>
+                      <div class="wo-type-chip" :style="{ background: typeChipColor(wo.workoutType) }">
+                        {{ wo.workoutType }}
+                      </div>
+                      <div class="wo-name">{{ wo.type }}</div>
+                      <div class="wo-detail" v-if="wo.workoutType !== 'REST'">
+                        {{ formatDistance(wo.distanceMeters) }} · {{ wo.durationMinutes }}min
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Start date picker -->
-              <div class="preview-start">
-                <label class="start-label">Start date</label>
-                <input type="date" class="start-input" v-model="startDate" :min="todayStr" />
-              </div>
-
-              <!-- AI refine toggle -->
-              <div class="ai-refine-row">
-                <div class="ai-refine-info">
-                  <i class="bi bi-stars me-2" style="color: var(--r-accent)"></i>
-                  <div>
-                    <div class="ai-refine-title">Refine with your activity data</div>
-                    <div class="ai-refine-sub">Adjusts volumes based on your recent workouts</div>
-                  </div>
+                <!-- Start date -->
+                <div class="preview-start">
+                  <label class="start-label">Start date</label>
+                  <input type="date" class="start-input" v-model="startDate" :min="todayStr()" @change="rebuildPreview" />
                 </div>
-                <button
-                  class="btn btn-outline-accent btn-sm"
-                  @click="runAiRefine"
-                  :disabled="aiLoading || !activities.length"
-                  :title="!activities.length ? 'Log some activities first' : ''"
-                >
-                  <span v-if="aiLoading" class="spinner-border spinner-border-sm me-1"></span>
-                  <i v-else class="bi bi-stars me-1"></i>
-                  {{ aiLoading ? 'Analyzing…' : aiRefined ? 'Re-refine' : 'Refine' }}
-                </button>
-              </div>
-              <div v-if="aiNote" class="ai-note">
-                <i class="bi bi-info-circle me-2"></i>{{ aiNote }}
-              </div>
 
-              <!-- Actions -->
-              <div class="preview-actions">
-                <button class="btn btn-ghost" @click="preview = null; aiRefined = false">
-                  Cancel
-                </button>
-                <button class="btn btn-primary" @click="confirmCreate" :disabled="creating">
-                  <span v-if="creating" class="spinner-border spinner-border-sm me-2"></span>
-                  Create Plan
-                </button>
+                <!-- Actions -->
+                <div class="preview-actions">
+                  <button class="btn btn-ghost" @click="wizardStep = 4">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                  </button>
+                  <button class="btn btn-primary" @click="confirmCreate" :disabled="creating">
+                    <span v-if="creating" class="spinner-border spinner-border-sm me-2"></span>
+                    Create Plan
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </Transition>
+          </Transition>
+        </div>
 
         <!-- Loading state -->
         <AppSpinner v-if="plansLoading" label="Loading plans…" />
 
-        <!-- Empty state (no plans + no goal selected yet + not loading) -->
+        <!-- Empty state (no plans + wizard at step 1 + not loading) -->
         <EmptyState
-          v-else-if="!plans.length && !selectedGoal"
+          v-else-if="!plans.length && wizardStep === 1 && !selectedGoal"
           icon="bi-calendar3"
           title="No plans yet"
-          message="Build a custom plan or start from a template."
-          action-label="Create Plan"
-          @action="selectedGoal = goals[0].key"
+          message="Build a personalized periodized plan in 5 steps."
         />
       </section>
     </div>
@@ -197,23 +321,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePlanStore } from '@/stores/plan.js'
-import { useActivityStore } from '@/stores/activity.js'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
+import { useAuthStore } from '@/stores/auth.js'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 
 const router = useRouter()
 const planStore = usePlanStore()
-const activityStore = useActivityStore()
+const authStore = useAuthStore()
 const { plans } = storeToRefs(planStore)
-const { activities } = storeToRefs(activityStore)
 const { formatDistance } = useUnits()
+const { unitSystem } = storeToRefs(authStore)
 
-// Status
+// ── Status ──────────────────────────────────────────
 const statusMessage = ref('')
 const statusType = ref('success')
 let statusTimer = null
@@ -224,18 +348,97 @@ const showStatus = (msg, type = 'success') => {
   statusTimer = setTimeout(() => { statusMessage.value = '' }, 4000)
 }
 
-// Plan creation state
+// ── Wizard state ────────────────────────────────────
+const wizardStep = ref(1)
+const stepLabels = ['Goal', 'Race Date', 'Fitness', 'Schedule', 'Preview']
+
 const selectedGoal = ref(null)
-const selectedLevel = ref(null)
+const targetRaceDate = ref('')
+const justBuildingFitness = ref(false)
+const weeklyMileageInput = ref(0)
+const recentRaceTimeInput = ref('')
+const availableDays = ref(new Set(['Monday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday']))
+const startDate = ref(nextMonday())
 const preview = ref(null)
-const startDate = ref(todayStr())
 const creating = ref(false)
-const aiLoading = ref(false)
-const aiRefined = ref(false)
-const aiNote = ref('')
 
-// ── Goal & Level definitions ──────────────────────
+// ── Units ───────────────────────────────────────────
+const distanceUnit = computed(() => unitSystem.value === 'imperial' ? 'mi' : 'km')
+const metersPerUnit = computed(() => unitSystem.value === 'imperial' ? 1609.344 : 1000)
+const currentWeeklyMeters = computed(() =>
+  Math.round((weeklyMileageInput.value || 0) * metersPerUnit.value)
+)
 
+// ── Race time parsing ────────────────────────────────
+const targetSeconds = computed(() => {
+  const t = recentRaceTimeInput.value.trim()
+  if (!t) return null
+  const parts = t.split(':').map(Number)
+  if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+    return parts[0] * 60 + parts[1]
+  }
+  if (parts.length === 3 && parts.every(p => !isNaN(p))) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+  }
+  return null
+})
+
+// ── Derived level ────────────────────────────────────
+const derivedLevel = computed(() => {
+  const miles = unitSystem.value === 'imperial'
+    ? weeklyMileageInput.value
+    : weeklyMileageInput.value * 0.621371
+  if (miles < 20) return 'beginner'
+  if (miles < 40) return 'intermediate'
+  return 'advanced'
+})
+const derivedLevelLabel = computed(() => {
+  const m = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' }
+  return m[derivedLevel.value]
+})
+
+// ── Date helpers ─────────────────────────────────────
+function nextMonday() {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = day === 0 ? 1 : 8 - day
+  const mon = new Date(d.getTime() + diff * 86400000)
+  return mon.toISOString().slice(0, 10)
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+const minRaceDate = computed(() => {
+  const d = new Date(startDate.value || todayStr())
+  d.setDate(d.getDate() + 28) // minimum 4 weeks
+  return d.toISOString().slice(0, 10)
+})
+
+const computedTotalWeeks = computed(() => {
+  if (!targetRaceDate.value || !startDate.value) return 0
+  const s = new Date(startDate.value)
+  const e = new Date(targetRaceDate.value)
+  return Math.max(4, Math.round((e - s) / (7 * 86400000)))
+})
+
+function formatDateShort(str) {
+  if (!str) return '—'
+  return new Date(str + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+function onJustFitnessToggle() {
+  if (justBuildingFitness.value) {
+    const d = new Date()
+    d.setDate(d.getDate() + 84)
+    targetRaceDate.value = d.toISOString().slice(0, 10)
+  } else {
+    targetRaceDate.value = ''
+  }
+}
+
+// ── Goals & constants ────────────────────────────────
 const goals = [
   { key: '5k',       label: '5K',           emoji: '🏃', sport: 'Running' },
   { key: '10k',      label: '10K',          emoji: '🏃', sport: 'Running' },
@@ -245,271 +448,216 @@ const goals = [
   { key: 'swim',     label: 'Swim Fitness', emoji: '🏊', sport: 'Swimming' },
 ]
 
-const levels = [
-  { key: 'beginner',     label: 'Beginner',     icon: '🌱' },
-  { key: 'intermediate', label: 'Intermediate', icon: '⚡' },
-  { key: 'advanced',     label: 'Advanced',     icon: '🔥' },
-]
+const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-const LEVEL_DESCS = {
-  '5k': {
-    beginner:     '8 wks · 3x/wk · 15–25 km/wk',
-    intermediate: '8 wks · 4x/wk · 25–40 km/wk',
-    advanced:     '8 wks · 5x/wk · 40–55 km/wk',
-  },
-  '10k': {
-    beginner:     '10 wks · 3x/wk · 20–30 km/wk',
-    intermediate: '10 wks · 4x/wk · 30–50 km/wk',
-    advanced:     '10 wks · 5x/wk · 50–70 km/wk',
-  },
-  half: {
-    beginner:     '12 wks · 4x/wk · 30–50 km/wk',
-    intermediate: '12 wks · 5x/wk · 50–70 km/wk',
-    advanced:     '14 wks · 6x/wk · 70–90 km/wk',
-  },
-  marathon: {
-    beginner:     '16 wks · 4x/wk · 40–60 km/wk',
-    intermediate: '16 wks · 5x/wk · 60–80 km/wk',
-    advanced:     '18 wks · 6x/wk · 80–110 km/wk',
-  },
-  cycling: {
-    beginner:     '8 wks · 3x/wk · 60–100 km/wk',
-    intermediate: '8 wks · 4x/wk · 100–160 km/wk',
-    advanced:     '10 wks · 5x/wk · 160–250 km/wk',
-  },
-  swim: {
-    beginner:     '6 wks · 3x/wk · 6–10 km/wk',
-    intermediate: '8 wks · 4x/wk · 10–18 km/wk',
-    advanced:     '10 wks · 5x/wk · 18–30 km/wk',
-  },
+function toggleDay(day) {
+  if (availableDays.value.has(day)) {
+    if (availableDays.value.size > 3) {
+      availableDays.value.delete(day)
+    }
+  } else {
+    availableDays.value.add(day)
+  }
 }
 
-const getLevelDesc = (goalKey, levelKey) => LEVEL_DESCS[goalKey]?.[levelKey] || ''
+// ── Periodization engine ─────────────────────────────
 
-// ── Template generation ───────────────────────────
-
-const TEMPLATES = {
-  '5k': {
-    beginner:     { weeks: 8,  days: 3, baseDist: 15000, goal: '5K'           },
-    intermediate: { weeks: 8,  days: 4, baseDist: 25000, goal: '5K'           },
-    advanced:     { weeks: 8,  days: 5, baseDist: 40000, goal: '5K'           },
-  },
-  '10k': {
-    beginner:     { weeks: 10, days: 3, baseDist: 20000, goal: '10K'          },
-    intermediate: { weeks: 10, days: 4, baseDist: 30000, goal: '10K'          },
-    advanced:     { weeks: 10, days: 5, baseDist: 50000, goal: '10K'          },
-  },
-  half: {
-    beginner:     { weeks: 12, days: 4, baseDist: 30000, goal: 'Half Marathon' },
-    intermediate: { weeks: 12, days: 5, baseDist: 50000, goal: 'Half Marathon' },
-    advanced:     { weeks: 14, days: 6, baseDist: 70000, goal: 'Half Marathon' },
-  },
-  marathon: {
-    beginner:     { weeks: 16, days: 4, baseDist: 40000, goal: 'Marathon'     },
-    intermediate: { weeks: 16, days: 5, baseDist: 60000, goal: 'Marathon'     },
-    advanced:     { weeks: 18, days: 6, baseDist: 80000, goal: 'Marathon'     },
-  },
-  cycling: {
-    beginner:     { weeks: 8,  days: 3, baseDist: 60000,  goal: 'Cycling Base' },
-    intermediate: { weeks: 8,  days: 4, baseDist: 100000, goal: 'Cycling Base' },
-    advanced:     { weeks: 10, days: 5, baseDist: 160000, goal: 'Cycling Base' },
-  },
-  swim: {
-    beginner:     { weeks: 6,  days: 3, baseDist: 6000,  goal: 'Swim Fitness' },
-    intermediate: { weeks: 8,  days: 4, baseDist: 10000, goal: 'Swim Fitness' },
-    advanced:     { weeks: 10, days: 5, baseDist: 18000, goal: 'Swim Fitness' },
-  },
+const WORKOUT_DESCS = {
+  EASY:     'Conversational pace, HR zone 2. Focus on easy effort.',
+  TEMPO:    'Comfortably hard. Sustained effort at lactate threshold.',
+  LONG_RUN: 'Slow and steady. The cornerstone of endurance training.',
+  INTERVAL: 'Short, hard efforts with recovery. Builds speed and VO2max.',
+  RECOVERY: 'Very easy pace. Active recovery between hard sessions.',
+}
+const CYCLING_DESCS = {
+  EASY: 'Steady aerobic effort, HR zone 2.', TEMPO: 'Sustained hard effort at threshold power.',
+  INTERVAL: 'Hard efforts above threshold, full recovery between.',
+  LONG_RUN: 'Long slow distance. Build endurance base.', RECOVERY: 'Very easy spinning. Flush the legs.',
+}
+const SWIM_DESCS = {
+  EASY: 'Steady aerobic effort, consistent pace.', TEMPO: 'Sustained moderate-hard effort.',
+  INTERVAL: 'Hard efforts with rest. Build speed and efficiency.',
+  LONG_RUN: 'Extended distance at comfortable pace.', RECOVERY: 'Easy technique focus.',
 }
 
-const WEEK_THEMES = [
-  'Base Building', 'Building Aerobic Base', 'Increasing Volume',
-  'Steady Progress', 'Building Strength', 'Peak Training',
-  'Peak Week', 'Speed Work', 'Race Preparation', 'Taper',
-  'Taper Week', 'Race Week', 'Recovery', 'Active Recovery',
-  'Base Fitness', 'Consolidation', 'Endurance Focus', 'Race Sharpening',
-]
-
-const WORKOUT_SCHEDULES = {
-  3: ['Monday', 'Wednesday', 'Saturday'],
-  4: ['Monday', 'Wednesday', 'Friday', 'Sunday'],
-  5: ['Monday', 'Tuesday', 'Thursday', 'Friday', 'Sunday'],
-  6: ['Monday', 'Tuesday', 'Wednesday', 'Friday', 'Saturday', 'Sunday'],
+function getWorkoutDesc(wType, sport) {
+  if (sport === 'Cycling') return CYCLING_DESCS[wType] || ''
+  if (sport === 'Swimming') return SWIM_DESCS[wType] || ''
+  return WORKOUT_DESCS[wType] || ''
 }
 
-const WORKOUT_TYPES_BY_DAYS = {
-  3: ['Easy Run', 'Tempo Run',    'Long Run'],
-  4: ['Easy Run', 'Interval',     'Easy Run', 'Long Run'],
-  5: ['Easy Run', 'Tempo Run',    'Easy Run', 'Interval', 'Long Run'],
-  6: ['Easy Run', 'Tempo Run',    'Easy Run', 'Interval', 'Easy Run', 'Long Run'],
+function getTypeDisplay(wType, sport) {
+  if (sport === 'Cycling') {
+    return { EASY: 'Endurance Ride', TEMPO: 'Tempo Ride', INTERVAL: 'Interval Ride', LONG_RUN: 'Long Ride', RECOVERY: 'Recovery Ride', REST: 'Rest' }[wType] || wType
+  }
+  if (sport === 'Swimming') {
+    return { EASY: 'Endurance Swim', TEMPO: 'Tempo Swim', INTERVAL: 'Interval Swim', LONG_RUN: 'Long Swim', RECOVERY: 'Recovery Swim', REST: 'Rest' }[wType] || wType
+  }
+  return { EASY: 'Easy Run', TEMPO: 'Tempo Run', INTERVAL: 'Interval', LONG_RUN: 'Long Run', RECOVERY: 'Recovery Run', REST: 'Rest' }[wType] || wType
 }
 
-const CYCLING_TYPES = {
-  3: ['Endurance Ride', 'Interval Ride', 'Long Ride'],
-  4: ['Endurance Ride', 'Interval Ride', 'Recovery Ride', 'Long Ride'],
-  5: ['Endurance Ride', 'Tempo Ride',    'Interval Ride', 'Recovery Ride', 'Long Ride'],
+function computePaceTarget(wType) {
+  if (!targetSeconds.value || targetSeconds.value <= 0) return null
+  // Treat recent race time as 5K time → s/km
+  const paceSkm = targetSeconds.value / 5
+  switch (wType) {
+    case 'EASY':     return Math.round(paceSkm + 120)
+    case 'TEMPO':    return Math.round(paceSkm + 30)
+    case 'INTERVAL': return Math.round(paceSkm - 10)
+    case 'LONG_RUN': return Math.round(paceSkm + 100)
+    default:         return null
+  }
 }
 
-const SWIM_TYPES = {
-  3: ['Technique Swim', 'Endurance Swim', 'Long Swim'],
-  4: ['Technique Swim', 'Interval Swim',  'Endurance Swim', 'Long Swim'],
-  5: ['Technique Swim', 'Interval Swim',  'Endurance Swim', 'Drill Set', 'Long Swim'],
+function assignWorkoutTypes(numDays, phase) {
+  const assignments = new Array(numDays).fill('EASY')
+  if (numDays === 0) return []
+
+  assignments[numDays - 1] = 'LONG_RUN'
+
+  if (phase === 'BUILD' || phase === 'PEAK') {
+    if (numDays >= 3) {
+      const midIdx = Math.floor(numDays / 2)
+      assignments[midIdx] = 'INTERVAL'
+      if (numDays >= 4) {
+        // Find TEMPO slot not adjacent to INTERVAL or LONG_RUN
+        let placed = false
+        for (let i = 1; i < numDays - 1 && !placed; i++) {
+          if (assignments[i] === 'EASY' && Math.abs(i - midIdx) > 1) {
+            assignments[i] = 'TEMPO'
+            placed = true
+          }
+        }
+        if (!placed) {
+          for (let i = 1; i < numDays - 1 && !placed; i++) {
+            if (assignments[i] === 'EASY') { assignments[i] = 'TEMPO'; placed = true }
+          }
+        }
+      }
+    }
+  } else if (phase === 'TAPER') {
+    if (numDays >= 2) {
+      assignments[Math.min(1, numDays - 2)] = 'TEMPO'
+    }
+  }
+  // BASE: EASY + LONG_RUN only
+  return assignments
 }
 
-const WORKOUT_DESCRIPTIONS = {
-  'Easy Run':       'Conversational pace, HR zone 2. Focus on easy effort.',
-  'Tempo Run':      'Comfortably hard. Sustained effort at lactate threshold.',
-  'Long Run':       'Slow and steady. The cornerstone of endurance training.',
-  'Interval':       'Short, hard efforts with recovery. Builds speed and VO2max.',
-  'Recovery Run':   'Very easy pace. Active recovery between hard sessions.',
-  'Endurance Ride': 'Steady aerobic effort, HR zone 2.',
-  'Tempo Ride':     'Sustained hard effort at threshold power.',
-  'Interval Ride':  'Hard efforts above threshold, full recovery between.',
-  'Recovery Ride':  'Very easy spinning. Flush the legs.',
-  'Long Ride':      'Long slow distance. Build endurance base.',
-  'Technique Swim': 'Focus on form — drills and feel for the water.',
-  'Endurance Swim': 'Steady aerobic effort, consistent pace.',
-  'Long Swim':      'Extended distance at comfortable pace.',
-  'Interval Swim':  'Hard efforts with rest. Build speed and efficiency.',
-  'Drill Set':      'Kick sets, pull buoy, paddles. Technical focus.',
-  'Rest':           'Full rest day. Recover and absorb training.',
-  'Cross Training': 'Low-impact cardio — swim, bike, yoga.',
-}
+function generatePlanWeeks() {
+  const goalDef = goals.find(g => g.key === selectedGoal.value)
+  if (!goalDef) return []
+  const sport = goalDef.sport
 
-function getWorkoutTypes(goalKey, days) {
-  if (goalKey === 'cycling') return CYCLING_TYPES[days] || CYCLING_TYPES[3]
-  if (goalKey === 'swim')    return SWIM_TYPES[days]    || SWIM_TYPES[3]
-  return WORKOUT_TYPES_BY_DAYS[days] || WORKOUT_TYPES_BY_DAYS[3]
-}
+  const totalWeeks = computedTotalWeeks.value
+  const baseWks  = Math.ceil(totalWeeks * 0.40)
+  const buildWks = Math.ceil(totalWeeks * 0.35)
+  const peakWks  = Math.ceil(totalWeeks * 0.15)
+  const taperWks = Math.max(0, totalWeeks - baseWks - buildWks - peakWks)
 
-function generatePlanWeeks(tpl, goalKey, levelKey) {
-  const { weeks, days, baseDist } = tpl
-  const schedule = WORKOUT_SCHEDULES[days] || WORKOUT_SCHEDULES[3]
-  const types = getWorkoutTypes(goalKey, days)
-  const distPerWorkout = baseDist / days
+  const dayOrder = allDays
+  const sortedDays = [...availableDays.value].sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b))
+  const numDays = sortedDays.length
 
-  return Array.from({ length: weeks }, (_, wi) => {
-    const isCutback = (wi + 1) % 4 === 0
-    const isTaper   = wi >= weeks - 2
-    const isPeak    = wi === weeks - 3
+  // Build volume array (10% rule)
+  const volumes = []
+  let vol = currentWeeklyMeters.value || 30000
+  let maxVol = vol
+  const taperStart = baseWks + buildWks + peakWks
 
-    let multiplier = isTaper ? 0.6 : isCutback ? 0.7 : 1 + (wi * 0.08)
-    if (isPeak) multiplier = Math.max(multiplier, 1.5)
+  for (let w = 0; w < totalWeeks; w++) {
+    if (w >= taperStart) { volumes.push(-1); continue }
+    const isCutback = (w + 1) % 4 === 0
+    if (isCutback) {
+      const cutVol = Math.round(vol * 0.70)
+      volumes.push(cutVol)
+      vol = Math.round(cutVol * 1.10)
+    } else {
+      volumes.push(vol)
+      maxVol = Math.max(maxVol, vol)
+      vol = Math.round(vol * 1.10)
+    }
+  }
 
-    // Theme selection
-    let theme
-    if (isTaper) theme = wi === weeks - 1 ? 'Race Week' : 'Taper'
-    else if (isPeak) theme = 'Peak Week'
-    else if (isCutback) theme = 'Recovery'
-    else theme = WEEK_THEMES[wi % 6] // cycle through base themes
+  const taperFactors = [0.80, 0.60, 0.40]
+  for (let i = 0; i < taperWks; i++) {
+    volumes[taperStart + i] = Math.round(maxVol * (taperFactors[i] ?? 0.40))
+  }
 
-    const workouts = schedule.map((day, di) => {
-      const type = types[di] || 'Easy Run'
-      const isLong = type.includes('Long')
-      const distFactor = isLong ? 1.8 : type.includes('Easy') || type.includes('Recovery') ? 0.8 : 1.1
-      const dist = Math.round(distPerWorkout * multiplier * distFactor / 500) * 500
-      const duration = Math.round(dist / 1000 * (type.includes('Easy') ? 6.5 : type.includes('Long') ? 7 : 5))
+  const weeks = []
+  for (let w = 0; w < totalWeeks; w++) {
+    const weekNum = w + 1
+    const weekVol = volumes[w] || currentWeeklyMeters.value || 30000
+
+    let phase, theme
+    if (weekNum <= baseWks) {
+      phase = 'BASE'; theme = weekNum % 4 === 0 ? 'Recovery' : 'Base Building'
+    } else if (weekNum <= baseWks + buildWks) {
+      phase = 'BUILD'; theme = weekNum % 4 === 0 ? 'Recovery' : 'Build Phase'
+    } else if (weekNum <= baseWks + buildWks + peakWks) {
+      phase = 'PEAK'; theme = 'Peak Week'
+    } else {
+      phase = 'TAPER'; theme = weekNum === totalWeeks ? 'Race Week' : 'Taper'
+    }
+
+    const workoutTypes = assignWorkoutTypes(numDays, phase)
+    const distPerDay = weekVol / numDays
+
+    const workouts = sortedDays.map((dayLabel, i) => {
+      const wType = workoutTypes[i]
+      const distFactor = wType === 'LONG_RUN' ? 1.8
+                       : (wType === 'EASY' || wType === 'RECOVERY') ? 0.8
+                       : 1.1
+      const dist = Math.max(0, Math.round(distPerDay * distFactor / 500) * 500)
+      const paceMinKm = wType === 'LONG_RUN' ? 7 : wType === 'EASY' ? 6.5
+                     : wType === 'RECOVERY' ? 7.5 : wType === 'TEMPO' ? 5.5 : 4.8
+      const duration = Math.max(20, Math.round(dist / 1000 * paceMinKm))
 
       return {
-        id: `${wi}-${di}`,
-        dayLabel: day,
-        type,
+        id: `${weekNum}-${i}`,
+        dayLabel,
+        day: i + 1,
+        type: getTypeDisplay(wType, sport),
+        workoutType: wType,
         distanceMeters: dist,
         durationMinutes: duration,
-        description: WORKOUT_DESCRIPTIONS[type] || '',
+        description: getWorkoutDesc(wType, sport),
+        targetPaceSeconds: computePaceTarget(wType),
         completed: false,
       }
     })
 
-    return { weekNumber: wi + 1, theme, workouts }
-  })
+    weeks.push({ weekNumber: weekNum, theme, phase, workouts })
+  }
+
+  return weeks
 }
 
-// ── UI helpers ─────────────────────────────────────
+// ── Wizard navigation ────────────────────────────────
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10)
+function goToPreview() {
+  rebuildPreview()
+  wizardStep.value = 5
 }
 
-function formatDateShort(str) {
-  if (!str) return '—'
-  return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
-function getSportIcon(sport) {
-  const map = { Running: '🏃', Cycling: '🚴', Swimming: '🏊', Hiking: '🥾', Walking: '🚶' }
-  return map[sport] || '🏋️'
-}
-
-function currentWeekOf(plan) {
-  if (!plan.startDate) return 1
-  const start = new Date(plan.startDate)
-  const now = new Date()
-  const diff = Math.floor((now - start) / (7 * 24 * 3600 * 1000))
-  return Math.min(Math.max(diff + 1, 1), plan.totalWeeks)
-}
-
-function planProgressPct(plan) {
-  return Math.round((currentWeekOf(plan) / plan.totalWeeks) * 100)
-}
-
-// ── Plan creation flow ────────────────────────────
-
-function selectGoal(key) {
-  selectedGoal.value = key
-  selectedLevel.value = null
-  preview.value = null
-  aiRefined.value = false
-  aiNote.value = ''
-}
-
-function buildPreview() {
-  if (!selectedGoal.value || !selectedLevel.value) return
+function rebuildPreview() {
+  if (!selectedGoal.value || !targetRaceDate.value) return
   const goalDef = goals.find(g => g.key === selectedGoal.value)
-  const tpl = TEMPLATES[selectedGoal.value][selectedLevel.value]
-  const weeks = generatePlanWeeks(tpl, selectedGoal.value, selectedLevel.value)
+  const weeks = generatePlanWeeks()
+  const totalWeeks = computedTotalWeeks.value
+  const baseWks  = Math.ceil(totalWeeks * 0.40)
+  const buildWks = Math.ceil(totalWeeks * 0.35)
+  const peakWks  = Math.ceil(totalWeeks * 0.15)
+  const taperWks = Math.max(0, totalWeeks - baseWks - buildWks - peakWks)
 
+  const levelLabel = derivedLevelLabel.value
   preview.value = {
-    name: `${goalDef.label} — ${selectedLevel.value.charAt(0).toUpperCase() + selectedLevel.value.slice(1)}`,
+    name: `${goalDef.label} — ${levelLabel}`,
     sport: goalDef.sport,
     goal: goalDef.label,
-    level: selectedLevel.value,
-    totalWeeks: tpl.weeks,
-    daysPerWeek: tpl.days,
+    totalWeeks,
+    phaseBreakdown: { base: baseWks, build: buildWks, peak: peakWks, taper: taperWks },
     weeks,
-  }
-  aiRefined.value = false
-  aiNote.value = ''
-  startDate.value = todayStr()
-}
-
-async function runAiRefine() {
-  if (!preview.value || aiLoading.value) return
-  aiLoading.value = true
-  aiNote.value = ''
-  try {
-    const goalDef = goals.find(g => g.key === selectedGoal.value)
-    const refined = await planStore.suggestPlan({
-      sport: goalDef.sport,
-      goal: selectedGoal.value,
-      level: selectedLevel.value,
-      recentActivities: (activities.value || []).slice(0, 20).map(a => ({
-        distanceMeters: a.distanceMeters,
-        durationSeconds: a.durationSeconds,
-        sportType: a.sportType,
-        createdAt: a.createdAt,
-      })),
-    })
-    // Merge AI weeks into preview, keep local structure
-    preview.value.weeks = refined.weeks || preview.value.weeks
-    if (refined.name) preview.value.name = refined.name
-    aiRefined.value = true
-    aiNote.value = 'Volumes adjusted to match your recent training load.'
-  } catch {
-    // Silent fallback — keep template
-    aiRefined.value = false
-    aiNote.value = 'Using template plan (AI service unavailable).'
-  } finally {
-    aiLoading.value = false
   }
 }
 
@@ -517,22 +665,75 @@ async function confirmCreate() {
   if (!preview.value || creating.value) return
   creating.value = true
   try {
+    const flatWorkouts = preview.value.weeks.flatMap(week =>
+      week.workouts.map(wo => ({
+        weekNumber: week.weekNumber,
+        day: wo.day,
+        title: wo.dayLabel,
+        description: wo.description,
+        workoutType: wo.workoutType,
+        distanceMeters: wo.distanceMeters,
+        durationMinutes: wo.durationMinutes,
+        targetPaceSeconds: wo.targetPaceSeconds || null,
+      }))
+    )
+
     const payload = {
-      ...preview.value,
+      name: preview.value.name,
+      sport: preview.value.sport,
+      goal: preview.value.goal,
+      level: derivedLevel.value,
+      totalWeeks: preview.value.totalWeeks,
+      daysPerWeek: availableDays.value.size,
       startDate: startDate.value,
-      isActive: plans.value.length === 0, // first plan auto-activates
+      targetRaceDate: targetRaceDate.value,
+      currentWeeklyMeters: currentWeeklyMeters.value,
+      targetSeconds: targetSeconds.value || null,
+      isActive: plans.value.length === 0,
+      workouts: flatWorkouts,
     }
+
     const created = await planStore.createPlan(payload)
     showStatus(`"${created.name}" created!`)
-    preview.value = null
+    // Reset wizard
+    wizardStep.value = 1
     selectedGoal.value = null
-    selectedLevel.value = null
+    targetRaceDate.value = ''
+    preview.value = null
+    weeklyMileageInput.value = 0
+    recentRaceTimeInput.value = ''
+    availableDays.value = new Set(['Monday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday'])
     router.push(`/plans/${created.id}`)
-  } catch (err) {
+  } catch {
     showStatus('Failed to create plan. Try again.', 'error')
   } finally {
     creating.value = false
   }
+}
+
+// ── Plan card helpers ────────────────────────────────
+
+function getSportIcon(sport) {
+  return { Running: '🏃', Cycling: '🚴', Swimming: '🏊', Hiking: '🥾', Walking: '🚶' }[sport] || '🏋️'
+}
+
+function currentWeekOf(plan) {
+  if (!plan.startDate) return 1
+  const diff = Math.floor((Date.now() - new Date(plan.startDate).getTime()) / (7 * 86400000))
+  return Math.min(Math.max(diff + 1, 1), plan.totalWeeks)
+}
+
+function planProgressPct(plan) {
+  return Math.round((currentWeekOf(plan) / plan.totalWeeks) * 100)
+}
+
+// ── Chip colors ──────────────────────────────────────
+
+function typeChipColor(wType) {
+  return {
+    EASY: '#22c55e', TEMPO: '#f97316', INTERVAL: '#ef4444',
+    LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#e5e7eb',
+  }[wType] || '#767676'
 }
 
 const plansLoading = ref(false)
@@ -544,7 +745,6 @@ onMounted(async () => {
   } finally {
     plansLoading.value = false
   }
-  activityStore.fetchActivities()
 })
 </script>
 
@@ -571,8 +771,7 @@ onMounted(async () => {
   position: fixed; top: 90px; right: 24px; z-index: 9000;
   display: flex; align-items: center; gap: 10px;
   padding: 14px 20px; border-radius: 0;
-  font-weight: 700; font-size: 0.9rem;
-  box-shadow: none;
+  font-weight: 700; font-size: 0.9rem; box-shadow: none;
   animation: slideInRight 0.3s ease;
 }
 .status-toast.success { background: #047857; color: white; }
@@ -589,129 +788,174 @@ onMounted(async () => {
 
 /* My Plans Grid */
 .plans-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-
 .plan-card {
-  background: white; border: 1px solid #E5E5E5;
-  border-radius: 0; padding: 24px; cursor: pointer;
-  transition: all 0.2s; box-shadow: none;
+  background: white; border: 1px solid #E5E5E5; border-radius: 0; padding: 24px;
+  cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.plan-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
 .plan-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
-.plan-card-active { border-color: #767676; box-shadow: none; }
-
+.plan-card-active { border-color: #767676; }
 .plan-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
 .plan-sport-icon { font-size: 2.2rem; }
 .plan-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-
-.plan-badge {
-  padding: 4px 10px; border-radius: 0;
-  font-size: 0.72rem; font-weight: 700; text-transform: capitalize;
-}
+.plan-badge { padding: 4px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; text-transform: capitalize; }
 .plan-badge-level.beginner     { background: #f0f0f0; color: #555; }
 .plan-badge-level.intermediate { background: #1a1a1a; color: #fff; }
-.plan-badge-level.advanced     { background: var(--rk-void, #0D0512); color: var(--rk-signal, #8B2BE2); }
+.plan-badge-level.advanced     { background: #0D0512; color: #8B2BE2; }
 .plan-badge-active { background: rgba(0,0,0,0.08); color: #000; }
-
 .plan-name { font-weight: 900; font-size: 1.05rem; margin: 0 0 4px; color: rgba(15,18,16,0.92); }
 .plan-meta { font-size: 0.82rem; color: rgba(15,18,16,0.55); margin: 0 0 14px; }
-
 .plan-progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: rgba(15,18,16,0.65); margin-bottom: 6px; }
 .plan-progress-bar { height: 6px; background: rgba(15,18,16,0.08); border-radius: 0; overflow: hidden; }
 .plan-progress-fill { height: 100%; background: #000; border-radius: 0; transition: width 0.5s; }
 
-/* Step blocks */
-.step-block { margin-bottom: 32px; }
-.step-label { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(15,18,16,0.50); margin-bottom: 14px; }
+/* Wizard */
+.new-plan-section { max-width: 860px; }
+.wizard { background: white; border: 1px solid #E5E5E5; border-radius: 0; overflow: hidden; }
+
+/* Step indicator bar */
+.wizard-steps-bar {
+  display: flex; background: #f8f8f8; border-bottom: 1px solid #E5E5E5; padding: 20px 28px; gap: 0;
+}
+.wsb-step {
+  display: flex; align-items: center; gap: 8px; flex: 1;
+  color: rgba(15,18,16,0.35); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.wsb-step:not(:last-child)::after {
+  content: ''; flex: 1; height: 1px; background: rgba(15,18,16,0.12); margin: 0 8px;
+}
+.wsb-dot {
+  width: 26px; height: 26px; border-radius: 0; border: 2px solid rgba(15,18,16,0.18);
+  display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 900;
+  flex-shrink: 0; background: white;
+}
+.wsb-step.active { color: #000; }
+.wsb-step.active .wsb-dot { border-color: #000; background: #000; color: white; }
+.wsb-step.done { color: rgba(15,18,16,0.55); }
+.wsb-step.done .wsb-dot { border-color: #22c55e; background: #22c55e; color: white; }
+.wsb-label { display: none; }
+@media (min-width: 580px) { .wsb-label { display: inline; } }
+
+/* Wizard content */
+.wizard-content { padding: 32px 28px; }
+.step-label { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(15,18,16,0.50); margin-bottom: 18px; }
 
 /* Goal tabs */
-.goal-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+.goal-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
 .goal-tab {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 16px 20px; min-width: 90px;
   background: white; border: 2px solid rgba(15,18,16,0.10);
-  border-radius: 0; cursor: pointer; transition: all 0.2s;
-  font-family: inherit;
+  border-radius: 0; cursor: pointer; transition: all 0.2s; font-family: inherit;
 }
 .goal-tab:hover { border-color: rgba(15,18,16,0.22); transform: translateY(-1px); }
-.goal-tab.active { border-color: #000; background: rgba(0,0,0,0.05); box-shadow: none; }
+.goal-tab.active { border-color: #000; background: rgba(0,0,0,0.04); }
 .goal-emoji { font-size: 1.8rem; }
 .goal-name { font-weight: 700; font-size: 0.85rem; color: rgba(15,18,16,0.85); white-space: nowrap; }
 
-/* Level cards */
-.level-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 600px; }
-.level-card {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 22px 16px; background: white;
-  border: 2px solid rgba(15,18,16,0.10); border-radius: 0;
-  cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: center;
+/* Field groups */
+.field-group { margin-bottom: 24px; }
+.field-label { display: block; font-weight: 700; font-size: 0.88rem; color: rgba(15,18,16,0.75); margin-bottom: 8px; }
+.field-input {
+  padding: 10px 14px; border: 1px solid #E5E5E5; border-radius: 0;
+  font-family: inherit; font-size: 0.95rem; background: #fff; cursor: text; width: 100%;
 }
-.level-card:hover { border-color: rgba(15,18,16,0.22); transform: translateY(-1px); }
-.level-card.active { border-color: #000; background: rgba(0,0,0,0.05); box-shadow: none; }
-.level-icon { font-size: 1.8rem; }
-.level-name { font-weight: 900; font-size: 0.95rem; color: rgba(15,18,16,0.90); }
-.level-desc { font-size: 0.78rem; color: rgba(15,18,16,0.55); line-height: 1.4; }
+.field-input:focus { outline: none; border-color: #767676; }
+.field-input-row { display: flex; align-items: center; gap: 10px; }
+.field-unit { font-size: 0.9rem; font-weight: 700; color: rgba(15,18,16,0.55); white-space: nowrap; }
+.field-hint { font-size: 0.83rem; color: rgba(15,18,16,0.55); margin-top: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.hint-warn { color: #b45309; }
+.optional-label { font-weight: 400; color: rgba(15,18,16,0.45); font-size: 0.82rem; }
+.mt-2 { margin-top: 8px; }
+
+/* Toggle (just building fitness) */
+.fitness-toggle-row { margin-bottom: 20px; }
+.fitness-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.fitness-toggle input[type="checkbox"] { display: none; }
+.toggle-track {
+  width: 40px; height: 22px; background: rgba(15,18,16,0.15); border-radius: 11px;
+  position: relative; transition: background 0.2s; flex-shrink: 0;
+}
+.fitness-toggle input:checked + .toggle-track { background: #000; }
+.toggle-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%; background: white;
+  transition: transform 0.2s;
+}
+.fitness-toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+.toggle-label { font-weight: 700; font-size: 0.9rem; color: rgba(15,18,16,0.78); }
+
+/* Level derived badge */
+.level-derived { margin-top: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: rgba(15,18,16,0.60); }
+.level-chip { padding: 3px 10px; border-radius: 0; font-size: 0.78rem; font-weight: 700; text-transform: capitalize; }
+.level-chip.beginner     { background: #f0f0f0; color: #555; }
+.level-chip.intermediate { background: #1a1a1a; color: #fff; }
+.level-chip.advanced     { background: #0D0512; color: #8B2BE2; }
+
+/* Days grid */
+.days-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.day-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 12px 14px; min-width: 60px; background: white;
+  border: 2px solid rgba(15,18,16,0.10); border-radius: 0;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.day-btn:hover { border-color: rgba(15,18,16,0.25); }
+.day-btn.active { border-color: #000; background: rgba(0,0,0,0.05); }
+.day-abbr { font-weight: 900; font-size: 0.88rem; color: rgba(15,18,16,0.85); }
+.day-full { font-size: 0.7rem; color: rgba(15,18,16,0.45); display: none; }
+@media (min-width: 500px) { .day-full { display: block; } }
 
 /* Preview card */
-.preview-card {
-  background: white; border: 1px solid #E5E5E5;
-  border-radius: 0; overflow: hidden;
-  box-shadow: none;
-}
-.preview-header {
-  padding: 24px 28px 20px;
-  border-bottom: 1px solid rgba(15,18,16,0.08);
-  background: #fff;
-}
+.preview-card { background: #fff; border: 1px solid #E5E5E5; }
+.preview-header { padding: 24px 28px 20px; border-bottom: 1px solid rgba(15,18,16,0.08); }
 .preview-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .preview-name { font-weight: 900; font-size: 1.3rem; color: rgba(15,18,16,0.92); margin: 0; }
-.preview-meta-row { display: flex; gap: 20px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; }
-.preview-meta-row span { display: flex; align-items: center; gap: 4px; }
-
-.ai-badge {
+.engine-badge {
   display: inline-flex; align-items: center;
-  background: #f0f0f0;
-  border: 1px solid #E5E5E5;
-  color: #000; padding: 4px 12px; border-radius: 0;
+  background: #f0fdf4; border: 1px solid #86efac;
+  color: #166534; padding: 4px 12px; border-radius: 0;
   font-size: 0.78rem; font-weight: 700;
 }
+.preview-meta-row { display: flex; gap: 20px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; flex-wrap: wrap; }
+.preview-meta-row span { display: flex; align-items: center; gap: 4px; }
+
+/* Phase breakdown */
+.phase-breakdown {
+  display: flex; border-bottom: 1px solid rgba(15,18,16,0.08);
+}
+.phase-strip {
+  flex: 1; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border-right: 1px solid rgba(255,255,255,0.30);
+}
+.phase-strip:last-child { border-right: none; }
+.phase-strip-label { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; color: white; }
+.phase-strip-weeks { font-size: 1rem; font-weight: 900; color: white; }
 
 /* Preview week */
 .preview-week { padding: 20px 28px; border-bottom: 1px solid rgba(15,18,16,0.08); }
 .preview-week-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; color: rgba(15,18,16,0.50); margin-bottom: 12px; }
 .preview-workouts { display: flex; gap: 8px; flex-wrap: wrap; }
 .preview-workout {
-  flex: 1; min-width: 100px; padding: 12px 14px;
-  background: #fff; border: 1px solid #E5E5E5;
-  border-radius: 0;
+  flex: 1; min-width: 90px; padding: 12px 10px;
+  background: #fff; border: 1px solid #E5E5E5; border-radius: 0; text-align: center;
 }
-.preview-workout.is-rest { opacity: 0.50; }
-.wo-day { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.50); margin-bottom: 4px; }
-.wo-type { font-weight: 700; font-size: 0.88rem; color: rgba(15,18,16,0.88); margin-bottom: 4px; }
-.wo-detail { font-size: 0.78rem; color: rgba(15,18,16,0.55); }
+.preview-workout.is-rest { opacity: 0.45; }
+.wo-day { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.45); margin-bottom: 6px; }
+.wo-type-chip { display: inline-block; padding: 2px 6px; border-radius: 0; font-size: 0.65rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.wo-name { font-weight: 700; font-size: 0.82rem; color: rgba(15,18,16,0.85); margin-bottom: 4px; }
+.wo-detail { font-size: 0.75rem; color: rgba(15,18,16,0.50); }
 
 /* Start date */
 .preview-start { padding: 20px 28px; border-bottom: 1px solid rgba(15,18,16,0.08); display: flex; align-items: center; gap: 16px; }
 .start-label { font-weight: 700; font-size: 0.9rem; color: rgba(15,18,16,0.75); min-width: 80px; }
-.start-input {
-  padding: 10px 14px; border: 1px solid #E5E5E5; border-radius: 0;
-  font-family: inherit; font-size: 0.95rem; background: #fff; cursor: pointer;
-}
-.start-input:focus { outline: none; border-color: #767676; box-shadow: none; background: white; }
-
-/* AI refine */
-.ai-refine-row { padding: 20px 28px; border-bottom: 1px solid rgba(15,18,16,0.08); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.ai-refine-info { display: flex; align-items: center; gap: 12px; }
-.ai-refine-title { font-weight: 700; font-size: 0.92rem; color: rgba(15,18,16,0.85); }
-.ai-refine-sub { font-size: 0.8rem; color: rgba(15,18,16,0.50); margin-top: 2px; }
-.ai-note { padding: 12px 28px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-style: italic; border-bottom: 1px solid rgba(15,18,16,0.08); display: flex; align-items: center; }
+.start-input { padding: 10px 14px; border: 1px solid #E5E5E5; border-radius: 0; font-family: inherit; font-size: 0.95rem; background: #fff; cursor: pointer; }
+.start-input:focus { outline: none; border-color: #767676; }
 
 /* Preview actions */
 .preview-actions { padding: 20px 28px; display: flex; justify-content: flex-end; gap: 12px; }
 
-/* Loading / empty */
-.loading-state { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 60px; color: rgba(15,18,16,0.55); }
-.empty-nudge { text-align: center; padding: 48px; color: rgba(15,18,16,0.45); }
-.empty-icon { font-size: 3rem; margin-bottom: 12px; }
+/* Wizard nav */
+.wizard-nav { display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(15,18,16,0.08); }
 
 /* Buttons */
 .btn {
@@ -722,31 +966,24 @@ onMounted(async () => {
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: var(--r-black, #0F1210); border-color: var(--r-black, #0F1210); color: white; }
-.btn-primary:hover:not(:disabled) { background: #2a2a2a; border-color: #2a2a2a; }
+.btn-primary { background: #0F1210; border-color: #0F1210; color: white; }
+.btn-primary:hover:not(:disabled) { background: #2a2a2a; }
 .btn-ghost { background: transparent; border-color: rgba(15,18,16,0.14); }
 .btn-ghost:hover:not(:disabled) { background: rgba(15,18,16,0.04); }
-.btn-outline-accent { background: transparent; border-color: #000; color: #767676; }
-.btn-outline-accent:hover:not(:disabled) { background: rgba(0,0,0,0.05); }
-.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; }
 
 /* Transitions */
-.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.3s ease; }
-.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(12px); }
+.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.25s ease; }
+.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(10px); }
 
-/* Responsive */
-.new-plan-section { max-width: 860px; }
 @media (max-width: 640px) {
-  .level-cards { grid-template-columns: 1fr 1fr; }
+  .plans-grid { grid-template-columns: 1fr; }
+  .wizard-steps-bar { padding: 14px 16px; }
+  .wizard-content { padding: 24px 16px; }
+  .preview-header, .preview-week, .preview-start, .preview-actions { padding-left: 16px; padding-right: 16px; }
+  .preview-meta-row { gap: 10px; }
   .goal-tabs { gap: 8px; }
   .goal-tab { padding: 12px 14px; min-width: 72px; }
-  .preview-meta-row { flex-wrap: wrap; gap: 10px; }
-  .preview-workouts { gap: 6px; }
-  .preview-workout { min-width: 80px; }
-  .plans-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 400px) {
-  .level-cards { grid-template-columns: 1fr; }
-  .goal-tab { min-width: 60px; font-size: 0.82rem; padding: 10px 12px; }
+  .phase-breakdown { flex-wrap: wrap; }
 }
 </style>
