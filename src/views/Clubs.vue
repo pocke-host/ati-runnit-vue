@@ -1058,7 +1058,7 @@ onMounted(() => {
   width: 380px;
   height: 100vh;
   background: white;
-  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.18);
+  border-left: 1px solid #E5E5E5;
   z-index: 1050;
   display: flex;
   flex-direction: column;
@@ -1333,7 +1333,7 @@ onMounted(() => {
   border-left: 1px solid #E5E5E5;
   border-right: 1px solid #E5E5E5;
   z-index: 10000;
-  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+  border-top: 1px solid #E5E5E5;
 }
 
 .create-modal-header {

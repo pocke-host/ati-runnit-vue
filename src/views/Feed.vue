@@ -657,7 +657,7 @@ onMounted(() => {
 .feed-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: var(--rk-paper, #FAF8FF);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -808,14 +808,12 @@ onMounted(() => {
   border: 1px solid #E5E5E5;
   border-radius: 0;
   overflow: hidden;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
   box-shadow: none;
   position: relative;
 }
 
 .feed-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+  transform: none;
 }
 
 /* Moment Cards */

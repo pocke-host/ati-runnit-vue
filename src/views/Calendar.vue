@@ -1215,7 +1215,6 @@ textarea.form-control { resize: vertical; min-height: 60px; }
     z-index: 200;
     border: none;
     border-top: 2px solid #000;
-    box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
   }
   .cal-cell { min-height: 72px; }
   .cal-chip-type { font-size: 0.52rem; }

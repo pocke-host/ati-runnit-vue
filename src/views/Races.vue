@@ -466,8 +466,8 @@ const resetFilters = () => {
 }
 
 const sportBgMap = {
-  running:   'linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 100%)',
-  triathlon: 'linear-gradient(135deg, #0a0a1a 0%, #0a2a4a 100%)',
+  running:   '#000',
+  triathlon: '#000',
 }
 
 const getCardStyle = (event) => {
@@ -556,7 +556,7 @@ watch(zipcode, () => {
 <style scoped>
 .events-page {
   min-height: 100vh;
-  background: var(--rk-paper, #FAF8FF);
+  background: #fff;
   font-family: Futura, "Futura PT", "Avenir Next", system-ui, sans-serif;
   padding-top: var(--nav-h, 64px);
 }
@@ -649,7 +649,7 @@ watch(zipcode, () => {
   letter-spacing: 0.04em;
 }
 .sport-tab:hover { color: rgba(15,18,16,0.80); }
-.sport-tab.active { color: #000; border-bottom-color: var(--rk-signal, #8B2BE2); }
+.sport-tab.active { color: #000; border-bottom-color: #000; }
 .sport-emoji { font-size: 1rem; }
 
 /* FILTERS */
@@ -691,7 +691,7 @@ watch(zipcode, () => {
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
-.filter-input:focus { border-color: var(--rk-signal, #8B2BE2); }
+.filter-input:focus { border-color: #000; }
 .filter-input--sm { flex: 0 0 140px; padding-left: 12px; }
 .filter-select {
   height: 40px;
@@ -709,7 +709,7 @@ watch(zipcode, () => {
   cursor: pointer;
   box-sizing: border-box;
 }
-.filter-select:focus { border-color: var(--rk-signal, #8B2BE2); }
+.filter-select:focus { border-color: #000; }
 .filter-clear {
   height: 40px;
   padding: 0 16px;
@@ -744,9 +744,9 @@ watch(zipcode, () => {
 }
 .chip-btn:hover { border-color: #000; color: #000; }
 .chip-btn.active {
-  border-color: var(--rk-signal, #8B2BE2);
-  color: var(--rk-signal, #8B2BE2);
-  background: rgba(139,43,226,0.06);
+  border-color: #000;
+  color: #fff;
+  background: #000;
 }
 
 /* RESULTS */
@@ -797,11 +797,10 @@ watch(zipcode, () => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
 .event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+  transform: none;
 }
 
 .event-img {
@@ -929,7 +928,7 @@ watch(zipcode, () => {
   height: 34px;
   padding: 0 14px;
   border: none;
-  background: var(--rk-signal, #8B2BE2);
+  background: #000;
   color: #fff;
   font-size: 0.76rem;
   font-weight: 700;

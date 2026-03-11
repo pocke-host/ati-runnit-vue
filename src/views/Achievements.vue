@@ -153,7 +153,7 @@ onMounted(async () => {
   --special: #7C3AED;
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: var(--rk-paper, #FAF8FF);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -195,7 +195,7 @@ onMounted(async () => {
 }
 .hero-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, rgba(255,255,255,0.70), rgba(255,255,255,0.90));
+  background: rgba(255,255,255,0.85);
   border-radius: 0;
   transition: width 0.5s ease;
 }

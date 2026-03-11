@@ -987,7 +987,7 @@ onMounted(() => {
   height: 100vh;
   background: white;
   z-index: 1100;
-  box-shadow: -8px 0 32px rgba(0,0,0,0.18);
+  border-left: 1px solid #E5E5E5;
   display: flex;
   flex-direction: column;
   overflow: hidden;

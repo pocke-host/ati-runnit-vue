@@ -429,8 +429,8 @@ onMounted(async () => {
 .plan-overall-progress { max-width: 400px; }
 .progress-labels { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.85); margin-bottom: 8px; }
 .progress-pct { color: rgba(255,255,255,0.70); }
-.progress-track { height: 8px; background: rgba(255,255,255,0.20); border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; background: rgba(255,255,255,0.90); border-radius: 99px; transition: width 0.5s; }
+.progress-track { height: 8px; background: rgba(255,255,255,0.20); border-radius: 0; overflow: hidden; }
+.progress-fill { height: 100%; background: rgba(255,255,255,0.90); border-radius: 0; transition: width 0.5s; }
 
 /* Header actions */
 .plan-header-actions { display: flex; gap: 10px; }
@@ -481,7 +481,7 @@ onMounted(async () => {
 .week-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
 .week-title { font-weight: 900; font-size: 1.2rem; color: rgba(15,18,16,0.92); margin-bottom: 6px; }
 .week-stats { display: flex; gap: 16px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; flex-wrap: wrap; }
-.week-progress-mini { width: 120px; height: 6px; background: rgba(15,18,16,0.10); border-radius: 99px; overflow: hidden; flex-shrink: 0; }
+.week-progress-mini { width: 120px; height: 6px; background: rgba(15,18,16,0.10); border-radius: 0; overflow: hidden; flex-shrink: 0; }
 .week-progress-fill { height: 100%; background: #000; border-radius: 0; transition: width 0.4s; }
 
 /* ── Workout Cards ── */

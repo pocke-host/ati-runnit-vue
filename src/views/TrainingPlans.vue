@@ -752,7 +752,7 @@ onMounted(async () => {
 .plans-page {
   padding-top: var(--nav-h, 64px);
   min-height: calc(100vh - var(--nav-h, 64px));
-  background: var(--rk-paper, #FAF8FF);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -792,7 +792,7 @@ onMounted(async () => {
   background: white; border: 1px solid #E5E5E5; border-radius: 0; padding: 24px;
   cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.plan-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
+.plan-card:hover { transform: none; }
 .plan-card-active { border-color: #767676; }
 .plan-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
 .plan-sport-icon { font-size: 2.2rem; }
@@ -800,7 +800,7 @@ onMounted(async () => {
 .plan-badge { padding: 4px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; text-transform: capitalize; }
 .plan-badge-level.beginner     { background: #f0f0f0; color: #555; }
 .plan-badge-level.intermediate { background: #1a1a1a; color: #fff; }
-.plan-badge-level.advanced     { background: #0D0512; color: #8B2BE2; }
+.plan-badge-level.advanced     { background: #000; color: #fff; }
 .plan-badge-active { background: rgba(0,0,0,0.08); color: #000; }
 .plan-name { font-weight: 900; font-size: 1.05rem; margin: 0 0 4px; color: rgba(15,18,16,0.92); }
 .plan-meta { font-size: 0.82rem; color: rgba(15,18,16,0.55); margin: 0 0 14px; }
@@ -889,7 +889,7 @@ onMounted(async () => {
 .level-chip { padding: 3px 10px; border-radius: 0; font-size: 0.78rem; font-weight: 700; text-transform: capitalize; }
 .level-chip.beginner     { background: #f0f0f0; color: #555; }
 .level-chip.intermediate { background: #1a1a1a; color: #fff; }
-.level-chip.advanced     { background: #0D0512; color: #8B2BE2; }
+.level-chip.advanced     { background: #000; color: #fff; }
 
 /* Days grid */
 .days-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }

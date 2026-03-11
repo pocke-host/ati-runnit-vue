@@ -646,7 +646,7 @@ function initWeeklyChart() {
         backgroundColor: 'rgba(196,106,42,0.80)',
         borderColor: 'rgba(196,106,42,1)',
         borderWidth: 2,
-        borderRadius: 8,
+        borderRadius: 0,
       }]
     },
     options: {
@@ -704,7 +704,7 @@ onMounted(async () => {
 .stats-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: var(--rk-paper, #FAF8FF);
+  background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -912,7 +912,7 @@ onMounted(async () => {
 .heatmap-cell {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
+  border-radius: 0;
   flex-shrink: 0;
 }
 .heatmap-l0  { background: #F0F0F0; }
@@ -1070,7 +1070,7 @@ onMounted(async () => {
   opacity: 1;
   box-shadow: none;
   border-color: #000;
-  border-left: 3px solid var(--rk-signal, #8B2BE2);
+  border-left: 3px solid #000;
 }
 .pr-card.pr-card-set:hover { transform: none; }
 
@@ -1087,8 +1087,8 @@ onMounted(async () => {
   margin-bottom: 2px;
 }
 .pr-card.pr-card-set .pr-icon-wrap {
-  background: var(--rk-signal, #8B2BE2);
-  color: var(--rk-void, #0D0512);
+  background: #000;
+  color: white;
 }
 .pr-label {
   font-weight: 900;

@@ -187,7 +187,7 @@ const handleGoogleSignIn = () => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .login-page {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -443,26 +443,6 @@ const handleGoogleSignIn = () => {
   overflow: hidden;
 }
 
-/* Subtle grid pattern */
-.visual-side::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.08;
-  background: 
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.05) 0px,
-      transparent 1px,
-      transparent 40px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.05) 0px,
-      transparent 1px,
-      transparent 40px
-    );
-}
 
 .visual-content {
   position: relative;
