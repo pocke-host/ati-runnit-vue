@@ -93,6 +93,120 @@
         </div>
       </section>
 
+      <!-- TRAINING LOG HEATMAP -->
+      <section class="section" v-if="heatmapData.length">
+        <h2 class="section-title">Training Log</h2>
+        <div class="heatmap-card">
+          <div class="heatmap-scroll">
+            <!-- Month labels -->
+            <div class="heatmap-months">
+              <span
+                v-for="m in heatmapMonths"
+                :key="m.col"
+                class="heatmap-month"
+                :style="{ gridColumn: m.col + 1 }"
+              >{{ m.label }}</span>
+            </div>
+            <!-- Week columns -->
+            <div class="heatmap-grid">
+              <div v-for="(week, wi) in heatmapData" :key="wi" class="heatmap-week">
+                <div
+                  v-for="day in week"
+                  :key="day.date"
+                  :class="['heatmap-cell', `heatmap-l${day.level < 0 ? 'x' : day.level}`]"
+                  @mouseenter="showHeatmapTooltip(day, $event)"
+                  @mouseleave="hideHeatmapTooltip"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- Legend -->
+          <div class="heatmap-legend">
+            <span class="heatmap-legend-label">Less</span>
+            <div class="heatmap-cell heatmap-l0"></div>
+            <div class="heatmap-cell heatmap-l1"></div>
+            <div class="heatmap-cell heatmap-l2"></div>
+            <div class="heatmap-cell heatmap-l3"></div>
+            <div class="heatmap-cell heatmap-l4"></div>
+            <span class="heatmap-legend-label">More</span>
+          </div>
+        </div>
+        <!-- Tooltip (fixed position) -->
+        <Teleport to="body">
+          <div
+            v-if="heatmapTooltip"
+            class="heatmap-tooltip"
+            :style="{ left: heatmapTooltip.x + 'px', top: (heatmapTooltip.y - 44) + 'px' }"
+          >{{ heatmapTooltip.text }}</div>
+        </Teleport>
+      </section>
+
+      <!-- TRAINING INSIGHTS -->
+      <section class="section" v-if="acwrInfo || weeklyTargetKm">
+        <h2 class="section-title">Training Insights</h2>
+        <div class="insights-row">
+
+          <!-- ACWR Card -->
+          <div class="insight-card" v-if="acwrInfo">
+            <div class="insight-head">
+              <span class="insight-label">Injury Risk (ACWR)</span>
+              <span class="insight-badge" :style="{ background: acwrInfo.color }">{{ acwrInfo.label }}</span>
+            </div>
+            <div class="insight-val" :style="{ color: acwrInfo.color }">{{ acwrScore }}</div>
+            <div class="insight-sub">{{ acwrInfo.desc }}</div>
+            <!-- Visual gauge bar -->
+            <div class="acwr-gauge">
+              <div class="acwr-zone" style="width:40%; background:#3b82f6"></div>
+              <div class="acwr-zone" style="width:10%; background:#86efac"></div>
+              <div class="acwr-zone" style="width:15%; background:#22c55e"></div>
+              <div class="acwr-zone" style="width:10%; background:#f97316"></div>
+              <div class="acwr-zone" style="width:25%; background:#ef4444"></div>
+              <div class="acwr-needle" :style="{ left: Math.min(98, (acwrScore / 2) * 100) + '%' }"></div>
+            </div>
+            <div class="acwr-ticks">
+              <span>0</span><span>0.8</span><span>1.0</span><span>1.3</span><span>1.5</span><span>2.0</span>
+            </div>
+          </div>
+
+          <!-- Weekly Target Card -->
+          <div class="insight-card" v-if="weeklyTargetKm">
+            <div class="insight-head">
+              <span class="insight-label">This Week's Target</span>
+            </div>
+            <div class="insight-val">{{ weeklyTargetKm }} <span class="insight-unit">{{ distanceLabel }}</span></div>
+            <div class="insight-sub">Based on your current fitness base (+5% progression)</div>
+            <div class="insight-tip">
+              <i class="bi bi-lightbulb-fill"></i>
+              Staying in this range keeps ACWR in the 0.8–1.3 safe zone.
+            </div>
+          </div>
+
+          <!-- Days Since Last Activity -->
+          <div class="insight-card" v-if="daysSinceLastActivity !== null">
+            <div class="insight-head">
+              <span class="insight-label">Last Activity</span>
+              <span
+                class="insight-badge"
+                :style="{ background: daysSinceLastActivity === 0 ? '#22c55e' : daysSinceLastActivity <= 2 ? '#f97316' : '#ef4444' }"
+              >
+                {{ daysSinceLastActivity === 0 ? 'Today' : daysSinceLastActivity === 1 ? 'Yesterday' : `${daysSinceLastActivity}d ago` }}
+              </span>
+            </div>
+            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#22c55e' : daysSinceLastActivity <= 3 ? '#f97316' : '#ef4444' }">
+              {{ daysSinceLastActivity }}
+              <span class="insight-unit">{{ daysSinceLastActivity === 1 ? 'day' : 'days' }}</span>
+            </div>
+            <div class="insight-sub">
+              {{ daysSinceLastActivity === 0 ? 'Great — you trained today!'
+                : daysSinceLastActivity <= 2 ? 'Normal recovery window'
+                : daysSinceLastActivity <= 5 ? 'Getting a bit long — consider a short run'
+                : 'Extended gap detected — ease back in gradually' }}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <!-- PERSONAL RECORDS -->
       <section class="section">
         <h2 class="section-title">Personal Records</h2>
@@ -352,6 +466,105 @@ const consistencyLabel = computed(() => {
   if (c >= 30) return 'Inconsistent'
   return 'Just getting started'
 })
+
+// ACWR (Acute:Chronic Workload Ratio)
+const acwrScore = computed(() => {
+  const m = performanceMetrics.value
+  if (!m || m.ctl === 0) return null
+  return Math.round((m.atl / m.ctl) * 100) / 100
+})
+
+const acwrInfo = computed(() => {
+  const a = acwrScore.value
+  if (a === null) return null
+  if (a < 0.8)  return { label: 'Undertraining', color: '#3b82f6', desc: 'Gradually increase volume to build fitness' }
+  if (a < 1.0)  return { label: 'Optimal Base', color: '#22c55e', desc: 'Solid aerobic foundation, safe to add load' }
+  if (a < 1.3)  return { label: 'Productive Load', color: '#22c55e', desc: 'Good training stimulus, manage recovery' }
+  if (a < 1.5)  return { label: 'Caution Zone', color: '#f97316', desc: 'Monitor fatigue — consider an easy day' }
+  return           { label: 'High Injury Risk', color: '#ef4444', desc: 'Reduce load or take a rest day now' }
+})
+
+const weeklyTargetKm = computed(() => {
+  const m = performanceMetrics.value
+  if (!m || m.ctl === 0) return null
+  const km = m.ctl * 7 * 1.05
+  if (isImperial.value) return Math.round(km * 0.621371 * 10) / 10
+  return Math.round(km * 10) / 10
+})
+
+const daysSinceLastActivity = computed(() => {
+  const acts = activities.value || []
+  if (!acts.length) return null
+  const latest = acts.reduce((max, a) => {
+    const d = new Date(a.createdAt)
+    return d > max ? d : max
+  }, new Date(0))
+  return Math.floor((Date.now() - latest.getTime()) / 86400000)
+})
+
+// 52-week training heatmap
+const heatmapData = computed(() => {
+  const acts = activities.value || []
+  const today = new Date()
+  today.setHours(23, 59, 59, 999)
+
+  const dailyKm = {}
+  for (const a of acts) {
+    if (!a.createdAt) continue
+    const key = new Date(a.createdAt).toISOString().slice(0, 10)
+    dailyKm[key] = (dailyKm[key] || 0) + (a.distanceMeters || 0) / 1000
+  }
+
+  const start = new Date(today)
+  start.setDate(start.getDate() - 363)
+  start.setDate(start.getDate() - start.getDay()) // align to Sunday
+
+  const weeks = []
+  const cur = new Date(start)
+  while (cur <= today) {
+    const week = []
+    for (let d = 0; d < 7; d++) {
+      const isFuture = new Date(cur) > today
+      const key = new Date(cur).toISOString().slice(0, 10)
+      const km = isFuture ? 0 : (dailyKm[key] || 0)
+      week.push({
+        date: key,
+        km,
+        level: isFuture ? -1 : km === 0 ? 0 : km < 5 ? 1 : km < 10 ? 2 : km < 20 ? 3 : 4,
+        dateLabel: new Date(cur).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      })
+      cur.setDate(cur.getDate() + 1)
+    }
+    weeks.push(week)
+  }
+  return weeks
+})
+
+const heatmapMonths = computed(() => {
+  const months = []
+  let last = -1
+  heatmapData.value.forEach((week, i) => {
+    if (!week[0]) return
+    const m = new Date(week[0].date).getMonth()
+    if (m !== last) {
+      months.push({ col: i, label: new Date(week[0].date).toLocaleDateString('en-US', { month: 'short' }) })
+      last = m
+    }
+  })
+  return months
+})
+
+const heatmapTooltip = ref(null)
+
+function showHeatmapTooltip(day, event) {
+  if (day.level === -1) return
+  const dist = day.km === 0 ? 'rest' : isImperial.value
+    ? `${(day.km * 0.621371).toFixed(1)} mi`
+    : `${day.km.toFixed(1)} km`
+  heatmapTooltip.value = { text: `${day.dateLabel} — ${dist}`, x: event.clientX, y: event.clientY }
+}
+
+function hideHeatmapTooltip() { heatmapTooltip.value = null }
 
 // ── Sport breakdown for doughnut
 const SPORT_COLORS = {
@@ -659,6 +872,171 @@ onMounted(async () => {
   color: #000;
 }
 
+/* TRAINING LOG HEATMAP */
+.heatmap-card {
+  background: white;
+  border: 1px solid #E5E5E5;
+  padding: 20px 20px 16px;
+}
+.heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.heatmap-months {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 14px;
+  gap: 2px;
+  margin-bottom: 4px;
+  padding-left: 0;
+  min-width: max-content;
+}
+.heatmap-month {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(15,18,16,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.heatmap-grid {
+  display: flex;
+  gap: 2px;
+  min-width: max-content;
+}
+.heatmap-week {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.heatmap-l0  { background: #F0F0F0; }
+.heatmap-l1  { background: #bbf7d0; }
+.heatmap-l2  { background: #4ade80; }
+.heatmap-l3  { background: #16a34a; }
+.heatmap-l4  { background: #064e3b; }
+.heatmap-lx  { background: transparent; }
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+.heatmap-legend-label {
+  font-size: 0.70rem;
+  color: rgba(15,18,16,0.45);
+  font-weight: 700;
+}
+.heatmap-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background: #000;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* TRAINING INSIGHTS */
+.insights-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+}
+.insight-card {
+  background: white;
+  border: 1px solid #E5E5E5;
+  padding: 20px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.insight-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.insight-label {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(15,18,16,0.50);
+}
+.insight-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 0;
+}
+.insight-val {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #000;
+  line-height: 1;
+}
+.insight-unit {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(15,18,16,0.50);
+}
+.insight-sub {
+  font-size: 0.75rem;
+  color: rgba(15,18,16,0.55);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.insight-tip {
+  font-size: 0.72rem;
+  color: rgba(15,18,16,0.45);
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.4;
+}
+.insight-tip i { flex-shrink: 0; margin-top: 1px; }
+/* ACWR gauge */
+.acwr-gauge {
+  display: flex;
+  height: 6px;
+  margin-top: 10px;
+  position: relative;
+  overflow: visible;
+}
+.acwr-zone { height: 100%; }
+.acwr-needle {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 14px;
+  background: #000;
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+.acwr-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  color: rgba(15,18,16,0.40);
+  font-weight: 700;
+  margin-top: 6px;
+}
+
 /* LOADING */
 .loading-state {
   display: flex;
@@ -852,6 +1230,10 @@ onMounted(async () => {
   .section-split { grid-template-columns: 1fr; }
   .perf-grid { grid-template-columns: repeat(2, 1fr); }
   .perf-bottom-row { grid-template-columns: 1fr; }
+  .insights-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .insights-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .pr-grid { grid-template-columns: repeat(2, 1fr); }

@@ -166,6 +166,30 @@
               </div>
             </div>
 
+            <!-- Training Insights Widget -->
+            <div v-if="dashInsights" class="dash-insights">
+              <div class="dash-insights-label">TRAINING INSIGHTS</div>
+              <div class="dash-insights-row">
+                <div class="dash-insight-item">
+                  <span class="dash-insight-key">Fitness</span>
+                  <span class="dash-insight-val">{{ dashInsights.fitnessScore }}</span>
+                </div>
+                <div class="dash-insight-item">
+                  <span class="dash-insight-key">Form</span>
+                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#22c55e' : dashInsights.formScore > -5 ? '#f97316' : '#ef4444' }">
+                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
+                  </span>
+                </div>
+                <div class="dash-insight-item" v-if="dashInsights.acwr !== null">
+                  <span class="dash-insight-key">ACWR</span>
+                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#22c55e' : dashInsights.acwr < 1.5 ? '#f97316' : '#ef4444' }">
+                    {{ dashInsights.acwr }}
+                  </span>
+                </div>
+              </div>
+              <router-link to="/stats" class="dash-insights-link">Full analysis →</router-link>
+            </div>
+
             <div class="profile-actions">
               <button class="action-btn" @click="openActivityModal">
                 <i class="bi bi-plus-circle me-2"></i>Log Activity
@@ -776,6 +800,39 @@ const currentStreak = computed(() => {
     }
   }
   return streak
+})
+
+// Training insights (compact CTL/ATL/ACWR for sidebar widget)
+const dashInsights = computed(() => {
+  const acts = activities.value || []
+  if (acts.length < 3) return null
+
+  const today = new Date()
+  today.setHours(23, 59, 59, 999)
+  const dayMs = 86400000
+  const DAYS = 90
+
+  const dailyLoad = new Array(DAYS).fill(0)
+  for (const a of acts) {
+    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
+    if (daysAgo >= 0 && daysAgo < DAYS) {
+      dailyLoad[DAYS - 1 - daysAgo] += (a.distanceMeters || 0) / 1000
+    }
+  }
+
+  let ctl = 0, atl = 0
+  const ctlK = 1 / 42, atlK = 1 / 7
+  for (let i = 0; i < DAYS; i++) {
+    ctl = ctl * (1 - ctlK) + dailyLoad[i] * ctlK
+    atl = atl * (1 - atlK) + dailyLoad[i] * atlK
+  }
+
+  const fitnessScore = Math.min(100, Math.round(ctl * 10))
+  const fatigueScore = Math.min(100, Math.round(atl * 10))
+  const formScore = Math.round(fitnessScore - fatigueScore)
+  const acwr = ctl > 0 ? Math.round((atl / ctl) * 100) / 100 : null
+
+  return { fitnessScore, fatigueScore, formScore, acwr }
 })
 
 const monthCompare = computed(() => {
@@ -1557,6 +1614,14 @@ onMounted(async () => {
 .manage-sub-link{margin-top:16px;padding:12px 0}
 .manage-sub-link a{font-size:0.82rem;color:#767676;text-decoration:none;display:flex;align-items:center;transition:color 0.15s}
 .manage-sub-link a:hover{color:#000}
+.dash-insights{margin-top:16px;padding:16px;border:1px solid #E5E5E5;background:#fff}
+.dash-insights-label{font-size:0.65rem;font-weight:900;letter-spacing:0.12em;color:rgba(15,18,16,0.40);text-transform:uppercase;margin-bottom:10px}
+.dash-insights-row{display:flex;gap:16px;margin-bottom:8px}
+.dash-insight-item{display:flex;flex-direction:column;gap:2px;flex:1}
+.dash-insight-key{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(15,18,16,0.45)}
+.dash-insight-val{font-size:1.15rem;font-weight:900;color:#000;line-height:1}
+.dash-insights-link{font-size:0.72rem;font-weight:700;color:#767676;text-decoration:none;letter-spacing:0.04em}
+.dash-insights-link:hover{color:#000}
 .recent-activities{background:#fff;border:1px solid #E5E5E5;border-radius:0;padding:24px;box-shadow:none}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .section-title{font-size:1.1rem;font-weight:900;margin:0}
