@@ -25,6 +25,74 @@
 
     <div class="stats-content">
 
+      <!-- PERFORMANCE INTELLIGENCE -->
+      <section class="section" v-if="performanceMetrics">
+        <h2 class="section-title">Performance Intelligence</h2>
+
+        <!-- 4-metric grid -->
+        <div class="perf-grid">
+          <div class="perf-card">
+            <div class="perf-label">Fitness</div>
+            <div class="perf-val">{{ performanceMetrics.fitnessScore }}</div>
+            <div class="perf-sub">Chronic Training Load</div>
+            <div class="perf-bar-bg">
+              <div class="perf-bar" :style="{ width: performanceMetrics.fitnessScore + '%', background: '#22c55e' }"></div>
+            </div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-label">Fatigue</div>
+            <div class="perf-val">{{ performanceMetrics.fatigueScore }}</div>
+            <div class="perf-sub">Acute Training Load</div>
+            <div class="perf-bar-bg">
+              <div class="perf-bar" :style="{ width: performanceMetrics.fatigueScore + '%', background: '#ef4444' }"></div>
+            </div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-label">Form</div>
+            <div class="perf-val" :style="{ color: formColor }">{{ performanceMetrics.formScore > 0 ? '+' : '' }}{{ performanceMetrics.formScore }}</div>
+            <div class="perf-sub">{{ formLabel }}</div>
+            <div class="perf-bar-bg">
+              <div class="perf-bar" :style="{
+                width: Math.min(100, Math.abs(performanceMetrics.formScore)) + '%',
+                background: formColor
+              }"></div>
+            </div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-label">VO2max</div>
+            <div class="perf-val" style="color:#3b82f6">{{ performanceMetrics.vo2max ?? '—' }}</div>
+            <div class="perf-sub">ml/kg/min estimate</div>
+            <div class="perf-bar-bg" v-if="performanceMetrics.vo2max">
+              <div class="perf-bar" :style="{ width: ((performanceMetrics.vo2max - 25) / 60 * 100) + '%', background: '#3b82f6' }"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consistency + Race Predictions -->
+        <div class="perf-bottom-row">
+          <div class="perf-consistency">
+            <div class="perf-consistency-head">
+              <span class="perf-label">Consistency</span>
+              <span class="perf-val-sm">{{ performanceMetrics.consistency }}%</span>
+            </div>
+            <div class="perf-sub">{{ consistencyLabel }} — last 12 weeks</div>
+            <div class="perf-bar-bg" style="margin-top:10px">
+              <div class="perf-bar" :style="{ width: performanceMetrics.consistency + '%', background: '#f97316' }"></div>
+            </div>
+          </div>
+
+          <div class="perf-preds" v-if="performanceMetrics.racePreds">
+            <div class="perf-label" style="margin-bottom:12px">Race Predictions</div>
+            <div class="pred-grid">
+              <div class="pred-item" v-for="(time, dist) in performanceMetrics.racePreds" :key="dist">
+                <div class="pred-dist">{{ dist }}</div>
+                <div class="pred-time">{{ time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- PERSONAL RECORDS -->
       <section class="section">
         <h2 class="section-title">Personal Records</h2>
@@ -129,8 +197,11 @@ import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 
 Chart.register(...registerables)
+
+const { classifyActivity } = useWorkoutClassifier()
 
 const activityStore = useActivityStore()
 const prStore = usePRStore()
@@ -163,7 +234,126 @@ const careerElevation = computed(() =>
   (activities.value || []).reduce((s, a) => s + (a.elevationMeters ?? a.elevationGain ?? 0), 0)
 )
 
-// Sport breakdown for doughnut
+// ── Performance Intelligence ──────────────────────
+
+const performanceMetrics = computed(() => {
+  const acts = activities.value || []
+  if (!acts.length) return null
+
+  const today = new Date()
+  today.setHours(23, 59, 59, 999)
+  const dayMs = 86400000
+  const DAYS = 90
+
+  // Daily training load (km) for last 90 days
+  const dailyLoad = new Array(DAYS).fill(0)
+  for (const a of acts) {
+    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
+    if (daysAgo >= 0 && daysAgo < DAYS) {
+      dailyLoad[DAYS - 1 - daysAgo] += (a.distanceMeters || 0) / 1000
+    }
+  }
+
+  // EMA — CTL (42d) and ATL (7d)
+  let ctl = 0, atl = 0
+  const ctlK = 1 / 42, atlK = 1 / 7
+  for (let i = 0; i < DAYS; i++) {
+    ctl = ctl * (1 - ctlK) + dailyLoad[i] * ctlK
+    atl = atl * (1 - atlK) + dailyLoad[i] * atlK
+  }
+
+  // Scale to 0-100 scores (10 km/day max = 100)
+  const fitnessScore  = Math.min(100, Math.round(ctl * 10))
+  const fatigueScore  = Math.min(100, Math.round(atl * 10))
+  const formScore     = Math.round(fitnessScore - fatigueScore)
+
+  // VO2max estimate from recent runs (best pace → 85% VO2max effort)
+  const recentRuns = acts
+    .filter(a => ['RUN', 'Running'].includes(a.sportType) && (a.distanceMeters || 0) > 2000 && (a.durationSeconds || 0) > 600)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 15)
+
+  let vo2max = null
+  if (recentRuns.length > 0) {
+    const bestPaceSkm = Math.min(...recentRuns.map(r => r.durationSeconds / r.distanceMeters * 1000))
+    const speedKmh = 3600 / bestPaceSkm
+    vo2max = Math.min(85, Math.max(25, Math.round(3.5 * speedKmh / 0.85)))
+  }
+
+  // Race time predictions — Riegel formula from best recent effort
+  let racePreds = null
+  if (recentRuns.length > 0) {
+    // Choose the run with highest speed × distance score
+    const bestRun = recentRuns.reduce((best, r) => {
+      const s = r.distanceMeters / r.durationSeconds
+      return s > best.s ? { r, s } : best
+    }, { r: recentRuns[0], s: 0 }).r
+
+    const knownKm  = bestRun.distanceMeters / 1000
+    const knownMin = bestRun.durationSeconds / 60
+
+    const riegel = (targetKm) => {
+      const t = knownMin * Math.pow(targetKm / knownKm, 1.06)
+      const h = Math.floor(t / 60)
+      const m = Math.floor(t % 60)
+      const s = Math.round((t * 60) % 60)
+      return h > 0
+        ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+        : `${m}:${String(s).padStart(2, '0')}`
+    }
+
+    // Only show predictions for distances longer than known
+    racePreds = {}
+    if (knownKm <= 5.5)  racePreds['5K']       = riegel(5)
+    if (knownKm <= 11)   racePreds['10K']      = riegel(10)
+    if (knownKm <= 22)   racePreds['Half']     = riegel(21.0975)
+    if (knownKm <= 43)   racePreds['Marathon'] = riegel(42.195)
+    if (!Object.keys(racePreds).length) racePreds = null
+  }
+
+  // Consistency: % of last 12 weeks with ≥ 3 activities
+  let activeWeeks = 0
+  const now = new Date()
+  for (let i = 0; i < 12; i++) {
+    const wEnd = new Date(now.getTime() - i * 7 * dayMs)
+    const wStart = new Date(wEnd.getTime() - 6 * dayMs)
+    const count = acts.filter(a => {
+      const d = new Date(a.createdAt)
+      return d >= wStart && d <= wEnd
+    }).length
+    if (count >= 3) activeWeeks++
+  }
+  const consistency = Math.round((activeWeeks / 12) * 100)
+
+  return { fitnessScore, fatigueScore, formScore, vo2max, racePreds, consistency, ctl, atl }
+})
+
+const formColor = computed(() => {
+  const f = performanceMetrics.value?.formScore ?? 0
+  if (f > 10)  return '#22c55e'
+  if (f > -5)  return '#f97316'
+  return '#ef4444'
+})
+
+const formLabel = computed(() => {
+  const f = performanceMetrics.value?.formScore ?? 0
+  if (f > 15)  return 'Fresh — ready to race'
+  if (f > 5)   return 'Good form'
+  if (f > -5)  return 'Neutral'
+  if (f > -20) return 'Building load'
+  return 'High fatigue'
+})
+
+const consistencyLabel = computed(() => {
+  const c = performanceMetrics.value?.consistency ?? 0
+  if (c >= 90) return 'Elite consistency'
+  if (c >= 70) return 'Strong habit'
+  if (c >= 50) return 'Building routine'
+  if (c >= 30) return 'Inconsistent'
+  return 'Just getting started'
+})
+
+// ── Sport breakdown for doughnut
 const SPORT_COLORS = {
   RUN: '#0C0C0C', Running: '#0C0C0C',
   BIKE: '#404040', Cycling: '#404040',
@@ -372,6 +562,103 @@ onMounted(async () => {
   letter-spacing: 0.06em;
 }
 
+/* PERFORMANCE INTELLIGENCE */
+.perf-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.perf-card {
+  background: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 20px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.perf-label {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(15,18,16,0.50);
+}
+.perf-val {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #000;
+  line-height: 1.1;
+}
+.perf-val-sm {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #000;
+}
+.perf-sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(15,18,16,0.50);
+  margin-bottom: 6px;
+}
+.perf-bar-bg {
+  height: 4px;
+  background: #F0F0F0;
+  border-radius: 0;
+  margin-top: auto;
+}
+.perf-bar {
+  height: 100%;
+  border-radius: 0;
+  transition: width 0.6s ease;
+}
+.perf-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.perf-consistency {
+  background: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 20px 18px 16px;
+}
+.perf-consistency-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.perf-preds {
+  background: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 20px 18px 16px;
+}
+.pred-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.pred-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pred-dist {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(15,18,16,0.50);
+}
+.pred-time {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #000;
+}
+
 /* LOADING */
 .loading-state {
   display: flex;
@@ -563,6 +850,8 @@ onMounted(async () => {
   .pr-grid { grid-template-columns: repeat(2, 1fr); }
   .milestone-grid { grid-template-columns: repeat(2, 1fr); }
   .section-split { grid-template-columns: 1fr; }
+  .perf-grid { grid-template-columns: repeat(2, 1fr); }
+  .perf-bottom-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .pr-grid { grid-template-columns: repeat(2, 1fr); }

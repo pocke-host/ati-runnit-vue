@@ -68,7 +68,7 @@
           <div class="det-card">
             <div class="det-card-top">
               <h3 class="det-section-title">Stats</h3>
-              <div v-if="activity.workoutType" class="workout-type-chip">{{ activity.workoutType }}</div>
+              <div v-if="displayClassification" class="workout-type-chip" :style="{ background: displayClassification.color }">{{ displayClassification.label }}</div>
             </div>
             <div class="stats-grid">
               <div class="stat-box">
@@ -243,6 +243,7 @@ import EmptyState from '@/components/EmptyState.vue'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
 import { useNotificationStore } from '@/stores/notification'
+import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -296,6 +297,20 @@ const computedPace = computed(() => {
   if (!activity.value?.distanceMeters || !activity.value?.durationSeconds) return '—'
   const minPerKm = (activity.value.durationSeconds / 60) / (activity.value.distanceMeters / 1000)
   return formatPace(minPerKm)
+})
+
+// Auto workout classification
+const { classifyActivity } = useWorkoutClassifier()
+const autoClassification = computed(() => classifyActivity(activity.value))
+const displayClassification = computed(() => {
+  if (activity.value?.workoutType) {
+    const colorMap = {
+      EASY: '#22c55e', TEMPO: '#f97316', INTERVAL: '#ef4444',
+      LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#9ca3af',
+    }
+    return { label: activity.value.workoutType.replace('_', ' '), color: colorMap[activity.value.workoutType] || '#000' }
+  }
+  return autoClassification.value ? { label: autoClassification.value.label, color: autoClassification.value.color } : null
 })
 
 const elevationDisplay = computed(() => {

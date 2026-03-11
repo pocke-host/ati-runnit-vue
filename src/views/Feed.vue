@@ -142,8 +142,15 @@
                   <div class="stat-value">{{ formatDuration(item.durationSeconds) }}</div>
                 </div>
                 <div class="activity-stat">
-                  <div class="stat-label">Sport</div>
-                  <div class="stat-value">{{ item.sportType }}</div>
+                  <div class="stat-label">Type</div>
+                  <div class="stat-value">
+                    <span
+                      v-if="classifyActivity(item)"
+                      class="feed-workout-chip"
+                      :style="{ background: classifyActivity(item).color }"
+                    >{{ classifyActivity(item).label }}</span>
+                    <span v-else>{{ item.sportType }}</span>
+                  </div>
                 </div>
               </div>
 
@@ -346,6 +353,7 @@ import { useUnits } from '@/composables/useUnits'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useNotificationStore } from '@/stores/notification'
+import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -354,6 +362,7 @@ const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
 const { formatDistance, formatDuration } = useUnits()
+const { classifyActivity } = useWorkoutClassifier()
 
 const activeTab = ref('all')
 const sortOrder = ref('newest')
@@ -892,6 +901,17 @@ onMounted(() => {
   background: rgba(255,255,255,0.90);
   border: 1px solid #E5E5E5;
   border-radius: 0;
+}
+
+.feed-workout-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: white;
 }
 
 .stat-label {
