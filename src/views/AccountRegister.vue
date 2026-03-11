@@ -211,7 +211,7 @@ const submit = async () => {
     sessionStorage.setItem('needs_onboarding', 'true')
     router.push('/onboard')
   } catch (e) {
-    error.value = e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
+    error.value = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
   } finally {
     loading.value = false
   }
