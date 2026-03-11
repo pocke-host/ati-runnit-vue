@@ -35,7 +35,7 @@
               <span class="panel-chip">70.3</span>
               <span class="panel-chip">Ironman</span>
             </div>
-            <div class="panel-sub">Live data · RunSignup API</div>
+            <div class="panel-sub">Live data · RunSignup + FindARace</div>
           </div>
         </div>
       </div>
@@ -308,7 +308,7 @@ const normalizeRace = (race) => {
   }
 }
 
-/* ─── Fetch: try RunSignup directly, fall back to proxy ── */
+/* ─── Fetch: RunSignup + FindARace in parallel ─────────── */
 const fetchEvents = async () => {
   loading.value  = true
   apiError.value = ''
@@ -322,38 +322,62 @@ const fetchEvents = async () => {
   if (zipcode.value.trim()) params.set('zipcode', zipcode.value.trim())
 
   let rawRaces = null
+  let farEvents = []
 
-  // 1 ── Try RunSignup directly (works if CORS is not blocked)
-  try {
-    const { data } = await axios.get(`${RUNSIGNUP_BASE}?${params}`, { timeout: 8000 })
-    rawRaces = Array.isArray(data) ? data : (data.races || [])
-    usingLiveData.value = true
-  } catch { /* CORS or network — fall through */ }
-
-  // 2 ── Fall back to backend proxy
-  if (!rawRaces) {
-    try {
+  // Run RunSignup + FindARace in parallel
+  const [rsResult, farResult] = await Promise.allSettled([
+    // RunSignup: try direct first, then proxy
+    (async () => {
+      try {
+        const { data } = await axios.get(`${RUNSIGNUP_BASE}?${params}`, { timeout: 8000 })
+        return Array.isArray(data) ? data : (data.races || [])
+      } catch { /* CORS — try proxy */ }
       const proxyParams = { page: 1, results_per_page: 50, future_events_only: 'T' }
       if (zipcode.value.trim()) proxyParams.zipcode = zipcode.value.trim()
       const { data } = await axios.get(`${API_URL}/events`, { params: proxyParams, timeout: 8000 })
-      rawRaces = Array.isArray(data) ? data : (data.races || [])
-      usingLiveData.value = true
-    } catch { /* proxy not configured — fall through */ }
+      return Array.isArray(data) ? data : (data.races || [])
+    })(),
+    // FindARace backend proxy
+    axios.get(`${API_URL}/events/findarace`, { timeout: 15000 }).then(r => r.data),
+  ])
+
+  // Process RunSignup results
+  if (rsResult.status === 'fulfilled' && rsResult.value?.length) {
+    rawRaces = rsResult.value
+    usingLiveData.value = true
   }
 
-  // 3 ── Sample data
-  if (!rawRaces) {
+  // Process FindARace results (already normalized)
+  if (farResult.status === 'fulfilled' && Array.isArray(farResult.value)) {
+    farEvents = farResult.value
+    usingLiveData.value = true
+  }
+
+  // If both sources failed, use sample data
+  if (!rawRaces && farEvents.length === 0) {
     events.value    = sampleEvents
     usingLiveData.value = false
     loading.value   = false
     return
   }
 
-  // Filter to running + triathlon only, then normalise
-  events.value = rawRaces
+  // Normalize RunSignup races
+  const rsNormalized = (rawRaces || [])
     .map(normalizeRace)
     .filter(e => e.sport === 'running' || e.sport === 'triathlon')
 
+  // Merge: deduplicate by name+date
+  const seen = new Set()
+  const merged = []
+  for (const ev of [...rsNormalized, ...farEvents]) {
+    const key = `${ev.name}|${ev.date}`
+    if (!seen.has(key)) {
+      seen.add(key)
+      merged.push(ev)
+    }
+  }
+
+  events.value = merged
   loading.value = false
 }
 
