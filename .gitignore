@@ -29,7 +29,9 @@ coverage
 
 *.tsbuildinfo
 
-# Environment variables
+# Environment variables — never commit real keys
 .env
 .env.local
+.env.production
+.env.staging
 .env.*.local
