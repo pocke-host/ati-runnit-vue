@@ -145,7 +145,7 @@ const syncing = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
 
-const STRAVA_CLIENT_ID = import.meta.env.VITE_STRAVA_CLIENT_ID
+
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -231,16 +231,13 @@ const syncNow = async () => {
   }
 }
 
-const connectStrava = () => {
-  const redirectUri = `${API_URL}/integrations/strava/callback`
-  const params = new URLSearchParams({
-    client_id: STRAVA_CLIENT_ID,
-    redirect_uri: redirectUri,
-    response_type: 'code',
-    scope: 'activity:read_all',
-    approval_prompt: 'auto',
-  })
-  window.location.href = `https://www.strava.com/oauth/authorize?${params}`
+const connectStrava = async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/strava/connect`, { headers: getAuthHeaders() })
+    window.location.href = data.url
+  } catch {
+    showStatus('Failed to connect Strava. Please try again.', 'error')
+  }
 }
 
 const disconnectStrava = async () => {
