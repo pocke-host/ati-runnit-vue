@@ -4,7 +4,7 @@
     <section class="hero">
       <div class="container-xxl">
         <h1 class="display-5 fw-bold mb-3">Privacy Policy</h1>
-        <p class="lead mb-0">Last updated: February 26, 2026</p>
+        <p class="lead mb-0">Last updated: March 11, 2026</p>
       </div>
     </section>
 
@@ -44,9 +44,14 @@
             <div class="contact-box">
               <h3 class="contact-title">Questions about this policy?</h3>
               <p class="contact-text">
-                If you have any questions or concerns about how we handle your data, reach out to us directly.
+                For privacy-related questions, data requests, or to exercise your rights, contact us directly at
+                <a href="mailto:privacy@runnit.live" class="contact-email">privacy@runnit.live</a>
               </p>
-              <router-link to="/support" class="btn-contact">Contact Support</router-link>
+              <p class="contact-company">
+                Runnit Inc. &nbsp;·&nbsp; Canada &nbsp;·&nbsp;
+                <a href="mailto:privacy@runnit.live" class="contact-email">privacy@runnit.live</a>
+              </p>
+              <a href="mailto:privacy@runnit.live" class="btn-contact">privacy@runnit.live</a>
             </div>
           </article>
         </div>
@@ -62,10 +67,10 @@ const sections = [
     title: '1. Overview',
     blocks: [
       {
-        text: 'RUNNIT ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, including our website and mobile application.'
+        text: 'RUNNIT ("we", "our", or "us") is a fitness training platform operated by Runnit Inc., a company registered in Canada. Our platform is available at runnit.live and through our mobile application.'
       },
       {
-        text: 'By using RUNNIT, you agree to the collection and use of information in accordance with this policy. If you do not agree with any part of this policy, please do not use our services.'
+        text: 'This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform. By using RUNNIT, you agree to the collection and use of information in accordance with this policy. If you do not agree with any part of this policy, please do not use our services.'
       }
     ]
   },
@@ -141,8 +146,36 @@ const sections = [
     ]
   },
   {
+    id: 'third-party-integrations',
+    title: '5. Third-Party Integrations',
+    blocks: [
+      {
+        heading: 'Garmin Connect',
+        text: 'RUNNIT integrates with the Garmin Connect API to allow users to sync their activity data from Garmin devices. When you connect your Garmin account, we request access to your activity data including GPS tracks, heart rate, pace, distance, elevation, and workout timestamps.'
+      },
+      {
+        text: 'We use this data solely to display your activities, calculate training metrics, and generate personalized training plans within the RUNNIT platform. We do not sell, license, or share Garmin data with any third party.'
+      },
+      {
+        heading: 'How Garmin Data is Stored',
+        text: 'Garmin activity data is stored securely on our servers and associated with your RUNNIT account. We retain Garmin-sourced data only for as long as your account remains active or until you disconnect your Garmin integration.'
+      },
+      {
+        heading: 'Disconnecting Garmin',
+        text: 'You may disconnect your Garmin account at any time from your device settings within the RUNNIT app. Upon disconnection, we revoke our OAuth access token. You may also request deletion of all Garmin-sourced data by contacting privacy@runnit.live.'
+      },
+      {
+        heading: 'Strava',
+        text: 'RUNNIT integrates with the Strava API to import activities from your Strava account. The same data principles apply: Strava data is used only to display and analyze your training within RUNNIT and is never sold or shared with third parties.'
+      },
+      {
+        text: 'RUNNIT\'s use of data from third-party integrations is limited to providing and improving the core features of the platform as requested by the user.'
+      }
+    ]
+  },
+  {
     id: 'data-retention',
-    title: '5. Data Retention',
+    title: '6. Data Retention',
     blocks: [
       {
         text: 'We retain your personal data for as long as your account is active or as needed to provide you services. You can request deletion of your account and associated data at any time through your account settings or by contacting support.'
@@ -154,7 +187,7 @@ const sections = [
   },
   {
     id: 'your-rights',
-    title: '6. Your Rights',
+    title: '7. Your Rights',
     blocks: [
       {
         text: 'Depending on your location, you may have the following rights regarding your personal data:'
@@ -176,7 +209,7 @@ const sections = [
   },
   {
     id: 'security',
-    title: '7. Security',
+    title: '8. Security',
     blocks: [
       {
         text: 'We implement industry-standard security measures including encryption in transit (TLS), hashed password storage, and access controls. However, no method of transmission over the internet or electronic storage is 100% secure.'
@@ -188,7 +221,7 @@ const sections = [
   },
   {
     id: 'children',
-    title: '8. Children\'s Privacy',
+    title: '9. Children\'s Privacy',
     blocks: [
       {
         text: 'RUNNIT is not directed to children under 13. We do not knowingly collect personal information from children under 13. If we become aware that a child under 13 has provided us with personal information, we will take steps to delete it.'
@@ -197,7 +230,7 @@ const sections = [
   },
   {
     id: 'changes',
-    title: '9. Changes to This Policy',
+    title: '10. Changes to This Policy',
     blocks: [
       {
         text: 'We may update this Privacy Policy from time to time. When we do, we will revise the "Last updated" date at the top of this page. We encourage you to review this policy periodically.'
@@ -404,6 +437,18 @@ const sections = [
 .btn-contact:hover {
   background: #e5e5e5;
   color: #000;
+}
+
+.contact-email {
+  color: #0052FF;
+  text-decoration: underline;
+}
+
+.contact-company {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 28px;
+  letter-spacing: 0.04em;
 }
 
 /* ===== RESPONSIVE ===== */
