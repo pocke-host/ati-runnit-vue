@@ -48,6 +48,7 @@ const routes = [
   { path: '/profile/:id',         name: 'UserProfile',    component: () => import('@/views/UserProfile.vue'),      meta: { requiresAuth: true } },
   { path: '/achievements',        name: 'Achievements',   component: () => import('@/views/Achievements.vue'),     meta: { requiresAuth: true } },
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },
+  { path: '/calendar',            name: 'Calendar',       component: () => import('@/views/Calendar.vue'),         meta: { requiresAuth: true } },
   { path: '/onboard',             name: 'Onboard',        component: () => import('@/views/Onboarding.vue'),       meta: { requiresAuth: true } },
 
   // Coach routes
