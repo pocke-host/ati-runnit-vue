@@ -10,6 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
     "android": "npx cap sync android && npx cap open android",
     "ios": "npx cap sync ios && npx cap open ios"
   },
@@ -35,7 +37,10 @@
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^28.1.0",
     "vite": "^7.0.6",
-    "vite-plugin-vue-devtools": "^8.0.0"
+    "vite-plugin-vue-devtools": "^8.0.0",
+    "vitest": "^4.0.18"
   }
 }

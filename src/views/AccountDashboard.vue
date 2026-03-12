@@ -55,179 +55,18 @@
       <!-- MAIN GRID -->
       <section class="dashboard-grid">
         <!-- LEFT: Charts -->
-        <div class="charts-section">
-          <!-- Weekly Activity Chart -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Weekly Activity</h3>
-              <div class="chart-tabs">
-                <button :class="['tab', {active: chartView === 'distance'}]" @click="chartView = 'distance'">Distance</button>
-                <button :class="['tab', {active: chartView === 'duration'}]" @click="chartView = 'duration'">Duration</button>
-              </div>
-            </div>
-            <div class="chart-body">
-              <canvas ref="weeklyChart"></canvas>
-            </div>
-          </div>
-
-          <!-- Activity Breakdown -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Activity Breakdown</h3>
-              <select class="period-select" v-model="breakdownPeriod">
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-              </select>
-            </div>
-            <div class="chart-body chart-body-split">
-              <div class="chart-doughnut">
-                <canvas ref="activityPieChart"></canvas>
-              </div>
-              <div class="chart-legend">
-                <div v-for="sport in sportBreakdown" :key="sport.type" class="legend-item">
-                  <div class="legend-color" :style="{background: sport.color}"></div>
-                  <div class="legend-text">
-                    <div class="legend-label">{{ sport.type }}</div>
-                    <div class="legend-value">{{ sport.count }} activities</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Progress Chart -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Monthly Progress</h3>
-              <div class="chart-metric">
-                <span class="metric-value">{{ monthlyGoalProgress }}%</span>
-                <span class="metric-label">of goal</span>
-              </div>
-            </div>
-            <div class="chart-body">
-              <canvas ref="progressChart"></canvas>
-            </div>
-          </div>
-        </div>
+        <DashChartsSection />
 
         <!-- RIGHT: Activity Feed & Profile -->
         <div class="sidebar-section">
           <!-- Quick Profile -->
-          <aside class="profile-card">
-            <div class="profile-header">
-              <div class="avatar-large">{{ userInitial }}</div>
-              <div class="profile-info">
-                <div class="profile-name">{{ user.displayName || 'User' }}</div>
-                <div class="profile-email">{{ user.email }}</div>
-              </div>
-            </div>
-
-            <div class="profile-stats-mini">
-              <div class="stat-mini">
-                <div class="stat-mini-value">{{ friendsCount }}</div>
-                <div class="stat-mini-label">Friends</div>
-              </div>
-              <div class="stat-mini">
-                <div class="stat-mini-value">{{ followersCount }}</div>
-                <div class="stat-mini-label">Followers</div>
-              </div>
-              <div class="stat-mini">
-                <div class="stat-mini-value">{{ activities?.length || 0 }}</div>
-                <div class="stat-mini-label">Activities</div>
-              </div>
-            </div>
-
-            <div class="profile-badges">
-              <template v-if="latestEarned.length">
-                <div v-for="badge in latestEarned" :key="badge.id" class="badge-item">
-                  <div class="badge-icon">{{ badge.icon }}</div>
-                  <div class="badge-text">{{ badge.name }}</div>
-                </div>
-              </template>
-              <div v-else class="badge-item">
-                <div class="badge-icon">⭐</div>
-                <div class="badge-text">Early Adopter</div>
-              </div>
-            </div>
-
-            <!-- PR Widget -->
-            <div class="profile-prs">
-              <div class="prs-row-header">
-                <span class="prs-label">⚡ Personal Records</span>
-                <router-link to="/stats" class="prs-all-link">View all →</router-link>
-              </div>
-              <div v-if="!topPRs.length" class="prs-empty">Log activities to set PRs!</div>
-              <div v-else class="prs-list">
-                <div v-for="pr in topPRs" :key="pr.id" class="pr-mini">
-                  <div class="pr-mini-label">{{ pr.label }}</div>
-                  <div class="pr-mini-val">{{ formatPRValue(pr) }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Training Insights Widget -->
-            <div v-if="dashInsights" class="dash-insights">
-              <div class="dash-insights-label">TRAINING INSIGHTS</div>
-              <div class="dash-insights-row">
-                <div class="dash-insight-item">
-                  <span class="dash-insight-key">Fitness</span>
-                  <span class="dash-insight-val">{{ dashInsights.fitnessScore }}</span>
-                </div>
-                <div class="dash-insight-item">
-                  <span class="dash-insight-key">Form</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#22c55e' : dashInsights.formScore > -5 ? '#f97316' : '#ef4444' }">
-                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
-                  </span>
-                </div>
-                <div class="dash-insight-item" v-if="dashInsights.acwr !== null">
-                  <span class="dash-insight-key">ACWR</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#22c55e' : dashInsights.acwr < 1.5 ? '#f97316' : '#ef4444' }">
-                    {{ dashInsights.acwr }}
-                  </span>
-                </div>
-              </div>
-              <router-link to="/stats" class="dash-insights-link">Full analysis →</router-link>
-            </div>
-
-            <div class="profile-actions">
-              <button class="action-btn" @click="openActivityModal">
-                <i class="bi bi-plus-circle me-2"></i>Log Activity
-              </button>
-              <button class="action-btn" @click="openFriendsModal">
-                <i class="bi bi-people me-2"></i>Find Friends
-              </button>
-              <button class="action-btn" @click="openMomentModal">
-                <i class="bi bi-camera me-2"></i>Share Moment
-              </button>
-              <button class="action-btn" @click="goToFeed">
-                <i class="bi bi-collection me-2"></i>View Feed
-              </button>
-              <button class="action-btn action-btn-danger" @click="handleLogout">
-                <i class="bi bi-box-arrow-right me-2"></i>Logout
-              </button>
-            </div>
-
-            <!-- Coach Widget -->
-            <div v-if="myCoach" class="coach-widget">
-              <div class="coach-widget-label">YOUR COACH</div>
-              <div class="coach-widget-row">
-                <div class="coach-avatar-sm">{{ (myCoach.displayName || '?')[0].toUpperCase() }}</div>
-                <div class="coach-name">{{ myCoach.displayName }}</div>
-              </div>
-            </div>
-            <!-- Subscription CTA -->
-            <div v-if="subscriptionTier === 'free'" class="upgrade-banner">
-              <div class="upgrade-label">UPGRADE TO PREMIUM</div>
-              <p class="upgrade-desc">Route planning, goal tracking, and pace insights.</p>
-              <router-link to="/subscribe" class="upgrade-btn">See Plans →</router-link>
-            </div>
-            <div v-else class="manage-sub-link">
-              <router-link to="/billing">
-                <i class="bi bi-credit-card me-2"></i>Manage Subscription →
-              </router-link>
-            </div>
-          </aside>
+          <DashProfileCard
+            :friends-count="friendsCount"
+            :followers-count="followersCount"
+            @log-activity="openActivityModal"
+            @find-friends="openFriendsModal"
+            @share-moment="openMomentModal"
+          />
 
           <!-- Recent Activities -->
           <div class="recent-activities">
@@ -668,7 +507,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useActivityStore } from '@/stores/activity'
@@ -676,7 +515,6 @@ import { useMomentStore } from '@/stores/moment'
 import { useUploadStore } from '@/stores/upload'
 import { useFollowStore } from '@/stores/follow'
 import { storeToRefs } from 'pinia'
-import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { usePlanStore } from '@/stores/plan'
@@ -684,8 +522,8 @@ import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
 import { useAthleteStore } from '@/stores/athlete'
 import AppSpinner from '@/components/AppSpinner.vue'
-
-Chart.register(...registerables)
+import DashChartsSection from '@/components/DashChartsSection.vue'
+import DashProfileCard from '@/components/DashProfileCard.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -696,7 +534,7 @@ const momentStore = useMomentStore()
 const uploadStore = useUploadStore()
 const followStore = useFollowStore()
 
-const { user, subscriptionTier } = storeToRefs(authStore)
+const { user } = storeToRefs(authStore)
 const { activities, loading } = storeToRefs(activityStore)
 const { uploading: momentLoading, progress: uploadProgress } = storeToRefs(uploadStore)
 
@@ -704,12 +542,8 @@ const planStore = usePlanStore()
 const achievementStore = useAchievementStore()
 const prStore = usePRStore()
 const athleteStore = useAthleteStore()
-const { activePlan } = storeToRefs(planStore)
-const { latestEarned } = storeToRefs(achievementStore)
-const { topPRs } = storeToRefs(prStore)
-const { myCoach } = storeToRefs(athleteStore)
 const myCoachLoaded = ref(false)
-const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
+const { formatDistance, formatDuration, isImperial, elevationLabel, metersToDisplay } = useUnits()
 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
@@ -758,22 +592,6 @@ const followingIds = ref(new Set())
 const filters = ['All', 'Run', 'Bike', 'Swim', 'Hike', 'Walk']
 const activeFilter = ref('All')
 
-const chartView = ref('distance')
-const breakdownPeriod = ref('month')
-
-// Chart refs
-const weeklyChart = ref(null)
-const activityPieChart = ref(null)
-const progressChart = ref(null)
-
-let weeklyChartInstance = null
-let pieChartInstance = null
-let progressChartInstance = null
-
-const userInitial = computed(() => {
-  return user.value?.displayName?.charAt(0).toUpperCase() || 'U'
-})
-
 const currentStreak = computed(() => {
   const acts = activities.value || []
   if (!acts.length) return 0
@@ -802,39 +620,6 @@ const currentStreak = computed(() => {
   return streak
 })
 
-// Training insights (compact CTL/ATL/ACWR for sidebar widget)
-const dashInsights = computed(() => {
-  const acts = activities.value || []
-  if (acts.length < 3) return null
-
-  const today = new Date()
-  today.setHours(23, 59, 59, 999)
-  const dayMs = 86400000
-  const DAYS = 90
-
-  const dailyLoad = new Array(DAYS).fill(0)
-  for (const a of acts) {
-    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
-    if (daysAgo >= 0 && daysAgo < DAYS) {
-      dailyLoad[DAYS - 1 - daysAgo] += (a.distanceMeters || 0) / 1000
-    }
-  }
-
-  let ctl = 0, atl = 0
-  const ctlK = 1 / 42, atlK = 1 / 7
-  for (let i = 0; i < DAYS; i++) {
-    ctl = ctl * (1 - ctlK) + dailyLoad[i] * ctlK
-    atl = atl * (1 - atlK) + dailyLoad[i] * atlK
-  }
-
-  const fitnessScore = Math.min(100, Math.round(ctl * 10))
-  const fatigueScore = Math.min(100, Math.round(atl * 10))
-  const formScore = Math.round(fitnessScore - fatigueScore)
-  const acwr = ctl > 0 ? Math.round((atl / ctl) * 100) / 100 : null
-
-  return { fitnessScore, fatigueScore, formScore, acwr }
-})
-
 const monthCompare = computed(() => {
   const acts = activities.value || []
   const now = new Date()
@@ -857,30 +642,6 @@ const monthCompare = computed(() => {
   return pct >= 0 ? `+${pct}% vs last month` : `${pct}% vs last month`
 })
 
-const weeklyChartData = computed(() => {
-  const acts = activities.value || []
-  const days = [0, 0, 0, 0, 0, 0, 0] // Mon–Sun
-
-  const now = new Date()
-  const monday = new Date(now)
-  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7))
-  monday.setHours(0, 0, 0, 0)
-
-  acts.forEach(a => {
-    const d = new Date(a.createdAt)
-    if (d >= monday) {
-      const idx = (d.getDay() + 6) % 7
-      if (chartView.value === 'distance') {
-        days[idx] += metersToDisplay(a.distanceMeters || 0)
-      } else {
-        days[idx] += (a.durationSeconds || 0) / 60
-      }
-    }
-  })
-
-  return days.map(v => parseFloat(v.toFixed(1)))
-})
-
 const totalStats = computed(() => {
   const acts = activities.value || []
   const totalMeters = acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
@@ -897,38 +658,6 @@ const totalStats = computed(() => {
 const monthlyDistanceMeters = computed(() => {
   const acts = activities.value || []
   return acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
-})
-
-const monthlyDistance = computed(() => {
-  const acts = activities.value || []
-  return (acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000).toFixed(1)
-})
-
-const monthlyGoalProgress = computed(() => {
-  return Math.min(Math.round((parseFloat(monthlyDistance.value) / 100) * 100), 100)
-})
-
-const sportBreakdown = computed(() => {
-  const acts = activities.value || []
-  const breakdown = {}
-  const colors = {
-    RUN: '#C46A2A',   // --r-accent
-    BIKE: '#5A6B4E',  // --r-olive
-    SWIM: '#2C3726',  // --r-olive-deep
-    HIKE: '#A0875A',  // warm earth
-    WALK: '#C8B49A',  // light earth
-    OTHER: '#E0D5C5'  // offwhite-tan
-  }
-  
-  acts.forEach(a => {
-    breakdown[a.sportType] = (breakdown[a.sportType] || 0) + 1
-  })
-  
-  return Object.entries(breakdown).map(([type, count]) => ({
-    type,
-    count,
-    color: colors[type] || colors.OTHER
-  }))
 })
 
 const filteredActivities = computed(() => {
@@ -957,17 +686,6 @@ const formatDateShort = (dateString) => {
     month: 'short',
     day: 'numeric'
   })
-}
-
-const formatPRValue = (pr) => {
-  if (!pr.data) return '—'
-  const { id, data: d } = pr
-  if (['best_5k', 'best_10k', 'best_half', 'best_marathon'].includes(id)) {
-    return formatDurationClock(d.estTime)
-  }
-  if (id === 'fastest_pace') return formatPace(d.pace / 60)
-  if (id === 'most_elevation') return formatElevation(d.elevationMeters)
-  return formatDistance(d.distanceMeters)
 }
 
 const openActivityModal = () => {
@@ -1181,152 +899,6 @@ const unfollowUser = async (userId) => {
   }
 }
 
-const goToFeed = () => {
-  router.push('/feed')
-}
-
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/')
-}
-
-// Chart initialization (keeping existing chart code)
-const initWeeklyChart = () => {
-  if (!weeklyChart.value) return
-  
-  if (weeklyChartInstance) {
-    weeklyChartInstance.destroy()
-  }
-  
-  const ctx = weeklyChart.value.getContext('2d')
-  weeklyChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      datasets: [{
-        label: chartView.value === 'distance' ? `Distance (${distanceLabel.value})` : 'Duration (min)',
-        data: weeklyChartData.value,
-        backgroundColor: '#C46A2A',
-        borderColor: '#C46A2A',
-        borderWidth: 1,
-        borderRadius: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: { 
-          beginAtZero: true,
-          grid: { color: 'rgba(15,18,16,0.05)' }
-        },
-        x: {
-          grid: { display: false }
-        }
-      }
-    }
-  })
-}
-
-const initPieChart = () => {
-  if (!activityPieChart.value) return
-  
-  if (pieChartInstance) {
-    pieChartInstance.destroy()
-  }
-  
-  const ctx = activityPieChart.value.getContext('2d')
-  pieChartInstance = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: sportBreakdown.value.map(s => s.type),
-      datasets: [{
-        data: sportBreakdown.value.map(s => s.count),
-        backgroundColor: sportBreakdown.value.map(s => s.color),
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { display: false }
-      },
-      cutout: '70%'
-    }
-  })
-}
-
-const initProgressChart = () => {
-  if (!progressChart.value) return
-  
-  if (progressChartInstance) {
-    progressChartInstance.destroy()
-  }
-  
-  const ctx = progressChart.value.getContext('2d')
-  progressChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-      datasets: [{
-        label: 'Distance',
-        data: [15, 28, 42, parseFloat(monthlyDistance.value)],
-        borderColor: '#C46A2A',
-        backgroundColor: 'rgba(196,106,42,0.07)',
-        tension: 0.3,
-        fill: true,
-        borderWidth: 2,
-        pointRadius: 4,
-        pointBackgroundColor: '#C46A2A'
-      }, {
-        label: 'Goal',
-        data: [25, 50, 75, 100],
-        borderColor: 'rgba(107, 107, 107, 0.40)',
-        borderDash: [5, 5],
-        borderWidth: 2,
-        pointRadius: 0,
-        fill: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: { 
-          beginAtZero: true,
-          grid: { color: 'rgba(15,18,16,0.05)' }
-        },
-        x: {
-          grid: { display: false }
-        }
-      }
-    }
-  })
-}
-
-const updateCharts = () => {
-  nextTick(() => {
-    initWeeklyChart()
-    initPieChart()
-    initProgressChart()
-  })
-}
-
-watch(chartView, () => {
-  initWeeklyChart()
-})
-
-watch(activities, () => {
-  updateCharts()
-}, { deep: true })
-
 onMounted(async () => {
   try {
     await activityStore.fetchActivities()
@@ -1337,8 +909,6 @@ onMounted(async () => {
       prStore.fetchPRs(activities.value),
       athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
     ])
-    await nextTick()
-    updateCharts()
   } catch (err) {
     console.error('Failed to load data:', err)
   }
