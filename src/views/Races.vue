@@ -937,7 +937,7 @@ watch(zipcode, () => {
   align-items: center;
   transition: background 0.15s;
 }
-.btn-register:hover { background: #7722CC; }
+.btn-register:hover { background: #003ECC; }
 
 /* Error */
 .events-error {

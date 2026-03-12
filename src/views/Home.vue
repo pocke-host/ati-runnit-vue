@@ -252,15 +252,15 @@ onMounted(async () => {
 
 <style scoped>
 .home-page {
-  background: var(--rk-paper, #FAF8FF);
-  color: var(--rk-void, #0D0512);
+  background: var(--rk-paper, #ffffff);
+  color: var(--rk-void, #000000);
   padding-top: var(--nav-h, 64px);
 }
 
 /* ── HERO ── */
 .hero {
   padding: 140px 0 120px;
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -306,7 +306,7 @@ onMounted(async () => {
   align-items: center;
   padding: 16px 48px;
   border-radius: 0;
-  background: var(--rk-signal, #8B2BE2);
+  background: var(--rk-signal, #0052FF);
   color: #fff;
   font-weight: 600;
   font-size: 0.78rem;
@@ -314,12 +314,12 @@ onMounted(async () => {
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid var(--rk-signal, #8B2BE2);
+  border: 2px solid var(--rk-signal, #0052FF);
   cursor: pointer;
 }
 .btn-cta:hover {
-  background: #7722CC;
-  border-color: #7722CC;
+  background: #003ECC;
+  border-color: #003ECC;
   color: #fff;
   text-decoration: none;
 }
@@ -330,36 +330,36 @@ onMounted(async () => {
   padding: 16px 48px;
   border-radius: 0;
   background: transparent;
-  color: var(--rk-signal, #8B2BE2);
+  color: var(--rk-signal, #0052FF);
   font-weight: 600;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   transition: background 0.15s;
-  border: 2px solid var(--rk-signal, #8B2BE2);
+  border: 2px solid var(--rk-signal, #0052FF);
   cursor: pointer;
 }
 .btn-cta-ghost:hover {
-  background: var(--rk-signal, #8B2BE2);
+  background: var(--rk-signal, #0052FF);
   color: #fff;
   text-decoration: none;
 }
 
 .btn-cta-light {
-  background: var(--rk-signal, #8B2BE2);
+  background: var(--rk-signal, #0052FF);
   color: #fff;
-  border: 2px solid var(--rk-signal, #8B2BE2);
+  border: 2px solid var(--rk-signal, #0052FF);
 }
 .btn-cta-light:hover {
-  background: #7722CC;
-  border-color: #7722CC;
+  background: #003ECC;
+  border-color: #003ECC;
   color: #fff;
 }
 
 /* ── STATS BAR ── */
 .stats-bar {
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   border-bottom: 1px solid #E5E5E5;
   padding: 56px 0;
 }
@@ -403,7 +403,7 @@ onMounted(async () => {
 
 /* ── MANIFESTO STRIP ── */
 .manifesto {
-  background: #0D0512;
+  background: #000;
   padding: 80px 0;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
@@ -421,7 +421,7 @@ onMounted(async () => {
 /* ── PILLARS ── */
 .pillars {
   padding: 0;
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -447,7 +447,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--rk-signal, #8B2BE2);
+  color: var(--rk-signal, #0052FF);
   margin-top: 4px;
   flex-shrink: 0;
 }
@@ -515,7 +515,7 @@ onMounted(async () => {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--rk-signal, #8B2BE2);
+  color: var(--rk-signal, #0052FF);
   margin-bottom: 16px;
 }
 
@@ -543,7 +543,7 @@ onMounted(async () => {
 
 /* ── STATEMENT ── */
 .statement {
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   border-bottom: 1px solid #E5E5E5;
   padding: 100px 0;
 }
@@ -571,7 +571,7 @@ onMounted(async () => {
 /* ── CAPABILITIES ── */
 .capabilities {
   padding: 100px 0;
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   border-bottom: 1px solid #E5E5E5;
 }
 
@@ -639,7 +639,7 @@ onMounted(async () => {
 /* ── FINAL CTA ── */
 .final-cta {
   padding: 140px 0;
-  background: #0D0512;
+  background: #000;
   color: white;
 }
 

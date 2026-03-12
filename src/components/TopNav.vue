@@ -40,18 +40,19 @@
           <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
         </div>
 
-        <!-- Auth icons: always visible (desktop + mobile) -->
+        <!-- Auth icons -->
         <template v-if="isAuthenticated">
-          <!-- DM -->
-          <div class="notif-wrap">
+          <div class="icon-group">
+          <!-- DM (hidden on mobile — accessible via drawer) -->
+          <div class="notif-wrap desktop-only">
             <button class="nav-icon-btn" @click="dmStore.open()" title="Messages">
               <i class="bi bi-chat-dots-fill"></i>
               <span v-if="dmStore.unreadCount > 0" class="notif-badge">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
             </button>
           </div>
 
-          <!-- Bell -->
-          <div class="notif-wrap" ref="notifRef">
+          <!-- Bell (hidden on mobile — accessible via drawer) -->
+          <div class="notif-wrap desktop-only" ref="notifRef">
             <button class="nav-icon-btn" @click="toggleNotifDropdown" title="Notifications">
               <i class="bi bi-bell-fill"></i>
               <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
@@ -92,7 +93,7 @@
           </div>
 
           <!-- Avatar -->
-          <div class="avatar-wrap" ref="avatarRef">
+          <div class="avatar-wrap" ref="avatarRef" style="margin-left:4px;">
             <button class="nav-avatar nav-avatar-btn" @click="toggleAvatarDropdown" :title="user?.displayName">
               <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="34" />
             </button>
@@ -116,6 +117,7 @@
               </button>
             </div>
           </div>
+          </div><!-- /icon-group -->
         </template>
 
         <!-- Hamburger (mobile only, all users) -->
@@ -161,6 +163,17 @@
           </div>
 
           <nav class="drawer-nav">
+            <!-- Messages + Notifications (mobile-only, hidden from top bar) -->
+            <button class="drawer-link" @click="dmStore.open(); mobileMenuOpen = false">
+              <i class="bi bi-chat-dots-fill"></i> Messages
+              <span v-if="dmStore.unreadCount > 0" class="drawer-badge">{{ dmStore.unreadCount }}</span>
+            </button>
+            <button class="drawer-link" @click="toggleNotifDropdown(); mobileMenuOpen = false">
+              <i class="bi bi-bell-fill"></i> Notifications
+              <span v-if="unreadCount > 0" class="drawer-badge">{{ unreadCount }}</span>
+            </button>
+            <div class="drawer-divider"></div>
+
             <!-- Coach drawer links -->
             <template v-if="role === 'coach'">
               <router-link to="/coach/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
@@ -379,7 +392,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--rk-void, #0D0512);
+  background: var(--rk-void, #000000);
   border-bottom: 1px solid rgba(139,43,226,0.20);
   box-shadow: none;
   transition: background 0.3s ease, border-color 0.3s ease;
@@ -412,10 +425,18 @@ onUnmounted(() => {
   gap: 4px;
   margin-left: auto;
 }
-.navbar-links {
+.nav-right .icon-group {
   display: flex;
   align-items: center;
   gap: 4px;
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255,255,255,0.15);
+}
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .brand-text {
@@ -445,8 +466,8 @@ onUnmounted(() => {
 .nav-link.router-link-active { color: white; }
 
 .nav-link-track {
-  background: var(--rk-signal, #8B2BE2);
-  color: var(--rk-void, #0D0512) !important;
+  background: #000;
+  color: #fff !important;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -454,8 +475,12 @@ onUnmounted(() => {
   padding: 8px 18px;
   margin-left: 6px;
   gap: 7px;
+  border: 1px solid rgba(255,255,255,0.25);
 }
-.nav-link-track:hover { background: #7722CC !important; color: #fff !important; }
+.nav-link-track:hover { background: #222 !important; color: #fff !important; }
+
+/* Hide on mobile, show on desktop */
+.desktop-only { display: flex; }
 
 /* Notification bell */
 .notif-wrap { position: relative; }
@@ -728,10 +753,17 @@ onUnmounted(() => {
     flex: 1;
     justify-content: flex-end;
     margin-left: 0;
-    gap: 2px;
+    gap: 8px;
   }
-  /* Hide text nav links on mobile — use drawer instead */
+  .nav-right .icon-group {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    gap: 8px;
+  }
+  /* Hide text nav links and DM/bell on mobile — use drawer instead */
   .navbar-links { display: none; }
+  .desktop-only { display: none !important; }
   .mobile-menu-toggle { display: flex; }
   .brand-text { font-size: 1rem; }
 }
@@ -754,7 +786,7 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   width: min(320px, 85vw);
-  background: var(--rk-void, #0D0512);
+  background: #000;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -860,6 +892,24 @@ onUnmounted(() => {
 .drawer-link-primary:hover { color: rgba(255,255,255,0.85); }
 .drawer-link-danger { color: rgba(248, 113, 113, 0.75); }
 .drawer-link-danger:hover { color: #f87171; }
+.drawer-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.10);
+  margin: 4px 20px;
+}
+.drawer-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
 
 /* Transitions */
 .drawer-fade-enter-active, .drawer-fade-leave-active { transition: opacity 0.20s ease; }

@@ -27,7 +27,7 @@ defineProps({
   border-radius: 50%;
   border-style: solid;
   border-color: rgba(139, 43, 226, 0.15);
-  border-top-color: var(--rk-signal, #8B2BE2);
+  border-top-color: var(--rk-signal, #0052FF);
   animation: rk-spin 0.75s linear infinite;
 }
 

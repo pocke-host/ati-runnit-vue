@@ -94,7 +94,7 @@ const userId = computed(() => user.value?.id)
 
 /* Active state — violet */
 .tab-active {
-  color: var(--rk-signal, #8B2BE2);
+  color: #0052FF;
 }
 
 /* Track center tab */
@@ -107,7 +107,7 @@ const userId = computed(() => user.value?.id)
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--rk-signal, #8B2BE2);
+  background: #0052FF;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--rk-paper, #FAF8FF);
+  background: var(--rk-paper, #ffffff);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
     system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   padding: 40px 24px;
