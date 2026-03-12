@@ -965,7 +965,7 @@ onUnmounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #000;
+  background: #5A6B4E;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1084,12 +1084,12 @@ onUnmounted(() => {
 }
 
 .moment-badge-type {
-  background: #000;
+  background: #C46A2A;
   color: white;
 }
 
 .activity-badge-type {
-  background: #000;
+  background: #5A6B4E;
   color: white;
 }
 
@@ -1223,7 +1223,7 @@ onUnmounted(() => {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #000;
+  background: #5A6B4E;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1305,9 +1305,9 @@ onUnmounted(() => {
 }
 
 .reaction-btn.active {
-  background: #000;
+  background: #C46A2A;
   color: white;
-  border-color: #000;
+  border-color: #C46A2A;
   transform: scale(1.05);
 }
 
@@ -1386,7 +1386,7 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #000;
+  background: #5A6B4E;
   display: flex;
   align-items: center;
   justify-content: center;

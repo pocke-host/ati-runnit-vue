@@ -29,7 +29,8 @@ export const useActivityStore = defineStore('activity', () => {
     error.value = null
     try {
       const response = await axios.post(`${API_URL}/activities`, data, {
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
+        timeout: 30000  // activity saves can include large route polylines
       })
       activities.value.unshift(response.data)
       saveCache(activities.value)
