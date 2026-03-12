@@ -16,6 +16,7 @@ export const useDMStore = defineStore('dm', () => {
   const activeUserName = ref('')
   const messages = ref([])
   const loading = ref(false)
+  const error = ref(null)
   const composeResults = ref([])
   const composeLoading = ref(false)
   const unreadCount = computed(() => conversations.value.filter(c => c.unread).length)
@@ -25,10 +26,12 @@ export const useDMStore = defineStore('dm', () => {
 
   const fetchConversations = async () => {
     loading.value = true
+    error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/dms/conversations`, { headers: getHeaders() })
       conversations.value = data
-    } catch {
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to load conversations'
       conversations.value = []
     } finally {
       loading.value = false
@@ -90,7 +93,7 @@ export const useDMStore = defineStore('dm', () => {
   }
 
   return {
-    isOpen, view, conversations, activeUserId, activeUserName, messages, loading,
+    isOpen, view, conversations, activeUserId, activeUserName, messages, loading, error,
     composeResults, composeLoading, unreadCount,
     open, close, fetchConversations, openThread, sendMessage, backToList, openCompose, searchUsers
   }

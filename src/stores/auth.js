@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
   if (storedToken && isJWTExpired(storedToken)) clearLocalAuth()
 
   const token = ref(localStorage.getItem('token'))
-  const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+  const user = ref((() => { try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { clearLocalAuth(); return null } })())
   const unitSystem = ref(localStorage.getItem('unitSystem') || 'imperial')
   const onboardingComplete = ref(localStorage.getItem('onboarding_complete') === 'true')
   const subscriptionTier = ref(localStorage.getItem('subscriptionTier') || 'free')

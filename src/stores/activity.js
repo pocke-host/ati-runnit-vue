@@ -82,12 +82,14 @@ export const useActivityStore = defineStore('activity', () => {
   }
 
   async function fetchFeed() {
+    error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/activities/feed`, {
         headers: getAuthHeaders()
       })
       return Array.isArray(data) ? data : (data.content || [])
-    } catch {
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to load feed'
       return []
     }
   }
