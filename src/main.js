@@ -17,6 +17,9 @@ const pinia = createPinia()
 app.use(pinia)  // ← THIS MUST COME BEFORE router
 app.use(router)
 
+// Default timeout for all requests — prevents indefinite UI freeze on slow/hung backends
+axios.defaults.timeout = 10000
+
 // Global response interceptor — 401 means token is definitively rejected by the server.
 // Clear auth state and send the user to login so they can get a fresh token.
 axios.interceptors.response.use(

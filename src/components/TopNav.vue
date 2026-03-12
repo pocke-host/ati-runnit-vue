@@ -45,17 +45,23 @@
           <div class="icon-group">
           <!-- DM (hidden on mobile — accessible via drawer) -->
           <div class="notif-wrap desktop-only">
-            <button class="nav-icon-btn" @click="dmStore.open()" title="Messages">
-              <i class="bi bi-chat-dots-fill"></i>
-              <span v-if="dmStore.unreadCount > 0" class="notif-badge">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
+            <button class="nav-icon-btn" @click="dmStore.open()" aria-label="Messages">
+              <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+              <span v-if="dmStore.unreadCount > 0" class="notif-badge" :aria-label="`${dmStore.unreadCount} unread messages`">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
             </button>
           </div>
 
           <!-- Bell (hidden on mobile — accessible via drawer) -->
           <div class="notif-wrap desktop-only" ref="notifRef">
-            <button class="nav-icon-btn" @click="toggleNotifDropdown" title="Notifications">
-              <i class="bi bi-bell-fill"></i>
-              <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+            <button
+              class="nav-icon-btn"
+              @click="toggleNotifDropdown"
+              aria-label="Notifications"
+              :aria-expanded="notifOpen"
+              aria-haspopup="true"
+            >
+              <i class="bi bi-bell-fill" aria-hidden="true"></i>
+              <span v-if="unreadCount > 0" class="notif-badge" :aria-label="`${unreadCount} unread notifications`">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
             </button>
             <div v-if="notifOpen" class="notif-dropdown">
               <div class="notif-header">
@@ -94,7 +100,13 @@
 
           <!-- Avatar -->
           <div class="avatar-wrap" ref="avatarRef" style="margin-left:4px;">
-            <button class="nav-avatar nav-avatar-btn" @click="toggleAvatarDropdown" :title="user?.displayName">
+            <button
+              class="nav-avatar nav-avatar-btn"
+              @click="toggleAvatarDropdown"
+              :aria-label="`Account menu for ${user?.displayName}`"
+              :aria-expanded="avatarOpen"
+              aria-haspopup="true"
+            >
               <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="34" />
             </button>
             <div v-if="avatarOpen" class="avatar-dropdown">
@@ -125,8 +137,10 @@
           class="mobile-menu-toggle"
           @click="mobileMenuOpen = !mobileMenuOpen"
           :aria-expanded="mobileMenuOpen"
+          aria-label="Open navigation menu"
+          aria-controls="mobile-drawer"
         >
-          <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
+          <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'" aria-hidden="true"></i>
         </button>
 
       </div>
@@ -147,8 +161,8 @@
         <!-- Drawer Header -->
         <div class="drawer-header">
           <span class="drawer-brand">RUNNIT</span>
-          <button class="drawer-close" @click="mobileMenuOpen = false">
-            <i class="bi bi-x-lg"></i>
+          <button class="drawer-close" @click="mobileMenuOpen = false" aria-label="Close navigation menu">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
 
@@ -363,6 +377,14 @@ const handleOutsideClick = (e) => {
   if (avatarRef.value && !avatarRef.value.contains(e.target)) avatarOpen.value = false
 }
 
+const handleKeydown = (e) => {
+  if (e.key === 'Escape') {
+    notifOpen.value = false
+    avatarOpen.value = false
+    mobileMenuOpen.value = false
+  }
+}
+
 const handleLogout = () => {
   notifStore.stopPolling()
   authStore.logout()
@@ -372,6 +394,7 @@ const handleLogout = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleOutsideClick)
+  document.addEventListener('keydown', handleKeydown)
   window.addEventListener('scroll', handleScroll, { passive: true })
   if (isAuthenticated.value) {
     notifStore.startPolling(30000)
@@ -380,6 +403,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleOutsideClick)
+  document.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('scroll', handleScroll)
   notifStore.stopPolling()
 })

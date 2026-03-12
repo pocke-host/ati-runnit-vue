@@ -14,13 +14,16 @@ export const useCoachStore = defineStore('coach', () => {
   const athletes = ref([])
   const pendingRequests = ref([])
   const loading = ref(false)
+  const error = ref(null)
 
   async function fetchAthletes() {
     loading.value = true
+    error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/coach/athletes`, { headers: getAuthHeaders() })
       athletes.value = Array.isArray(data) ? data : []
-    } catch {
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to load athletes'
       athletes.value = []
     } finally {
       loading.value = false
@@ -28,10 +31,12 @@ export const useCoachStore = defineStore('coach', () => {
   }
 
   async function fetchRequests() {
+    error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/coach/athletes/requests`, { headers: getAuthHeaders() })
       pendingRequests.value = Array.isArray(data) ? data : []
-    } catch {
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to load requests'
       pendingRequests.value = []
     }
   }
@@ -53,7 +58,7 @@ export const useCoachStore = defineStore('coach', () => {
   }
 
   return {
-    athletes, pendingRequests, loading,
+    athletes, pendingRequests, loading, error,
     fetchAthletes, fetchRequests, approveRequest, rejectRequest, removeAthlete
   }
 })
