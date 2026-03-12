@@ -201,10 +201,15 @@
       </div>
     </div>
 
-    <!-- Full Moment Modal (same as before) -->
-    <div v-if="selectedMoment" class="moment-modal-overlay" @click="closeMoment">
-      <div class="moment-modal" @click.stop>
-        <button class="modal-close-btn" @click="closeMoment">
+    <!-- Full Moment Modal -->
+    <div
+      v-if="selectedMoment"
+      class="moment-modal-overlay"
+      role="presentation"
+      @click="closeMoment"
+    >
+      <div class="moment-modal" role="dialog" aria-modal="true" aria-label="View moment" @click.stop>
+        <button class="modal-close-btn" @click="closeMoment" aria-label="Close">
           <i class="bi bi-x-lg"></i>
         </button>
 
@@ -344,7 +349,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
@@ -553,34 +558,42 @@ const addComment = async () => {
 const toggleReaction = async (type) => {
   if (!selectedMoment.value || reactionLoading.value) return
 
+  // Snapshot for rollback
+  const prevReaction = userReaction.value
+  const prevCounts = { ...reactionCounts.value }
+  const momentIndex = moments.value.findIndex(m => m.id === selectedMoment.value.id)
+
+  // Optimistic update
+  if (userReaction.value === type) {
+    reactionCounts.value[type] = (reactionCounts.value[type] || 1) - 1
+    userReaction.value = null
+  } else {
+    if (userReaction.value) {
+      reactionCounts.value[userReaction.value] = (reactionCounts.value[userReaction.value] || 1) - 1
+    }
+    reactionCounts.value[type] = (reactionCounts.value[type] || 0) + 1
+    userReaction.value = type
+  }
+  if (momentIndex !== -1) {
+    moments.value[momentIndex].reactions = { ...reactionCounts.value }
+    moments.value[momentIndex].currentUserReaction = userReaction.value
+  }
+
   reactionLoading.value = true
   try {
-    if (userReaction.value === type) {
-      await axios.delete(`${API_URL}/reactions/${selectedMoment.value.id}`, {
-        headers: getAuthHeaders()
-      })
-      reactionCounts.value[type] = (reactionCounts.value[type] || 1) - 1
-      userReaction.value = null
+    if (prevReaction === type) {
+      await axios.delete(`${API_URL}/reactions/${selectedMoment.value.id}`, { headers: getAuthHeaders() })
     } else {
-      await axios.post(
-        `${API_URL}/reactions/${selectedMoment.value.id}`,
-        { reactionType: type },
-        { headers: getAuthHeaders() }
-      )
-      
-      if (userReaction.value) {
-        reactionCounts.value[userReaction.value] = (reactionCounts.value[userReaction.value] || 1) - 1
-      }
-      reactionCounts.value[type] = (reactionCounts.value[type] || 0) + 1
-      userReaction.value = type
-    }
-
-    const momentIndex = moments.value.findIndex(m => m.id === selectedMoment.value.id)
-    if (momentIndex !== -1) {
-      moments.value[momentIndex].reactions = { ...reactionCounts.value }
-      moments.value[momentIndex].currentUserReaction = userReaction.value
+      await axios.post(`${API_URL}/reactions/${selectedMoment.value.id}`, { reactionType: type }, { headers: getAuthHeaders() })
     }
   } catch (err) {
+    // Rollback
+    userReaction.value = prevReaction
+    reactionCounts.value = prevCounts
+    if (momentIndex !== -1) {
+      moments.value[momentIndex].reactions = prevCounts
+      moments.value[momentIndex].currentUserReaction = prevReaction
+    }
     console.error('Failed to toggle reaction:', err)
   } finally {
     reactionLoading.value = false
@@ -624,12 +637,11 @@ const isFollowing = (userId) => {
 }
 
 const followUser = async (userId) => {
+  // Optimistic update
+  followingIds.value.add(userId)
   followLoading.value = true
   try {
-    await axios.post(`${API_URL}/follow/${userId}`, {}, {
-      headers: getAuthHeaders()
-    })
-    followingIds.value.add(userId)
+    await axios.post(`${API_URL}/follow/${userId}`, {}, { headers: getAuthHeaders() })
     notificationStore.createNotification({
       type: 'NEW_FOLLOWER',
       targetUserId: userId,
@@ -637,6 +649,8 @@ const followUser = async (userId) => {
       actorName: user.value?.displayName
     })
   } catch (err) {
+    // Rollback
+    followingIds.value.delete(userId)
     console.error('Follow failed:', err)
   } finally {
     followLoading.value = false
@@ -647,9 +661,18 @@ const goToDashboard = () => {
   router.push('/dashboard')
 }
 
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && selectedMoment.value) closeMoment()
+}
+
 onMounted(() => {
   fetchFeed()
   loadFollowStatus()
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
