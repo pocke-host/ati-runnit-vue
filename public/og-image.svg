@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#000000"/>
+
+  <!-- Electric blue accent bar left -->
+  <rect x="0" y="0" width="8" height="630" fill="#0052FF"/>
+
+  <!-- Grid lines (subtle) -->
+  <line x1="0" y1="210" x2="1200" y2="210" stroke="#111" stroke-width="1"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="#111" stroke-width="1"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#111" stroke-width="1"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#111" stroke-width="1"/>
+
+  <!-- R mark -->
+  <text x="80" y="420" font-family="Arial Black, sans-serif" font-size="320" font-weight="900" fill="#0052FF" opacity="0.12">R</text>
+
+  <!-- Wordmark -->
+  <text x="80" y="310" font-family="Arial Black, sans-serif" font-size="120" font-weight="900" fill="#FFFFFF" letter-spacing="-2">RUNNIT</text>
+
+  <!-- Tagline -->
+  <text x="82" y="370" font-family="Arial, sans-serif" font-size="32" font-weight="400" fill="#767676" letter-spacing="6">TRAIN SMARTER. RACE FASTER.</text>
+
+  <!-- Blue underline accent -->
+  <rect x="80" y="390" width="180" height="5" fill="#0052FF"/>
+
+  <!-- Bottom stats row -->
+  <text x="80" y="530" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">GPS TRACKING</text>
+  <text x="80" y="560" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">PERIODIZED PLANS</text>
+  <text x="480" y="530" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">GARMIN SYNC</text>
+  <text x="480" y="560" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">COMMUNITY</text>
+  <text x="880" y="530" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">STRAVA IMPORT</text>
+  <text x="880" y="560" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">RACE TRACKING</text>
+
+  <!-- URL -->
+  <text x="1120" y="600" font-family="Arial, sans-serif" font-size="20" fill="#0052FF" text-anchor="end" letter-spacing="1">runnit.live</text>
+</svg>

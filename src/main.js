@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createUnhead } from '@unhead/vue'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
@@ -13,9 +14,11 @@ import '@/assets/main.css'
 
 const app = createApp(App)
 const pinia = createPinia()
+const head = createUnhead()
 
 app.use(pinia)  // ← THIS MUST COME BEFORE router
 app.use(router)
+app.use(head)
 
 // Global response interceptor — 401 means token is definitively rejected by the server.
 // Clear auth state and send the user to login so they can get a fresh token.
