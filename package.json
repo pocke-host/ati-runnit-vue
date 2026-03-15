@@ -21,6 +21,7 @@
     "@capacitor/core": "^6.0.0",
     "@capacitor/ios": "^6.0.0",
     "@stripe/stripe-js": "^8.9.0",
+    "@unhead/vue": "^2.1.12",
     "@vercel/analytics": "^1.6.1",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",

@@ -225,6 +225,18 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Features — Runnit',
+  meta: [
+    { name: 'description', content: 'GPS tracking, periodized training plans, Garmin & Strava sync, personal records, clubs, challenges, and more. Everything you need to train and race smarter.' },
+    { property: 'og:title', content: 'Features — Runnit' },
+    { property: 'og:description', content: 'GPS tracking, periodized training plans, Garmin & Strava sync, personal records, clubs, challenges, and more.' },
+    { property: 'og:url', content: 'https://runnit.live/features' },
+  ]
+})
+
 const coreFeatures = [
   {
     icon: 'bi bi-activity',
