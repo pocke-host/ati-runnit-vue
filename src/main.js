@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createUnhead } from '@unhead/vue'
+import { createHead } from '@unhead/vue/legacy'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
@@ -14,7 +14,7 @@ import '@/assets/main.css'
 
 const app = createApp(App)
 const pinia = createPinia()
-const head = createUnhead()
+const head = createHead()
 
 app.use(pinia)  // ← THIS MUST COME BEFORE router
 app.use(router)
