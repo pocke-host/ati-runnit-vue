@@ -176,13 +176,13 @@
                 </div>
                 <div class="dash-insight-item">
                   <span class="dash-insight-key">Form</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#22c55e' : dashInsights.formScore > -5 ? '#f97316' : '#ef4444' }">
+                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#22c55e' : dashInsights.formScore > -5 ? '#0052FF' : '#ef4444' }">
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
                 <div class="dash-insight-item" v-if="dashInsights.acwr !== null">
                   <span class="dash-insight-key">ACWR</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#22c55e' : dashInsights.acwr < 1.5 ? '#f97316' : '#ef4444' }">
+                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#22c55e' : dashInsights.acwr < 1.5 ? '#0052FF' : '#ef4444' }">
                     {{ dashInsights.acwr }}
                   </span>
                 </div>
@@ -912,9 +912,9 @@ const sportBreakdown = computed(() => {
   const acts = activities.value || []
   const breakdown = {}
   const colors = {
-    RUN: '#C46A2A',   // --r-accent
-    BIKE: '#5A6B4E',  // --r-olive
-    SWIM: '#2C3726',  // --r-olive-deep
+    RUN: '#0052FF',   // --r-accent
+    BIKE: '#000',  // --r-olive
+    SWIM: '#000',  // --r-olive-deep
     HIKE: '#A0875A',  // warm earth
     WALK: '#C8B49A',  // light earth
     OTHER: '#E0D5C5'  // offwhite-tan
@@ -1206,8 +1206,8 @@ const initWeeklyChart = () => {
       datasets: [{
         label: chartView.value === 'distance' ? `Distance (${distanceLabel.value})` : 'Duration (min)',
         data: weeklyChartData.value,
-        backgroundColor: '#C46A2A',
-        borderColor: '#C46A2A',
+        backgroundColor: '#0052FF',
+        borderColor: '#0052FF',
         borderWidth: 1,
         borderRadius: 0
       }]
@@ -1275,13 +1275,13 @@ const initProgressChart = () => {
       datasets: [{
         label: 'Distance',
         data: [15, 28, 42, parseFloat(monthlyDistance.value)],
-        borderColor: '#C46A2A',
+        borderColor: '#0052FF',
         backgroundColor: 'rgba(196,106,42,0.07)',
         tension: 0.3,
         fill: true,
         borderWidth: 2,
         pointRadius: 4,
-        pointBackgroundColor: '#C46A2A'
+        pointBackgroundColor: '#0052FF'
       }, {
         label: 'Goal',
         data: [25, 50, 75, 100],
@@ -1462,7 +1462,7 @@ onMounted(async () => {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #5A6B4E;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1539,7 +1539,7 @@ onMounted(async () => {
 .wrap{max-width:1400px;margin:0 auto;padding:26px 20px 56px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px}
 .brandline{display:flex;align-items:center;gap:10px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#C46A2A;flex-shrink:0}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#0052FF;flex-shrink:0}
 .kicker{letter-spacing:.18em;font-weight:900;font-size:.78rem;color:rgba(15,18,16,0.70)}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap}
 .perf-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #E5E5E5;margin-bottom:32px;background:#E5E5E5;gap:1px}
@@ -1548,7 +1548,7 @@ onMounted(async () => {
 .perf-num{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;letter-spacing:-0.03em;line-height:1;color:#000;display:flex;align-items:baseline;gap:4px}
 .perf-unit{font-size:0.9rem;font-weight:600;color:rgba(15,18,16,0.40);margin-left:4px}
 .perf-change{font-size:0.73rem;font-weight:600;color:rgba(15,18,16,0.38);margin-top:6px}
-.perf-change--up{color:#fff;background:#C46A2A;padding:1px 6px;display:inline-block}
+.perf-change--up{color:#fff;background:#0052FF;padding:1px 6px;display:inline-block}
 .perf-change--down{color:rgba(15,18,16,0.45)}
 .dashboard-grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
 .charts-section{display:flex;flex-direction:column;gap:24px}
@@ -1571,11 +1571,11 @@ onMounted(async () => {
 .legend-label{font-weight:700;font-size:0.9rem}
 .legend-value{font-size:0.8rem;color:rgba(15,18,16,0.60)}
 .chart-metric{text-align:right}
-.metric-value{font-size:1.8rem;font-weight:900;color:#C46A2A}
+.metric-value{font-size:1.8rem;font-weight:900;color:#0052FF}
 .metric-label{font-size:0.75rem;color:rgba(15,18,16,0.60);display:block;margin-top:2px}
 .profile-card{background:#fff;border:1px solid #E5E5E5;border-radius:0;padding:24px;box-shadow:none}
 .profile-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08)}
-.avatar-large{width:64px;height:64px;background:#5A6B4E;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.7rem;color:white}
+.avatar-large{width:64px;height:64px;background:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.7rem;color:white}
 .profile-info{flex:1}
 .profile-name{font-weight:900;font-size:1.15rem;margin-bottom:4px}
 .profile-email{font-size:0.85rem;color:rgba(15,18,16,0.60)}
@@ -1601,7 +1601,7 @@ onMounted(async () => {
 .coach-widget{margin-top:16px;padding:16px;border:1px solid #E5E5E5}
 .coach-widget-label{font-size:0.70rem;font-weight:700;letter-spacing:0.14em;color:#767676;text-transform:uppercase;margin-bottom:10px}
 .coach-widget-row{display:flex;align-items:center;gap:10px}
-.coach-avatar-sm{width:34px;height:34px;background:#5A6B4E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
+.coach-avatar-sm{width:34px;height:34px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0}
 .coach-name{font-weight:700;font-size:0.88rem}
 .find-coach-cta{margin-top:12px;padding:4px 0}
 .find-coach-cta a{font-size:0.82rem;font-weight:600;color:#000;text-decoration:none}
@@ -1651,7 +1651,7 @@ onMounted(async () => {
 .goal-label{display:flex;justify-content:space-between;margin-bottom:8px;font-weight:700;font-size:0.9rem}
 .goal-progress-text{color:rgba(15,18,16,0.60);font-weight:600}
 .goal-bar{height:12px;background:rgba(15,18,16,0.08);border-radius:0;overflow:hidden}
-.goal-fill{height:100%;background:#C46A2A;border-radius:0;transition:width 0.3s}
+.goal-fill{height:100%;background:#0052FF;border-radius:0;transition:width 0.3s}
 .btn{border:1px solid #E5E5E5;background:#fff;color:#000;border-radius:0;height:44px;padding:0 16px;font-weight:900;letter-spacing:0.02em;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all 0.2s}
 .btn:hover{transform:translateY(-1px);border-color:rgba(15,18,16,0.18);background:rgba(255,255,255,0.72)}
 .btn-primary{background:#000;border-color:#000;color:#fff}

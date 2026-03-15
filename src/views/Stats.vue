@@ -77,7 +77,7 @@
             </div>
             <div class="perf-sub">{{ consistencyLabel }} — last 12 weeks</div>
             <div class="perf-bar-bg" style="margin-top:10px">
-              <div class="perf-bar" :style="{ width: performanceMetrics.consistency + '%', background: '#f97316' }"></div>
+              <div class="perf-bar" :style="{ width: performanceMetrics.consistency + '%', background: '#0052FF' }"></div>
             </div>
           </div>
 
@@ -159,7 +159,7 @@
               <div class="acwr-zone" style="width:40%; background:#3b82f6"></div>
               <div class="acwr-zone" style="width:10%; background:#86efac"></div>
               <div class="acwr-zone" style="width:15%; background:#22c55e"></div>
-              <div class="acwr-zone" style="width:10%; background:#f97316"></div>
+              <div class="acwr-zone" style="width:10%; background:#0052FF"></div>
               <div class="acwr-zone" style="width:25%; background:#ef4444"></div>
               <div class="acwr-needle" :style="{ left: Math.min(98, (acwrScore / 2) * 100) + '%' }"></div>
             </div>
@@ -187,12 +187,12 @@
               <span class="insight-label">Last Activity</span>
               <span
                 class="insight-badge"
-                :style="{ background: daysSinceLastActivity === 0 ? '#22c55e' : daysSinceLastActivity <= 2 ? '#f97316' : '#ef4444' }"
+                :style="{ background: daysSinceLastActivity === 0 ? '#22c55e' : daysSinceLastActivity <= 2 ? '#0052FF' : '#ef4444' }"
               >
                 {{ daysSinceLastActivity === 0 ? 'Today' : daysSinceLastActivity === 1 ? 'Yesterday' : `${daysSinceLastActivity}d ago` }}
               </span>
             </div>
-            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#22c55e' : daysSinceLastActivity <= 3 ? '#f97316' : '#ef4444' }">
+            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#22c55e' : daysSinceLastActivity <= 3 ? '#0052FF' : '#ef4444' }">
               {{ daysSinceLastActivity }}
               <span class="insight-unit">{{ daysSinceLastActivity === 1 ? 'day' : 'days' }}</span>
             </div>
@@ -460,7 +460,7 @@ const performanceMetrics = computed(() => {
 const formColor = computed(() => {
   const f = performanceMetrics.value?.formScore ?? 0
   if (f > 10)  return '#22c55e'
-  if (f > -5)  return '#f97316'
+  if (f > -5)  return '#0052FF'
   return '#ef4444'
 })
 
@@ -495,7 +495,7 @@ const acwrInfo = computed(() => {
   if (a < 0.8)  return { label: 'Undertraining', color: '#3b82f6', desc: 'Gradually increase volume to build fitness' }
   if (a < 1.0)  return { label: 'Optimal Base', color: '#22c55e', desc: 'Solid aerobic foundation, safe to add load' }
   if (a < 1.3)  return { label: 'Productive Load', color: '#22c55e', desc: 'Good training stimulus, manage recovery' }
-  if (a < 1.5)  return { label: 'Caution Zone', color: '#f97316', desc: 'Monitor fatigue — consider an easy day' }
+  if (a < 1.5)  return { label: 'Caution Zone', color: '#0052FF', desc: 'Monitor fatigue — consider an easy day' }
   return           { label: 'High Injury Risk', color: '#ef4444', desc: 'Reduce load or take a rest day now' }
 })
 

@@ -312,7 +312,7 @@ onMounted(async () => {
   background: rgba(255,255,255,0.2);
   flex-shrink: 0; transition: background 0.2s;
 }
-.dirty-dot.dirty { background: #f59e0b; }
+.dirty-dot.dirty { background: #0052FF; }
 .editor-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .athlete-chip { padding: 3px 10px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; }
 .sport-badge { padding: 3px 10px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }

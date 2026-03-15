@@ -250,7 +250,7 @@ const formatDateShort = (str) => {
 
 function typeChipColor(wType) {
   return {
-    EASY: '#22c55e', TEMPO: '#f97316', INTERVAL: '#ef4444',
+    EASY: '#22c55e', TEMPO: '#0052FF', INTERVAL: '#ef4444',
     LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#9ca3af',
   }[wType] || '#767676'
 }
@@ -269,7 +269,7 @@ function formatPace(sPerKm) {
 // ── Phase ─────────────────────────────────────────
 
 const phaseColors = {
-  BASE: '#22c55e', BUILD: '#f97316', PEAK: '#ef4444', TAPER: '#3b82f6',
+  BASE: '#22c55e', BUILD: '#0052FF', PEAK: '#ef4444', TAPER: '#3b82f6',
 }
 
 const phaseDescriptions = {
@@ -518,7 +518,7 @@ onMounted(async () => {
 
 /* Workout type colors */
 .type-easy, .type-recovery   { color: #047857; }
-.type-tempo                  { color: #b45309; }
+.type-tempo                  { color: #0052FF; }
 .type-long                   { color: #000; }
 .type-interval               { color: #b91c1c; }
 .type-endurance              { color: #047857; }

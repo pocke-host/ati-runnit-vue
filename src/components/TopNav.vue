@@ -3,37 +3,37 @@
   <nav :class="['navbar', { 'navbar--scrolled': scrolled }]">
     <div class="navbar-content">
 
-      <!-- LEFT: spacer (keeps brand centered on mobile) -->
-      <div class="nav-left"></div>
-
-      <!-- CENTER: brand -->
+      <!-- LEFT: brand -->
       <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
         <span class="brand-text">RUNNIT</span>
       </router-link>
 
-      <!-- RIGHT: desktop nav links + action icons + hamburger -->
+      <!-- CENTER: desktop nav links (authenticated athletes get centered; coach + public stay in flow) -->
+      <div class="navbar-links" v-if="isAuthenticated && role !== 'coach'">
+        <router-link to="/feed" class="nav-link">Feed</router-link>
+        <router-link to="/explore" class="nav-link">Explore</router-link>
+        <router-link to="/track" class="nav-link nav-link-track">
+          <i class="bi bi-play-circle-fill"></i> Track
+        </router-link>
+        <router-link to="/stats" class="nav-link">Stats</router-link>
+        <router-link to="/my-coach" class="nav-link">My Coach</router-link>
+      </div>
+
+      <!-- RIGHT: icons + coach links + public links + hamburger -->
       <div class="nav-right">
 
-        <!-- Desktop-only text nav links -->
-        <div class="navbar-links" v-if="isAuthenticated">
-          <template v-if="role === 'coach'">
-            <router-link to="/coach/dashboard" class="nav-link">
-              <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
-            </router-link>
-            <router-link to="/coach/athletes" class="nav-link">
-              <i class="bi bi-people me-2"></i>Roster
-            </router-link>
-          </template>
-          <template v-else>
-            <router-link to="/feed" class="nav-link">Feed</router-link>
-            <router-link to="/explore" class="nav-link">Explore</router-link>
-            <router-link to="/track" class="nav-link nav-link-track">
-              <i class="bi bi-play-circle-fill"></i> Track
-            </router-link>
-            <router-link to="/stats" class="nav-link">Stats</router-link>
-          </template>
+        <!-- Coach desktop nav links (right-aligned, not centered) -->
+        <div class="navbar-links navbar-links--coach" v-if="isAuthenticated && role === 'coach'">
+          <router-link to="/coach/dashboard" class="nav-link">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
+          </router-link>
+          <router-link to="/coach/athletes" class="nav-link">
+            <i class="bi bi-people me-2"></i>Roster
+          </router-link>
         </div>
-        <div class="navbar-links" v-else>
+
+        <!-- Public nav links -->
+        <div class="navbar-links navbar-links--public" v-if="!isAuthenticated">
           <router-link to="/features" class="nav-link">Features</router-link>
           <router-link to="/about" class="nav-link">About</router-link>
           <router-link to="/blog" class="nav-link">Blog</router-link>
@@ -439,11 +439,28 @@ onUnmounted(() => {
   align-items: center;
 }
 
-/* Desktop: brand left, nav-right pushed right */
-.nav-left { display: none; }
+/* Desktop layout: brand left | athlete links centered | icons right */
+.navbar-content { position: relative; }
 .mobile-menu-toggle { display: none; }
 /* Override Bootstrap's .navbar-brand margin-right: 1rem */
 .navbar-brand { text-decoration: none; flex-shrink: 0; margin-right: 0; }
+
+/* Athlete nav links: absolutely centered in the navbar */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+/* Coach + public links: sit inside nav-right, not centered */
+.navbar-links--coach,
+.navbar-links--public {
+  position: static;
+  transform: none;
+}
+
 .nav-right {
   display: flex;
   align-items: center;
@@ -457,11 +474,6 @@ onUnmounted(() => {
   margin-left: 8px;
   padding-left: 12px;
   border-left: 1px solid rgba(255,255,255,0.15);
-}
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .brand-text {
@@ -629,7 +641,7 @@ onUnmounted(() => {
 .notif-icon-reaction { background: #fff0f0; color: #ef4444; }
 .notif-icon-comment { background: #f0f4ff; color: #3b82f6; }
 .notif-icon-club_invite { background: #f0f0f0; color: #000; }
-.notif-icon-challenge { background: #fffaf0; color: #f59e0b; }
+.notif-icon-challenge { background: #EBF0FF; color: #0052FF; }
 .notif-body { flex: 1; min-width: 0; }
 .notif-msg {
   font-size: 0.83rem;
@@ -762,22 +774,18 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .navbar-content {
-    display: flex;
-    align-items: center;
     padding: 0 16px;
   }
-  .nav-left {
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
+  /* Center brand on mobile via absolute */
   .navbar-brand {
-    flex: 0 0 auto;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
   .nav-right {
     flex: 1;
     justify-content: flex-end;
-    margin-left: 0;
+    margin-left: auto;
     gap: 8px;
   }
   .nav-right .icon-group {
@@ -787,7 +795,7 @@ onUnmounted(() => {
     gap: 8px;
   }
   /* Hide text nav links and DM/bell on mobile — use drawer instead */
-  .navbar-links { display: none; }
+  .navbar-links { display: none !important; }
   .desktop-only { display: none !important; }
   .mobile-menu-toggle { display: flex; }
   .brand-text { font-size: 1rem; }
