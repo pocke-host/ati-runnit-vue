@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import TopNav from './components/TopNav.vue'
 import BottomNav from './components/BottomNav.vue'
@@ -7,6 +7,12 @@ import Footer from './components/Footer.vue'
 
 const route = useRoute()
 const showChrome = computed(() => route.path !== '/onboard')
+
+// Warm up the backend on app load so login/register don't hit a cold Render instance
+onMounted(() => {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+  fetch(`${API_URL}/health`, { method: 'GET' }).catch(() => {})
+})
 </script>
 
 <template>
