@@ -210,6 +210,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+import { useCountUp } from '@/composables/useCountUp'
 import { useHead } from '@unhead/vue'
 
 useHead({
@@ -221,7 +222,6 @@ useHead({
     { property: 'og:url', content: 'https://runnit.live' },
   ]
 })
-import { useCountUp } from '@/composables/useCountUp'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
