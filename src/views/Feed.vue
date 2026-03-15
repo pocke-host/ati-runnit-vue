@@ -43,15 +43,22 @@
       </div>
 
       <div class="feed-sort">
-        <button 
-          :class="['sort-btn', {active: sortOrder === 'newest'}]" 
+        <button
+          class="create-event-btn"
+          @click="showCreateEvent = true"
+          title="Group activities as a multisport event"
+        >
+          <i class="bi bi-collection-play me-1"></i>Create Event
+        </button>
+        <button
+          :class="['sort-btn', {active: sortOrder === 'newest'}]"
           @click="sortOrder = 'newest'"
           title="Sort by newest"
         >
           <i class="bi bi-clock"></i>
         </button>
-        <button 
-          :class="['sort-btn', {active: sortOrder === 'popular'}]" 
+        <button
+          :class="['sort-btn', {active: sortOrder === 'popular'}]"
           @click="sortOrder = 'popular'"
           title="Sort by popular"
         >
@@ -198,6 +205,17 @@
         <button class="btn btn-primary mt-3" @click="goToDashboard">
           <i class="bi bi-plus-lg me-2"></i>Get Started
         </button>
+      </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div class="modal-backdrop" v-if="showCreateEvent" @click.self="showCreateEvent = false">
+      <div class="modal-box">
+        <h2 class="modal-title">Create Multisport Event</h2>
+        <CreateEventForm
+          @saved="onEventCreated"
+          @cancel="showCreateEvent = false"
+        />
       </div>
     </div>
 
@@ -359,6 +377,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
+import CreateEventForm from '@/components/CreateEventForm.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -372,6 +391,7 @@ const { classifyActivity } = useWorkoutClassifier()
 const activeTab = ref('all')
 const sortOrder = ref('newest')
 const loading = ref(false)
+const showCreateEvent = ref(false)
 const moments = ref([])
 const activities = ref([])
 
@@ -663,6 +683,11 @@ const goToDashboard = () => {
 
 const handleKeydown = (e) => {
   if (e.key === 'Escape' && selectedMoment.value) closeMoment()
+}
+
+function onEventCreated(event) {
+  showCreateEvent.value = false
+  router.push(`/multisport-events/${event.id}`)
 }
 
 onMounted(() => {
@@ -1575,5 +1600,36 @@ onUnmounted(() => {
   .feed-container { padding: 8px; padding-top: 168px; }
   .feed-header { padding: 12px 0; }
   .feed-header-content { padding: 0 8px; }
+}
+
+.create-event-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid #E5E5E5;
+  background: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  color: #333;
+  white-space: nowrap;
+}
+.create-event-btn:hover { border-color: #000; color: #000; }
+
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000; padding: 16px;
+}
+.modal-box {
+  background: #fff; width: 100%; max-width: 600px;
+  padding: 32px; max-height: 90vh; overflow-y: auto;
+}
+.modal-title {
+  font-size: 1.1rem; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 0.06em; margin: 0 0 20px;
 }
 </style>

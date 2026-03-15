@@ -17,6 +17,18 @@
 
     <template v-else-if="activity">
 
+      <!-- PART OF EVENT BANNER -->
+      <router-link
+        v-if="parentEvent"
+        :to="`/multisport-events/${parentEvent.id}`"
+        class="event-banner"
+      >
+        <i class="bi bi-collection me-2"></i>
+        Part of <strong>{{ parentEvent.name }}</strong>
+        <span class="event-banner-type">{{ parentEvent.eventType }}</span>
+        <i class="bi bi-chevron-right ms-auto"></i>
+      </router-link>
+
       <!-- TOP BAR -->
       <div class="top-bar">
         <button class="back-btn" @click="router.back()">
@@ -277,6 +289,7 @@ const followLoading = ref(false)
 const deleteLoading = ref(false)
 
 const activityId = computed(() => route.params.id)
+const parentEvent = ref(null)
 const activityPRs = ref([])
 
 const isOwn = computed(() =>
@@ -369,6 +382,11 @@ const init = async () => {
       activityStore.fetchActivity(activityId.value),
       activityStore.fetchComments(activityId.value).catch(() => [])
     ])
+
+    // Check if this activity is part of a multisport event
+    axios.get(`${API_URL}/multisport-events/by-activity/${activityId.value}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).then(r => { parentEvent.value = r.data }).catch(() => {})
     activity.value = actData
     comments.value = Array.isArray(commData) ? commData : []
     reactionCounts.value = actData.reactions || {}
@@ -501,6 +519,30 @@ onMounted(init)
 }
 .page-error i { font-size: 4rem; color: rgba(15,18,16,0.20); }
 .page-error h2 { font-weight: 900; font-size: 1.8rem; color: rgba(15,18,16,0.80); margin: 0; }
+
+/* EVENT BANNER */
+.event-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #000;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid #333;
+}
+.event-banner:hover { background: #111; color: #fff; text-decoration: none; }
+.event-banner-type {
+  padding: 2px 8px;
+  background: rgba(255,255,255,0.12);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-left: 4px;
+}
 
 /* TOP BAR */
 .top-bar {

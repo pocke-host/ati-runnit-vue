@@ -121,6 +121,10 @@
             <i class="bi bi-trophy me-2"></i>Badges
             <span class="ctab-count">{{ profileBadges.filter(b => b.earned).length }}</span>
           </button>
+          <button :class="['ctab', { active: tab === 'events' }]" @click="switchToEvents">
+            <i class="bi bi-collection me-2"></i>Events
+            <span class="ctab-count">{{ profileEvents.length }}</span>
+          </button>
         </div>
       </div>
 
@@ -240,6 +244,43 @@
           </div>
         </div>
 
+        <!-- ── EVENTS TAB ── -->
+        <div v-if="tab === 'events'">
+          <div v-if="eventsLoading" class="tab-loading">
+            <div class="spinner-border spinner-border-sm"></div>
+            <span>Loading events…</span>
+          </div>
+
+          <div v-else-if="profileEvents.length === 0" class="tab-empty">
+            <i class="bi bi-collection"></i>
+            <p>No multisport events yet.</p>
+            <router-link v-if="isOwnProfile" to="/feed" class="btn btn-primary mt-2" style="font-size:.78rem">
+              Create Event
+            </router-link>
+          </div>
+
+          <div v-else class="events-list">
+            <router-link
+              v-for="ev in profileEvents"
+              :key="ev.id"
+              :to="`/multisport-events/${ev.id}`"
+              class="event-row"
+            >
+              <div class="event-row-left">
+                <div class="event-type-badge">{{ eventTypeLabel(ev.eventType) }}</div>
+                <div class="event-row-name">{{ ev.name }}</div>
+                <div class="event-row-meta">
+                  {{ ev.eventDate || 'No date' }} · {{ ev.segmentCount }} segments
+                </div>
+              </div>
+              <div class="event-row-right">
+                <div class="event-row-dist">{{ formatDistance(ev.totalDistanceMeters) }}</div>
+                <i class="bi bi-chevron-right event-row-arrow"></i>
+              </div>
+            </router-link>
+          </div>
+        </div>
+
       </div>
     </template>
 
@@ -324,6 +365,11 @@ const hasMoreActivities = ref(false)
 const profileBadges = ref([])
 const badgesLoading = ref(false)
 const badgesLoaded = ref(false)
+
+// Events tab
+const profileEvents = ref([])
+const eventsLoading = ref(false)
+const eventsLoaded = ref(false)
 
 const profileId = computed(() => route.params.id)
 const isOwnProfile = computed(() => user.value?.id && String(user.value.id) === String(profileId.value))
@@ -476,6 +522,29 @@ const loadBadges = async () => {
   }
 }
 
+const loadEvents = async () => {
+  eventsLoading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/multisport-events`, { headers: getAuthHeaders() })
+    profileEvents.value = Array.isArray(data) ? data : []
+    eventsLoaded.value = true
+  } catch {
+    profileEvents.value = []
+  } finally {
+    eventsLoading.value = false
+  }
+}
+
+function switchToEvents() {
+  tab.value = 'events'
+  if (!eventsLoaded.value) loadEvents()
+}
+
+function eventTypeLabel(type) {
+  const map = { TRIATHLON: 'Triathlon', DUATHLON: 'Duathlon', AQUABIKE: 'Aquabike', BRICK: 'Brick', STAGE_RACE: 'Stage Race', TRIP: 'Trip', MULTISPORT: 'Multisport', OTHER: 'Event' }
+  return map[type] || type
+}
+
 // Lazy-load tabs on first switch
 watch(tab, (val) => {
   if (val === 'moments' && moments.value.length === 0 && !momentsLoading.value) {
@@ -495,6 +564,8 @@ const init = async () => {
   pageError.value = ''
   profileBadges.value = []
   badgesLoaded.value = false
+  profileEvents.value = []
+  eventsLoaded.value = false
   await loadProfile()
   if (!notFound.value && !pageError.value) {
     await Promise.all([loadActivities(), loadFollowStatus()])
@@ -966,4 +1037,24 @@ onMounted(init)
   .activities-grid { grid-template-columns: 1fr; }
   .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }
+
+/* Events tab */
+.events-list { display: flex; flex-direction: column; }
+.event-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0; border-bottom: 1px solid #E5E5E5;
+  text-decoration: none; color: inherit; gap: 12px;
+}
+.event-row:hover .event-row-name { text-decoration: underline; }
+.event-type-badge {
+  display: inline-block; padding: 2px 8px;
+  background: #000; color: #fff;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.event-row-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+.event-row-meta { font-size: 0.75rem; color: #767676; }
+.event-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.event-row-dist { font-size: 0.9rem; font-weight: 700; }
+.event-row-arrow { color: #A0A0A0; font-size: 0.8rem; }
 </style>
