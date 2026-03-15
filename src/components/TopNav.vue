@@ -26,6 +26,7 @@
           </template>
           <template v-else>
             <router-link to="/feed" class="nav-link">Feed</router-link>
+            <router-link to="/explore" class="nav-link">Explore</router-link>
             <router-link to="/track" class="nav-link nav-link-track">
               <i class="bi bi-play-circle-fill"></i> Track
             </router-link>
