@@ -240,9 +240,17 @@
         </div>
       </section>
 
-      <!-- WEEKLY DISTANCE CHART -->
+      <!-- DISTANCE CHART (weekly / monthly toggle) -->
       <section class="section">
-        <h2 class="section-title">Weekly Distance (Last 12 Weeks)</h2>
+        <div class="section-header-row">
+          <h2 class="section-title">
+            {{ chartPeriod === 'monthly' ? 'Monthly Distance' : 'Weekly Distance (Last 12 Weeks)' }}
+          </h2>
+          <div class="period-toggle">
+            <button :class="['period-btn', { active: chartPeriod === 'monthly' }]" @click="setPeriod('monthly')">Monthly</button>
+            <button :class="['period-btn', { active: chartPeriod === 'weekly' }]" @click="setPeriod('weekly')">Weekly</button>
+          </div>
+        </div>
         <div class="chart-card">
           <canvas ref="weeklyChartRef"></canvas>
         </div>
@@ -336,6 +344,13 @@ const weeklyChartRef = ref(null)
 const pieChartRef = ref(null)
 let weeklyChartInstance = null
 let pieChartInstance = null
+
+const chartPeriod = ref('monthly') // 'monthly' | 'weekly'
+
+function setPeriod(p) {
+  chartPeriod.value = p
+  nextTick(initWeeklyChart)
+}
 
 // Career totals
 const careerMeters = computed(() =>
@@ -609,6 +624,34 @@ const weeklyData = computed(() => {
   return weeks
 })
 
+// Monthly distance — last 12 calendar months
+const monthlyData = computed(() => {
+  const now = new Date()
+  const months = []
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const start = new Date(d.getFullYear(), d.getMonth(), 1)
+    const end   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
+    const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+    const meters = (activities.value || [])
+      .filter(a => {
+        const ad = new Date(a.createdAt)
+        return ad >= start && ad <= end
+      })
+      .reduce((s, a) => s + (a.distanceMeters || 0), 0)
+    const dist = isImperial.value
+      ? parseFloat((meters / 1000 * 0.621371).toFixed(2))
+      : parseFloat((meters / 1000).toFixed(2))
+    months.push({ label, dist })
+  }
+  return months
+})
+
+// Active chart data based on period toggle
+const activeChartData = computed(() =>
+  chartPeriod.value === 'monthly' ? monthlyData.value : weeklyData.value
+)
+
 // Format a PR's primary value for display
 function formatPRValue(pr) {
   const d = pr.data
@@ -639,10 +682,10 @@ function initWeeklyChart() {
   weeklyChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: weeklyData.value.map(w => w.label),
+      labels: activeChartData.value.map(w => w.label),
       datasets: [{
         label: `Distance (${distanceLabel.value})`,
-        data: weeklyData.value.map(w => w.dist),
+        data: activeChartData.value.map(w => w.dist),
         backgroundColor: 'rgba(196,106,42,0.80)',
         borderColor: 'rgba(196,106,42,1)',
         borderWidth: 2,
@@ -773,6 +816,38 @@ onMounted(async () => {
   margin: 0 0 20px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.section-header-row .section-title {
+  margin: 0;
+}
+.period-toggle {
+  display: flex;
+  border: 1px solid #E5E5E5;
+}
+.period-btn {
+  padding: 6px 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  color: #767676;
+  transition: background 0.15s, color 0.15s;
+}
+.period-btn + .period-btn {
+  border-left: 1px solid #E5E5E5;
+}
+.period-btn.active {
+  background: #000;
+  color: #fff;
 }
 
 /* PERFORMANCE INTELLIGENCE */

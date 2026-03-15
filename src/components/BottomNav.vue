@@ -17,9 +17,9 @@
       <span class="tab-label">Track</span>
     </router-link>
 
-    <router-link to="/stats" class="tab-item" active-class="tab-active">
-      <i class="bi bi-bar-chart-fill tab-icon"></i>
-      <span class="tab-label">Stats</span>
+    <router-link to="/explore" class="tab-item" active-class="tab-active">
+      <i class="bi bi-compass-fill tab-icon"></i>
+      <span class="tab-label">Explore</span>
     </router-link>
 
     <router-link :to="userId ? `/profile/${userId}` : '/dashboard'" class="tab-item" active-class="tab-active">
