@@ -46,6 +46,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Support — Runnit',
+  meta: [
+    { name: 'description', content: 'Get help with Runnit. Browse help articles on GPS tracking, Garmin sync, training plans, billing, and more — or submit a support request.' },
+    { property: 'og:title', content: 'Support — Runnit' },
+    { property: 'og:description', content: 'Find answers to common questions about Runnit, or contact our support team directly.' },
+    { property: 'og:url', content: 'https://runnit.live/support' },
+  ]
+})
+
 const articles = [
   { title: 'Login Problems on iOS?',            subtitle: 'Known issue for app version 4.25' },
   { title: 'How are distances calculated?',     subtitle: 'Understand how we measure activity distance' },

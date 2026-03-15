@@ -1,0 +1,30 @@
+User-agent: *
+Allow: /
+
+# Public marketing pages
+Allow: /features
+Allow: /about
+Allow: /blog
+Allow: /privacy
+Allow: /terms
+Allow: /support
+Allow: /join-us
+Allow: /signup
+
+# Block authenticated app routes
+Disallow: /dashboard
+Disallow: /feed
+Disallow: /track
+Disallow: /stats
+Disallow: /plans
+Disallow: /achievements
+Disallow: /clubs
+Disallow: /challenges
+Disallow: /devices
+Disallow: /profile
+Disallow: /settings
+Disallow: /calendar
+Disallow: /activities
+Disallow: /onboard
+
+Sitemap: https://runnit.live/sitemap.xml

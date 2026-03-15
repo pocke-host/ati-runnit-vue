@@ -61,6 +61,16 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Privacy Policy — Runnit',
+  meta: [
+    { name: 'description', content: 'Read the Runnit Privacy Policy. Understand how we collect, use, and protect your data, including GPS activity data, Garmin and Strava integrations.' },
+    { property: 'og:title', content: 'Privacy Policy — Runnit' },
+    { property: 'og:url', content: 'https://runnit.live/privacy' },
+  ]
+})
+
 const sections = [
   {
     id: 'overview',

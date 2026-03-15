@@ -210,6 +210,17 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Runnit — Train Smarter. Race Faster.',
+  meta: [
+    { name: 'description', content: 'Runnit is a modern training platform for runners and triathletes. Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
+    { property: 'og:title', content: 'Runnit — Train Smarter. Race Faster.' },
+    { property: 'og:description', content: 'Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
+    { property: 'og:url', content: 'https://runnit.live' },
+  ]
+})
 import { useCountUp } from '@/composables/useCountUp'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'

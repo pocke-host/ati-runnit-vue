@@ -69,6 +69,16 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Blog — Runnit',
+  meta: [
+    { name: 'description', content: 'Training intel for serious athletes. Science, strategy, and stories on running, racing, periodization, and everything in between.' },
+    { property: 'og:title', content: 'Blog — Runnit' },
+    { property: 'og:description', content: 'Science, stories, and strategy for athletes who take their training seriously.' },
+    { property: 'og:url', content: 'https://runnit.live/blog' },
+  ]
+})
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const email = ref('')

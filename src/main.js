@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createUnhead } from '@unhead/vue'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
@@ -13,9 +14,11 @@ import '@/assets/main.css'
 
 const app = createApp(App)
 const pinia = createPinia()
+const head = createUnhead()
 
 app.use(pinia)  // ← THIS MUST COME BEFORE router
 app.use(router)
+app.use(head)
 
 // Default timeout for all requests — prevents indefinite UI freeze on slow/hung backends
 axios.defaults.timeout = 10000

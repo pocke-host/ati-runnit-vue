@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" fill="#000000"/>
+  <!-- Stylised forward-slash R mark -->
+  <text x="8" y="50" font-family="Arial Black, sans-serif" font-size="52" font-weight="900" fill="#0052FF" letter-spacing="-2">R</text>
+  <!-- Electric underline accent -->
+  <rect x="8" y="55" width="48" height="4" fill="#0052FF"/>
+</svg>

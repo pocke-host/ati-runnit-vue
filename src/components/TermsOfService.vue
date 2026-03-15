@@ -56,6 +56,16 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Terms of Service — Runnit',
+  meta: [
+    { name: 'description', content: 'Read the Runnit Terms of Service. Review our usage policies, account terms, and guidelines for the Runnit training platform.' },
+    { property: 'og:title', content: 'Terms of Service — Runnit' },
+    { property: 'og:url', content: 'https://runnit.live/terms' },
+  ]
+})
+
 const sections = [
   {
     id: 'acceptance',
