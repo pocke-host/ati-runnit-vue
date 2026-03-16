@@ -49,7 +49,10 @@
             ]"
             @click="selectDay(day.fullDate)"
           >
-            <div class="cal-date-num">{{ day.date }}</div>
+            <div class="cal-date-num">
+              {{ day.date }}
+              <span v-if="day.weather" class="cal-weather-icon" :title="day.weather.label">{{ day.weather.icon }}</span>
+            </div>
 
             <!-- Planned events -->
             <div
@@ -100,6 +103,15 @@
         </div>
 
         <div class="drawer-body">
+
+          <!-- Weather warning strip -->
+          <div
+            v-if="selectedDay?.weather"
+            :class="['weather-warn', { 'weather-warn--severe': selectedDay.weather.severe }]"
+          >
+            <span class="weather-warn-icon">{{ selectedDay.weather.icon }}</span>
+            <span class="weather-warn-label">{{ selectedDay.weather.label }}</span>
+          </div>
 
           <!-- Planned workouts -->
           <div class="drawer-section" v-if="selectedEvents.length">
@@ -329,6 +341,7 @@ import { useActivityStore } from '@/stores/activity'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useAiWorkout } from '@/composables/useAiWorkout'
+import { initWeather, getWeatherForDate } from '@/composables/useWeather'
 import axios from 'axios'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -410,6 +423,7 @@ function _makeDay(date, isCurrentMonth) {
     events:     events.value.filter(e => e.plannedDate === fullDate),
     activities: (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
     races:      raceBookmarks.value.filter(r => r.raceDate === fullDate),
+    weather:    getWeatherForDate(fullDate),
   }
 }
 
@@ -423,6 +437,10 @@ const selectedActivities = computed(() =>
 
 const selectedRaces = computed(() =>
   raceBookmarks.value.filter(r => r.raceDate === selectedDate.value)
+)
+
+const selectedDay = computed(() =>
+  selectedDate.value ? calDays.value.find(d => d.fullDate === selectedDate.value) ?? null : null
 )
 
 const drawerDateLabel = computed(() => {
@@ -709,6 +727,25 @@ function weekDayNum(dateStr) {
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
   await Promise.all([fetchEvents(), fetchRaceBookmarks()])
+
+  // Weather: use cached coords or request geolocation
+  const cachedLoc = localStorage.getItem('runnit_weather_loc')
+  if (cachedLoc) {
+    try {
+      const { lat, lng } = JSON.parse(cachedLoc)
+      initWeather(lat, lng)
+    } catch { /* ignore malformed cache */ }
+  } else if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude
+        const lng = pos.coords.longitude
+        localStorage.setItem('runnit_weather_loc', JSON.stringify({ lat, lng }))
+        initWeather(lat, lng)
+      },
+      () => { /* denied — silently skip */ }
+    )
+  }
 })
 
 watch([currentYear, currentMonth], fetchEvents)
@@ -1323,4 +1360,35 @@ textarea.form-control { resize: vertical; min-height: 60px; }
   .week-plan-grid { grid-template-columns: repeat(2, 1fr); }
   .cal-legend { display: none; }
 }
+
+/* ── Weather ─────────────────────────────────────────────── */
+.cal-date-num {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.cal-weather-icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.weather-warn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: #FFF8E1;
+  border-left: 3px solid #F59E0B;
+  font-size: 0.8rem;
+  color: #78350F;
+}
+.weather-warn--severe {
+  background: #FEF2F2;
+  border-left-color: #EF4444;
+  color: #7F1D1D;
+}
+.weather-warn-icon { font-size: 1rem; flex-shrink: 0; }
+.weather-warn-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 </style>
