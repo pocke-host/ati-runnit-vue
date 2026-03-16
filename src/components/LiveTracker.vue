@@ -131,7 +131,25 @@
         <i v-else class="bi bi-stop-fill"></i>
         {{ saving ? 'Saving…' : 'Finish' }}
       </button>
+
+      <!-- Share Live button -->
+      <button
+        v-if="hasStarted && !isSharing"
+        class="control-btn control-btn-share"
+        @click="startSharing"
+      >
+        <i class="bi bi-broadcast"></i> Share Live
+      </button>
     </div>
+
+    <!-- Broadcasting banner -->
+    <div v-if="isSharing" class="share-banner">
+      <span class="share-live-dot"></span>
+      <span class="share-broadcasting">BROADCASTING</span>
+      <span class="share-url" :title="shareUrl">{{ shareUrl.replace('https://', '').slice(0, 32) }}…</span>
+      <button class="share-stop-btn" @click="stopSharing">Stop Sharing</button>
+    </div>
+    <div v-if="shareCopied" class="share-copied-toast">Link copied to clipboard!</div>
 
   </div>
 </template>
@@ -184,6 +202,13 @@ const notesSubmitting  = ref(false)
 
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+// Live sharing state
+const shareToken   = ref(null)
+const isSharing    = ref(false)
+const shareUrl     = ref('')
+const shareCopied  = ref(false)
+let lastShareUpdate = 0
 
 let watchId       = null
 let timerInterval = null
@@ -338,12 +363,51 @@ const handlePositionUpdate = (position) => {
   }
 
   lastPosition.value = [longitude, latitude, now, altitude]
+  pushShareUpdate(latitude, longitude)
 }
 
 const handlePositionError = (err) => {
   console.warn('GPS error', err)
   gpsError.value = 'GPS signal lost — move to an open area.'
   setTimeout(() => { gpsError.value = '' }, 4000)
+}
+
+// ── Live sharing ──────────────────────────────────────────────────────────────
+
+const startSharing = async () => {
+  try {
+    const { data } = await axios.post(`${API_URL}/live-shares`, { sportType: selectedSport.value })
+    shareToken.value = data.token
+    shareUrl.value   = data.shareUrl
+    isSharing.value  = true
+    lastShareUpdate  = 0
+    try { await navigator.clipboard.writeText(data.shareUrl) } catch {}
+    shareCopied.value = true
+    setTimeout(() => { shareCopied.value = false }, 3000)
+  } catch (e) {
+    console.error('startSharing error', e)
+  }
+}
+
+const stopSharing = async () => {
+  if (!shareToken.value) return
+  try { await axios.delete(`${API_URL}/live-shares/${shareToken.value}`) } catch {}
+  isSharing.value = false
+  shareToken.value = null
+  shareUrl.value   = ''
+}
+
+const pushShareUpdate = (lat, lng) => {
+  if (!isSharing.value || !shareToken.value) return
+  const now = Date.now()
+  if (now - lastShareUpdate < 5000) return
+  lastShareUpdate = now
+  axios.patch(`${API_URL}/live-shares/${shareToken.value}`, {
+    lat,
+    lng,
+    elapsedSeconds: elapsedTime.value,
+    distanceMeters: Math.round(totalDistance.value),
+  }).catch(() => {})
 }
 
 // ── Tracking controls ─────────────────────────────────────────────────────────
@@ -387,6 +451,7 @@ const resumeTracking = () => {
 
 const stopTracking = async () => {
   if (!confirm('Finish this activity?')) return
+  await stopSharing()
   pauseTracking()
   saving.value = true
   saveError.value = ''
@@ -822,4 +887,39 @@ onUnmounted(() => {
   cursor: pointer;
 }
 .notes-btn-done:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Live sharing ──────────────────────────────────────────── */
+.control-btn-share {
+  background: #4f46e5; color: #fff; font-size: 0.8rem; padding: 10px 14px;
+}
+.control-btn-share:hover { background: #4338ca; }
+
+.share-banner {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 16px; background: #ecfdf5; border-top: 2px solid #22c55e;
+  font-size: 12px;
+}
+.share-live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
+  animation: live-pulse-dot 1.5s infinite;
+  flex-shrink: 0;
+}
+@keyframes live-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.share-broadcasting { font-weight: 800; letter-spacing: 0.10em; color: #166534; text-transform: uppercase; }
+.share-url { font-size: 11px; color: #555; font-family: monospace; }
+.share-stop-btn {
+  margin-left: auto; background: none; border: none; color: #dc2626;
+  font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; font-family: inherit;
+  text-decoration: underline;
+}
+
+.share-copied-toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: #000; color: #fff; padding: 8px 20px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+  z-index: 9999;
+}
 </style>
