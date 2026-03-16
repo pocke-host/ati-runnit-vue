@@ -895,13 +895,16 @@ const totalStats = computed(() => {
 })
 
 const monthlyDistanceMeters = computed(() => {
-  const acts = activities.value || []
+  const now = new Date()
+  const acts = (activities.value || []).filter(a => {
+    const d = new Date(a.createdAt)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  })
   return acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
 })
 
 const monthlyDistance = computed(() => {
-  const acts = activities.value || []
-  return (acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000).toFixed(1)
+  return (monthlyDistanceMeters.value / 1000).toFixed(1)
 })
 
 const monthlyGoalProgress = computed(() => {
