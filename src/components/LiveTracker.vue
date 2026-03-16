@@ -308,22 +308,34 @@ const handlePositionError = (err) => {
 
 const startTracking = () => {
   gpsError.value = ''
+
+  if (!navigator.geolocation) {
+    gpsError.value = 'GPS not supported on this device or connection.'
+    return
+  }
+
   isTracking.value = true
   hasStarted.value = true
   startEpoch = Date.now() - pausedMs
 
-  watchId = navigator.geolocation.watchPosition(
-    handlePositionUpdate,
-    handlePositionError,
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  )
+  try {
+    watchId = navigator.geolocation.watchPosition(
+      handlePositionUpdate,
+      handlePositionError,
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+  } catch (e) {
+    gpsError.value = 'Could not start GPS. Check location permissions.'
+  }
 
   timerInterval = setInterval(() => {
     elapsedTime.value = Math.floor((Date.now() - startEpoch) / 1000)
   }, 1000)
 
   // Ensure GeolocateControl is tracking
-  if (geolocateControl.value) geolocateControl.value.trigger()
+  if (geolocateControl.value) {
+    try { geolocateControl.value.trigger() } catch {}
+  }
 }
 
 const pauseTracking = () => {
@@ -592,9 +604,9 @@ onUnmounted(() => {
 
 .control-btn {
   flex: 1;
-  height: 52px;
+  height: 56px;
   border: none;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.10em;
@@ -603,7 +615,12 @@ onUnmounted(() => {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.15s;
+}
+
+.control-btn-start {
+  font-size: 1rem;
+  height: 64px;
 }
 
 .control-btn:disabled {
@@ -611,8 +628,8 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
-.control-btn-start  { background: #000; color: #fff; }
-.control-btn-start:hover:not(:disabled)  { background: #222; }
+.control-btn-start  { background: #0052FF; color: #fff; }
+.control-btn-start:hover:not(:disabled)  { background: #0040CC; }
 .control-btn-pause  { background: #555; color: #fff; }
 .control-btn-pause:hover  { background: #333; }
 .control-btn-finish { background: #dc2626; color: #fff; }
