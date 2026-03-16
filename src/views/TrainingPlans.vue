@@ -249,7 +249,7 @@
                     <span class="phase-strip-label">Base</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.base }}w</span>
                   </div>
-                  <div class="phase-strip" title="Build phase" style="background:#f97316">
+                  <div class="phase-strip" title="Build phase" style="background:#0052FF">
                     <span class="phase-strip-label">Build</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.build }}w</span>
                   </div>
@@ -731,7 +731,7 @@ function planProgressPct(plan) {
 
 function typeChipColor(wType) {
   return {
-    EASY: '#22c55e', TEMPO: '#f97316', INTERVAL: '#ef4444',
+    EASY: '#22c55e', TEMPO: '#0052FF', INTERVAL: '#ef4444',
     LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#e5e7eb',
   }[wType] || '#767676'
 }
@@ -863,7 +863,7 @@ onMounted(async () => {
 .field-input-row { display: flex; align-items: center; gap: 10px; }
 .field-unit { font-size: 0.9rem; font-weight: 700; color: rgba(15,18,16,0.55); white-space: nowrap; }
 .field-hint { font-size: 0.83rem; color: rgba(15,18,16,0.55); margin-top: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
-.hint-warn { color: #b45309; }
+.hint-warn { color: #0052FF; }
 .optional-label { font-weight: 400; color: rgba(15,18,16,0.45); font-size: 0.82rem; }
 .mt-2 { margin-top: 8px; }
 

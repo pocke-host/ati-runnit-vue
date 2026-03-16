@@ -51,20 +51,22 @@
         </div>
         <div v-else class="accordion-list">
           <div v-for="athlete in athletes" :key="athlete.id" class="accordion-item">
-            <button
-              class="accordion-header"
-              @click="toggleAthlete(athlete.id)"
-              :aria-expanded="expanded.includes(athlete.id)"
-            >
-              <div class="ath-row">
+            <div class="accordion-header-wrap">
+              <router-link :to="`/coach/athletes/${athlete.id}`" class="ath-row ath-row--link">
                 <div class="ath-avatar">{{ (athlete.displayName || '?')[0].toUpperCase() }}</div>
                 <div class="ath-info">
                   <div class="ath-name">{{ athlete.displayName }}</div>
                   <div class="ath-meta">{{ athlete.email }} · {{ athlete.activePlan?.name || 'No active plan' }}</div>
                 </div>
-              </div>
-              <i :class="['bi', expanded.includes(athlete.id) ? 'bi-chevron-up' : 'bi-chevron-down']"></i>
-            </button>
+              </router-link>
+              <button
+                class="accordion-toggle"
+                @click="toggleAthlete(athlete.id)"
+                :aria-expanded="expanded.includes(athlete.id)"
+              >
+                <i :class="['bi', expanded.includes(athlete.id) ? 'bi-chevron-up' : 'bi-chevron-down']"></i>
+              </button>
+            </div>
 
             <div v-if="expanded.includes(athlete.id)" class="accordion-body">
               <div v-if="!athletePlans[athlete.id]" class="plan-loading">
@@ -278,11 +280,20 @@ onMounted(() => {
 /* Accordion */
 .accordion-list { display: flex; flex-direction: column; }
 .accordion-item { border-bottom: 1px solid #E5E5E5; }
-.accordion-header {
+.accordion-header-wrap {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0; background: none; border: none; cursor: pointer; gap: 12px;
+  padding: 16px 0; gap: 12px;
 }
+.accordion-toggle {
+  background: none; border: none; cursor: pointer; color: #767676;
+  font-size: 0.9rem; padding: 6px; flex-shrink: 0;
+}
+.accordion-toggle:hover { color: #000; }
 .ath-row { display: flex; align-items: center; gap: 14px; flex: 1; }
+.ath-row--link {
+  text-decoration: none; color: inherit; flex: 1; transition: opacity 0.12s;
+}
+.ath-row--link:hover { opacity: 0.70; }
 .ath-avatar { width: 44px; height: 44px; background: #f0f0f0; color: #000; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
 .ath-name { font-weight: 700; font-size: 0.9rem; text-align: left; }
 .ath-meta { font-size: 0.75rem; color: #767676; text-align: left; margin-top: 2px; }

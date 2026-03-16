@@ -474,7 +474,7 @@
   }
   
   .ring-avatar.ring-add {
-    background: var(--r-olive);
+    background: #000;
   }
   
   .avatar-initial {
@@ -492,8 +492,8 @@
   
   .ring-add {
     background: white !important;
-    border: 2px dashed var(--r-olive);
-    color: var(--r-olive);
+    border: 2px dashed #000;
+    color: #000;
     font-size: 2rem;
   }
   
@@ -582,7 +582,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--r-olive), var(--r-olive-deep));
+    background: #000;
     display: flex;
     align-items: center;
     justify-content: center;

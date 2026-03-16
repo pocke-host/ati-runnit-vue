@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="cal-legend">
-          <span v-for="(color, type) in TYPE_COLORS" :key="type" class="legend-item">
+          <span v-for="(color, type) in legendColors" :key="type" class="legend-item">
             <span class="legend-dot" :style="{ background: color }"></span>{{ type.replace('_', ' ') }}
           </span>
         </div>
@@ -72,6 +72,15 @@
             >
               <span class="cal-chip-type">✓ {{ act.sportType }}</span>
               <span class="cal-chip-dist">{{ formatDistShort(act.distanceMeters) }}</span>
+            </div>
+
+            <!-- Race bookmarks -->
+            <div
+              v-for="race in day.races"
+              :key="'r' + race.id"
+              class="cal-chip cal-chip-race"
+            >
+              <span class="cal-chip-type">🏁 {{ race.raceName }}</span>
             </div>
 
             <button
@@ -138,8 +147,29 @@
             </router-link>
           </div>
 
+          <!-- Race bookmarks -->
+          <div class="drawer-section" v-if="selectedRaces.length">
+            <div class="drawer-section-label">RACES</div>
+            <div v-for="race in selectedRaces" :key="race.id" class="drawer-race">
+              <div class="drawer-race-head">
+                <span class="drawer-race-chip">🏁 {{ race.raceType || 'Race' }}</span>
+                <button class="ev-btn ev-btn-del" @click="removeRaceBookmark(race)" title="Remove bookmark">
+                  <i class="bi bi-bookmark-x"></i>
+                </button>
+              </div>
+              <div class="drawer-race-name">{{ race.raceName }}</div>
+              <div class="drawer-race-meta" v-if="race.city || race.state">
+                <i class="bi bi-geo-alt"></i>
+                {{ race.city }}<span v-if="race.city && race.state">, </span>{{ race.state }}
+              </div>
+              <a v-if="race.raceUrl" :href="race.raceUrl" target="_blank" rel="noopener" class="drawer-race-link">
+                View → <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+            </div>
+          </div>
+
           <!-- Empty state -->
-          <div class="drawer-empty" v-if="!selectedEvents.length && !selectedActivities.length && !showCreateForm && !aiSuggestion">
+          <div class="drawer-empty" v-if="!selectedEvents.length && !selectedActivities.length && !selectedRaces.length && !showCreateForm && !aiSuggestion">
             <i class="bi bi-calendar3" style="font-size:2rem;color:#d0d0d0"></i>
             <p>Nothing planned yet</p>
           </div>
@@ -307,6 +337,7 @@ const activityStore = useActivityStore()
 const { activities } = storeToRefs(activityStore)
 const { isImperial, distanceLabel } = useUnits()
 const { generateWorkout, generateWeek, typeColor, TYPE_COLORS } = useAiWorkout()
+const legendColors = computed(() => ({ ...TYPE_COLORS, RACE: '#ef4444' }))
 
 const DOW_LABELS    = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const WORKOUT_TYPES = ['EASY', 'TEMPO', 'INTERVAL', 'LONG_RUN', 'RECOVERY', 'REST']
@@ -316,6 +347,7 @@ const currentYear  = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth()) // 0-indexed
 
 const events       = ref([])
+const raceBookmarks = ref([])
 const selectedDate = ref(null)
 const aiSuggestion = ref(null)
 const aiLoading    = ref(false)
@@ -377,6 +409,7 @@ function _makeDay(date, isCurrentMonth) {
     isPast:  date < new Date(todayStr),
     events:     events.value.filter(e => e.plannedDate === fullDate),
     activities: (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
+    races:      raceBookmarks.value.filter(r => r.raceDate === fullDate),
   }
 }
 
@@ -386,6 +419,10 @@ const selectedEvents = computed(() =>
 
 const selectedActivities = computed(() =>
   (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === selectedDate.value)
+)
+
+const selectedRaces = computed(() =>
+  raceBookmarks.value.filter(r => r.raceDate === selectedDate.value)
 )
 
 const drawerDateLabel = computed(() => {
@@ -430,6 +467,24 @@ function selectDay(fullDate) {
 function quickAdd(fullDate) {
   selectDay(fullDate)
   openCreateForm()
+}
+
+// ── Race Bookmarks ────────────────────────────────────────────
+
+async function fetchRaceBookmarks() {
+  try {
+    const { data } = await axios.get(`${API}/race-bookmarks`)
+    raceBookmarks.value = Array.isArray(data) ? data : []
+  } catch {
+    raceBookmarks.value = []
+  }
+}
+
+async function removeRaceBookmark(race) {
+  try {
+    await axios.delete(`${API}/race-bookmarks/${race.id}`)
+    raceBookmarks.value = raceBookmarks.value.filter(r => r.id !== race.id)
+  } catch { /* silent */ }
 }
 
 // ── Events CRUD ───────────────────────────────────────────────
@@ -653,7 +708,7 @@ function weekDayNum(dateStr) {
 
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
-  await fetchEvents()
+  await Promise.all([fetchEvents(), fetchRaceBookmarks()])
 })
 
 watch([currentYear, currentMonth], fetchEvents)
@@ -859,6 +914,10 @@ watch([currentYear, currentMonth], fetchEvents)
 }
 .cal-chip-done .cal-chip-type { color: rgba(15,18,16,0.60); }
 .cal-chip-done .cal-chip-dist { color: rgba(15,18,16,0.40); }
+.cal-chip-race {
+  background: #ef4444 !important;
+}
+.cal-chip-race .cal-chip-type { color: #fff; }
 .cal-plus {
   position: absolute;
   bottom: 4px;
@@ -985,6 +1044,43 @@ watch([currentYear, currentMonth], fetchEvents)
 .drawer-act-arrow { color: #ccc; font-size: 0.80rem; }
 .drawer-empty { text-align: center; padding: 32px 16px; color: rgba(15,18,16,0.35); }
 .drawer-empty p { font-size: 0.85rem; margin-top: 10px; font-weight: 600; }
+
+/* Drawer race entries */
+.drawer-race {
+  background: #fff5f5;
+  border: 1px solid #fca5a5;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.drawer-race-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-race-chip {
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ef4444;
+  background: #fee2e2;
+  padding: 2px 7px;
+}
+.drawer-race-name { font-size: 0.88rem; font-weight: 900; color: #000; }
+.drawer-race-meta { font-size: 0.75rem; color: #767676; display: flex; align-items: center; gap: 4px; }
+.drawer-race-link {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ef4444;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.drawer-race-link:hover { text-decoration: underline; }
 .drawer-footer {
   display: flex;
   gap: 8px;

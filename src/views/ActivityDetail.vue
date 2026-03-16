@@ -318,7 +318,7 @@ const autoClassification = computed(() => classifyActivity(activity.value))
 const displayClassification = computed(() => {
   if (activity.value?.workoutType) {
     const colorMap = {
-      EASY: '#22c55e', TEMPO: '#f97316', INTERVAL: '#ef4444',
+      EASY: '#22c55e', TEMPO: '#0052FF', INTERVAL: '#ef4444',
       LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#9ca3af',
     }
     return { label: activity.value.workoutType.replace('_', ' '), color: colorMap[activity.value.workoutType] || '#000' }

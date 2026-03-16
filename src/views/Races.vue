@@ -136,6 +136,14 @@
                 <span class="date-badge">{{ formatDateShort(event.date) }}</span>
                 <span class="sport-badge">{{ event.sportEmoji }} {{ event.sportLabel }}</span>
                 <span v-if="event.isPast" class="past-badge">Past</span>
+                <button
+                  class="bookmark-btn"
+                  :class="{ bookmarked: bookmarkedIds.has(String(event.id)) }"
+                  :title="bookmarkedIds.has(String(event.id)) ? 'Remove bookmark' : 'Bookmark race'"
+                  @click.prevent="toggleBookmark(event)"
+                >
+                  <i :class="bookmarkedIds.has(String(event.id)) ? 'bi bi-bookmark-fill' : 'bi bi-bookmark'"></i>
+                </button>
               </div>
               <div class="event-body">
                 <h3 class="event-name">{{ event.name }}</h3>
@@ -177,6 +185,66 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+/* ─── Bookmarks ─────────────────────────────────────────── */
+// bookmarkedIds: Set of externalRaceId strings
+// bookmarkIdMap: externalRaceId → bookmark DB id (for deletion)
+const bookmarkedIds  = ref(new Set())
+const bookmarkIdMap  = ref({}) // externalRaceId → { bookmarkId }
+
+const loadBookmarks = async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/race-bookmarks`)
+    const ids = new Set()
+    const idMap = {}
+    for (const bm of data) {
+      if (bm.externalRaceId) {
+        ids.add(String(bm.externalRaceId))
+        idMap[String(bm.externalRaceId)] = bm.id
+      }
+    }
+    bookmarkedIds.value = ids
+    bookmarkIdMap.value = idMap
+  } catch { /* not logged in or API down — silently skip */ }
+}
+
+const toggleBookmark = async (event) => {
+  const extId = String(event.id)
+  if (bookmarkedIds.value.has(extId)) {
+    // Remove bookmark
+    const bmId = bookmarkIdMap.value[extId]
+    bookmarkedIds.value = new Set([...bookmarkedIds.value].filter(x => x !== extId))
+    try {
+      await axios.delete(`${API_URL}/race-bookmarks/${bmId}`)
+    } catch {
+      // Revert on failure
+      bookmarkedIds.value.add(extId)
+    }
+  } else {
+    // Add bookmark (optimistic)
+    bookmarkedIds.value = new Set([...bookmarkedIds.value, extId])
+    try {
+      const dateStr = event.date
+        ? (event.date.includes('/')
+            ? (() => { const [m, d, y] = event.date.split('/'); return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}` })()
+            : event.date)
+        : null
+      const { data } = await axios.post(`${API_URL}/race-bookmarks`, {
+        externalRaceId: extId,
+        raceName:       event.name,
+        raceDate:       dateStr,
+        raceType:       event.sport,
+        city:           event.city,
+        state:          event.state,
+        raceUrl:        event.url || '',
+      })
+      bookmarkIdMap.value = { ...bookmarkIdMap.value, [extId]: data.id }
+    } catch {
+      // Revert on failure
+      bookmarkedIds.value = new Set([...bookmarkedIds.value].filter(x => x !== extId))
+    }
+  }
+}
 const RUNSIGNUP_BASE = 'https://runsignup.com/Rest/races'
 
 /* ─── Sport types (running + triathlon) ─────────────── */
@@ -543,7 +611,10 @@ const sampleEvents = [
   },
 ]
 
-onMounted(fetchEvents)
+onMounted(() => {
+  fetchEvents()
+  loadBookmarks()
+})
 
 // Re-fetch when zipcode changes (debounced)
 let zipTimer = null
@@ -843,6 +914,24 @@ watch(zipcode, () => {
   font-weight: 700;
   padding: 2px 6px;
 }
+.bookmark-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 30px;
+  height: 30px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.30);
+  color: #000;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+.bookmark-btn:hover { background: #fff; }
+.bookmark-btn.bookmarked { background: #ef4444; color: #fff; border-color: #ef4444; }
 
 .event-body {
   padding: 16px;

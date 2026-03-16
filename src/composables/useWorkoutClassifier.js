@@ -49,7 +49,7 @@ export function useWorkoutClassifier() {
     if (paceSecKm < 270 && distKm < 14) return { type: 'INTERVAL', label: 'Interval', color: '#ef4444' }
 
     // Tempo: sustained hard effort
-    if (paceSecKm < 330 && durationMin > 22 && distKm > 4) return { type: 'TEMPO', label: 'Tempo', color: '#f97316' }
+    if (paceSecKm < 330 && durationMin > 22 && distKm > 4) return { type: 'TEMPO', label: 'Tempo', color: '#0052FF' }
 
     // Recovery: very slow or very short
     if (paceSecKm > 420 || (distKm < 4 && durationMin < 25)) return { type: 'RECOVERY', label: 'Recovery', color: '#06b6d4' }

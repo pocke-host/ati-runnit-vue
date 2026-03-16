@@ -5,7 +5,7 @@
 
 const TYPE_COLORS = {
   EASY:     '#22c55e',
-  TEMPO:    '#f97316',
+  TEMPO:    '#0052FF',
   INTERVAL: '#ef4444',
   LONG_RUN: '#8b5cf6',
   RECOVERY: '#06b6d4',
