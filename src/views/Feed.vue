@@ -1,69 +1,36 @@
 <template>
   <div class="feed-page">
-    <!-- Header -->
-    <header class="feed-header">
-      <div class="feed-header-content">
-        <h1 class="feed-title">Feed</h1>
-      </div>
-    </header>
-
-    <!-- Tabs -->
-    <div class="feed-tabs-wrapper">
-      <div class="feed-tabs">
-        <button 
-          :class="['feed-tab', {active: activeTab === 'all'}]" 
-          @click="activeTab = 'all'"
-        >
-          All
-        </button>
-        <button 
-          :class="['feed-tab', {active: activeTab === 'activities'}]" 
-          @click="activeTab = 'activities'"
-        >
-          Activities
-        </button>
-        <button 
-          :class="['feed-tab', {active: activeTab === 'moments'}]" 
-          @click="activeTab = 'moments'"
-        >
-          Moments
-        </button>
-        <button
-          :class="['feed-tab', {active: activeTab === 'mine'}]"
-          @click="activeTab = 'mine'"
-        >
-          Mine
-        </button>
-        <button
-          :class="['feed-tab', {active: activeTab === 'following'}]"
-          @click="activeTab = 'following'"
-        >
-          Following
-        </button>
-      </div>
-
-      <div class="feed-sort">
-        <button
-          class="create-event-btn"
-          @click="showCreateEvent = true"
-          title="Group activities as a multisport event"
-        >
-          <i class="bi bi-collection-play me-1"></i>Create Event
-        </button>
-        <button
-          :class="['sort-btn', {active: sortOrder === 'newest'}]"
-          @click="sortOrder = 'newest'"
-          title="Sort by newest"
-        >
-          <i class="bi bi-clock"></i>
-        </button>
-        <button
-          :class="['sort-btn', {active: sortOrder === 'popular'}]"
-          @click="sortOrder = 'popular'"
-          title="Sort by popular"
-        >
-          <i class="bi bi-fire"></i>
-        </button>
+    <!-- Editorial Header + Tabs -->
+    <div class="feed-header-bar">
+      <div class="feed-header-inner">
+        <div class="feed-dateline">
+          <span class="feed-brand">RUNNIT FEED</span>
+          <span class="feed-date-text">{{ feedDateline }}</span>
+        </div>
+        <div class="feed-controls">
+          <div class="feed-tabs">
+            <button :class="['feed-tab', {active: activeTab === 'all'}]"      @click="activeTab = 'all'">All</button>
+            <button :class="['feed-tab', {active: activeTab === 'following'}]" @click="activeTab = 'following'">Following</button>
+            <button :class="['feed-tab', {active: activeTab === 'mine'}]"      @click="activeTab = 'mine'">Mine</button>
+          </div>
+          <div class="feed-actions">
+            <button
+              class="feed-action-btn"
+              @click="showCreateEvent = true"
+              title="Create multisport event"
+            ><i class="bi bi-collection-play"></i></button>
+            <button
+              :class="['feed-action-btn', {active: sortOrder === 'newest'}]"
+              @click="sortOrder = 'newest'"
+              title="Newest"
+            ><i class="bi bi-clock"></i></button>
+            <button
+              :class="['feed-action-btn', {active: sortOrder === 'popular'}]"
+              @click="sortOrder = 'popular'"
+              title="Popular"
+            ><i class="bi bi-fire"></i></button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -128,54 +95,34 @@
 
           <!-- ACTIVITY CARD -->
           <template v-else-if="item.type === 'activity'">
-            <div class="activity-card-content">
-              <router-link :to="`/activities/${item.id}`" class="activity-header activity-header-link">
-                <div class="activity-icon-large">{{ getSportIcon(item.sportType) }}</div>
-                <div v-if="item.user.id === user?.id" class="item-badge">
-                  <i class="bi bi-person-fill me-1"></i>You
-                </div>
-                <div class="type-badge activity-badge-type">
-                  <i class="bi bi-activity"></i>
-                </div>
-              </router-link>
-
-              <div class="activity-stats-grid">
-                <div class="activity-stat">
-                  <div class="stat-label">Distance</div>
-                  <div class="stat-value">{{ formatDistance(item.distanceMeters) }}</div>
-                </div>
-                <div class="activity-stat">
-                  <div class="stat-label">Duration</div>
-                  <div class="stat-value">{{ formatDuration(item.durationSeconds) }}</div>
-                </div>
-                <div class="activity-stat">
-                  <div class="stat-label">Type</div>
-                  <div class="stat-value">
-                    <span
-                      v-if="classifyActivity(item)"
-                      class="feed-workout-chip"
-                      :style="{ background: classifyActivity(item).color }"
-                    >{{ classifyActivity(item).label }}</span>
-                    <span v-else>{{ item.sportType }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card-info">
-                <div class="card-user">
-                  <router-link :to="`/profile/${item.user.id}`" class="user-avatar-small avatar-link">{{ getUserInitial(item.user) }}</router-link>
-                  <div class="user-details">
-                    <router-link :to="`/profile/${item.user.id}`" class="user-name-link">
-                      <div class="user-name">
-                        {{ item.user.displayName }}
-                        <span v-if="item.user.id === user?.id" class="you-label">(You)</span>
-                      </div>
+            <router-link :to="`/activities/${item.id}`" class="act-card">
+              <!-- Top: user + time -->
+              <div class="act-card-top">
+                <div class="act-card-user">
+                  <router-link :to="`/profile/${item.user.id}`" class="act-avatar" @click.stop>{{ getUserInitial(item.user) }}</router-link>
+                  <div>
+                    <router-link :to="`/profile/${item.user.id}`" class="act-name" @click.stop>
+                      {{ item.user.displayName }}<span v-if="item.user.id === user?.id" class="act-you"> · YOU</span>
                     </router-link>
-                    <div class="card-time">{{ formatTime(item.createdAt) }}</div>
+                    <div class="act-time">{{ formatTime(item.createdAt) }}</div>
                   </div>
                 </div>
+                <div class="act-sport-icon">{{ getSportIcon(item.sportType) }}</div>
               </div>
-            </div>
+
+              <!-- Dominant stat: distance -->
+              <div class="act-card-hero">
+                <span class="act-dist">{{ formatDistance(item.distanceMeters) || '—' }}</span>
+                <span v-if="classifyActivity(item)" class="act-chip" :style="{ background: classifyActivity(item).color }">{{ classifyActivity(item).label }}</span>
+              </div>
+
+              <!-- Secondary stats -->
+              <div class="act-card-chips">
+                <span class="act-stat-chip" v-if="item.durationSeconds"><i class="bi bi-stopwatch me-1"></i>{{ formatDuration(item.durationSeconds) }}</span>
+                <span class="act-stat-chip" v-if="item.avgHeartRate"><i class="bi bi-heart me-1"></i>{{ item.avgHeartRate }} bpm</span>
+                <span class="act-stat-chip" v-if="item.elevationGain"><i class="bi bi-graph-up me-1"></i>{{ Math.round(item.elevationGain) }}m</span>
+              </div>
+            </router-link>
           </template>
         </article>
       </div>
@@ -189,19 +136,10 @@
 
       <div v-else class="feed-empty">
         <i class="bi bi-collection" style="font-size: 4rem; color: rgba(15,18,16,0.30);"></i>
-        <h3>No activity yet</h3>
-        <p v-if="activeTab === 'mine'">
-          You haven't logged any activities or created moments yet
-        </p>
-        <p v-else-if="activeTab === 'activities'">
-          No activities have been logged yet
-        </p>
-        <p v-else-if="activeTab === 'moments'">
-          No moments have been shared yet
-        </p>
-        <p v-else>
-          Be the first to log an activity or share a moment!
-        </p>
+        <h3>Nothing here yet</h3>
+        <p v-if="activeTab === 'mine'">You haven't logged any activities or created moments yet.</p>
+        <p v-else-if="activeTab === 'following'">Follow some athletes to see their workouts.</p>
+        <p v-else>Be the first to log an activity or share a moment!</p>
         <button class="btn btn-primary mt-3" @click="goToDashboard">
           <i class="bi bi-plus-lg me-2"></i>Get Started
         </button>
@@ -387,6 +325,10 @@ const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
 const { formatDistance, formatDuration } = useUnits()
 const { classifyActivity } = useWorkoutClassifier()
+
+const feedDateline = computed(() => {
+  return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase()
+})
 
 const activeTab = ref('all')
 const sortOrder = ref('newest')
@@ -709,117 +651,93 @@ onUnmounted(() => {
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
-.feed-header {
+/* ── HEADER BAR ── */
+.feed-header-bar {
   position: fixed;
   top: var(--nav-h, 64px);
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15,18,16,0.10);
-  padding: 16px 0;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
 }
-
-.feed-header-content {
+.feed-header-inner {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
+}
+.feed-dateline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 12px 0 8px;
+  border-bottom: 1px solid #E5E5E5;
+}
+.feed-brand {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  color: #000;
+}
+.feed-date-text {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  color: rgba(15,18,16,0.35);
+  text-transform: uppercase;
+}
+.feed-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
 }
-
-.feed-title {
-  font-weight: 900;
-  font-size: 1.5rem;
-  margin: 0;
-  color: rgba(15,18,16,0.92);
-}
-
-.feed-tabs-wrapper {
-  position: fixed;
-  top: 140px;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15,18,16,0.10);
-  padding: 12px 0;
-}
-
 .feed-tabs {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 24px;
   display: flex;
-  gap: 12px;
+  gap: 0;
 }
-
 .feed-tab {
-  flex: 1;
-  max-width: 180px;
-  padding: 12px 20px;
-  border-radius: 0;
-  border: 1px solid #E5E5E5;
-  background: rgba(255,255,255,0.70);
-  font-weight: 900;
-  font-size: 0.9rem;
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #767676;
   cursor: pointer;
-  transition: all 0.2s;
-  color: rgba(15,18,16,0.70);
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
 }
-
-.feed-tab:hover {
-  background: rgba(255,255,255,0.90);
-  color: rgba(15,18,16,0.90);
-}
-
-.feed-tab.active {
-  background: var(--r-black, #0F1210);
-  color: white;
-  border-color: var(--r-black, #0F1210);
-}
-
-.feed-sort {
-  position: absolute;
-  right: 24px;
-  top: 12px;
+.feed-tab:hover { color: #000; }
+.feed-tab.active { color: #000; border-bottom-color: #000; }
+.feed-actions {
   display: flex;
   gap: 8px;
 }
-
-.sort-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+.feed-action-btn {
+  width: 36px;
+  height: 36px;
   border: 1px solid #E5E5E5;
-  background: rgba(255,255,255,0.70);
+  background: #fff;
+  font-size: 1rem;
+  color: #767676;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: rgba(15,18,16,0.60);
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
 }
-
-.sort-btn:hover {
-  background: rgba(255,255,255,0.95);
-  color: rgba(15,18,16,0.90);
-}
-
-.sort-btn.active {
-  background: var(--r-black, #0F1210);
-  color: white;
-  border-color: var(--r-black, #0F1210);
-}
+.feed-action-btn:hover { color: #000; border-color: #000; }
+.feed-action-btn.active { color: #000; border-color: #000; background: #000; color: #fff; }
 
 .feed-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 200px 24px 60px;
+  padding: 140px 24px 60px;
 }
 
 .feed-loading {
@@ -912,41 +830,97 @@ onUnmounted(() => {
   font-size: 0.95rem;
 }
 
-/* Activity Cards */
-.activity-card-content {
+/* Activity Cards — editorial */
+.act-card {
+  display: block;
   padding: 20px;
+  text-decoration: none;
+  color: inherit;
 }
-
-.activity-header {
+.act-card:hover { text-decoration: none; background: #fafafa; }
+.act-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.act-card-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.act-avatar {
+  width: 32px;
+  height: 32px;
+  background: #000;
+  color: #fff;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px 24px;
-  background: #fff;
-  border-bottom: 1px solid var(--r-border);
-  position: relative;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-
-.activity-icon-large {
-  font-size: 5rem;
+.act-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #000;
+  text-decoration: none;
+  display: block;
+  line-height: 1.3;
+}
+.act-name:hover { color: #000; text-decoration: underline; }
+.act-you {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #767676;
+}
+.act-time {
+  font-size: 0.72rem;
+  color: #767676;
+  margin-top: 1px;
+}
+.act-sport-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  opacity: 0.60;
+}
+.act-card-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.act-dist {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: -0.03em;
   line-height: 1;
 }
-
-.activity-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding: 20px;
-  background: rgba(255,255,255,0.60);
-  margin: -1px 0 16px;
+.act-chip {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 3px 8px;
 }
-
-.activity-stat {
-  text-align: center;
-  padding: 12px;
-  background: rgba(255,255,255,0.90);
+.act-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.act-stat-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #767676;
+  background: #f5f5f5;
+  padding: 4px 10px;
   border: 1px solid #E5E5E5;
-  border-radius: 0;
 }
 
 .feed-workout-chip {
@@ -958,21 +932,6 @@ onUnmounted(() => {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: white;
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(15,18,16,0.60);
-  margin-bottom: 6px;
-}
-
-.stat-value {
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: rgba(15,18,16,0.92);
 }
 
 /* Shared Card Info */

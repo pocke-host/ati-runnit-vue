@@ -6,23 +6,24 @@
 
     <!-- Dashboard Content -->
     <div v-else class="wrap">
-      <!-- TOP BAR -->
-      <header class="topbar">
-        <div class="brandline">
-          <div class="status-dot" aria-hidden="true"></div>
-          <div class="kicker">RUNNIT // TRAINING HUB</div>
+      <!-- EDITORIAL GREETING -->
+      <header class="dash-greeting">
+        <div class="greeting-left">
+          <div class="greeting-dateline">{{ todayLine }}</div>
+          <h1 class="greeting-headline">{{ greeting }}, {{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}</h1>
         </div>
-
-        <div class="top-actions">
-          <button class="btn btn-ghost" type="button" @click="openActivityModal">
-            <i class="bi bi-plus-lg me-2"></i>New Activity
-          </button>
-          <button class="btn btn-ghost" type="button" @click="openFriendsModal">
-            <i class="bi bi-people-fill me-2"></i>Find Friends
-          </button>
-          <button class="btn btn-primary" type="button" @click="openMomentModal">
-            <i class="bi bi-camera-fill me-2"></i>Create Moment
-          </button>
+        <div class="greeting-right">
+          <div class="training-block-badge" :style="{ borderColor: trainingBlock.color, color: trainingBlock.color }">
+            {{ trainingBlock.label }} PHASE
+          </div>
+          <div class="top-actions">
+            <button class="btn btn-ghost" type="button" @click="openActivityModal">
+              <i class="bi bi-plus-lg me-2"></i>Log
+            </button>
+            <button class="btn btn-primary" type="button" @click="openMomentModal">
+              <i class="bi bi-camera-fill me-2"></i>Moment
+            </button>
+          </div>
         </div>
       </header>
 
@@ -712,6 +713,7 @@ import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { useDisciplineScore } from '@/composables/useDisciplineScore'
+import { useTrainingBlock } from '@/composables/useTrainingBlock'
 import { useVoiceNote } from '@/composables/useVoiceNote'
 import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
@@ -871,6 +873,22 @@ const dashInsights = computed(() => {
 })
 
 const disciplineData = computed(() => useDisciplineScore(activities.value))
+const trainingBlock = computed(() => useTrainingBlock(activities.value))
+
+const greeting = computed(() => {
+  const h = new Date().getHours()
+  if (h < 12) return 'GOOD MORNING'
+  if (h < 17) return 'GOOD AFTERNOON'
+  return 'GOOD EVENING'
+})
+
+const todayLine = computed(() => {
+  const d = new Date()
+  const day = d.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()
+  const date = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }).toUpperCase()
+  const weekNum = Math.ceil((d - new Date(d.getFullYear(), 0, 1)) / 604800000)
+  return `${day} · ${date} · WEEK ${weekNum}`
+})
 
 const monthCompare = computed(() => {
   const acts = activities.value || []
@@ -1577,10 +1595,12 @@ onMounted(async () => {
 .dash-loader{width:32px;height:32px;border:2px solid rgba(15,18,16,0.10);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .wrap{max-width:1400px;margin:0 auto;padding:26px 20px 56px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px}
-.brandline{display:flex;align-items:center;gap:10px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#0052FF;flex-shrink:0}
-.kicker{letter-spacing:.18em;font-weight:900;font-size:.78rem;color:rgba(15,18,16,0.70)}
+.dash-greeting{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid #E5E5E5}
+.greeting-left{flex:1;min-width:0}
+.greeting-dateline{font-size:0.68rem;font-weight:700;letter-spacing:0.20em;color:rgba(15,18,16,0.40);text-transform:uppercase;margin-bottom:8px}
+.greeting-headline{font-size:clamp(1.8rem,3.5vw,3rem);font-weight:900;letter-spacing:-0.02em;line-height:1;color:#000;margin:0}
+.greeting-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px;flex-shrink:0}
+.training-block-badge{font-size:0.68rem;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;border:1.5px solid;padding:5px 12px;white-space:nowrap}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap}
 .perf-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #E5E5E5;margin-bottom:32px;background:#E5E5E5;gap:1px}
 .perf-cell{background:#fff;padding:28px 24px;display:flex;flex-direction:column}
@@ -1758,6 +1778,6 @@ textarea.form-control{resize:vertical;min-height:72px}
 @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
 @media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}.perf-strip{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
-@media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.topbar{flex-direction:column;align-items:flex-start}.top-actions{width:100%}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
+@media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.dash-greeting{flex-direction:column;align-items:flex-start;gap:16px}.greeting-right{flex-direction:row;align-items:center;width:100%;justify-content:space-between}.greeting-headline{font-size:1.8rem}.top-actions{width:auto}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
 @media(max-width:375px){.perf-strip{grid-template-columns:repeat(2,1fr)}.profile-stats-mini{grid-template-columns:repeat(2,1fr)}.top-actions .btn{font-size:0.72rem;padding:10px 12px}}
 </style>
