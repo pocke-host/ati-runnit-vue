@@ -138,6 +138,66 @@
         </div>
       </section>
 
+      <!-- ── SAFETY ─────────────────────────────── -->
+      <section class="settings-section">
+        <div class="section-label">Safety</div>
+        <div class="section-sublabel">Emergency contacts are notified when you trigger SOS during a run.</div>
+
+        <div class="settings-card">
+          <!-- Contact list -->
+          <div v-if="contacts.length === 0" class="contact-empty">No emergency contacts added.</div>
+          <div v-else class="contact-list">
+            <div v-for="c in contacts" :key="c.id" class="contact-row">
+              <div class="contact-info">
+                <span class="contact-name">{{ c.name }}</span>
+                <span v-if="c.phone" class="contact-detail">{{ c.phone }}</span>
+                <span v-if="c.email" class="contact-detail">{{ c.email }}</span>
+              </div>
+              <button class="btn-remove-contact" @click="removeContact(c.id)" title="Remove">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Add form -->
+          <form class="contact-form" @submit.prevent="addContact">
+            <div class="field-row contact-form-row">
+              <input
+                v-model.trim="newContact.name"
+                class="field-input"
+                placeholder="Name *"
+                required
+                maxlength="100"
+              />
+              <input
+                v-model.trim="newContact.phone"
+                class="field-input"
+                placeholder="Phone"
+                maxlength="30"
+              />
+              <input
+                v-model.trim="newContact.email"
+                class="field-input"
+                placeholder="Email"
+                type="email"
+                maxlength="150"
+              />
+              <button type="submit" class="btn btn-primary btn-sm" :disabled="addingContact || !newContact.name">
+                <span v-if="addingContact" class="spinner-border spinner-border-sm me-1"></span>
+                Add
+              </button>
+            </div>
+          </form>
+
+          <div v-if="contactStatus" :class="['field-status', contactStatusType]">
+            <i :class="contactStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
+            {{ contactStatus }}
+          </div>
+        </div>
+      </section>
+
       <!-- ── DANGER ZONE ────────────────────────── -->
       <section class="settings-section">
         <div class="section-label danger-label">Account</div>
@@ -158,7 +218,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
@@ -228,6 +288,60 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/')
 }
+
+/* ── Emergency Contacts ── */
+const contacts = ref([])
+const newContact = ref({ name: '', phone: '', email: '' })
+const addingContact = ref(false)
+const contactStatus = ref('')
+const contactStatusType = ref('success')
+let contactTimer = null
+
+const showContactStatus = (msg, type = 'success') => {
+  clearTimeout(contactTimer)
+  contactStatus.value = msg
+  contactStatusType.value = type
+  contactTimer = setTimeout(() => { contactStatus.value = '' }, 3000)
+}
+
+const loadContacts = async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/emergency-contacts`, { headers: getAuthHeaders() })
+    contacts.value = data
+  } catch {}
+}
+
+const addContact = async () => {
+  if (!newContact.value.name.trim()) return
+  addingContact.value = true
+  try {
+    const { data } = await axios.post(`${API_URL}/emergency-contacts`, {
+      name: newContact.value.name.trim(),
+      phone: newContact.value.phone.trim() || null,
+      email: newContact.value.email.trim() || null,
+    }, { headers: getAuthHeaders() })
+    contacts.value.push(data)
+    newContact.value = { name: '', phone: '', email: '' }
+    showContactStatus('Contact added.')
+  } catch {
+    showContactStatus('Failed to add contact.', 'error')
+  } finally {
+    addingContact.value = false
+  }
+}
+
+const removeContact = async (id) => {
+  try {
+    await axios.delete(`${API_URL}/emergency-contacts/${id}`, { headers: getAuthHeaders() })
+    contacts.value = contacts.value.filter(c => c.id !== id)
+  } catch {
+    showContactStatus('Failed to remove contact.', 'error')
+  }
+}
+
+onMounted(() => {
+  loadContacts()
+})
 </script>
 
 <style scoped>
@@ -559,6 +673,37 @@ const handleLogout = () => {
 .btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }
 
+/* ── Emergency Contacts ── */
+.contact-empty {
+  font-size: 0.85rem;
+  color: rgba(15,18,16,0.45);
+  padding: 4px 0;
+}
+.contact-list { display: flex; flex-direction: column; gap: 10px; }
+.contact-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 14px;
+  border: 1px solid #E5E5E5; background: #fafafa;
+}
+.contact-info { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; }
+.contact-name { font-weight: 700; font-size: 0.9rem; color: #000; }
+.contact-detail { font-size: 0.80rem; color: #767676; }
+.btn-remove-contact {
+  width: 32px; height: 32px; border: 1px solid #E5E5E5; background: #fff;
+  color: #767676; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 0.85rem; flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-remove-contact:hover { border-color: #dc2626; color: #dc2626; }
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+  justify-content: unset;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .settings-body { padding: 20px 16px 60px; }
@@ -572,5 +717,6 @@ const handleLogout = () => {
   .unit-preview-row { grid-template-columns: repeat(2, 1fr); }
   .unit-cards { grid-template-columns: 1fr; }
   .section-title { font-size: 1rem; }
+  .contact-form-row { grid-template-columns: 1fr 1fr; }
 }
 </style>
