@@ -23,19 +23,18 @@ app.use(head)
 // Default timeout for all requests — prevents indefinite UI freeze on slow/hung backends
 axios.defaults.timeout = 10000
 
-// Global response interceptor — 401 means token is definitively rejected by the server.
-// Clear auth state and send the user to login so they can get a fresh token.
+// Global response interceptor — 401/403 means token is rejected or forbidden.
+// Sync Pinia auth store + redirect to login.
 axios.interceptors.response.use(
   res => res,
   err => {
-    if (err.response?.status === 401) {
+    const status = err.response?.status
+    if (status === 401 || status === 403) {
       const wasLoggedIn = !!localStorage.getItem('token')
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      localStorage.removeItem('onboarding_complete')
-      localStorage.removeItem('userRole')
-      localStorage.removeItem('subscriptionTier')
-      delete axios.defaults.headers.common['Authorization']
+      // Import lazily to avoid circular dependency — pinia is already initialized by this point
+      import('@/stores/auth').then(({ useAuthStore }) => {
+        try { useAuthStore().logout() } catch { /* store may not be ready on very first load */ }
+      })
       if (wasLoggedIn) router.push('/join-us')
     }
     return Promise.reject(err)

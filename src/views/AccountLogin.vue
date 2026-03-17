@@ -81,9 +81,15 @@
             {{ error }}
           </div>
 
+          <!-- Lockout warning -->
+          <div v-if="isLocked" class="lockout-bar mb-3">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            Account locked — try again in <strong>{{ lockCountdown }}s</strong>
+          </div>
+
           <button
             class="btn btn-primary w-100"
-            :disabled="loading"
+            :disabled="loading || isLocked"
             type="submit"
           >
             <span v-if="!loading">Sign In</span>
@@ -143,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
@@ -159,24 +165,83 @@ const showPwd = ref(false)
 const loading = ref(false)
 const error = ref('')
 
+// ── Brute-force protection ────────────────────────────────────────────────────
+const MAX_ATTEMPTS  = 5
+const LOCKOUT_MS    = 30 * 1000 // 30 seconds
+
+const failCount  = ref(parseInt(sessionStorage.getItem('login_fails') || '0'))
+const lockedUntil = ref(parseInt(sessionStorage.getItem('login_locked_until') || '0'))
+const lockCountdown = ref(0)
+
+let lockTimer = null
+
+const isLocked = computed(() => Date.now() < lockedUntil.value)
+
+const startCountdown = () => {
+  clearInterval(lockTimer)
+  lockCountdown.value = Math.ceil((lockedUntil.value - Date.now()) / 1000)
+  lockTimer = setInterval(() => {
+    lockCountdown.value = Math.ceil((lockedUntil.value - Date.now()) / 1000)
+    if (lockCountdown.value <= 0) {
+      clearInterval(lockTimer)
+      lockCountdown.value = 0
+      failCount.value = 0
+      sessionStorage.removeItem('login_fails')
+      sessionStorage.removeItem('login_locked_until')
+    }
+  }, 1000)
+}
+
+// Resume countdown if locked on page load
+if (isLocked.value) startCountdown()
+
+const recordFailure = () => {
+  failCount.value += 1
+  sessionStorage.setItem('login_fails', failCount.value)
+  if (failCount.value >= MAX_ATTEMPTS) {
+    lockedUntil.value = Date.now() + LOCKOUT_MS
+    sessionStorage.setItem('login_locked_until', lockedUntil.value)
+    startCountdown()
+  }
+}
+
+const clearFailures = () => {
+  failCount.value = 0
+  lockedUntil.value = 0
+  sessionStorage.removeItem('login_fails')
+  sessionStorage.removeItem('login_locked_until')
+}
+
 const onSubmit = async (e) => {
   e.preventDefault()
+  if (isLocked.value) return
   error.value = ''
-  loading.value = true
-  
-  try {
-    if (!email.value || !password.value) {
-      throw new Error('Please enter email and password')
-    }
 
+  if (!email.value || !password.value) {
+    error.value = 'Please enter your email and password.'
+    return
+  }
+
+  loading.value = true
+  try {
     await authStore.login(email.value, password.value)
+    clearFailures()
     router.push(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
   } catch (err) {
-    error.value = err?.response?.data?.message || err?.message || 'Login failed. Please check your credentials.'
+    recordFailure()
+    if (isLocked.value) {
+      error.value = `Too many failed attempts. Try again in ${lockCountdown.value}s.`
+    } else {
+      const remaining = MAX_ATTEMPTS - failCount.value
+      error.value = (err?.response?.data?.message || 'Incorrect email or password.') +
+        (remaining > 0 ? ` ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` : '')
+    }
   } finally {
     loading.value = false
   }
 }
+
+onUnmounted(() => clearInterval(lockTimer))
 
 const handleGoogleSignIn = () => {
   console.log('Google sign-in clicked')
@@ -430,6 +495,18 @@ const handleGoogleSignIn = () => {
   border-radius: 0;
   color: #DC2626;
   font-size: 14px;
+}
+
+/* Lockout bar */
+.lockout-bar {
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  color: #C2410C;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
 }
 
 /* ===== RIGHT SIDE: Visual ===== */
