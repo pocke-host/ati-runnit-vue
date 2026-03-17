@@ -93,7 +93,7 @@ const userId = computed(() => user.value?.id)
 }
 
 .tab-active {
-  color: #000;
+  color: #0052FF;
 }
 
 /* Track center tab */
@@ -106,7 +106,7 @@ const userId = computed(() => user.value?.id)
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #000;
+  background: #0052FF;
   display: flex;
   align-items: center;
   justify-content: center;
