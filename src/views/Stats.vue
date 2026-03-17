@@ -93,6 +93,30 @@
         </div>
       </section>
 
+      <!-- DISCIPLINE SCORE -->
+      <section class="section disc-section">
+        <h2 class="section-title">Discipline Score</h2>
+        <div class="disc-card">
+          <div class="disc-card-left">
+            <div class="disc-big-num" :style="{ color: disciplineData.levelColor }">{{ disciplineData.score }}</div>
+            <div class="disc-big-label" :style="{ color: disciplineData.levelColor }">{{ disciplineData.level }}</div>
+            <div class="disc-big-sub">out of 100</div>
+          </div>
+          <div class="disc-card-right">
+            <div v-for="(item, key) in disciplineData.breakdown" :key="key" class="disc-row">
+              <div class="disc-row-top">
+                <span class="disc-row-label">{{ item.label }}</span>
+                <span class="disc-row-pts">{{ item.score }}<span class="disc-row-max">/{{ item.max }}</span></span>
+              </div>
+              <div class="disc-row-track">
+                <div class="disc-row-fill" :style="{ width: (item.score / item.max * 100) + '%' }"></div>
+              </div>
+              <div class="disc-row-detail">{{ item.detail }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- TRAINING LOG HEATMAP -->
       <section class="section" v-if="heatmapData.length">
         <h2 class="section-title">Training Log</h2>
@@ -317,6 +341,7 @@ import { usePRStore } from '@/stores/pr'
 import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
+import { useDisciplineScore } from '@/composables/useDisciplineScore'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
@@ -483,6 +508,8 @@ const consistencyLabel = computed(() => {
 })
 
 // ACWR (Acute:Chronic Workload Ratio)
+const disciplineData = computed(() => useDisciplineScore(activities.value))
+
 const acwrScore = computed(() => {
   const m = performanceMetrics.value
   if (!m || m.ctl === 0) return null
@@ -948,6 +975,82 @@ onMounted(async () => {
 }
 
 /* TRAINING LOG HEATMAP */
+.disc-card {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 32px;
+  border: 1px solid #E5E5E5;
+  padding: 24px;
+  background: #fff;
+}
+.disc-card-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid #E5E5E5;
+  padding-right: 32px;
+}
+.disc-big-num {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.disc-big-label {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.disc-big-sub {
+  font-size: 0.65rem;
+  color: #767676;
+  margin-top: 4px;
+}
+.disc-card-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+}
+.disc-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.disc-row-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #000;
+}
+.disc-row-pts {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #000;
+}
+.disc-row-max {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #767676;
+}
+.disc-row-track {
+  height: 5px;
+  background: #E5E5E5;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+.disc-row-fill {
+  height: 100%;
+  background: #000;
+  transition: width 0.4s ease;
+}
+.disc-row-detail {
+  font-size: 0.67rem;
+  color: #767676;
+}
 .heatmap-card {
   background: white;
   border: 1px solid #E5E5E5;

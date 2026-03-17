@@ -68,6 +68,11 @@
                 <div class="hstat-val">{{ profile.followerCount ?? '—' }}</div>
                 <div class="hstat-label">Followers</div>
               </div>
+              <div class="hstat-divider"></div>
+              <div class="hstat">
+                <div class="hstat-val" :style="{ color: disciplineData.levelColor }">{{ disciplineData.level }}</div>
+                <div class="hstat-label">Discipline</div>
+              </div>
             </div>
 
             <div class="hero-actions">
@@ -326,6 +331,7 @@ import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useDisciplineScore } from '@/composables/useDisciplineScore'
 import { useAchievementStore, BADGE_CATALOG, computeEarnedBadges } from '@/stores/achievement'
 import { useNotificationStore } from '@/stores/notification'
 
@@ -376,6 +382,7 @@ const isOwnProfile = computed(() => user.value?.id && String(user.value.id) === 
 const userInitial = computed(() => profile.value.displayName?.charAt(0).toUpperCase() || '?')
 const activitiesCount = computed(() => profile.value.activityCount ?? profileActivities.value.length)
 const totalDistanceMeters = computed(() => profileActivities.value.reduce((s, a) => s + (a.distanceMeters || 0), 0))
+const disciplineData = computed(() => useDisciplineScore(profileActivities.value))
 
 const joinedDate = computed(() => {
   if (!profile.value.createdAt) return ''

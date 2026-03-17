@@ -151,6 +151,27 @@
               </div>
             </div>
 
+            <!-- Discipline Score Widget -->
+            <div class="disc-widget">
+              <div class="disc-widget-header">
+                <span class="disc-widget-label">DISCIPLINE SCORE</span>
+                <span class="disc-widget-tip" title="Composite metric: consistency, frequency, early-morning commitment & volume trend">?</span>
+              </div>
+              <div class="disc-widget-hero">
+                <span class="disc-score-num">{{ disciplineData.score }}</span>
+                <span class="disc-level" :style="{ color: disciplineData.levelColor }">{{ disciplineData.level }}</span>
+              </div>
+              <div class="disc-bars">
+                <div v-for="(item, key) in disciplineData.breakdown" :key="key" class="disc-bar-row">
+                  <span class="disc-bar-label">{{ item.label }}</span>
+                  <div class="disc-bar-track">
+                    <div class="disc-bar-fill" :style="{ width: (item.score / item.max * 100) + '%' }"></div>
+                  </div>
+                  <span class="disc-bar-pts">{{ item.score }}/{{ item.max }}</span>
+                </div>
+              </div>
+            </div>
+
             <!-- PR Widget -->
             <div class="profile-prs">
               <div class="prs-row-header">
@@ -690,6 +711,7 @@ import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useDisciplineScore } from '@/composables/useDisciplineScore'
 import { useVoiceNote } from '@/composables/useVoiceNote'
 import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
@@ -847,6 +869,8 @@ const dashInsights = computed(() => {
 
   return { fitnessScore, fatigueScore, formScore, acwr }
 })
+
+const disciplineData = computed(() => useDisciplineScore(activities.value))
 
 const monthCompare = computed(() => {
   const acts = activities.value || []
@@ -1599,6 +1623,19 @@ onMounted(async () => {
 .badge-item{flex:1;padding:12px;background:#f9f9f9;border-radius:0;text-align:center;border:1px solid #E5E5E5}
 .badge-icon{font-size:1.5rem;margin-bottom:4px}
 .badge-text{font-size:0.75rem;font-weight:700;color:rgba(15,18,16,0.70)}
+.disc-widget{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08)}
+.disc-widget-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.disc-widget-label{font-size:0.65rem;font-weight:900;letter-spacing:0.12em;color:rgba(15,18,16,0.40);text-transform:uppercase}
+.disc-widget-tip{width:16px;height:16px;border-radius:50%;border:1px solid #767676;font-size:0.65rem;color:#767676;display:flex;align-items:center;justify-content:center;cursor:help}
+.disc-widget-hero{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.disc-score-num{font-size:2rem;font-weight:900;color:#000;line-height:1}
+.disc-level{font-size:0.75rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase}
+.disc-bars{display:flex;flex-direction:column;gap:6px}
+.disc-bar-row{display:grid;grid-template-columns:90px 1fr 36px;align-items:center;gap:8px}
+.disc-bar-label{font-size:0.72rem;color:rgba(15,18,16,0.60);font-weight:600}
+.disc-bar-track{height:4px;background:#E5E5E5;border-radius:0;overflow:hidden}
+.disc-bar-fill{height:100%;background:#000;transition:width 0.4s ease}
+.disc-bar-pts{font-size:0.68rem;font-weight:700;color:rgba(15,18,16,0.50);text-align:right}
 .profile-prs{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08)}
 .prs-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .prs-label{font-weight:900;font-size:0.85rem;color:rgba(15,18,16,0.80)}
