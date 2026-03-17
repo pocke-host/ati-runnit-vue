@@ -131,7 +131,7 @@
           />
 
           <div v-else class="events-grid">
-            <article v-for="event in pagedEvents" :key="event.id" class="event-card">
+            <article v-for="event in pagedEvents" :key="event.id" class="event-card" style="cursor:pointer" @click="openRaceDrawer(event)">
               <div class="event-img" :style="getCardStyle(event)">
                 <span class="date-badge">{{ formatDateShort(event.date) }}</span>
                 <span class="sport-badge">{{ event.sportEmoji }} {{ event.sportLabel }}</span>
@@ -161,8 +161,8 @@
                     {{ formatDateLong(event.date) }}
                   </span>
                   <div class="event-actions">
-                    <a v-if="event.url" :href="event.url" target="_blank" rel="noopener" class="btn-details">Details</a>
-                    <a v-if="event.registerUrl" :href="event.registerUrl" target="_blank" rel="noopener" class="btn-register">Register</a>
+                    <a v-if="event.url" :href="event.url" target="_blank" rel="noopener" class="btn-details" @click.stop>Details</a>
+                    <a v-if="event.registerUrl" :href="event.registerUrl" target="_blank" rel="noopener" class="btn-register" @click.stop>Register</a>
                   </div>
                 </div>
               </div>
@@ -176,6 +176,103 @@
       </div>
     </section>
   </main>
+
+  <!-- RACE DETAIL DRAWER -->
+  <Teleport to="body">
+    <transition name="drawer-slide">
+      <div v-if="drawerRace" class="race-drawer" role="dialog" aria-modal="true">
+        <!-- Sticky header -->
+        <div class="rd-header">
+          <button class="rd-close" @click="drawerRace = null"><i class="bi bi-x-lg"></i></button>
+          <span class="rd-sport-label">{{ drawerRace.sportEmoji }} {{ drawerRace.sportLabel }}</span>
+        </div>
+
+        <div class="rd-scroll">
+          <!-- Hero -->
+          <div class="rd-hero" :style="getCardStyle(drawerRace)">
+            <span class="rd-date-badge">{{ formatDateLong(drawerRace.date) }}</span>
+          </div>
+
+          <!-- Title block -->
+          <div class="rd-title-block">
+            <h2 class="rd-name">{{ drawerRace.name }}</h2>
+            <p class="rd-location"><i class="bi bi-geo-alt me-1"></i>{{ drawerRace.city }}<span v-if="drawerRace.state">, {{ drawerRace.state }}</span></p>
+            <div class="rd-pills">
+              <span v-for="d in drawerRace.distances" :key="d" class="dist-pill">{{ d }}</span>
+            </div>
+          </div>
+
+          <!-- PACING CALCULATOR -->
+          <div class="rd-section">
+            <div class="rd-section-label">Pacing Calculator</div>
+            <div class="rd-pace-inputs">
+              <select v-model="paceDistance" class="rd-select">
+                <option v-for="(_, label) in DISTANCE_MILES" :key="label" :value="label">{{ label }}</option>
+              </select>
+              <input
+                v-model="goalTimeInput"
+                class="rd-input"
+                placeholder="Goal time H:MM:SS"
+                @input="calcSplits"
+              />
+            </div>
+            <div v-if="splits.length" class="rd-splits">
+              <div class="rd-splits-head">
+                <span>Mile</span><span>Split</span><span>Cumulative</span>
+              </div>
+              <div v-for="s in splits" :key="s.mile" class="rd-split-row">
+                <span>{{ s.mile }}</span>
+                <span>{{ s.split }}</span>
+                <span>{{ s.cum }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADD TO CALENDAR -->
+          <div class="rd-section">
+            <div class="rd-section-label">Add to Calendar</div>
+            <div class="rd-cal-btns">
+              <a :href="googleCalUrl(drawerRace)" target="_blank" rel="noopener" class="rd-btn-outline">
+                <i class="bi bi-google me-2"></i>Google Calendar
+              </a>
+              <button class="rd-btn-outline" @click="downloadIcs(drawerRace)">
+                <i class="bi bi-download me-2"></i>Download .ics
+              </button>
+            </div>
+          </div>
+
+          <!-- TRAINING PLAN -->
+          <div class="rd-section">
+            <div class="rd-section-label">Training Plan</div>
+            <p class="rd-section-sub">Generate a Sunday long-run schedule building to race day.</p>
+            <div v-if="planError" class="rd-plan-error">{{ planError }}</div>
+            <button
+              class="rd-btn-primary"
+              :disabled="planGenerating || planGenerated"
+              @click="generatePlan(drawerRace)"
+            >
+              <span v-if="planGenerating" class="spinner-border spinner-border-sm me-2"></span>
+              <i v-else-if="planGenerated" class="bi bi-check-lg me-2"></i>
+              {{ planGenerated ? 'Plan Added to Calendar' : planGenerating ? 'Generating…' : 'Generate Training Plan' }}
+            </button>
+          </div>
+
+          <!-- External links -->
+          <div class="rd-section rd-links">
+            <a v-if="drawerRace.url" :href="drawerRace.url" target="_blank" rel="noopener" class="rd-btn-outline">
+              <i class="bi bi-box-arrow-up-right me-2"></i>Race Details
+            </a>
+            <a v-if="drawerRace.registerUrl" :href="drawerRace.registerUrl" target="_blank" rel="noopener" class="rd-btn-primary">
+              Register
+            </a>
+          </div>
+        </div>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div v-if="drawerRace" class="drawer-overlay" @click="drawerRace = null"></div>
+    </transition>
+  </Teleport>
 </template>
 
 <script setup>
@@ -610,6 +707,171 @@ const sampleEvents = [
     url: '#', registerUrl: '#', image: '',
   },
 ]
+
+/* ─── Race Detail Drawer ─────────────────────────────── */
+const drawerRace     = ref(null)
+const goalTimeInput  = ref('')
+const paceDistance   = ref('Marathon')
+const splits         = ref([])
+const planGenerating = ref(false)
+const planGenerated  = ref(false)
+const planError      = ref('')
+
+const DISTANCE_MILES = {
+  '5K': 3.1, '10K': 6.2, 'Half Marathon': 13.1, 'Marathon': 26.2,
+  'Sprint': 16, 'Olympic': 32, '70.3': 56, 'Ironman': 112,
+}
+
+const openRaceDrawer = (event) => {
+  drawerRace.value     = event
+  goalTimeInput.value  = ''
+  splits.value         = []
+  planError.value      = ''
+  // restore localStorage plan flag
+  planGenerated.value  = !!localStorage.getItem(`plan_gen_${event.id}`)
+  // pre-select distance from event's first distance
+  if (event.distances?.length) {
+    const first = event.distances[0]
+    if (DISTANCE_MILES[first]) paceDistance.value = first
+  }
+}
+
+const parseGoalTime = (s) => {
+  const parts = s.trim().split(':').map(Number)
+  if (parts.some(isNaN)) return null
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
+  if (parts.length === 2) return parts[0] * 60 + parts[1]
+  return null
+}
+
+const fmtSecs = (totalSecs) => {
+  const h = Math.floor(totalSecs / 3600)
+  const m = Math.floor((totalSecs % 3600) / 60)
+  const s = Math.round(totalSecs % 60)
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+  return `${m}:${String(s).padStart(2,'0')}`
+}
+
+const calcSplits = () => {
+  const totalSecs = parseGoalTime(goalTimeInput.value)
+  const miles     = DISTANCE_MILES[paceDistance.value]
+  if (!totalSecs || !miles) { splits.value = []; return }
+  const secsPerMile = totalSecs / miles
+  const rows = []
+  let cumSecs = 0
+  for (let i = 1; i <= Math.floor(miles); i++) {
+    cumSecs += secsPerMile
+    rows.push({ mile: i, split: fmtSecs(secsPerMile), cum: fmtSecs(cumSecs) })
+  }
+  const remaining = miles - Math.floor(miles)
+  if (remaining > 0.01) {
+    const partial = secsPerMile * remaining
+    cumSecs += partial
+    rows.push({ mile: `${miles.toFixed(1)}`, split: fmtSecs(partial), cum: fmtSecs(cumSecs) })
+  }
+  splits.value = rows
+}
+
+/* ─── Calendar helpers (mirrors Calendar.vue) ──────── */
+const googleCalUrl = (event) => {
+  const d = parseDate(event.date)
+  const fmt = (dt) => dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+  const start = fmt(d)
+  const end   = fmt(new Date(d.getTime() + 86400000))
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.name)}&dates=${start}/${end}&details=${encodeURIComponent(event.summary || '')}&location=${encodeURIComponent((event.city || '') + (event.state ? ', ' + event.state : ''))}`
+}
+
+const downloadIcs = (event) => {
+  const d = parseDate(event.date)
+  const fmt = (dt) => dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '').slice(0, 15) + 'Z'
+  const start = fmt(d)
+  const end   = fmt(new Date(d.getTime() + 86400000))
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Runnit//EN',
+    'BEGIN:VEVENT',
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `SUMMARY:${event.name}`,
+    `DESCRIPTION:${(event.summary || '').replace(/\n/g, '\\n')}`,
+    `LOCATION:${(event.city || '')}${event.state ? ', ' + event.state : ''}`,
+    'END:VEVENT', 'END:VCALENDAR',
+  ].join('\r\n')
+  const blob = new Blob([ics], { type: 'text/calendar' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `${event.name.replace(/\s+/g, '_')}.ics`
+  a.click()
+}
+
+/* ─── Training plan generator ────────────────────────── */
+const generatePlan = async (event) => {
+  if (planGenerated.value) return
+  planError.value    = ''
+  planGenerating.value = true
+
+  const raceDate = parseDate(event.date)
+  const today    = new Date(); today.setHours(0, 0, 0, 0)
+
+  // Collect Sundays from next Sunday through race date
+  const sundays = []
+  const cur = new Date(today)
+  cur.setDate(cur.getDate() + ((7 - cur.getDay()) % 7 || 7))
+  while (cur <= raceDate) {
+    sundays.push(new Date(cur))
+    cur.setDate(cur.getDate() + 7)
+  }
+
+  if (sundays.length === 0) {
+    planError.value = 'Race date is too close to generate a plan.'
+    planGenerating.value = false
+    return
+  }
+
+  // Pick race distance in miles for the plan
+  const raceMiles = (() => {
+    const d = event.distances?.[0]
+    return DISTANCE_MILES[d] || 13.1
+  })()
+  const peakMiles = raceMiles * 0.85
+  const total = sundays.length
+
+  // Build linear ramp + 2-week taper
+  const token = localStorage.getItem('token')
+  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  const isoDate = (d) => d.toISOString().slice(0, 10)
+
+  try {
+    for (let i = 0; i < total; i++) {
+      let miles
+      const weeksOut = total - 1 - i
+      if (weeksOut === 0) {
+        miles = raceMiles * 0.30   // race week
+      } else if (weeksOut === 1) {
+        miles = peakMiles * 0.60   // taper
+      } else if (weeksOut === 2) {
+        miles = peakMiles * 0.75
+      } else {
+        miles = peakMiles * ((i + 1) / (total - 2))
+      }
+      miles = Math.max(3, Math.round(miles * 10) / 10)
+
+      await axios.post(`${API_URL}/workout-events`, {
+        title:       `Long Run — ${miles} mi`,
+        description: `Training for ${event.name}`,
+        eventDate:   isoDate(sundays[i]),
+        duration:    Math.round(miles * 10),
+        source:      'RACE_PLAN',
+        raceId:      String(event.id),
+      }, { headers })
+    }
+    planGenerated.value = true
+    localStorage.setItem(`plan_gen_${event.id}`, '1')
+  } catch (e) {
+    planError.value = 'Failed to generate plan. Please try again.'
+  } finally {
+    planGenerating.value = false
+  }
+}
 
 onMounted(() => {
   fetchEvents()
@@ -1076,4 +1338,124 @@ watch(zipcode, () => {
   .sport-tabs { padding: 0 12px; }
   .sport-tab { padding: 12px 16px; font-size: 0.78rem; }
 }
+
+/* ── Race Detail Drawer ── */
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1040;
+}
+.race-drawer {
+  position: fixed; top: 0; right: 0; width: 480px; max-width: 100vw;
+  height: 100vh; background: #fff; border-left: 1px solid #E5E5E5;
+  z-index: 1050; display: flex; flex-direction: column;
+  font-family: Futura, "Futura PT", "Avenir Next", system-ui, sans-serif;
+}
+.drawer-slide-enter-active, .drawer-slide-leave-active {
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.drawer-slide-enter-from, .drawer-slide-leave-to { transform: translateX(100%); }
+
+.rd-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid #E5E5E5;
+  flex-shrink: 0; position: sticky; top: 0; background: #fff; z-index: 2;
+}
+.rd-close {
+  width: 36px; height: 36px; border: 1px solid #E5E5E5; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.9rem; color: #767676;
+  transition: border-color 0.15s;
+}
+.rd-close:hover { border-color: #000; color: #000; }
+.rd-sport-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #767676;
+}
+
+.rd-scroll { flex: 1; overflow-y: auto; }
+
+.rd-hero {
+  height: 160px; background: #111; position: relative; flex-shrink: 0;
+  display: flex; align-items: flex-end; padding: 12px;
+}
+.rd-date-badge {
+  background: rgba(255,255,255,0.93); color: #000;
+  font-size: 0.72rem; font-weight: 900; padding: 4px 10px;
+  letter-spacing: 0.04em; border: 1px solid rgba(15,18,16,0.08);
+}
+
+.rd-title-block { padding: 20px 20px 0; }
+.rd-name {
+  font-size: 1.3rem; font-weight: 900; color: #000;
+  margin: 0 0 6px; line-height: 1.25;
+}
+.rd-location { font-size: 0.82rem; color: #767676; margin: 0 0 10px; }
+.rd-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+
+.rd-section {
+  padding: 20px; border-top: 1px solid #E5E5E5; margin-top: 8px;
+}
+.rd-section-label {
+  font-size: 0.68rem; font-weight: 900; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #767676; margin-bottom: 14px;
+}
+.rd-section-sub { font-size: 0.82rem; color: #767676; margin: -8px 0 14px; }
+
+/* Pacing */
+.rd-pace-inputs { display: flex; gap: 10px; margin-bottom: 14px; }
+.rd-select, .rd-input {
+  height: 40px; border: 1px solid #E5E5E5; border-radius: 0;
+  padding: 0 12px; font-size: 0.88rem; font-family: inherit;
+  color: #000; outline: none; background: #fff;
+  transition: border-color 0.15s;
+}
+.rd-select { flex: 0 0 160px; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  cursor: pointer;
+}
+.rd-input { flex: 1; }
+.rd-select:focus, .rd-input:focus { border-color: #000; }
+
+.rd-splits { border: 1px solid #E5E5E5; }
+.rd-splits-head, .rd-split-row {
+  display: grid; grid-template-columns: 60px 1fr 1fr;
+  padding: 8px 12px; font-size: 0.80rem;
+}
+.rd-splits-head {
+  background: #000; color: #fff; font-weight: 700;
+  font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.rd-split-row { border-top: 1px solid #E5E5E5; color: #333; }
+.rd-split-row:nth-child(even) { background: #fafafa; }
+
+/* Calendar */
+.rd-cal-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Plan */
+.rd-plan-error {
+  background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626;
+  font-size: 0.82rem; padding: 10px 12px; margin-bottom: 12px;
+}
+
+/* Buttons */
+.rd-btn-outline {
+  display: inline-flex; align-items: center;
+  height: 40px; padding: 0 16px; border: 1px solid #E5E5E5;
+  background: #fff; color: #000; font-size: 0.80rem; font-weight: 700;
+  text-decoration: none; cursor: pointer; font-family: inherit;
+  transition: border-color 0.15s;
+}
+.rd-btn-outline:hover { border-color: #000; }
+.rd-btn-primary {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; height: 44px; background: #000; color: #fff;
+  border: none; font-size: 0.82rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
+  font-family: inherit; transition: background 0.15s;
+}
+.rd-btn-primary:hover:not(:disabled) { background: #222; }
+.rd-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.rd-links { display: flex; gap: 10px; }
+.rd-links .rd-btn-primary { width: auto; flex: 1; }
 </style>

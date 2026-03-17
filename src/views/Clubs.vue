@@ -38,6 +38,13 @@
           >
             <i class="bi bi-link-45deg me-2"></i>Invite Links
           </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'map' }"
+            @click="activeTab = 'map'; loadMapClubs()"
+          >
+            <i class="bi bi-map me-2"></i>Map
+          </button>
         </div>
 
         <!-- Filters (only on Discover tab) -->
@@ -164,8 +171,15 @@
                 <h5 class="title mb-1">{{ club.name }}</h5>
                 <p class="text-muted small mb-2">
                   <i class="bi bi-people-fill me-1"></i>{{ formatK(club.memberCount ?? club.members ?? 0) }} members
+                  <span v-if="club.city" class="ms-2"><i class="bi bi-geo-alt me-1"></i>{{ club.city }}</span>
                 </p>
                 <p class="small mb-3 flex-grow-1">{{ club.description }}</p>
+                <!-- Set Location for owners -->
+                <div v-if="isOwner(club) && !club.latitude" class="mb-2">
+                  <button class="btn-set-location" @click="openSetLocation(club)">
+                    <i class="bi bi-geo-alt-fill me-1"></i>Set Location
+                  </button>
+                </div>
                 <div class="d-flex gap-2 align-items-center mt-auto">
                   <button class="chat-btn flex-grow-1" @click="openChat(club)">
                     <i class="bi bi-chat-dots-fill me-1"></i>Open Chat
@@ -224,6 +238,53 @@
         </div>
       </div>
     </section>
+
+    <!-- MAP TAB -->
+    <section v-else-if="activeTab === 'map'" class="list">
+      <div class="container-xxl">
+        <div v-if="mapClubsLoading" class="text-center py-5">
+          <div class="spinner-border" role="status"></div>
+          <p class="mt-2 text-muted">Loading map…</p>
+        </div>
+        <div v-else>
+          <p v-if="mapClubsNoLocation > 0" class="map-strip">
+            <i class="bi bi-info-circle me-1"></i>
+            {{ mapClubsNoLocation }} club{{ mapClubsNoLocation !== 1 ? 's have' : ' has' }} no location set.
+            Own a club? Set its location in the <strong>My Clubs</strong> tab.
+          </p>
+          <div ref="clubMapContainer" class="clubs-map"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SET LOCATION MODAL -->
+    <transition name="fade">
+      <div v-if="locationModalClub" class="chat-overlay" @click.self="locationModalClub = null"></div>
+    </transition>
+    <transition name="slide-up">
+      <div v-if="locationModalClub" class="create-modal">
+        <div class="create-modal-header">
+          <span class="create-modal-title">SET CLUB LOCATION — {{ locationModalClub.name }}</span>
+          <button class="chat-close" @click="locationModalClub = null"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div v-if="locationError" class="create-error">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>{{ locationError }}
+        </div>
+        <form class="create-form" @submit.prevent="geocodeAndSave">
+          <div class="create-field">
+            <label class="create-label">City / Address *</label>
+            <input v-model.trim="locationCityInput" class="create-input" placeholder="e.g. San Francisco, CA" required />
+          </div>
+          <div class="create-actions">
+            <button type="button" class="btn-cancel" @click="locationModalClub = null">Cancel</button>
+            <button type="submit" class="btn-create" :disabled="locationSaving || !locationCityInput">
+              <span v-if="locationSaving" class="spinner-border spinner-border-sm me-1"></span>
+              {{ locationSaving ? 'Saving…' : 'Save Location' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </transition>
 
     <!-- CTA -->
     <section class="cta">
@@ -365,9 +426,12 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 const appOrigin = window.location.origin
 
 const getAuthHeaders = () => ({
@@ -403,6 +467,22 @@ const createModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref('')
 const newClub = ref({ name: '', sport: '', description: '' })
+
+// Map tab
+const clubMapContainer = ref(null)
+const clubMap = ref(null)
+const mapClubsLoading = ref(false)
+const mapClubsNoLocation = ref(0)
+
+// Set Location modal
+const locationModalClub = ref(null)
+const locationCityInput = ref('')
+const locationSaving = ref(false)
+const locationError = ref('')
+
+// Current user id (for isOwner check)
+const currentUserId = ref(null)
+try { currentUserId.value = JSON.parse(atob((localStorage.getItem('token') || '').split('.')[1] || 'e30=')).sub } catch {}
 
 // ── Computed ───────────────────────────────────────────────────────────────
 const filtered = computed(() => {
@@ -613,6 +693,129 @@ function formatTime(d) {
 
 function getInitial(name) {
   return (name || '?').charAt(0).toUpperCase()
+}
+
+function isOwner(club) {
+  if (!currentUserId.value) return false
+  return String(club.ownerId) === String(currentUserId.value)
+}
+
+// ── Map ─────────────────────────────────────────────────────────────────────
+async function loadMapClubs() {
+  mapClubsLoading.value = true
+  try {
+    const res = await fetch(`${API_URL}/clubs/with-location`, { headers: getAuthHeaders() })
+    const clubs = res.ok ? await res.json() : []
+    const allRes = await fetch(`${API_URL}/clubs`, { headers: getAuthHeaders() })
+    const all = allRes.ok ? await allRes.json() : []
+    mapClubsNoLocation.value = all.filter(c => !c.latitude).length
+    await nextTick()
+    initClubMap(clubs)
+  } catch (e) {
+    console.error('loadMapClubs error', e)
+  } finally {
+    mapClubsLoading.value = false
+  }
+}
+
+function initClubMap(clubs) {
+  if (!MAPBOX_TOKEN || !clubMapContainer.value) return
+  if (clubMap.value) { clubMap.value.remove(); clubMap.value = null }
+
+  mapboxgl.accessToken = MAPBOX_TOKEN
+  const map = new mapboxgl.Map({
+    container: clubMapContainer.value,
+    style: 'mapbox://styles/quinn-runnit/cmml6ynyy000701suetifc5y0',
+    zoom: 3.5,
+    center: [-98.5, 39.5],
+    attributionControl: false,
+  })
+  clubMap.value = map
+
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
+
+  // User location dot
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      new mapboxgl.Marker({ color: '#0052FF' })
+        .setLngLat([pos.coords.longitude, pos.coords.latitude])
+        .addTo(map)
+      if (clubs.length === 0) {
+        map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 10 })
+      }
+    }, () => {})
+  }
+
+  // Club markers
+  for (const club of clubs) {
+    if (club.latitude == null || club.longitude == null) continue
+    const popup = new mapboxgl.Popup({ offset: 10 }).setHTML(
+      `<div style="font-family:Futura,sans-serif;min-width:160px">
+        <div style="font-weight:900;font-size:13px;color:#000;margin-bottom:4px">${club.name}</div>
+        <div style="font-size:11px;color:#767676;margin-bottom:2px">${club.sport || 'General'}</div>
+        <div style="font-size:11px;color:#767676">${club.memberCount || 0} members${club.city ? ' · ' + club.city : ''}</div>
+      </div>`
+    )
+    new mapboxgl.Marker({ color: '#000' })
+      .setLngLat([club.longitude, club.latitude])
+      .setPopup(popup)
+      .addTo(map)
+  }
+
+  // Fit to markers if any
+  if (clubs.length > 0) {
+    const bounds = new mapboxgl.LngLatBounds()
+    clubs.forEach(c => bounds.extend([c.longitude, c.latitude]))
+    map.fitBounds(bounds, { padding: 60, maxZoom: 12 })
+  }
+}
+
+// Destroy map when leaving map tab
+watch(activeTab, (newTab, oldTab) => {
+  if (oldTab === 'map' && clubMap.value) {
+    clubMap.value.remove()
+    clubMap.value = null
+  }
+})
+
+// ── Set Location ─────────────────────────────────────────────────────────────
+function openSetLocation(club) {
+  locationModalClub.value = club
+  locationCityInput.value = club.city || ''
+  locationError.value = ''
+}
+
+async function geocodeAndSave() {
+  if (!locationCityInput.value || !locationModalClub.value) return
+  locationSaving.value = true
+  locationError.value = ''
+  try {
+    const q = encodeURIComponent(locationCityInput.value)
+    const geoRes = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=${MAPBOX_TOKEN}&limit=1`
+    )
+    const geoData = await geoRes.json()
+    const feature = geoData.features?.[0]
+    if (!feature) throw new Error('Location not found. Try a different city name.')
+    const [lng, lat] = feature.center
+    const cityName = feature.place_name?.split(',')[0] || locationCityInput.value
+
+    const res = await fetch(`${API_URL}/clubs/${locationModalClub.value.id}/location`, {
+      method: 'PATCH',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ latitude: lat, longitude: lng, city: cityName }),
+    })
+    if (!res.ok) throw new Error('Failed to save location.')
+    const updated = await res.json()
+    // Update in myClubs
+    const idx = myClubs.value.findIndex(c => c.id === updated.id)
+    if (idx !== -1) myClubs.value[idx] = { ...myClubs.value[idx], ...updated }
+    locationModalClub.value = null
+  } catch (e) {
+    locationError.value = e.message || 'Failed to save location.'
+  } finally {
+    locationSaving.value = false
+  }
 }
 
 onMounted(() => {
@@ -1453,4 +1656,34 @@ onMounted(() => {
 /* slide-up transition for modal */
 .slide-up-enter-active, .slide-up-leave-active { transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
 .slide-up-enter-from, .slide-up-leave-to { transform: translateX(-50%) translateY(100%); }
+
+/* ===== MAP TAB ===== */
+.clubs-map {
+  width: 100%;
+  height: 520px;
+  border: 1px solid #E5E5E5;
+}
+.map-strip {
+  font-size: 0.82rem;
+  color: #767676;
+  background: #fafafa;
+  border: 1px solid #E5E5E5;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+/* Set Location button */
+.btn-set-location {
+  display: inline-flex; align-items: center;
+  height: 34px; padding: 0 14px;
+  border: 1px solid #E5E5E5; background: #fff;
+  color: #000; font-family: inherit; font-size: 0.78rem;
+  font-weight: 700; cursor: pointer; transition: border-color 0.15s;
+  width: 100%;
+}
+.btn-set-location:hover { border-color: #000; }
+
+@media (max-width: 768px) {
+  .clubs-map { height: 360px; }
+}
 </style>

@@ -151,11 +151,41 @@
     </div>
     <div v-if="shareCopied" class="share-copied-toast">Link copied to clipboard!</div>
 
+    <!-- SOS Button -->
+    <button v-if="isTracking" class="sos-btn" @click="showSosModal = true">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>SOS
+    </button>
+
+    <!-- SOS Modal -->
+    <div v-if="showSosModal" class="sos-overlay">
+      <div class="sos-modal">
+        <div class="sos-modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>SEND SOS ALERT</div>
+        <p class="sos-modal-sub">
+          This will sound an alert and send an email to your emergency contacts with your current location.
+        </p>
+        <div v-if="sosContacts.length === 0" class="sos-no-contacts">
+          No emergency contacts found. Add contacts in Settings → Safety.
+        </div>
+        <div v-else class="sos-contacts-list">
+          <div v-for="c in sosContacts" :key="c.id" class="sos-contact">
+            <span class="sos-contact-name">{{ c.name }}</span>
+            <span v-if="c.email" class="sos-contact-email">{{ c.email }}</span>
+          </div>
+        </div>
+        <div class="sos-modal-actions">
+          <button class="sos-cancel-btn" @click="showSosModal = false">Cancel</button>
+          <button class="sos-confirm-btn" @click="sendSos">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Send SOS
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -209,6 +239,10 @@ const isSharing    = ref(false)
 const shareUrl     = ref('')
 const shareCopied  = ref(false)
 let lastShareUpdate = 0
+
+// SOS state
+const showSosModal = ref(false)
+const sosContacts  = ref([])
 
 let watchId       = null
 let timerInterval = null
@@ -408,6 +442,62 @@ const pushShareUpdate = (lat, lng) => {
     elapsedSeconds: elapsedTime.value,
     distanceMeters: Math.round(totalDistance.value),
   }).catch(() => {})
+}
+
+// ── SOS ───────────────────────────────────────────────────────────────────────
+
+const fetchContacts = async () => {
+  try {
+    const token = localStorage.getItem('token')
+    const { data } = await axios.get(`${API_URL}/emergency-contacts`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    sosContacts.value = data
+  } catch {}
+}
+
+watch(isTracking, (val) => {
+  if (val && sosContacts.value.length === 0) fetchContacts()
+})
+
+const sendSos = async () => {
+  showSosModal.value = false
+
+  // 1. Beep
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(800, ctx.currentTime)
+    osc.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + 1)
+  } catch {}
+
+  // 2. Build mailto
+  const pos = lastPosition.value
+  const locationText = pos
+    ? `My current location: https://maps.google.com/?q=${pos[1]},${pos[0]}`
+    : 'Location unavailable'
+  const shareText = isSharing.value && shareUrl.value
+    ? `\nLive tracking: ${shareUrl.value}`
+    : ''
+  const body = `EMERGENCY ALERT from Runnit\n\nI need help!\n\n${locationText}${shareText}\n\nSent via Runnit SOS`
+  const subject = 'EMERGENCY: SOS Alert from Runnit'
+
+  const emailAddresses = sosContacts.value.filter(c => c.email).map(c => c.email)
+  if (emailAddresses.length > 0) {
+    const mailto = `mailto:${emailAddresses.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.open(mailto)
+  }
+
+  // 3. Log SOS event (fire-and-forget)
+  const token = localStorage.getItem('token')
+  axios.post(`${API_URL}/sos-events`, {
+    lat: pos?.[1] ?? null,
+    lng: pos?.[0] ?? null,
+    shareUrl: isSharing.value ? shareUrl.value : null,
+  }, { headers: { Authorization: `Bearer ${token}` } }).catch(() => {})
 }
 
 // ── Tracking controls ─────────────────────────────────────────────────────────
@@ -922,4 +1012,56 @@ onUnmounted(() => {
   font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
   z-index: 9999;
 }
+
+/* ── SOS ── */
+.sos-btn {
+  width: 100%; height: 52px;
+  background: #dc2626; color: #fff; border: none;
+  font-family: inherit; font-size: 0.9rem; font-weight: 900;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.15s;
+}
+.sos-btn:hover { background: #b91c1c; }
+
+.sos-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.65);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.sos-modal {
+  background: #fff; width: 100%; max-width: 420px;
+  padding: 24px; display: flex; flex-direction: column; gap: 14px;
+}
+.sos-modal-title {
+  font-size: 1rem; font-weight: 900; color: #dc2626;
+  text-transform: uppercase; letter-spacing: 0.10em;
+}
+.sos-modal-sub { font-size: 0.85rem; color: #767676; margin: 0; }
+.sos-no-contacts {
+  font-size: 0.82rem; color: #767676;
+  background: #fafafa; border: 1px solid #E5E5E5; padding: 12px;
+}
+.sos-contacts-list { display: flex; flex-direction: column; gap: 6px; }
+.sos-contact {
+  display: flex; gap: 10px; align-items: center;
+  padding: 8px 12px; border: 1px solid #E5E5E5; background: #fafafa;
+}
+.sos-contact-name { font-weight: 700; font-size: 0.88rem; color: #000; }
+.sos-contact-email { font-size: 0.78rem; color: #767676; }
+.sos-modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+.sos-cancel-btn {
+  flex: 1; height: 44px; border: 1px solid #E5E5E5; background: #fff;
+  color: #767676; font-family: inherit; font-weight: 700; font-size: 0.82rem;
+  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
+}
+.sos-cancel-btn:hover { background: #f5f5f5; color: #000; }
+.sos-confirm-btn {
+  flex: 2; height: 44px; background: #dc2626; color: #fff; border: none;
+  font-family: inherit; font-weight: 900; font-size: 0.88rem;
+  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.sos-confirm-btn:hover { background: #b91c1c; }
 </style>
