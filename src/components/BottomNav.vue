@@ -92,7 +92,6 @@ const userId = computed(() => user.value?.id)
   line-height: 1;
 }
 
-/* Active state — violet */
 .tab-active {
   color: #0052FF;
 }

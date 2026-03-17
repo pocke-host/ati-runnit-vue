@@ -83,6 +83,18 @@
             </div>
           </div>
 
+          <!-- Password strength meter -->
+          <div v-if="password.length > 0" class="pwd-strength mb-3">
+            <div class="pwd-strength-bars">
+              <div
+                v-for="i in 4" :key="i"
+                class="pwd-bar"
+                :style="{ background: i <= pwdStrength.score ? pwdStrength.color : '#E5E5E5' }"
+              ></div>
+            </div>
+            <span class="pwd-strength-label" :style="{ color: pwdStrength.color }">{{ pwdStrength.label }}</span>
+          </div>
+
           <div class="form-check mb-3">
             <input id="tos" class="form-check-input" type="checkbox" v-model="agree" />
             <label class="form-check-label small" for="tos">
@@ -193,11 +205,27 @@ const loading = ref(false)
 const error = ref('')
 const role = ref('athlete')
 
+// ── Password strength ─────────────────────────────────────────────────────────
+const pwdStrength = computed(() => {
+  const p = password.value
+  if (!p) return { score: 0, label: '', color: '' }
+  let score = 0
+  if (p.length >= 8)  score++
+  if (p.length >= 12) score++
+  if (/[A-Z]/.test(p)) score++
+  if (/[0-9]/.test(p)) score++
+  if (/[^A-Za-z0-9]/.test(p)) score++
+  if (score <= 1) return { score, label: 'Weak',      color: '#DC2626' }
+  if (score === 2) return { score, label: 'Fair',      color: '#C46A2A' }
+  if (score === 3) return { score, label: 'Good',      color: '#0052FF' }
+  return               { score, label: 'Strong',     color: '#16a34a' }
+})
+
 const canSubmit = computed(() =>
-  displayName.value && 
-  email.value && 
-  password.value.length >= 8 && 
-  agree.value && 
+  displayName.value &&
+  email.value &&
+  pwdStrength.value.score >= 2 &&
+  agree.value &&
   !loading.value
 )
 
@@ -466,6 +494,30 @@ const onSocial = (provider) => {
 .role-tile-name { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
 .role-tile-sub { font-size: 11px; color: #9CA3AF; line-height: 1.3; }
 .role-tile--selected .role-tile-sub { color: rgba(255,255,255,0.65); }
+
+/* Password strength */
+.pwd-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pwd-strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+.pwd-bar {
+  flex: 1;
+  height: 4px;
+  transition: background 0.2s;
+}
+.pwd-strength-label {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 44px;
+  text-align: right;
+  transition: color 0.2s;
+}
 
 /* Alert */
 .alert-danger {

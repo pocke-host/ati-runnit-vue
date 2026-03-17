@@ -5,7 +5,8 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">📊 Your Stats</h1>
+        <div class="hero-kicker">RUNNIT // PERFORMANCE</div>
+        <h1 class="hero-title">YOUR STATS</h1>
         <div class="hero-chips">
           <div class="hero-chip">
             <span class="chip-val">{{ formatDistance(careerMeters) }}</span>
@@ -19,15 +20,39 @@
             <span class="chip-val">{{ formatDuration(careerSeconds) }}</span>
             <span class="chip-label">Total Time</span>
           </div>
+          <div class="hero-chip hero-chip-block" :style="{ borderColor: trainingBlock.color }">
+            <span class="chip-val" :style="{ color: trainingBlock.color }">{{ trainingBlock.label }}</span>
+            <span class="chip-label">Training Phase</span>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- JUMP NAV -->
+    <nav class="stats-jumpnav">
+      <div class="jumpnav-inner">
+        <button v-for="s in [
+          { id: 'overview',   label: 'Overview'   },
+          { id: 'block',      label: 'Block'       },
+          { id: 'discipline', label: 'Discipline'  },
+          { id: 'log',        label: 'Log'         },
+          { id: 'insights',   label: 'Insights'    },
+          { id: 'records',    label: 'Records'     },
+          { id: 'milestones', label: 'Milestones'  },
+        ]" :key="s.id"
+          :class="['jumpnav-btn', { active: activeSection === s.id }]"
+          @click="jumpTo(s.id)"
+        >{{ s.label }}</button>
+      </div>
+    </nav>
+
     <div class="stats-content">
 
       <!-- PERFORMANCE INTELLIGENCE -->
-      <section class="section" v-if="performanceMetrics">
-        <h2 class="section-title">Performance Intelligence</h2>
+      <section id="stats-overview" class="section" v-if="performanceMetrics">
+        <div class="section-header">
+          <span class="section-kicker">Performance Intelligence</span>
+        </div>
 
         <!-- 4-metric grid -->
         <div class="perf-grid">
@@ -93,9 +118,72 @@
         </div>
       </section>
 
+      <!-- TRAINING BLOCK -->
+      <section id="stats-block" class="section">
+        <div class="section-header">
+          <span class="section-kicker">Training Block</span>
+        </div>
+        <div class="block-card">
+          <div class="block-card-left">
+            <div class="block-phase-label" :style="{ color: trainingBlock.color }">{{ trainingBlock.label }}</div>
+            <div class="block-phase-desc">{{ trainingBlock.description }}</div>
+            <div class="block-trend" v-if="trainingBlock.trend !== 0">
+              <span :class="trainingBlock.trend > 0 ? 'trend-up' : 'trend-down'">
+                {{ trainingBlock.trend > 0 ? '+' : '' }}{{ trainingBlock.trend }}% vs prior 4 weeks
+              </span>
+            </div>
+          </div>
+          <div class="block-card-right">
+            <div class="block-sparkline-label">8-WEEK VOLUME</div>
+            <div class="block-sparkline">
+              <div
+                v-for="(w, i) in trainingBlock.weeklyKms"
+                :key="i"
+                class="spark-bar"
+                :class="{ 'spark-bar-current': i >= 4 }"
+                :style="{ height: trainingBlock.weeklyKms.some(x => x.km > 0) ? Math.max(4, (w.km / Math.max(...trainingBlock.weeklyKms.map(x => x.km), 1)) * 80) + 'px' : '4px' }"
+                :title="`${w.km} km`"
+              ></div>
+            </div>
+            <div class="block-avg-row">
+              <span class="block-avg-item">Current 4-wk avg: <strong>{{ trainingBlock.current4km }} km</strong></span>
+              <span class="block-avg-item">Prior 4-wk avg: <strong>{{ trainingBlock.prior4km }} km</strong></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DISCIPLINE SCORE -->
+      <section id="stats-discipline" class="section disc-section">
+        <div class="section-header">
+          <span class="section-kicker">Discipline Score</span>
+        </div>
+        <div class="disc-card">
+          <div class="disc-card-left">
+            <div class="disc-big-num" :style="{ color: disciplineData.levelColor }">{{ disciplineData.score }}</div>
+            <div class="disc-big-label" :style="{ color: disciplineData.levelColor }">{{ disciplineData.level }}</div>
+            <div class="disc-big-sub">out of 100</div>
+          </div>
+          <div class="disc-card-right">
+            <div v-for="(item, key) in disciplineData.breakdown" :key="key" class="disc-row">
+              <div class="disc-row-top">
+                <span class="disc-row-label">{{ item.label }}</span>
+                <span class="disc-row-pts">{{ item.score }}<span class="disc-row-max">/{{ item.max }}</span></span>
+              </div>
+              <div class="disc-row-track">
+                <div class="disc-row-fill" :style="{ width: (item.score / item.max * 100) + '%' }"></div>
+              </div>
+              <div class="disc-row-detail">{{ item.detail }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- TRAINING LOG HEATMAP -->
-      <section class="section" v-if="heatmapData.length">
-        <h2 class="section-title">Training Log</h2>
+      <section id="stats-log" class="section" v-if="heatmapData.length">
+        <div class="section-header">
+          <span class="section-kicker">Training Log</span>
+        </div>
         <div class="heatmap-card">
           <div class="heatmap-scroll">
             <!-- Month labels -->
@@ -142,8 +230,10 @@
       </section>
 
       <!-- TRAINING INSIGHTS -->
-      <section class="section" v-if="acwrInfo || weeklyTargetKm">
-        <h2 class="section-title">Training Insights</h2>
+      <section id="stats-insights" class="section" v-if="acwrInfo || weeklyTargetKm">
+        <div class="section-header">
+          <span class="section-kicker">Training Insights</span>
+        </div>
         <div class="insights-row">
 
           <!-- ACWR Card -->
@@ -208,8 +298,10 @@
       </section>
 
       <!-- PERSONAL RECORDS -->
-      <section class="section">
-        <h2 class="section-title">Personal Records</h2>
+      <section id="stats-records" class="section">
+        <div class="section-header">
+          <span class="section-kicker">Personal Records</span>
+        </div>
         <AppSpinner v-if="prStore.loading" label="Loading records…" />
         <EmptyState
           v-else-if="!prStore.allPRs.some(pr => pr.data)"
@@ -280,8 +372,10 @@
       </section>
 
       <!-- CAREER MILESTONES -->
-      <section class="section">
-        <h2 class="section-title">Career Milestones</h2>
+      <section id="stats-milestones" class="section">
+        <div class="section-header">
+          <span class="section-kicker">Career Milestones</span>
+        </div>
         <div class="milestone-grid">
           <div class="milestone-card">
             <div class="milestone-icon">🗺️</div>
@@ -317,6 +411,8 @@ import { usePRStore } from '@/stores/pr'
 import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
+import { useDisciplineScore } from '@/composables/useDisciplineScore'
+import { useTrainingBlock } from '@/composables/useTrainingBlock'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
@@ -483,6 +579,18 @@ const consistencyLabel = computed(() => {
 })
 
 // ACWR (Acute:Chronic Workload Ratio)
+const disciplineData = computed(() => useDisciplineScore(activities.value))
+const trainingBlock = computed(() => useTrainingBlock(activities.value))
+
+const activeSection = ref('overview')
+const statsEl = ref(null)
+
+const jumpTo = (id) => {
+  activeSection.value = id
+  const el = document.getElementById(`stats-${id}`)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 const acwrScore = computed(() => {
   const m = performanceMetrics.value
   if (!m || m.ctl === 0) return null
@@ -762,28 +870,40 @@ onMounted(async () => {
   margin: 0 auto;
   text-align: center;
 }
+.hero-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
 .hero-title {
-  font-size: 2.6rem;
+  font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 900;
-  margin: 0 0 28px;
-  line-height: 1.1;
+  margin: 0 0 32px;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 .hero-chips {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 .hero-chip {
-  background: rgba(255,255,255,0.14);
-  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
   border-radius: 0;
-  padding: 14px 28px;
+  padding: 16px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 130px;
+  gap: 6px;
+  min-width: 120px;
+}
+.hero-chip-block {
+  border-color: rgba(255,255,255,0.30);
 }
 .chip-val {
   font-size: 1.5rem;
@@ -792,12 +912,130 @@ onMounted(async () => {
   line-height: 1;
 }
 .chip-label {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.70);
+  color: rgba(255,255,255,0.55);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.10em;
 }
+
+/* JUMP NAV */
+.stats-jumpnav {
+  position: sticky;
+  top: var(--nav-h, 64px);
+  z-index: 50;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+}
+.jumpnav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.jumpnav-inner::-webkit-scrollbar { display: none; }
+.jumpnav-btn {
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #767676;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.jumpnav-btn:hover { color: #000; }
+.jumpnav-btn.active { color: #000; border-bottom-color: #000; }
+
+/* SECTION HEADER */
+.section-header {
+  margin-bottom: 20px;
+}
+.section-kicker {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(15,18,16,0.40);
+  display: block;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+/* TRAINING BLOCK */
+.block-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 40px;
+  border: 1px solid #E5E5E5;
+  padding: 28px 32px;
+  background: #fff;
+}
+.block-card-left {
+  border-right: 1px solid #E5E5E5;
+  padding-right: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.block-phase-label {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.block-phase-desc {
+  font-size: 0.82rem;
+  color: #767676;
+  line-height: 1.5;
+}
+.block-trend { margin-top: 4px; }
+.trend-up { font-size: 0.78rem; font-weight: 700; color: #16a34a; }
+.trend-down { font-size: 0.78rem; font-weight: 700; color: #C46A2A; }
+.block-card-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+.block-sparkline-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: rgba(15,18,16,0.35);
+}
+.block-sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 80px;
+}
+.spark-bar {
+  flex: 1;
+  background: #E5E5E5;
+  min-height: 4px;
+  transition: height 0.3s ease;
+}
+.spark-bar-current { background: #000; }
+.block-avg-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.block-avg-item {
+  font-size: 0.75rem;
+  color: #767676;
+}
+.block-avg-item strong { color: #000; font-weight: 800; }
 
 /* CONTENT */
 .stats-content {
@@ -948,6 +1186,82 @@ onMounted(async () => {
 }
 
 /* TRAINING LOG HEATMAP */
+.disc-card {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 32px;
+  border: 1px solid #E5E5E5;
+  padding: 24px;
+  background: #fff;
+}
+.disc-card-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid #E5E5E5;
+  padding-right: 32px;
+}
+.disc-big-num {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.disc-big-label {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.disc-big-sub {
+  font-size: 0.65rem;
+  color: #767676;
+  margin-top: 4px;
+}
+.disc-card-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+}
+.disc-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.disc-row-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #000;
+}
+.disc-row-pts {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #000;
+}
+.disc-row-max {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #767676;
+}
+.disc-row-track {
+  height: 5px;
+  background: #E5E5E5;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+.disc-row-fill {
+  height: 100%;
+  background: #000;
+  transition: width 0.4s ease;
+}
+.disc-row-detail {
+  font-size: 0.67rem;
+  color: #767676;
+}
 .heatmap-card {
   background: white;
   border: 1px solid #E5E5E5;
