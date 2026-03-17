@@ -1,13 +1,11 @@
-<!-- src/views/Races.vue — powered by RunSignup public API (no key required) -->
+<!-- src/views/Races.vue — All US Sports Edition -->
 <!--
-  RunSignup REST API: https://runsignup.com/Rest/races?format=json
-  Public endpoint — no auth needed for race discovery.
-  Calls RunSignup directly from the browser; falls back to backend proxy
-  at GET /api/events if CORS blocks the direct call.
-
-  Sport detection is done client-side by matching keywords in the race name/description
-  because RunSignup's event_type values ("running_race", "nonprofit_event", etc.) don't
-  map cleanly to our UI sports. We filter for running & triathlon keyword sets.
+  Data sources (parallel fetch):
+    1. RunSignup REST API: https://runsignup.com/Rest/races?format=json (no auth)
+    2. FindARace backend proxy: GET /api/events/findarace
+    3. BikeReg backend proxy:   GET /api/events/bikereg
+  Sport detection is client-side keyword matching against race name/description.
+  Filtering is entirely client-side — no re-fetch on filter changes.
 -->
 <template>
   <main class="events-page">
@@ -16,26 +14,23 @@
       <div class="container-xxl d-flex align-items-center justify-content-between gap-4">
         <div class="hero-copy">
           <p class="eyebrow mb-2">Event Calendar</p>
-          <h1 class="display-5 fw-bold mb-2">Find your next<br>start line.</h1>
+          <h1 class="display-5 fw-bold mb-2">Every sport.<br>Every start line.</h1>
           <p class="lead mb-0">
-            Running races and triathlons — filter by distance, location, and date.
+            Running, cycling, trail, triathlon, OCR, open water, nordic — every race in America.
           </p>
         </div>
         <div class="hero-art d-none d-lg-block" aria-hidden="true">
           <div class="hero-panel">
-            <div class="panel-kicker">UPCOMING EVENTS</div>
-            <div class="panel-row">
+            <div class="panel-kicker">ALL US EVENTS · LIVE DATA</div>
+            <div class="panel-row flex-wrap">
               <span class="panel-pill">🏃 Running</span>
+              <span class="panel-pill">🚴 Cycling</span>
+              <span class="panel-pill">🏔️ Trail</span>
               <span class="panel-pill">🏊 Triathlon</span>
+              <span class="panel-pill">🪖 OCR</span>
+              <span class="panel-pill">🌊 Open Water</span>
             </div>
-            <div class="panel-chips">
-              <span class="panel-chip">5K</span>
-              <span class="panel-chip">Half Marathon</span>
-              <span class="panel-chip">Marathon</span>
-              <span class="panel-chip">70.3</span>
-              <span class="panel-chip">Ironman</span>
-            </div>
-            <div class="panel-sub">Live data · RunSignup + FindARace</div>
+            <div class="panel-sub">RunSignup · FindARace · BikeReg</div>
           </div>
         </div>
       </div>
@@ -69,6 +64,11 @@
           </div>
 
           <input v-model.trim="zipcode" class="filter-input filter-input--sm" placeholder="ZIP code" maxlength="10" />
+
+          <select v-model="stateFilter" class="filter-select">
+            <option value="">Any state</option>
+            <option v-for="st in US_STATES" :key="st.abbr" :value="st.abbr">{{ st.abbr }} — {{ st.name }}</option>
+          </select>
 
           <select v-model="month" class="filter-select">
             <option value="">Any month</option>
@@ -202,8 +202,8 @@
             </div>
           </div>
 
-          <!-- PACING CALCULATOR -->
-          <div class="rd-section">
+          <!-- PACING CALCULATOR — shown for run/trail/tri/duathlon -->
+          <div v-if="showPaceCalc" class="rd-section">
             <div class="rd-section-label">Pacing Calculator</div>
             <div class="rd-pace-inputs">
               <select v-model="paceDistance" class="rd-select">
@@ -241,8 +241,8 @@
             </div>
           </div>
 
-          <!-- TRAINING PLAN -->
-          <div class="rd-section">
+          <!-- TRAINING PLAN — running/trail/tri only -->
+          <div v-if="showPaceCalc" class="rd-section">
             <div class="rd-section-label">Training Plan</div>
             <p class="rd-section-sub">Generate a Sunday long-run schedule building to race day.</p>
             <div v-if="planError" class="rd-plan-error">{{ planError }}</div>
@@ -283,11 +283,9 @@ import EmptyState from '@/components/EmptyState.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
-/* ─── Bookmarks ─────────────────────────────────────────── */
-// bookmarkedIds: Set of externalRaceId strings
-// bookmarkIdMap: externalRaceId → bookmark DB id (for deletion)
-const bookmarkedIds  = ref(new Set())
-const bookmarkIdMap  = ref({}) // externalRaceId → { bookmarkId }
+/* ─── Bookmarks ───────────────────────────────────────────── */
+const bookmarkedIds = ref(new Set())
+const bookmarkIdMap = ref({})
 
 const loadBookmarks = async () => {
   try {
@@ -308,17 +306,14 @@ const loadBookmarks = async () => {
 const toggleBookmark = async (event) => {
   const extId = String(event.id)
   if (bookmarkedIds.value.has(extId)) {
-    // Remove bookmark
     const bmId = bookmarkIdMap.value[extId]
     bookmarkedIds.value = new Set([...bookmarkedIds.value].filter(x => x !== extId))
     try {
       await axios.delete(`${API_URL}/race-bookmarks/${bmId}`)
     } catch {
-      // Revert on failure
       bookmarkedIds.value.add(extId)
     }
   } else {
-    // Add bookmark (optimistic)
     bookmarkedIds.value = new Set([...bookmarkedIds.value, extId])
     try {
       const dateStr = event.date
@@ -337,37 +332,75 @@ const toggleBookmark = async (event) => {
       })
       bookmarkIdMap.value = { ...bookmarkIdMap.value, [extId]: data.id }
     } catch {
-      // Revert on failure
       bookmarkedIds.value = new Set([...bookmarkedIds.value].filter(x => x !== extId))
     }
   }
 }
-const RUNSIGNUP_BASE = 'https://runsignup.com/Rest/races'
 
-/* ─── Sport types (running + triathlon) ─────────────── */
+/* ─── Sport types (10 sports) ─────────────────────────────── */
 const sportTypes = [
-  { value: 'all',       emoji: '🏅', label: 'All Events' },
-  { value: 'running',   emoji: '🏃', label: 'Running' },
-  { value: 'triathlon', emoji: '🏊', label: 'Triathlon' },
+  { value: 'all',       emoji: '🏅', label: 'All Events'  },
+  { value: 'running',   emoji: '🏃', label: 'Running'     },
+  { value: 'trail',     emoji: '🏔️', label: 'Trail'       },
+  { value: 'cycling',   emoji: '🚴', label: 'Cycling'     },
+  { value: 'gravel',    emoji: '🪨', label: 'Gravel/MTB'  },
+  { value: 'triathlon', emoji: '🏊', label: 'Triathlon'   },
+  { value: 'duathlon',  emoji: '🔁', label: 'Duathlon'    },
+  { value: 'openwater', emoji: '🌊', label: 'Open Water'  },
+  { value: 'ocr',       emoji: '🪖', label: 'OCR'         },
+  { value: 'nordic',    emoji: '⛷️', label: 'Nordic/Ski'  },
 ]
 
-const sportEmojiMap = { running: '🏃', triathlon: '🏊' }
-const sportLabelMap = { running: 'Running', triathlon: 'Triathlon' }
+const sportEmojiMap = {
+  running:   '🏃',
+  trail:     '🏔️',
+  cycling:   '🚴',
+  gravel:    '🪨',
+  triathlon: '🏊',
+  duathlon:  '🔁',
+  openwater: '🌊',
+  ocr:       '🪖',
+  nordic:    '⛷️',
+}
 
-/* ─── Distance chips per sport ───────────────────────── */
-const runningChips   = ['5K', '10K', 'Half Marathon', 'Marathon', 'Ultra', 'Trail']
-const triathlonChips = ['Sprint', 'Olympic', '70.3', 'Ironman']
+const sportLabelMap = {
+  running:   'Running',
+  trail:     'Trail',
+  cycling:   'Cycling',
+  gravel:    'Gravel/MTB',
+  triathlon: 'Triathlon',
+  duathlon:  'Duathlon',
+  openwater: 'Open Water',
+  ocr:       'OCR',
+  nordic:    'Nordic/Ski',
+}
+
+/* ─── Distance chips per sport ───────────────────────────── */
+const CHIPS_BY_SPORT = {
+  running:   ['5K', '10K', 'Half Marathon', 'Marathon', 'Ultra', '1-Mile'],
+  trail:     ['5K', '10K', '25K', '50K', '100K', '100mi'],
+  cycling:   ['Metric Century', 'Century', 'Gran Fondo', 'Criterium', '25mi', '50mi'],
+  gravel:    ['25mi', '50mi', '100mi', '200mi', 'Enduro', 'XC'],
+  triathlon: ['Sprint', 'Olympic', '70.3', 'Ironman'],
+  duathlon:  ['Sprint', 'Standard', 'Long Course'],
+  openwater: ['1K', '2.5K', '5K', '10K'],
+  ocr:       ['3mi', '5mi', '13mi', '24hr'],
+  nordic:    ['5K', '10K', '25K', '50K'],
+}
+
+const ALL_CHIPS = ['5K', 'Half Marathon', 'Marathon', 'Century', 'Triathlon', '70.3', 'Trail', 'OCR']
 
 const activeChips = computed(() => {
-  if (selectedSport.value === 'running')   return runningChips
-  if (selectedSport.value === 'triathlon') return triathlonChips
-  return [...runningChips, ...triathlonChips]
+  const s = selectedSport.value
+  if (s !== 'all' && CHIPS_BY_SPORT[s]) return CHIPS_BY_SPORT[s]
+  return ALL_CHIPS
 })
 
-/* ─── Filter state ───────────────────────────────────── */
+/* ─── Filter state ───────────────────────────────────────── */
 const selectedSport = ref('all')
 const q             = ref('')
 const zipcode       = ref('')
+const stateFilter   = ref('')
 const month         = ref('')
 const sort          = ref('soon')
 const chipActive    = ref('')
@@ -382,28 +415,68 @@ const months = [
   { value: '11', label: 'November' }, { value: '12', label: 'December' },
 ]
 
-/* ─── API state ──────────────────────────────────────── */
-const loading      = ref(false)
-const apiError     = ref('')
-const events       = ref([])
+const US_STATES = [
+  { abbr: 'AL', name: 'Alabama' },      { abbr: 'AK', name: 'Alaska' },
+  { abbr: 'AZ', name: 'Arizona' },      { abbr: 'AR', name: 'Arkansas' },
+  { abbr: 'CA', name: 'California' },   { abbr: 'CO', name: 'Colorado' },
+  { abbr: 'CT', name: 'Connecticut' },  { abbr: 'DE', name: 'Delaware' },
+  { abbr: 'FL', name: 'Florida' },      { abbr: 'GA', name: 'Georgia' },
+  { abbr: 'HI', name: 'Hawaii' },       { abbr: 'ID', name: 'Idaho' },
+  { abbr: 'IL', name: 'Illinois' },     { abbr: 'IN', name: 'Indiana' },
+  { abbr: 'IA', name: 'Iowa' },         { abbr: 'KS', name: 'Kansas' },
+  { abbr: 'KY', name: 'Kentucky' },     { abbr: 'LA', name: 'Louisiana' },
+  { abbr: 'ME', name: 'Maine' },        { abbr: 'MD', name: 'Maryland' },
+  { abbr: 'MA', name: 'Massachusetts' },{ abbr: 'MI', name: 'Michigan' },
+  { abbr: 'MN', name: 'Minnesota' },    { abbr: 'MS', name: 'Mississippi' },
+  { abbr: 'MO', name: 'Missouri' },     { abbr: 'MT', name: 'Montana' },
+  { abbr: 'NE', name: 'Nebraska' },     { abbr: 'NV', name: 'Nevada' },
+  { abbr: 'NH', name: 'New Hampshire' },{ abbr: 'NJ', name: 'New Jersey' },
+  { abbr: 'NM', name: 'New Mexico' },   { abbr: 'NY', name: 'New York' },
+  { abbr: 'NC', name: 'North Carolina' },{ abbr: 'ND', name: 'North Dakota' },
+  { abbr: 'OH', name: 'Ohio' },         { abbr: 'OK', name: 'Oklahoma' },
+  { abbr: 'OR', name: 'Oregon' },       { abbr: 'PA', name: 'Pennsylvania' },
+  { abbr: 'RI', name: 'Rhode Island' }, { abbr: 'SC', name: 'South Carolina' },
+  { abbr: 'SD', name: 'South Dakota' }, { abbr: 'TN', name: 'Tennessee' },
+  { abbr: 'TX', name: 'Texas' },        { abbr: 'UT', name: 'Utah' },
+  { abbr: 'VT', name: 'Vermont' },      { abbr: 'VA', name: 'Virginia' },
+  { abbr: 'WA', name: 'Washington' },   { abbr: 'WV', name: 'West Virginia' },
+  { abbr: 'WI', name: 'Wisconsin' },    { abbr: 'WY', name: 'Wyoming' },
+]
+
+/* ─── API state ──────────────────────────────────────────── */
+const loading       = ref(false)
+const apiError      = ref('')
+const events        = ref([])
 const usingLiveData = ref(false)
 
-/* ─── Sport detection from race name / description ───── */
-// RunSignup's event_type values (running_race, nonprofit_event, etc.) don't map
-// to our UI — detect sport client-side from the race name.
-const TRI_KEYWORDS  = /triath|ironman|70\.3|half.?iron|swim.?bike.?run|duathlon|aquabike/i
-const RUN_KEYWORDS  = /run|race|marathon|5k|10k|ultra|trail|road race|fun run|relay/i
+const RUNSIGNUP_BASE = 'https://runsignup.com/Rest/races'
+
+/* ─── Keyword patterns for sport detection ───────────────── */
+const OCR_KEYWORDS       = /spartan|tough.?mudder|warrior.?dash|mud.?run|obstacle.?course|battlefrog|rugged.?maniac|savage.?race|goruck|bonefrog/i
+const NORDIC_KEYWORDS    = /\bnordic\b|snowshoe.?race|ski.?marathon|cross.?country.?ski|skate.?ski|birkebeiner|loppet|vasaloppet/i
+const OPENWATER_KEYWORDS = /open.?water\s*swim|lake\s*swim|ocean\s*swim|river\s*swim|bay\s*swim|\bows\b/i
+const DUATHLON_KEYWORDS  = /\bduathlon\b|run[\s-]bike[\s-]run|powerman/i
+const TRI_KEYWORDS       = /triath|ironman|70\.3|half.?iron|swim.?bike.?run|aquabike/i
+const GRAVEL_KEYWORDS    = /gravel\s*ride|gravel\s*race|dirty\s*kanza|unbound\s*gravel|mountain\s*bike\s*race|\bxco\b|enduro\s*race|cyclocross|fat\s*bike/i
+const CYCLING_KEYWORDS   = /\bcriterium\b|\bcrit\b|gran\s*fondo|century\s*ride|bike\s*century|tour\s*de\b|velodrome|road\s*race.*bike/i
+const TRAIL_KEYWORDS     = /trail\s*run|mountain\s*run|skyrace|sky\s*race|single\s*track\s*run/i
+const RUN_KEYWORDS       = /run|race|marathon|5k|10k|ultra|road\s*race|fun\s*run|relay/i
 
 const detectSport = (r) => {
-  const text = `${r.name || ''} ${r.description || ''}`.toLowerCase()
-  if (TRI_KEYWORDS.test(text)) return 'triathlon'
-  if (RUN_KEYWORDS.test(text)) return 'running'
-  return 'running' // default — RunSignup is primarily a running platform
+  const text = `${r.name || ''} ${r.description || ''}`
+  if (OCR_KEYWORDS.test(text))       return 'ocr'
+  if (NORDIC_KEYWORDS.test(text))    return 'nordic'
+  if (OPENWATER_KEYWORDS.test(text)) return 'openwater'
+  if (DUATHLON_KEYWORDS.test(text))  return 'duathlon'
+  if (TRI_KEYWORDS.test(text))       return 'triathlon'
+  if (GRAVEL_KEYWORDS.test(text))    return 'gravel'
+  if (CYCLING_KEYWORDS.test(text))   return 'cycling'
+  if (TRAIL_KEYWORDS.test(text))     return 'trail'
+  if (RUN_KEYWORDS.test(text))       return 'running'
+  return 'running'
 }
 
-/* ─── Distance extraction from race name ─────────────── */
-// RunSignup doesn't always return an `events` sub-array in the basic races endpoint;
-// extract distance labels from the race name instead.
+/* ─── Distance extraction from race name ─────────────────── */
 const extractDistances = (r) => {
   const name = (r.name || '').toLowerCase()
   const found = []
@@ -414,15 +487,30 @@ const extractDistances = (r) => {
   if (/olympic/i.test(name) && TRI_KEYWORDS.test(name)) found.push('Olympic')
   if (/sprint/i.test(name) && TRI_KEYWORDS.test(name)) found.push('Sprint')
 
+  // Cycling distances
+  if (/century/i.test(name) && !/metric/i.test(name)) found.push('Century')
+  if (/metric.?century/i.test(name)) found.push('Metric Century')
+  if (/gran.?fondo/i.test(name)) found.push('Gran Fondo')
+  if (/criterium|\bcrit\b/i.test(name)) found.push('Criterium')
+
+  // OCR distances
+  if (/beast|ultra\s*beast/i.test(name) && OCR_KEYWORDS.test(name)) found.push('13mi')
+  else if (/super/i.test(name) && OCR_KEYWORDS.test(name)) found.push('5mi')
+  else if (/sprint|fire/i.test(name) && OCR_KEYWORDS.test(name)) found.push('3mi')
+
   // Running distances
   if (/\bmarathon\b/i.test(name) && !/half/i.test(name)) found.push('Marathon')
   if (/half.?marathon|half\s*marathon/i.test(name)) found.push('Half Marathon')
   if (/\b10k\b|\b10\s*km\b/i.test(name)) found.push('10K')
   if (/\b5k\b|\b5\s*km\b/i.test(name)) found.push('5K')
+  if (/\b25k\b/i.test(name)) found.push('25K')
+  if (/\b50k\b/i.test(name)) found.push('50K')
+  if (/\b100k\b/i.test(name)) found.push('100K')
+  if (/100.?mi|100\s*mile/i.test(name)) found.push('100mi')
   if (/\bultral?\b/i.test(name)) found.push('Ultra')
-  if (/\btrail\b/i.test(name)) found.push('Trail')
+  if (/\btrail\b/i.test(name) && TRAIL_KEYWORDS.test(name)) found.push('Trail')
 
-  // Sub-events from the events[] array when present
+  // Sub-events from events[] array when present
   if (r.events?.length) {
     for (const e of r.events.slice(0, 3)) {
       const dist = parseFloat(e.distance)
@@ -442,17 +530,16 @@ const extractDistances = (r) => {
     }
   }
 
-  // Deduplicate and cap
   return [...new Set(found)].slice(0, 4)
 }
 
-/* ─── Normalise RunSignup race → our event shape ─────── */
+/* ─── Normalise RunSignup race → our event shape ──────────── */
 const normalizeRace = (race) => {
-  const r = race.race || race
-  const sport     = detectSport(r)
+  const r        = race.race || race
+  const sport    = detectSport(r)
   const distances = extractDistances(r)
-  const city      = r.address?.city  || ''
-  const state     = r.address?.state || ''
+  const city     = r.address?.city  || ''
+  const state    = r.address?.state || ''
 
   return {
     id:          r.race_id || Math.random(),
@@ -473,7 +560,7 @@ const normalizeRace = (race) => {
   }
 }
 
-/* ─── Fetch: RunSignup + FindARace in parallel ─────────── */
+/* ─── Fetch: RunSignup + FindARace + BikeReg in parallel ──── */
 const fetchEvents = async () => {
   loading.value  = true
   apiError.value = ''
@@ -481,60 +568,60 @@ const fetchEvents = async () => {
   const params = new URLSearchParams({
     format:             'json',
     future_events_only: 'T',
-    results_per_page:   '50',
+    results_per_page:   '100',
     page:               '1',
   })
   if (zipcode.value.trim()) params.set('zipcode', zipcode.value.trim())
 
-  let rawRaces = null
-  let farEvents = []
-
-  // Run RunSignup + FindARace in parallel
-  const [rsResult, farResult] = await Promise.allSettled([
-    // RunSignup: try direct first, then proxy
+  const [rsResult, farResult, bikeResult] = await Promise.allSettled([
+    // 1. RunSignup: try direct first, then proxy
     (async () => {
       try {
         const { data } = await axios.get(`${RUNSIGNUP_BASE}?${params}`, { timeout: 8000 })
         return Array.isArray(data) ? data : (data.races || [])
       } catch { /* CORS — try proxy */ }
-      const proxyParams = { page: 1, results_per_page: 50, future_events_only: 'T' }
+      const proxyParams = { page: 1, results_per_page: 100, future_events_only: 'T' }
       if (zipcode.value.trim()) proxyParams.zipcode = zipcode.value.trim()
       const { data } = await axios.get(`${API_URL}/events`, { params: proxyParams, timeout: 8000 })
       return Array.isArray(data) ? data : (data.races || [])
     })(),
-    // FindARace backend proxy
+    // 2. FindARace backend proxy (triathlon-heavy)
     axios.get(`${API_URL}/events/findarace`, { timeout: 15000 }).then(r => r.data),
+    // 3. BikeReg backend proxy (cycling events)
+    axios.get(`${API_URL}/events/bikereg`, { timeout: 10000 }).then(r => r.data),
   ])
 
-  // Process RunSignup results
+  let rawRaces = null
+  let farEvents = []
+  let bikeEvents = []
+
   if (rsResult.status === 'fulfilled' && rsResult.value?.length) {
     rawRaces = rsResult.value
     usingLiveData.value = true
   }
-
-  // Process FindARace results (already normalized)
   if (farResult.status === 'fulfilled' && Array.isArray(farResult.value)) {
     farEvents = farResult.value
     usingLiveData.value = true
   }
+  if (bikeResult.status === 'fulfilled' && Array.isArray(bikeResult.value)) {
+    bikeEvents = bikeResult.value
+    usingLiveData.value = true
+  }
 
-  // If both sources failed, use sample data
-  if (!rawRaces && farEvents.length === 0) {
+  if (!rawRaces && farEvents.length === 0 && bikeEvents.length === 0) {
     events.value    = sampleEvents
     usingLiveData.value = false
     loading.value   = false
     return
   }
 
-  // Normalize RunSignup races
-  const rsNormalized = (rawRaces || [])
-    .map(normalizeRace)
-    .filter(e => e.sport === 'running' || e.sport === 'triathlon')
+  // Normalize RunSignup races — no sport filter, show everything
+  const rsNormalized = (rawRaces || []).map(normalizeRace)
 
-  // Merge: deduplicate by name+date
+  // Merge all sources, deduplicate by name+date
   const seen = new Set()
   const merged = []
-  for (const ev of [...rsNormalized, ...farEvents]) {
+  for (const ev of [...rsNormalized, ...farEvents, ...bikeEvents]) {
     const key = `${ev.name}|${ev.date}`
     if (!seen.has(key)) {
       seen.add(key)
@@ -542,18 +629,30 @@ const fetchEvents = async () => {
     }
   }
 
+  // If live data came back sparse, supplement with sample events
+  if (merged.length < 10) {
+    for (const s of sampleEvents) {
+      const key = `${s.name}|${s.date}`
+      if (!seen.has(key)) { seen.add(key); merged.push(s) }
+    }
+  }
+
   events.value = merged
   loading.value = false
 }
 
-/* ─── Client-side filtering + sorting ───────────────── */
+/* ─── Client-side filtering + sorting ───────────────────── */
 const today = new Date(); today.setHours(0, 0, 0, 0)
 
 const filteredEvents = computed(() => {
-  let r = events.value.filter(e => !e.date || new Date(e.date) >= today)
+  let r = events.value.filter(e => !e.date || parseDate(e.date) >= today)
 
   if (selectedSport.value !== 'all') {
     r = r.filter(e => e.sport === selectedSport.value)
+  }
+
+  if (stateFilter.value) {
+    r = r.filter(e => e.state === stateFilter.value)
   }
 
   if (q.value) {
@@ -566,12 +665,11 @@ const filteredEvents = computed(() => {
   }
 
   if (month.value) {
-    // RunSignup date format: MM/DD/YYYY — also handle ISO YYYY-MM-DD
     r = r.filter(x => {
       const d = x.date
       if (!d) return false
-      if (d.includes('/')) return d.startsWith(month.value + '/')          // MM/DD/YYYY
-      return d.slice(5, 7) === month.value                                  // YYYY-MM-DD
+      if (d.includes('/')) return d.startsWith(month.value + '/')
+      return d.slice(5, 7) === month.value
     })
   }
 
@@ -584,10 +682,7 @@ const filteredEvents = computed(() => {
   }
 
   if (sort.value === 'soon') {
-    r = [...r].sort((a, b) => {
-      const da = parseDate(a.date), db = parseDate(b.date)
-      return da - db
-    })
+    r = [...r].sort((a, b) => parseDate(a.date) - parseDate(b.date))
   } else {
     r = [...r].sort((a, b) => a.name.localeCompare(b.name))
   }
@@ -597,8 +692,7 @@ const filteredEvents = computed(() => {
 
 const pagedEvents = computed(() => filteredEvents.value.slice(0, perPage.value))
 
-/* ─── Helpers ────────────────────────────────────────── */
-// RunSignup returns dates as MM/DD/YYYY — handle both formats
+/* ─── Helpers ────────────────────────────────────────────── */
 const parseDate = (d) => {
   if (!d) return new Date(0)
   if (d.includes('/')) {
@@ -621,94 +715,229 @@ const setActiveSport = (sport) => {
   selectedSport.value = sport
   chipActive.value    = ''
   perPage.value       = 12
-  // No re-fetch needed — filtering is client-side
 }
 
 const resetFilters = () => {
-  q.value = ''; zipcode.value = ''; month.value = ''
-  sort.value = 'soon'; chipActive.value = ''; selectedSport.value = 'all'
-  perPage.value = 12
-}
-
-const sportBgMap = {
-  running:   '#000',
-  triathlon: '#000',
+  q.value = ''; zipcode.value = ''; stateFilter.value = ''
+  month.value = ''; sort.value = 'soon'; chipActive.value = ''
+  selectedSport.value = 'all'; perPage.value = 12
 }
 
 const getCardStyle = (event) => {
   if (event.image) return { backgroundImage: `url(${event.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-  return { background: sportBgMap[event.sport] || sportBgMap.running }
+  return { background: '#111' }
 }
 
-/* ─── Sample / fallback data ─────────────────────────── */
+/* ─── Sample / fallback data — all 10 sport types ────────── */
 const sampleEvents = [
+  // ── RUNNING ──
   {
-    id: 's1', name: 'LA Marathon', date: '2026-03-15', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running',
-    city: 'Los Angeles', state: 'CA',
+    id: 's-run-1', name: 'LA Marathon', date: '2026-03-15', sport: 'running',
+    sportEmoji: '🏃', sportLabel: 'Running', city: 'Los Angeles', state: 'CA',
     distances: ['Marathon', 'Half Marathon'],
     summary: 'Iconic 26.2-mile course through LA neighborhoods — Dodger Stadium to Santa Monica.',
     url: 'https://www.lamarathon.com', registerUrl: 'https://www.lamarathon.com', image: '',
   },
   {
-    id: 's2', name: 'IRONMAN 70.3 Oceanside', date: '2026-03-28', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon',
-    city: 'Oceanside', state: 'CA',
-    distances: ['70.3'],
-    summary: 'Swim, bike, and run along the Southern California coast. A premier half-iron event.',
-    url: 'https://www.ironman.com', registerUrl: 'https://www.ironman.com', image: '',
-  },
-  {
-    id: 's3', name: 'Boston Marathon', date: '2026-04-20', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running',
-    city: 'Boston', state: 'MA',
+    id: 's-run-2', name: 'Boston Marathon', date: '2026-04-20', sport: 'running',
+    sportEmoji: '🏃', sportLabel: 'Running', city: 'Boston', state: 'MA',
     distances: ['Marathon'],
-    summary: "The world's oldest annual marathon. Hopkinton to Boylston Street.",
+    summary: "The world's oldest annual marathon. Hopkinton to Boylston Street — qualification required.",
     url: 'https://www.baa.org', registerUrl: 'https://www.baa.org', image: '',
   },
   {
-    id: 's4', name: 'Escape From Alcatraz Triathlon', date: '2026-06-07', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon',
-    city: 'San Francisco', state: 'CA',
-    distances: ['Olympic'],
-    summary: 'Swim from the island, bike the Marin Headlands, run the coastal trails.',
-    url: 'https://www.escapealcatraztri.com', registerUrl: 'https://www.escapealcatraztri.com', image: '',
-  },
-  {
-    id: 's5', name: 'Big Sur International Marathon', date: '2026-04-26', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running',
-    city: 'Big Sur', state: 'CA',
+    id: 's-run-3', name: 'Big Sur International Marathon', date: '2026-04-26', sport: 'running',
+    sportEmoji: '🏃', sportLabel: 'Running', city: 'Big Sur', state: 'CA',
     distances: ['Marathon', '21 mi', '10.6 mi', '5K'],
     summary: 'Point-to-point along Highway 1 — the most scenic marathon in America.',
     url: 'https://www.bsim.org', registerUrl: 'https://www.bsim.org', image: '',
   },
   {
-    id: 's6', name: 'Ironman Coeur d\'Alene', date: '2026-06-28', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon',
-    city: 'Coeur d\'Alene', state: 'ID',
-    distances: ['Ironman'],
-    summary: '2.4-mile swim, 112-mile bike, 26.2-mile run through Idaho\'s panhandle.',
-    url: 'https://www.ironman.com', registerUrl: 'https://www.ironman.com', image: '',
+    id: 's-run-4', name: 'Chicago Marathon', date: '2026-10-11', sport: 'running',
+    sportEmoji: '🏃', sportLabel: 'Running', city: 'Chicago', state: 'IL',
+    distances: ['Marathon'],
+    summary: 'World Marathon Major through 29 neighborhoods of Chicago. Flat, fast, legendary.',
+    url: 'https://www.chicagomarathon.com', registerUrl: 'https://www.chicagomarathon.com', image: '',
   },
   {
-    id: 's7', name: 'Run Wild Missoula Half Marathon', date: '2026-07-04', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running',
-    city: 'Missoula', state: 'MT',
+    id: 's-run-5', name: 'NYC Marathon', date: '2026-11-01', sport: 'running',
+    sportEmoji: '🏃', sportLabel: 'Running', city: 'New York', state: 'NY',
+    distances: ['Marathon'],
+    summary: 'The world\'s largest marathon — 26.2 miles through all five boroughs of New York City.',
+    url: 'https://www.nyrr.org/tcsnycmarathon', registerUrl: 'https://www.nyrr.org/tcsnycmarathon', image: '',
+  },
+  {
+    id: 's-run-6', name: 'Run Wild Missoula Half Marathon', date: '2026-07-04', sport: 'running',
+    sportEmoji: '🏃', sportLabel: 'Running', city: 'Missoula', state: 'MT',
     distances: ['Half Marathon', '10K', '5K'],
-    summary: 'Beloved summer race through the streets of downtown Missoula.',
+    summary: 'Beloved summer race through the streets of downtown Missoula. All distances welcome.',
+    url: '#', registerUrl: '#', image: '',
+  },
+  // ── TRAIL ──
+  {
+    id: 's-trail-1', name: 'Western States 100', date: '2026-06-27', sport: 'trail',
+    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Squaw Valley', state: 'CA',
+    distances: ['100mi'],
+    summary: 'The most storied 100-mile trail run in the world. Squaw Valley to Auburn through the Sierra Nevada.',
+    url: 'https://www.wser.org', registerUrl: 'https://www.wser.org', image: '',
+  },
+  {
+    id: 's-trail-2', name: 'Leadville Trail 100', date: '2026-08-15', sport: 'trail',
+    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Leadville', state: 'CO',
+    distances: ['100mi', '50mi'],
+    summary: 'Run through the clouds. 100 miles at altitude — the "Race Across the Sky."',
+    url: 'https://www.leadvilleraceseries.com', registerUrl: 'https://www.leadvilleraceseries.com', image: '',
+  },
+  {
+    id: 's-trail-3', name: 'Hardrock 100', date: '2026-07-11', sport: 'trail',
+    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Silverton', state: 'CO',
+    distances: ['100mi'],
+    summary: '100-mile loop through the San Juan Mountains with over 33,000 ft of gain. Lottery entry.',
+    url: 'https://www.hardrock100.com', registerUrl: 'https://www.hardrock100.com', image: '',
+  },
+  {
+    id: 's-trail-4', name: 'Sean O\'Brien 100K', date: '2026-02-01', sport: 'trail',
+    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Malibu', state: 'CA',
+    distances: ['100K', '50K', '50mi'],
+    summary: 'A premier WSER-qualifier through the hills above Malibu. Multi-distance options available.',
+    url: '#', registerUrl: '#', image: '',
+  },
+  // ── CYCLING ──
+  {
+    id: 's-cyc-1', name: 'Tour of the Battenkill', date: '2026-04-19', sport: 'cycling',
+    sportEmoji: '🚴', sportLabel: 'Cycling', city: 'Cambridge', state: 'NY',
+    distances: ['50mi', '66mi'],
+    summary: 'America\'s Queen of the Classics — rolling roads and gravel through the New York countryside.',
+    url: 'https://www.mybattenkill.com', registerUrl: 'https://www.mybattenkill.com', image: '',
+  },
+  {
+    id: 's-cyc-2', name: 'Red Rocks Gran Fondo', date: '2026-06-06', sport: 'cycling',
+    sportEmoji: '🚴', sportLabel: 'Cycling', city: 'Morrison', state: 'CO',
+    distances: ['Gran Fondo', 'Metric Century', '50mi'],
+    summary: 'Climb through Red Rocks Amphitheatre and the Colorado foothills. Breathtaking views all route.',
     url: '#', registerUrl: '#', image: '',
   },
   {
-    id: 's8', name: 'Alpha Win Napa Valley Triathlon', date: '2026-04-11', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon',
-    city: 'Napa', state: 'CA',
-    distances: ['Olympic', 'Sprint'],
-    summary: 'Multi-distance triathlon through Napa Valley wine country.',
+    id: 's-cyc-3', name: 'Chicago Criterium', date: '2026-07-18', sport: 'cycling',
+    sportEmoji: '🚴', sportLabel: 'Cycling', city: 'Chicago', state: 'IL',
+    distances: ['Criterium'],
+    summary: 'Urban circuit race through downtown Chicago. Cat 1–5 fields, spectator-friendly course.',
+    url: '#', registerUrl: '#', image: '',
+  },
+  // ── GRAVEL / MTB ──
+  {
+    id: 's-grv-1', name: 'Unbound Gravel', date: '2026-06-06', sport: 'gravel',
+    sportEmoji: '🪨', sportLabel: 'Gravel/MTB', city: 'Emporia', state: 'KS',
+    distances: ['200mi', '100mi', '50mi', '25mi'],
+    summary: 'The world\'s premier gravel race. 200 miles of unforgiving Kansas dirt — brutal and iconic.',
+    url: 'https://www.unboundgravel.com', registerUrl: 'https://www.unboundgravel.com', image: '',
+  },
+  {
+    id: 's-grv-2', name: 'Belgian Waffle Ride', date: '2026-04-05', sport: 'gravel',
+    sportEmoji: '🪨', sportLabel: 'Gravel/MTB', city: 'San Marcos', state: 'CA',
+    distances: ['130mi', '71mi', '35mi'],
+    summary: 'Cobbles, climbs, and chaos — California\'s answer to the Classics. Gravel in the hills of Palomar.',
+    url: 'https://www.belgianwaffleride.bike', registerUrl: 'https://www.belgianwaffleride.bike', image: '',
+  },
+  {
+    id: 's-grv-3', name: 'SBT GRVL', date: '2026-08-09', sport: 'gravel',
+    sportEmoji: '🪨', sportLabel: 'Gravel/MTB', city: 'Steamboat Springs', state: 'CO',
+    distances: ['144mi', '60mi', '36mi'],
+    summary: 'Mountain gravel racing through Routt County — stunning Colorado scenery, serious altitude.',
+    url: 'https://www.sbtgrvl.com', registerUrl: 'https://www.sbtgrvl.com', image: '',
+  },
+  // ── TRIATHLON ──
+  {
+    id: 's-tri-1', name: 'IRONMAN 70.3 Oceanside', date: '2026-03-28', sport: 'triathlon',
+    sportEmoji: '🏊', sportLabel: 'Triathlon', city: 'Oceanside', state: 'CA',
+    distances: ['70.3'],
+    summary: 'Swim, bike, and run along the Southern California coast. One of the most popular 70.3s in the US.',
+    url: 'https://www.ironman.com', registerUrl: 'https://www.ironman.com', image: '',
+  },
+  {
+    id: 's-tri-2', name: 'Escape From Alcatraz Triathlon', date: '2026-06-07', sport: 'triathlon',
+    sportEmoji: '🏊', sportLabel: 'Triathlon', city: 'San Francisco', state: 'CA',
+    distances: ['Olympic'],
+    summary: 'Swim from the island, bike the Marin Headlands, run the coastal trails. A true bucket-list race.',
+    url: 'https://www.escapealcatraztri.com', registerUrl: 'https://www.escapealcatraztri.com', image: '',
+  },
+  {
+    id: 's-tri-3', name: 'IRONMAN Coeur d\'Alene', date: '2026-06-28', sport: 'triathlon',
+    sportEmoji: '🏊', sportLabel: 'Triathlon', city: 'Coeur d\'Alene', state: 'ID',
+    distances: ['Ironman'],
+    summary: '2.4-mile swim, 112-mile bike, 26.2-mile run through Idaho\'s panhandle. Full-distance glory.',
+    url: 'https://www.ironman.com', registerUrl: 'https://www.ironman.com', image: '',
+  },
+  // ── DUATHLON ──
+  {
+    id: 's-du-1', name: 'USAT Duathlon Nationals', date: '2026-09-12', sport: 'duathlon',
+    sportEmoji: '🔁', sportLabel: 'Duathlon', city: 'Tucson', state: 'AZ',
+    distances: ['Sprint', 'Standard'],
+    summary: 'Run-bike-run on fast desert roads. USAT Age Group National Championship — qualifier required.',
+    url: 'https://www.usatriathlon.org', registerUrl: 'https://www.usatriathlon.org', image: '',
+  },
+  {
+    id: 's-du-2', name: 'Powerman Alabama', date: '2026-04-18', sport: 'duathlon',
+    sportEmoji: '🔁', sportLabel: 'Duathlon', city: 'Auburn', state: 'AL',
+    distances: ['Long Course', 'Standard', 'Sprint'],
+    summary: 'Run-bike-run through the rolling hills of Auburn. Part of the Powerman World Series.',
+    url: '#', registerUrl: '#', image: '',
+  },
+  // ── OPEN WATER ──
+  {
+    id: 's-ow-1', name: 'Great Chesapeake Bay Swim', date: '2026-06-13', sport: 'openwater',
+    sportEmoji: '🌊', sportLabel: 'Open Water', city: 'Annapolis', state: 'MD',
+    distances: ['4.4mi'],
+    summary: 'Cross the Chesapeake Bay from Sandy Point to Kent Island — 4.4 miles of open water.',
+    url: '#', registerUrl: '#', image: '',
+  },
+  {
+    id: 's-ow-2', name: 'Horsetooth Open Water Swim', date: '2026-08-08', sport: 'openwater',
+    sportEmoji: '🌊', sportLabel: 'Open Water', city: 'Fort Collins', state: 'CO',
+    distances: ['10K', '5K', '2.5K', '1K'],
+    summary: 'Mountain reservoir racing in Colorado. Multiple distances from 1K to the 10K championship.',
+    url: '#', registerUrl: '#', image: '',
+  },
+  // ── OCR ──
+  {
+    id: 's-ocr-1', name: 'Spartan Race World Championship', date: '2026-10-03', sport: 'ocr',
+    sportEmoji: '🪖', sportLabel: 'OCR', city: 'Lake Tahoe', state: 'CA',
+    distances: ['13mi', '5mi'],
+    summary: 'Elite and age group athletes converge on Tahoe for the ultimate Spartan showdown.',
+    url: 'https://www.spartan.com', registerUrl: 'https://www.spartan.com', image: '',
+  },
+  {
+    id: 's-ocr-2', name: 'Tough Mudder Chicago', date: '2026-05-16', sport: 'ocr',
+    sportEmoji: '🪖', sportLabel: 'OCR', city: 'Joliet', state: 'IL',
+    distances: ['5mi', '3mi'],
+    summary: 'Team-oriented mud and obstacles through the Illinois countryside. All fitness levels welcome.',
+    url: 'https://www.toughmudder.com', registerUrl: 'https://www.toughmudder.com', image: '',
+  },
+  {
+    id: 's-ocr-3', name: 'Savage Race Southeast', date: '2026-04-04', sport: 'ocr',
+    sportEmoji: '🪖', sportLabel: 'OCR', city: 'Plant City', state: 'FL',
+    distances: ['5mi'],
+    summary: 'Savage Race packs more obstacles per mile than any other OCR. Challenging and creative course design.',
+    url: 'https://www.savagerace.com', registerUrl: 'https://www.savagerace.com', image: '',
+  },
+  // ── NORDIC / SKI ──
+  {
+    id: 's-nor-1', name: 'American Birkebeiner', date: '2026-02-21', sport: 'nordic',
+    sportEmoji: '⛷️', sportLabel: 'Nordic/Ski', city: 'Hayward', state: 'WI',
+    distances: ['50K', '25K', '10K', '5K'],
+    summary: 'North America\'s largest cross-country ski marathon — the "Birkie." 55 km through the Northwoods.',
+    url: 'https://www.birkie.com', registerUrl: 'https://www.birkie.com', image: '',
+  },
+  {
+    id: 's-nor-2', name: 'Craftsbury Marathon', date: '2026-01-17', sport: 'nordic',
+    sportEmoji: '⛷️', sportLabel: 'Nordic/Ski', city: 'Craftsbury Common', state: 'VT',
+    distances: ['50K', '25K', '10K'],
+    summary: 'Classic New England nordic skiing through Vermont\'s Northeast Kingdom. Groomed trails, stunning scenery.',
     url: '#', registerUrl: '#', image: '',
   },
 ]
 
-/* ─── Race Detail Drawer ─────────────────────────────── */
+/* ─── Race Detail Drawer ──────────────────────────────────── */
 const drawerRace     = ref(null)
 const goalTimeInput  = ref('')
 const paceDistance   = ref('Marathon')
@@ -717,9 +946,17 @@ const planGenerating = ref(false)
 const planGenerated  = ref(false)
 const planError      = ref('')
 
+// Show pace calc and training plan for run/trail/tri/duathlon only
+const PACE_CALC_SPORTS = new Set(['running', 'trail', 'triathlon', 'duathlon'])
+const showPaceCalc = computed(() =>
+  drawerRace.value && PACE_CALC_SPORTS.has(drawerRace.value.sport)
+)
+
 const DISTANCE_MILES = {
-  '5K': 3.1, '10K': 6.2, 'Half Marathon': 13.1, 'Marathon': 26.2,
-  'Sprint': 16, 'Olympic': 32, '70.3': 56, 'Ironman': 112,
+  '5K': 3.1, '10K': 6.2, '25K': 15.5, '50K': 31.1, '100K': 62.1, '100mi': 100,
+  'Half Marathon': 13.1, 'Marathon': 26.2, 'Ultra': 50,
+  'Sprint': 16.2, 'Olympic': 32.1, '70.3': 70.3, 'Ironman': 140.6,
+  'Standard Duathlon': 18.5, 'Metric Century': 62.1, 'Century': 100,
 }
 
 const openRaceDrawer = (event) => {
@@ -727,12 +964,11 @@ const openRaceDrawer = (event) => {
   goalTimeInput.value  = ''
   splits.value         = []
   planError.value      = ''
-  // restore localStorage plan flag
   planGenerated.value  = !!localStorage.getItem(`plan_gen_${event.id}`)
-  // pre-select distance from event's first distance
   if (event.distances?.length) {
     const first = event.distances[0]
     if (DISTANCE_MILES[first]) paceDistance.value = first
+    else paceDistance.value = 'Marathon'
   }
 }
 
@@ -772,9 +1008,9 @@ const calcSplits = () => {
   splits.value = rows
 }
 
-/* ─── Calendar helpers (mirrors Calendar.vue) ──────── */
+/* ─── Calendar helpers ────────────────────────────────────── */
 const googleCalUrl = (event) => {
-  const d = parseDate(event.date)
+  const d   = parseDate(event.date)
   const fmt = (dt) => dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
   const start = fmt(d)
   const end   = fmt(new Date(d.getTime() + 86400000))
@@ -782,15 +1018,14 @@ const googleCalUrl = (event) => {
 }
 
 const downloadIcs = (event) => {
-  const d = parseDate(event.date)
+  const d   = parseDate(event.date)
   const fmt = (dt) => dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '').slice(0, 15) + 'Z'
   const start = fmt(d)
   const end   = fmt(new Date(d.getTime() + 86400000))
   const ics = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Runnit//EN',
     'BEGIN:VEVENT',
-    `DTSTART:${start}`,
-    `DTEND:${end}`,
+    `DTSTART:${start}`, `DTEND:${end}`,
     `SUMMARY:${event.name}`,
     `DESCRIPTION:${(event.summary || '').replace(/\n/g, '\\n')}`,
     `LOCATION:${(event.city || '')}${event.state ? ', ' + event.state : ''}`,
@@ -803,18 +1038,17 @@ const downloadIcs = (event) => {
   a.click()
 }
 
-/* ─── Training plan generator ────────────────────────── */
+/* ─── Training plan generator ─────────────────────────────── */
 const generatePlan = async (event) => {
   if (planGenerated.value) return
   planError.value    = ''
   planGenerating.value = true
 
   const raceDate = parseDate(event.date)
-  const today    = new Date(); today.setHours(0, 0, 0, 0)
+  const now      = new Date(); now.setHours(0, 0, 0, 0)
 
-  // Collect Sundays from next Sunday through race date
   const sundays = []
-  const cur = new Date(today)
+  const cur = new Date(now)
   cur.setDate(cur.getDate() + ((7 - cur.getDay()) % 7 || 7))
   while (cur <= raceDate) {
     sundays.push(new Date(cur))
@@ -827,32 +1061,21 @@ const generatePlan = async (event) => {
     return
   }
 
-  // Pick race distance in miles for the plan
-  const raceMiles = (() => {
-    const d = event.distances?.[0]
-    return DISTANCE_MILES[d] || 13.1
-  })()
-  const peakMiles = raceMiles * 0.85
-  const total = sundays.length
-
-  // Build linear ramp + 2-week taper
-  const token = localStorage.getItem('token')
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-  const isoDate = (d) => d.toISOString().slice(0, 10)
+  const raceMiles  = DISTANCE_MILES[event.distances?.[0]] || 13.1
+  const peakMiles  = raceMiles * 0.85
+  const total      = sundays.length
+  const token      = localStorage.getItem('token')
+  const headers    = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  const isoDate    = (d) => d.toISOString().slice(0, 10)
 
   try {
     for (let i = 0; i < total; i++) {
       let miles
       const weeksOut = total - 1 - i
-      if (weeksOut === 0) {
-        miles = raceMiles * 0.30   // race week
-      } else if (weeksOut === 1) {
-        miles = peakMiles * 0.60   // taper
-      } else if (weeksOut === 2) {
-        miles = peakMiles * 0.75
-      } else {
-        miles = peakMiles * ((i + 1) / (total - 2))
-      }
+      if (weeksOut === 0)      miles = raceMiles * 0.30
+      else if (weeksOut === 1) miles = peakMiles * 0.60
+      else if (weeksOut === 2) miles = peakMiles * 0.75
+      else                     miles = peakMiles * ((i + 1) / (total - 2))
       miles = Math.max(3, Math.round(miles * 10) / 10)
 
       await axios.post(`${API_URL}/workout-events`, {
@@ -866,7 +1089,7 @@ const generatePlan = async (event) => {
     }
     planGenerated.value = true
     localStorage.setItem(`plan_gen_${event.id}`, '1')
-  } catch (e) {
+  } catch {
     planError.value = 'Failed to generate plan. Please try again.'
   } finally {
     planGenerating.value = false
@@ -938,19 +1161,11 @@ watch(zipcode, () => {
   border: 1px solid rgba(255,255,255,0.12);
   color: rgba(255,255,255,0.80);
   font-weight: 700;
-  font-size: 0.76rem;
-}
-.panel-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.panel-chip {
-  padding: 3px 8px;
-  border: 1px solid rgba(139,43,226,0.40);
-  color: rgba(139,43,226,0.90);
-  font-size: 0.70rem;
-  font-weight: 700;
+  font-size: 0.72rem;
 }
 .panel-sub { color: rgba(255,255,255,0.40); font-size: 0.72rem; font-weight: 600; }
 
-/* SPORT TABS */
+/* SPORT TABS — scrollable for 10 tabs */
 .sport-tabs-wrap {
   background: #fff;
   border-bottom: 1px solid #E5E5E5;
@@ -963,12 +1178,15 @@ watch(zipcode, () => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.sport-tabs::-webkit-scrollbar { display: none; }
 .sport-tab {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 14px 24px;
+  padding: 14px 20px;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -980,6 +1198,7 @@ watch(zipcode, () => {
   white-space: nowrap;
   transition: color 0.15s, border-color 0.15s;
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 .sport-tab:hover { color: rgba(15,18,16,0.80); }
 .sport-tab.active { color: #000; border-bottom-color: #000; }
@@ -1025,7 +1244,7 @@ watch(zipcode, () => {
   transition: border-color 0.15s;
 }
 .filter-input:focus { border-color: #000; }
-.filter-input--sm { flex: 0 0 140px; padding-left: 12px; }
+.filter-input--sm { flex: 0 0 120px; padding-left: 12px; }
 .filter-select {
   height: 40px;
   border: 1px solid #E5E5E5;
@@ -1076,11 +1295,7 @@ watch(zipcode, () => {
   letter-spacing: 0.04em;
 }
 .chip-btn:hover { border-color: #000; color: #000; }
-.chip-btn.active {
-  border-color: #000;
-  color: #fff;
-  background: #000;
-}
+.chip-btn.active { border-color: #000; color: #fff; background: #000; }
 
 /* RESULTS */
 .results { padding: 24px 0 80px; }
@@ -1132,14 +1347,10 @@ watch(zipcode, () => {
   flex-direction: column;
 }
 
-.event-card:hover {
-  transform: none;
-}
-
 .event-img {
   position: relative;
   height: 140px;
-  background: #1a1a1a;
+  background: #111;
   flex-shrink: 0;
 }
 
@@ -1288,7 +1499,7 @@ watch(zipcode, () => {
   align-items: center;
   transition: background 0.15s;
 }
-.btn-register:hover { background: #003ECC; }
+.btn-register:hover { background: #222; }
 
 /* Error */
 .events-error {
@@ -1333,10 +1544,10 @@ watch(zipcode, () => {
 @media (max-width: 768px) {
   .hero { padding: 28px 0; }
   .filter-row { gap: 8px; }
-  .filter-input--sm { flex: 1 1 120px; }
+  .filter-input--sm { flex: 1 1 100px; }
   .events-grid { grid-template-columns: 1fr; }
   .sport-tabs { padding: 0 12px; }
-  .sport-tab { padding: 12px 16px; font-size: 0.78rem; }
+  .sport-tab { padding: 12px 14px; font-size: 0.76rem; }
 }
 
 /* ── Race Detail Drawer ── */
@@ -1408,7 +1619,8 @@ watch(zipcode, () => {
   color: #000; outline: none; background: #fff;
   transition: border-color 0.15s;
 }
-.rd-select { flex: 0 0 160px; appearance: none;
+.rd-select {
+  flex: 0 0 160px; appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 10px center;
   cursor: pointer;
@@ -1458,4 +1670,7 @@ watch(zipcode, () => {
 
 .rd-links { display: flex; gap: 10px; }
 .rd-links .rd-btn-primary { width: auto; flex: 1; }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
