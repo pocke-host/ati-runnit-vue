@@ -205,7 +205,7 @@ onMounted(async () => {
   background: white;
   border-bottom: 1px solid rgba(15,18,16,0.10);
   position: sticky;
-  top: 72px;
+  top: var(--nav-h, 64px);
   z-index: 50;
 }
 .tabs-inner {

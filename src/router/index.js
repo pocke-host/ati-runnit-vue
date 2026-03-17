@@ -61,6 +61,9 @@ const routes = [
   { path: '/coaches',         name: 'FindCoaches',    component: () => import('@/views/FindCoaches.vue'),    meta: { requiresAuth: true } },
   { path: '/my-coach',        name: 'MyCoach',        component: () => import('@/views/MyCoach.vue'),        meta: { requiresAuth: true } },
 
+  // Public live share (no auth)
+  { path: '/live/:token', name: 'LiveShare', component: () => import('@/views/LiveShare.vue') },
+
   // Catch-all
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/NotFound.vue') },
 ]

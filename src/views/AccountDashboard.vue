@@ -566,7 +566,18 @@
           <!-- Notes -->
           <div class="form-group">
             <label class="form-label">Notes <span class="optional">(optional)</span></label>
-            <textarea v-model="activityForm.notes" class="form-control" rows="2" placeholder="How did it feel?"></textarea>
+            <div class="notes-input-wrap">
+              <textarea v-model="activityForm.notes" class="form-control" rows="2" placeholder="How did it feel?"></textarea>
+              <button
+                v-if="micSupported"
+                type="button"
+                :class="['mic-btn', { 'mic-btn--active': micListening }]"
+                @click="toggleListening(t => activityForm.notes = (activityForm.notes ? activityForm.notes + ' ' : '') + t)"
+                :title="micListening ? 'Stop recording' : 'Dictate note'"
+              >
+                <i :class="micListening ? 'bi bi-stop-fill' : 'bi bi-mic-fill'"></i>
+              </button>
+            </div>
           </div>
 
           <div v-if="activityError" class="alert alert-danger">
@@ -679,6 +690,7 @@ import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useVoiceNote } from '@/composables/useVoiceNote'
 import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
@@ -710,6 +722,7 @@ const { topPRs } = storeToRefs(prStore)
 const { myCoach } = storeToRefs(athleteStore)
 const myCoachLoaded = ref(false)
 const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
+const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
@@ -895,13 +908,16 @@ const totalStats = computed(() => {
 })
 
 const monthlyDistanceMeters = computed(() => {
-  const acts = activities.value || []
+  const now = new Date()
+  const acts = (activities.value || []).filter(a => {
+    const d = new Date(a.createdAt)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  })
   return acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
 })
 
 const monthlyDistance = computed(() => {
-  const acts = activities.value || []
-  return (acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000).toFixed(1)
+  return (monthlyDistanceMeters.value / 1000).toFixed(1)
 })
 
 const monthlyGoalProgress = computed(() => {
@@ -1697,6 +1713,12 @@ onMounted(async () => {
 .duration-field .form-control{flex:1}
 .duration-unit{font-size:0.85rem;font-weight:700;color:rgba(15,18,16,0.50);white-space:nowrap}
 textarea.form-control{resize:vertical;min-height:72px}
+.notes-input-wrap{position:relative}
+.notes-input-wrap textarea{padding-bottom:36px}
+.mic-btn{position:absolute;bottom:8px;right:8px;width:28px;height:28px;border:none;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.75rem;transition:background 0.2s}
+.mic-btn:hover{background:#333}
+.mic-btn--active{background:#ef4444;animation:mic-pulse 1s ease-in-out infinite}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
 @media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}.perf-strip{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
 @media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.topbar{flex-direction:column;align-items:flex-start}.top-actions{width:100%}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}

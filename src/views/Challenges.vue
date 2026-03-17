@@ -501,7 +501,7 @@ onMounted(() => {
   background: white;
   border-bottom: 1px solid #E5E7EB;
   position: sticky;
-  top: 72px;
+  top: var(--nav-h, 64px);
   z-index: 90;
 }
 
@@ -560,7 +560,7 @@ onMounted(() => {
   padding: 20px 0;
   border-bottom: 1px solid #E5E7EB;
   position: sticky;
-  top: calc(72px + 49px);
+  top: calc(var(--nav-h, 64px) + 49px);
   z-index: 80;
 }
 
@@ -846,7 +846,7 @@ onMounted(() => {
 .btn-join:hover:not(:disabled) {
   background: #2a2a2a;
   transform: translateY(-1px);
-  box-shadow: none);
+  box-shadow: none;
 }
 
 .btn-join:disabled {

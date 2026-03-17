@@ -202,8 +202,8 @@ function plotActivities() {
       .setLngLat([act.start_lng, act.start_lat])
       .setPopup(new mapboxgl.Popup({ offset: 12, closeButton: false }).setHTML(`
         <div class="map-popup">
-          <div class="map-popup-user">${act.display_name || 'Athlete'}</div>
-          <div class="map-popup-title">${act.title || act.sport_type}</div>
+          <div class="map-popup-user">${(act.display_name || 'Athlete').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}</div>
+          <div class="map-popup-title">${(act.title || act.sport_type || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}</div>
           ${act.distance_meters ? `<div class="map-popup-meta">${(act.distance_meters / 1000).toFixed(1)} km</div>` : ''}
         </div>
       `))

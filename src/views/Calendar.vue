@@ -49,7 +49,10 @@
             ]"
             @click="selectDay(day.fullDate)"
           >
-            <div class="cal-date-num">{{ day.date }}</div>
+            <div class="cal-date-num">
+              {{ day.date }}
+              <span v-if="day.weather" class="cal-weather-icon" :title="day.weather.label">{{ day.weather.icon }}</span>
+            </div>
 
             <!-- Planned events -->
             <div
@@ -83,6 +86,13 @@
               <span class="cal-chip-type">🏁 {{ race.raceName }}</span>
             </div>
 
+            <!-- Group events indicator -->
+            <i
+              v-if="day.groupEvents?.length"
+              class="bi bi-people-fill cal-group-icon"
+              :title="`${day.groupEvents.length} group event${day.groupEvents.length > 1 ? 's' : ''}`"
+            ></i>
+
             <button
               class="cal-plus"
               @click.stop="quickAdd(day.fullDate)"
@@ -100,6 +110,62 @@
         </div>
 
         <div class="drawer-body">
+
+          <!-- Weather warning strip -->
+          <div
+            v-if="selectedDay?.weather"
+            :class="['weather-warn', { 'weather-warn--severe': selectedDay.weather.severe }]"
+          >
+            <span class="weather-warn-icon">{{ selectedDay.weather.icon }}</span>
+            <span class="weather-warn-label">{{ selectedDay.weather.label }}</span>
+          </div>
+
+          <!-- Group Events -->
+          <div class="drawer-section" v-if="selectedGroupEvents.length">
+            <div class="drawer-section-label">GROUP EVENTS</div>
+            <div v-for="ge in selectedGroupEvents" :key="'ge' + ge.id" class="drawer-group-event">
+              <div class="dge-head">
+                <span class="dge-sport">{{ sportEmojiForType(ge.sportType) }}</span>
+                <span class="dge-title">{{ ge.title }}</span>
+                <span class="dge-rsvp-badge" v-if="ge.myRsvpStatus" :class="`rsvp-${ge.myRsvpStatus?.toLowerCase()}`">
+                  {{ ge.myRsvpStatus }}
+                </span>
+              </div>
+              <div class="dge-meta">
+                <span v-if="ge.locationName"><i class="bi bi-geo-alt"></i> {{ ge.locationName }}</span>
+                <span class="dge-time">{{ ge.eventDatetime?.slice(11, 16) }}</span>
+                <span class="dge-creator">by {{ ge.creatorName }}</span>
+                <span class="dge-attendees"><i class="bi bi-people"></i> {{ ge.attendeeCount + 1 }} going</span>
+              </div>
+              <!-- RSVP buttons (only if invited) -->
+              <div class="dge-rsvp-row" v-if="ge.myInviteId">
+                <button
+                  class="dge-rsvp-btn dge-rsvp-yes"
+                  :class="{ active: ge.myRsvpStatus === 'ACCEPTED' }"
+                  @click="handleRsvp(ge, 'ACCEPTED')"
+                >Going</button>
+                <button
+                  class="dge-rsvp-btn dge-rsvp-maybe"
+                  :class="{ active: ge.myRsvpStatus === 'MAYBE' }"
+                  @click="handleRsvp(ge, 'MAYBE')"
+                >Maybe</button>
+                <button
+                  class="dge-rsvp-btn dge-rsvp-no"
+                  :class="{ active: ge.myRsvpStatus === 'DECLINED' }"
+                  @click="handleRsvp(ge, 'DECLINED')"
+                >Decline</button>
+              </div>
+              <!-- Calendar export -->
+              <div class="dge-export-row">
+                <a :href="googleCalUrl(ge)" target="_blank" rel="noopener" class="dge-export-link">
+                  <i class="bi bi-google"></i> Google Calendar
+                </a>
+                <button class="dge-export-link" @click="downloadIcs(ge)">
+                  <i class="bi bi-download"></i> Download .ics
+                </button>
+              </div>
+            </div>
+          </div>
 
           <!-- Planned workouts -->
           <div class="drawer-section" v-if="selectedEvents.length">
@@ -169,7 +235,7 @@
           </div>
 
           <!-- Empty state -->
-          <div class="drawer-empty" v-if="!selectedEvents.length && !selectedActivities.length && !selectedRaces.length && !showCreateForm && !aiSuggestion">
+          <div class="drawer-empty" v-if="!selectedEvents.length && !selectedActivities.length && !selectedRaces.length && !selectedGroupEvents.length && !showCreateForm && !aiSuggestion">
             <i class="bi bi-calendar3" style="font-size:2rem;color:#d0d0d0"></i>
             <p>Nothing planned yet</p>
           </div>
@@ -259,6 +325,9 @@
           <button class="footer-btn" @click="openCreateForm">
             <i class="bi bi-plus-lg me-1"></i>Manual
           </button>
+          <button class="footer-btn footer-btn-group" @click="showGroupEventModal = true">
+            <i class="bi bi-people me-1"></i>Group Event
+          </button>
           <button class="footer-btn footer-btn-ai" @click="getAiSuggestion" :disabled="aiLoading">
             <span v-if="aiLoading" class="spinner-border spinner-border-sm me-1"></span>
             <i v-else class="bi bi-stars me-1"></i>
@@ -268,6 +337,13 @@
       </aside>
 
     </div>
+
+    <!-- CREATE GROUP EVENT MODAL ───────────────────────── -->
+    <CreateGroupEventModal
+      v-if="showGroupEventModal"
+      @close="showGroupEventModal = false"
+      @created="onGroupEventCreated"
+    />
 
     <!-- AI PLAN WEEK MODAL ──────────────────────────────── -->
     <div v-if="showWeekPlanModal" class="modal-overlay" @click.self="showWeekPlanModal = false">
@@ -326,15 +402,21 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useActivityStore } from '@/stores/activity'
+import { useGroupEventStore } from '@/stores/groupEvent'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useAiWorkout } from '@/composables/useAiWorkout'
+import { initWeather, getWeatherForDate } from '@/composables/useWeather'
 import axios from 'axios'
+import CreateGroupEventModal from '@/components/CreateGroupEventModal.vue'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const activityStore = useActivityStore()
 const { activities } = storeToRefs(activityStore)
+const groupEventStore = useGroupEventStore()
+const { events: groupEvents } = storeToRefs(groupEventStore)
+const showGroupEventModal = ref(false)
 const { isImperial, distanceLabel } = useUnits()
 const { generateWorkout, generateWeek, typeColor, TYPE_COLORS } = useAiWorkout()
 const legendColors = computed(() => ({ ...TYPE_COLORS, RACE: '#ef4444' }))
@@ -407,9 +489,11 @@ function _makeDay(date, isCurrentMonth) {
     isCurrentMonth,
     isToday: fullDate === todayStr,
     isPast:  date < new Date(todayStr),
-    events:     events.value.filter(e => e.plannedDate === fullDate),
-    activities: (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
-    races:      raceBookmarks.value.filter(r => r.raceDate === fullDate),
+    events:      events.value.filter(e => e.plannedDate === fullDate),
+    activities:  (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
+    races:       raceBookmarks.value.filter(r => r.raceDate === fullDate),
+    groupEvents: groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === fullDate),
+    weather:     getWeatherForDate(fullDate),
   }
 }
 
@@ -423,6 +507,62 @@ const selectedActivities = computed(() =>
 
 const selectedRaces = computed(() =>
   raceBookmarks.value.filter(r => r.raceDate === selectedDate.value)
+)
+
+const selectedGroupEvents = computed(() =>
+  groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === selectedDate.value)
+)
+
+function googleCalUrl(ge) {
+  const dt = ge.eventDatetime?.replace('T', '').replace(/[-:]/g, '').slice(0, 15)
+  const dtEnd = dt // single moment; Google needs start/end
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: ge.title,
+    dates: `${dt}/${dtEnd}`,
+    details: ge.description || '',
+    location: ge.locationName || '',
+  })
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
+function downloadIcs(ge) {
+  const dt = ge.eventDatetime?.replace('T', '').replace(/[-:]/g, '').slice(0, 15) + 'Z'
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'BEGIN:VEVENT',
+    `SUMMARY:${ge.title}`,
+    `DTSTART:${dt}`,
+    `DTEND:${dt}`,
+    `LOCATION:${ge.locationName || ''}`,
+    `DESCRIPTION:${ge.description || ''}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n')
+  const blob = new Blob([ics], { type: 'text/calendar' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = `${ge.title.replace(/\s+/g, '_')}.ics`; a.click()
+  URL.revokeObjectURL(url)
+}
+
+function sportEmojiForType(type) {
+  const map = { RUN: '🏃', RIDE: '🚴', SWIM: '🏊', HIKE: '🥾', WALK: '🚶', TRIATHLON: '🏅' }
+  return map[type] || '🏃'
+}
+
+async function handleRsvp(ge, status) {
+  if (!ge.myInviteId) return
+  await groupEventStore.rsvp(ge.myInviteId, status)
+}
+
+function onGroupEventCreated() {
+  groupEventStore.fetchMyEvents()
+}
+
+const selectedDay = computed(() =>
+  selectedDate.value ? calDays.value.find(d => d.fullDate === selectedDate.value) ?? null : null
 )
 
 const drawerDateLabel = computed(() => {
@@ -708,7 +848,26 @@ function weekDayNum(dateStr) {
 
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
-  await Promise.all([fetchEvents(), fetchRaceBookmarks()])
+  await Promise.all([fetchEvents(), fetchRaceBookmarks(), groupEventStore.fetchMyEvents()])
+
+  // Weather: use cached coords or request geolocation
+  const cachedLoc = localStorage.getItem('runnit_weather_loc')
+  if (cachedLoc) {
+    try {
+      const { lat, lng } = JSON.parse(cachedLoc)
+      initWeather(lat, lng)
+    } catch { /* ignore malformed cache */ }
+  } else if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude
+        const lng = pos.coords.longitude
+        localStorage.setItem('runnit_weather_loc', JSON.stringify({ lat, lng }))
+        initWeather(lat, lng)
+      },
+      () => { /* denied — silently skip */ }
+    )
+  }
 })
 
 watch([currentYear, currentMonth], fetchEvents)
@@ -1323,4 +1482,97 @@ textarea.form-control { resize: vertical; min-height: 60px; }
   .week-plan-grid { grid-template-columns: repeat(2, 1fr); }
   .cal-legend { display: none; }
 }
+
+/* ── Weather ─────────────────────────────────────────────── */
+.cal-date-num {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.cal-weather-icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.weather-warn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: #FFF8E1;
+  border-left: 3px solid #F59E0B;
+  font-size: 0.8rem;
+  color: #78350F;
+}
+.weather-warn--severe {
+  background: #FEF2F2;
+  border-left-color: #EF4444;
+  color: #7F1D1D;
+}
+.weather-warn-icon { font-size: 1rem; flex-shrink: 0; }
+.weather-warn-label { font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── Group event cell icon ───────────────────────────────── */
+.cal-group-icon {
+  font-size: 0.65rem;
+  color: #4f46e5;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  pointer-events: none;
+}
+
+/* ── Drawer Group Event ───────────────────────────────────── */
+.drawer-group-event {
+  border: 1px solid #E5E5E5;
+  padding: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dge-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dge-sport { font-size: 1.1rem; }
+.dge-title { font-size: 14px; font-weight: 700; flex: 1; }
+.dge-rsvp-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 2px 6px; border-radius: 0;
+}
+.rsvp-accepted { background: #dcfce7; color: #166534; }
+.rsvp-pending  { background: #fef9c3; color: #713f12; }
+.rsvp-declined { background: #fee2e2; color: #991b1b; }
+.rsvp-maybe    { background: #e0e7ff; color: #3730a3; }
+
+.dge-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: #767676; align-items: center; }
+.dge-time { font-weight: 700; color: #000; }
+
+.dge-rsvp-row { display: flex; gap: 6px; }
+.dge-rsvp-btn {
+  flex: 1; padding: 6px 0; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border: 1px solid #E5E5E5; background: #fff; cursor: pointer;
+  font-family: inherit;
+}
+.dge-rsvp-yes.active   { background: #000; color: #fff; border-color: #000; }
+.dge-rsvp-maybe.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+.dge-rsvp-no.active    { background: #dc2626; color: #fff; border-color: #dc2626; }
+.dge-rsvp-btn:hover:not(.active) { border-color: #999; }
+
+.dge-export-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.dge-export-link {
+  font-size: 12px; color: #767676; text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+  background: none; border: none; cursor: pointer; padding: 0; font-family: inherit;
+}
+.dge-export-link:hover { color: #000; text-decoration: underline; }
+
+/* ── Drawer footer Group Event button ────────────────────── */
+.footer-btn-group {
+  background: #f0f0ff;
+  color: #4f46e5;
+  border: 1px solid #4f46e5;
+}
+.footer-btn-group:hover { background: #4f46e5; color: #fff; }
 </style>

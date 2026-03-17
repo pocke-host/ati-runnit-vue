@@ -62,6 +62,39 @@
       <i class="bi bi-exclamation-circle me-2"></i>{{ saveError }}
     </div>
 
+    <!-- Post-workout Notes Overlay -->
+    <div v-if="showNotesStep" class="notes-overlay">
+      <div class="notes-overlay-inner">
+        <div class="notes-overlay-title">WORKOUT SAVED</div>
+        <p class="notes-overlay-sub">Add a note while it's fresh</p>
+        <div class="notes-input-wrap">
+          <textarea
+            v-model="postNotes"
+            class="notes-textarea"
+            rows="4"
+            placeholder="How did it feel? Any pain? Weather?"
+            autofocus
+          ></textarea>
+          <button
+            v-if="micSupported"
+            type="button"
+            :class="['mic-btn', { 'mic-btn--active': micListening }]"
+            @click="toggleListening(t => postNotes = (postNotes ? postNotes + ' ' : '') + t)"
+            :title="micListening ? 'Stop recording' : 'Dictate note'"
+          >
+            <i :class="micListening ? 'bi bi-stop-fill' : 'bi bi-mic-fill'"></i>
+          </button>
+        </div>
+        <div class="notes-overlay-actions">
+          <button class="notes-btn-skip" type="button" @click="skipNotes">Skip</button>
+          <button class="notes-btn-done" type="button" @click="finishWithNotes" :disabled="notesSubmitting">
+            <span v-if="notesSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Controls -->
     <div class="tracker-controls">
       <button
@@ -98,7 +131,25 @@
         <i v-else class="bi bi-stop-fill"></i>
         {{ saving ? 'Saving…' : 'Finish' }}
       </button>
+
+      <!-- Share Live button -->
+      <button
+        v-if="hasStarted && !isSharing"
+        class="control-btn control-btn-share"
+        @click="startSharing"
+      >
+        <i class="bi bi-broadcast"></i> Share Live
+      </button>
     </div>
+
+    <!-- Broadcasting banner -->
+    <div v-if="isSharing" class="share-banner">
+      <span class="share-live-dot"></span>
+      <span class="share-broadcasting">BROADCASTING</span>
+      <span class="share-url" :title="shareUrl">{{ shareUrl.replace('https://', '').slice(0, 32) }}…</span>
+      <button class="share-stop-btn" @click="stopSharing">Stop Sharing</button>
+    </div>
+    <div v-if="shareCopied" class="share-copied-toast">Link copied to clipboard!</div>
 
   </div>
 </template>
@@ -110,6 +161,8 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useUnits } from '@/composables/useUnits'
 import { useActivityStore } from '@/stores/activity'
+import { useVoiceNote } from '@/composables/useVoiceNote'
+import axios from 'axios'
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
@@ -142,6 +195,20 @@ const currentPaceMinPerKm = ref(0)
 const saving           = ref(false)
 const saveError        = ref('')
 const gpsError         = ref('')
+const showNotesStep    = ref(false)
+const savedActivityId  = ref(null)
+const postNotes        = ref('')
+const notesSubmitting  = ref(false)
+
+const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+// Live sharing state
+const shareToken   = ref(null)
+const isSharing    = ref(false)
+const shareUrl     = ref('')
+const shareCopied  = ref(false)
+let lastShareUpdate = 0
 
 let watchId       = null
 let timerInterval = null
@@ -296,12 +363,51 @@ const handlePositionUpdate = (position) => {
   }
 
   lastPosition.value = [longitude, latitude, now, altitude]
+  pushShareUpdate(latitude, longitude)
 }
 
 const handlePositionError = (err) => {
   console.warn('GPS error', err)
   gpsError.value = 'GPS signal lost — move to an open area.'
   setTimeout(() => { gpsError.value = '' }, 4000)
+}
+
+// ── Live sharing ──────────────────────────────────────────────────────────────
+
+const startSharing = async () => {
+  try {
+    const { data } = await axios.post(`${API_URL}/live-shares`, { sportType: selectedSport.value })
+    shareToken.value = data.token
+    shareUrl.value   = data.shareUrl
+    isSharing.value  = true
+    lastShareUpdate  = 0
+    try { await navigator.clipboard.writeText(data.shareUrl) } catch {}
+    shareCopied.value = true
+    setTimeout(() => { shareCopied.value = false }, 3000)
+  } catch (e) {
+    console.error('startSharing error', e)
+  }
+}
+
+const stopSharing = async () => {
+  if (!shareToken.value) return
+  try { await axios.delete(`${API_URL}/live-shares/${shareToken.value}`) } catch {}
+  isSharing.value = false
+  shareToken.value = null
+  shareUrl.value   = ''
+}
+
+const pushShareUpdate = (lat, lng) => {
+  if (!isSharing.value || !shareToken.value) return
+  const now = Date.now()
+  if (now - lastShareUpdate < 5000) return
+  lastShareUpdate = now
+  axios.patch(`${API_URL}/live-shares/${shareToken.value}`, {
+    lat,
+    lng,
+    elapsedSeconds: elapsedTime.value,
+    distanceMeters: Math.round(totalDistance.value),
+  }).catch(() => {})
 }
 
 // ── Tracking controls ─────────────────────────────────────────────────────────
@@ -345,25 +451,52 @@ const resumeTracking = () => {
 
 const stopTracking = async () => {
   if (!confirm('Finish this activity?')) return
+  await stopSharing()
   pauseTracking()
   saving.value = true
   saveError.value = ''
 
   try {
-    await activityStore.createActivity({
+    const activity = await activityStore.createActivity({
       sportType: selectedSport.value,
       durationSeconds: elapsedTime.value,
       distanceMeters: Math.round(totalDistance.value),
       elevationGain: Math.round(elevationGain.value),
       routePolyline: routeCoordinates.value.length ? encodePolyline(routeCoordinates.value) : null,
     })
-    router.push('/dashboard')
+    savedActivityId.value = activity?.id ?? null
+    saving.value = false
+    showNotesStep.value = true
   } catch (err) {
     console.error('Save failed:', err)
     saveError.value = 'Failed to save. Tap Finish again to retry.'
     saving.value = false
     startTracking()
   }
+}
+
+async function finishWithNotes() {
+  if (notesSubmitting.value) return
+  if (postNotes.value.trim() && savedActivityId.value) {
+    notesSubmitting.value = true
+    try {
+      const token = localStorage.getItem('token')
+      await axios.patch(
+        `${API_URL}/activities/${savedActivityId.value}`,
+        { notes: postNotes.value.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+    } catch (e) {
+      console.warn('[LiveTracker] notes patch failed:', e)
+    } finally {
+      notesSubmitting.value = false
+    }
+  }
+  router.push('/dashboard')
+}
+
+function skipNotes() {
+  router.push('/dashboard')
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -408,6 +541,7 @@ onUnmounted(() => {
 
 <style scoped>
 .live-tracker {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -651,5 +785,141 @@ onUnmounted(() => {
   .live-map { height: 320px; }
   .tracker-time { font-size: 1.6rem; }
   .stat-value { font-size: 1.1rem; }
+}
+
+/* ── Post-workout Notes Overlay ── */
+.notes-overlay {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.notes-overlay-inner {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.notes-overlay-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  color: #000;
+}
+.notes-overlay-sub {
+  font-size: 0.85rem;
+  color: #767676;
+  margin: 0;
+}
+.notes-input-wrap {
+  position: relative;
+}
+.notes-textarea {
+  width: 100%;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  padding: 10px 12px 36px 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 100px;
+  outline: none;
+}
+.notes-textarea:focus { border-color: #000; }
+.mic-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background 0.2s;
+}
+.mic-btn:hover { background: #333; }
+.mic-btn--active {
+  background: #ef4444;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+.notes-overlay-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.notes-btn-skip {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #E5E5E5;
+  background: #fff;
+  color: #767676;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+}
+.notes-btn-done {
+  flex: 2;
+  padding: 12px;
+  border: none;
+  background: #000;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+}
+.notes-btn-done:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Live sharing ──────────────────────────────────────────── */
+.control-btn-share {
+  background: #4f46e5; color: #fff; font-size: 0.8rem; padding: 10px 14px;
+}
+.control-btn-share:hover { background: #4338ca; }
+
+.share-banner {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 16px; background: #ecfdf5; border-top: 2px solid #22c55e;
+  font-size: 12px;
+}
+.share-live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
+  animation: live-pulse-dot 1.5s infinite;
+  flex-shrink: 0;
+}
+@keyframes live-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.share-broadcasting { font-weight: 800; letter-spacing: 0.10em; color: #166534; text-transform: uppercase; }
+.share-url { font-size: 11px; color: #555; font-family: monospace; }
+.share-stop-btn {
+  margin-left: auto; background: none; border: none; color: #dc2626;
+  font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; font-family: inherit;
+  text-decoration: underline;
+}
+
+.share-copied-toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: #000; color: #fff; padding: 8px 20px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+  z-index: 9999;
 }
 </style>
