@@ -35,6 +35,8 @@
           { id: 'overview',   label: 'Overview'   },
           { id: 'block',      label: 'Block'       },
           { id: 'discipline', label: 'Discipline'  },
+          { id: 'archetype',  label: 'Archetype'   },
+          { id: 'journey',    label: 'Journey'     },
           { id: 'log',        label: 'Log'         },
           { id: 'insights',   label: 'Insights'    },
           { id: 'records',    label: 'Records'     },
@@ -176,6 +178,55 @@
               <div class="disc-row-detail">{{ item.detail }}</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ATHLETE ARCHETYPE -->
+      <section id="stats-archetype" class="section">
+        <div class="section-header">
+          <span class="section-kicker">Athlete Archetype</span>
+        </div>
+        <div class="archetype-card">
+          <div class="arch-card-left">
+            <i :class="['bi', archetypeData.icon, 'arch-big-icon']" :style="{ color: archetypeData.color }"></i>
+            <div class="arch-label" :style="{ color: archetypeData.color }">{{ archetypeData.label }}</div>
+            <div class="arch-tagline">{{ archetypeData.tagline }}</div>
+          </div>
+          <div class="arch-card-right">
+            <div class="arch-traits-label">DEFINING TRAITS</div>
+            <div class="arch-traits">
+              <div v-for="trait in archetypeData.traits" :key="trait" class="arch-trait-row">
+                <span class="arch-trait-dot" :style="{ background: archetypeData.color }"></span>
+                <span class="arch-trait-text">{{ trait }}</span>
+              </div>
+            </div>
+            <div class="arch-how-label">HOW IT'S COMPUTED</div>
+            <p class="arch-how-text">Based on your pace profile, activity frequency, early-morning ratio, sport diversity, and long-run history from your last 90 days of training.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PERSONAL GROWTH TIMELINE -->
+      <section id="stats-journey" class="section" v-if="growthTimeline.length">
+        <div class="section-header">
+          <span class="section-kicker">Your Journey</span>
+        </div>
+        <div class="journey-scroll-wrap">
+          <div class="journey-track">
+            <div
+              v-for="(m, i) in growthTimeline"
+              :key="i"
+              class="journey-node"
+            >
+              <div class="jnode-icon">{{ m.icon }}</div>
+              <div class="jnode-line" v-if="i < growthTimeline.length - 1"></div>
+              <div class="jnode-label">{{ m.label }}</div>
+              <div class="jnode-date">{{ m.date }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="journey-empty-cta" v-if="growthTimeline.length < 3">
+          <p>Keep logging — more milestones unlock as you train.</p>
         </div>
       </section>
 
@@ -413,6 +464,8 @@ import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
 import { useDisciplineScore } from '@/composables/useDisciplineScore'
 import { useTrainingBlock } from '@/composables/useTrainingBlock'
+import { useArchetype } from '@/composables/useArchetype'
+import { useGrowthTimeline } from '@/composables/useGrowthTimeline'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
@@ -579,8 +632,10 @@ const consistencyLabel = computed(() => {
 })
 
 // ACWR (Acute:Chronic Workload Ratio)
-const disciplineData = computed(() => useDisciplineScore(activities.value))
-const trainingBlock = computed(() => useTrainingBlock(activities.value))
+const disciplineData  = computed(() => useDisciplineScore(activities.value))
+const trainingBlock   = computed(() => useTrainingBlock(activities.value))
+const archetypeData   = computed(() => useArchetype(activities.value))
+const growthTimeline  = computed(() => useGrowthTimeline(activities.value))
 
 const activeSection = ref('overview')
 const statsEl = ref(null)
@@ -1645,5 +1700,153 @@ onMounted(async () => {
   .section-title { font-size: 1.1rem; }
   .pr-card { padding: 16px; }
   .pr-value { font-size: 1.3rem; }
+}
+
+/* ── Athlete Archetype ── */
+.archetype-card {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  border: 1px solid #E5E5E5;
+}
+.arch-card-left {
+  padding: 28px 24px;
+  background: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.arch-big-icon {
+  font-size: 2.2rem;
+  margin-bottom: 6px;
+}
+.arch-label {
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.arch-tagline {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  font-style: italic;
+  line-height: 1.4;
+}
+.arch-card-right {
+  padding: 24px 28px;
+}
+.arch-traits-label,
+.arch-how-label {
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 10px;
+}
+.arch-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.arch-trait-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.arch-trait-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+}
+.arch-trait-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #000;
+}
+.arch-how-text {
+  font-size: 0.78rem;
+  color: #767676;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Personal Growth Timeline ── */
+.journey-scroll-wrap {
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #E5E5E5 transparent;
+}
+.journey-track {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  min-width: max-content;
+  padding: 8px 0;
+}
+.journey-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 90px;
+}
+.jnode-icon {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #000;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  z-index: 1;
+  position: relative;
+  flex-shrink: 0;
+}
+.jnode-line {
+  position: absolute;
+  top: 22px;
+  left: calc(50% + 22px);
+  width: calc(100% - 22px);
+  height: 2px;
+  background: #E5E5E5;
+  z-index: 0;
+}
+.jnode-label {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #000;
+  margin-top: 10px;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 80px;
+}
+.jnode-date {
+  font-size: 0.64rem;
+  color: #767676;
+  margin-top: 2px;
+  text-align: center;
+}
+.journey-empty-cta {
+  margin-top: 16px;
+  font-size: 0.80rem;
+  color: #767676;
+  text-align: center;
+}
+.journey-empty-cta p { margin: 0; }
+
+@media (max-width: 768px) {
+  .archetype-card { grid-template-columns: 1fr; }
+  .arch-card-left { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .arch-big-icon { font-size: 1.6rem; margin-bottom: 0; }
 }
 </style>

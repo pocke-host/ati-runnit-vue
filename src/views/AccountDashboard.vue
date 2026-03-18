@@ -173,6 +173,21 @@
               </div>
             </div>
 
+            <!-- Archetype Widget -->
+            <div class="archetype-widget">
+              <div class="archetype-widget-label">ATHLETE ARCHETYPE</div>
+              <div class="archetype-widget-body">
+                <i :class="['bi', archetypeData.icon, 'archetype-widget-icon']" :style="{ color: archetypeData.color }"></i>
+                <div>
+                  <div class="archetype-widget-name" :style="{ color: archetypeData.color }">{{ archetypeData.label }}</div>
+                  <div class="archetype-widget-tagline">{{ archetypeData.tagline }}</div>
+                </div>
+              </div>
+              <div class="archetype-widget-traits">
+                <span v-for="t in archetypeData.traits" :key="t" class="archetype-trait">{{ t }}</span>
+              </div>
+            </div>
+
             <!-- PR Widget -->
             <div class="profile-prs">
               <div class="prs-row-header">
@@ -714,6 +729,7 @@ import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { useDisciplineScore } from '@/composables/useDisciplineScore'
 import { useTrainingBlock } from '@/composables/useTrainingBlock'
+import { useArchetype } from '@/composables/useArchetype'
 import { useVoiceNote } from '@/composables/useVoiceNote'
 import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
@@ -873,7 +889,8 @@ const dashInsights = computed(() => {
 })
 
 const disciplineData = computed(() => useDisciplineScore(activities.value))
-const trainingBlock = computed(() => useTrainingBlock(activities.value))
+const trainingBlock  = computed(() => useTrainingBlock(activities.value))
+const archetypeData  = computed(() => useArchetype(activities.value))
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -1644,6 +1661,14 @@ onMounted(async () => {
 .badge-icon{font-size:1.5rem;margin-bottom:4px}
 .badge-text{font-size:0.75rem;font-weight:700;color:rgba(15,18,16,0.70)}
 .disc-widget{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08)}
+.archetype-widget{padding-bottom:20px;border-bottom:1px solid rgba(15,18,16,0.08);margin-bottom:20px}
+.archetype-widget-label{font-size:0.65rem;font-weight:900;letter-spacing:0.12em;color:rgba(15,18,16,0.40);text-transform:uppercase;margin-bottom:10px}
+.archetype-widget-body{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.archetype-widget-icon{font-size:1.4rem}
+.archetype-widget-name{font-size:0.78rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;line-height:1.2}
+.archetype-widget-tagline{font-size:0.74rem;color:#767676;margin-top:2px}
+.archetype-widget-traits{display:flex;flex-wrap:wrap;gap:4px}
+.archetype-trait{font-size:0.64rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border:1px solid #E5E5E5;color:rgba(15,18,16,0.55)}
 .disc-widget-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .disc-widget-label{font-size:0.65rem;font-weight:900;letter-spacing:0.12em;color:rgba(15,18,16,0.40);text-transform:uppercase}
 .disc-widget-tip{width:16px;height:16px;border-radius:50%;border:1px solid #767676;font-size:0.65rem;color:#767676;display:flex;align-items:center;justify-content:center;cursor:help}

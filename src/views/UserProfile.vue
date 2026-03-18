@@ -111,6 +111,22 @@
         </div>
       </section>
 
+      <!-- ARCHETYPE CARD -->
+      <section class="archetype-section" v-if="profileActivities.length > 0">
+        <div class="arch-inner">
+          <div class="arch-left">
+            <div class="arch-eyebrow">ATHLETE ARCHETYPE</div>
+            <div class="arch-name" :style="{ color: archetypeData.color }">
+              <i :class="['bi', archetypeData.icon, 'me-2']"></i>{{ archetypeData.label }}
+            </div>
+            <div class="arch-tagline">{{ archetypeData.tagline }}</div>
+          </div>
+          <div class="arch-right">
+            <span v-for="t in archetypeData.traits" :key="t" class="arch-trait-pill">{{ t }}</span>
+          </div>
+        </div>
+      </section>
+
       <!-- CONTENT TABS -->
       <div class="content-tabs-bar">
         <div class="content-tabs">
@@ -125,6 +141,10 @@
           <button :class="['ctab', { active: tab === 'badges' }]" @click="tab = 'badges'">
             <i class="bi bi-trophy me-2"></i>Badges
             <span class="ctab-count">{{ profileBadges.filter(b => b.earned).length }}</span>
+          </button>
+          <button :class="['ctab', { active: tab === 'journey' }]" @click="tab = 'journey'">
+            <i class="bi bi-map me-2"></i>Journey
+            <span class="ctab-count">{{ growthTimeline.length }}</span>
           </button>
           <button :class="['ctab', { active: tab === 'events' }]" @click="switchToEvents">
             <i class="bi bi-collection me-2"></i>Events
@@ -250,6 +270,24 @@
         </div>
 
         <!-- ── EVENTS TAB ── -->
+        <!-- ── JOURNEY TAB ── -->
+        <div v-if="tab === 'journey'">
+          <div v-if="growthTimeline.length === 0" class="tab-empty">
+            <i class="bi bi-map"></i>
+            <p>Log activities to build your journey timeline.</p>
+          </div>
+          <div v-else class="journey-list">
+            <div v-for="(m, i) in growthTimeline" :key="i" class="journey-row">
+              <div class="journey-row-icon">{{ m.icon }}</div>
+              <div class="journey-row-body">
+                <div class="journey-row-label">{{ m.label }}</div>
+                <div class="journey-row-sub">{{ m.sub }}</div>
+              </div>
+              <div class="journey-row-date">{{ m.date }}</div>
+            </div>
+          </div>
+        </div>
+
         <div v-if="tab === 'events'">
           <div v-if="eventsLoading" class="tab-loading">
             <div class="spinner-border spinner-border-sm"></div>
@@ -332,6 +370,8 @@ import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { useDisciplineScore } from '@/composables/useDisciplineScore'
+import { useArchetype } from '@/composables/useArchetype'
+import { useGrowthTimeline } from '@/composables/useGrowthTimeline'
 import { useAchievementStore, BADGE_CATALOG, computeEarnedBadges } from '@/stores/achievement'
 import { useNotificationStore } from '@/stores/notification'
 
@@ -382,7 +422,9 @@ const isOwnProfile = computed(() => user.value?.id && String(user.value.id) === 
 const userInitial = computed(() => profile.value.displayName?.charAt(0).toUpperCase() || '?')
 const activitiesCount = computed(() => profile.value.activityCount ?? profileActivities.value.length)
 const totalDistanceMeters = computed(() => profileActivities.value.reduce((s, a) => s + (a.distanceMeters || 0), 0))
-const disciplineData = computed(() => useDisciplineScore(profileActivities.value))
+const disciplineData  = computed(() => useDisciplineScore(profileActivities.value))
+const archetypeData   = computed(() => useArchetype(profileActivities.value))
+const growthTimeline  = computed(() => useGrowthTimeline(profileActivities.value))
 
 const joinedDate = computed(() => {
   if (!profile.value.createdAt) return ''
@@ -1064,4 +1106,106 @@ onMounted(init)
 .event-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .event-row-dist { font-size: 0.9rem; font-weight: 700; }
 .event-row-arrow { color: #A0A0A0; font-size: 0.8rem; }
+
+/* ── Archetype Section ── */
+.archetype-section {
+  background: #000;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.arch-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.arch-left { flex: 1; min-width: 200px; }
+.arch-eyebrow {
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.40);
+  margin-bottom: 6px;
+}
+.arch-name {
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.arch-tagline {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+}
+.arch-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.arch-trait-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(255,255,255,0.20);
+  color: rgba(255,255,255,0.75);
+}
+
+/* ── Journey Tab ── */
+.journey-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.journey-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #E5E5E5;
+}
+.journey-row:last-child { border-bottom: none; }
+.journey-row-icon {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.journey-row-body { flex: 1; }
+.journey-row-label {
+  font-size: 0.90rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.journey-row-sub {
+  font-size: 0.76rem;
+  color: #767676;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+.journey-row-date {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #767676;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 </style>
