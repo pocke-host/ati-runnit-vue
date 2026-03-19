@@ -5,18 +5,27 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
-export const getAuthHeaders = () => {
-  const token = localStorage.getItem('token')
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
-
 const CACHE_KEY = 'runnit_activities_cache'
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 const loadCache = () => {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] }
+  try {
+    const raw = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}')
+    if (raw.fetchedAt && Date.now() - raw.fetchedAt < CACHE_TTL_MS) {
+      return raw.data || []
+    }
+    return []
+  } catch { return [] }
 }
+
 const saveCache = (list) => {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify(list)) } catch {}
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: list, fetchedAt: Date.now() }))
+  } catch {}
+}
+
+const clearCache = () => {
+  try { localStorage.removeItem(CACHE_KEY) } catch {}
 }
 
 export const useActivityStore = defineStore('activity', () => {
@@ -28,10 +37,7 @@ export const useActivityStore = defineStore('activity', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.post(`${API_URL}/activities`, data, {
-        headers: getAuthHeaders(),
-        timeout: 30000  // activity saves can include large route polylines
-      })
+      const response = await axios.post(`${API_URL}/activities`, data, { timeout: 30000 })
       activities.value.unshift(response.data)
       saveCache(activities.value)
       return response.data
@@ -47,9 +53,7 @@ export const useActivityStore = defineStore('activity', () => {
     loading.value = true
     error.value = null
     try {
-      const { data } = await axios.get(`${API_URL}/activities?page=${page}`, {
-        headers: getAuthHeaders()
-      })
+      const { data } = await axios.get(`${API_URL}/activities?page=${page}`)
       const result = Array.isArray(data) ? data : (data.content || [])
       if (result.length > 0) {
         activities.value = result
@@ -68,26 +72,20 @@ export const useActivityStore = defineStore('activity', () => {
   }
 
   async function fetchActivity(id) {
-    const { data } = await axios.get(`${API_URL}/activities/${id}`, {
-      headers: getAuthHeaders()
-    })
+    const { data } = await axios.get(`${API_URL}/activities/${id}`)
     return data
   }
 
   async function deleteActivity(id) {
-    await axios.delete(`${API_URL}/activities/${id}`, {
-      headers: getAuthHeaders()
-    })
+    await axios.delete(`${API_URL}/activities/${id}`)
     activities.value = activities.value.filter(a => String(a.id) !== String(id))
     saveCache(activities.value)
   }
 
-  async function fetchFeed() {
+  async function fetchFeed(page = 0) {
     error.value = null
     try {
-      const { data } = await axios.get(`${API_URL}/activities/feed`, {
-        headers: getAuthHeaders()
-      })
+      const { data } = await axios.get(`${API_URL}/activities/feed?page=${page}`)
       return Array.isArray(data) ? data : (data.content || [])
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to load feed'
@@ -96,39 +94,33 @@ export const useActivityStore = defineStore('activity', () => {
   }
 
   async function reactToActivity(id, type) {
-    const { data } = await axios.post(
-      `${API_URL}/activities/${id}/reactions`,
-      { type },
-      { headers: getAuthHeaders() }
-    )
+    const { data } = await axios.post(`${API_URL}/activities/${id}/reactions`, { type })
     return data
   }
 
   async function removeReaction(id) {
-    await axios.delete(`${API_URL}/activities/${id}/reactions`, {
-      headers: getAuthHeaders()
-    })
+    await axios.delete(`${API_URL}/activities/${id}/reactions`)
   }
 
   async function fetchComments(id) {
-    const { data } = await axios.get(`${API_URL}/activities/${id}/comments`, {
-      headers: getAuthHeaders()
-    })
+    const { data } = await axios.get(`${API_URL}/activities/${id}/comments`)
     return Array.isArray(data) ? data : []
   }
 
   async function addComment(id, text) {
-    const { data } = await axios.post(
-      `${API_URL}/activities/${id}/comments`,
-      { text },
-      { headers: getAuthHeaders() }
-    )
+    const { data } = await axios.post(`${API_URL}/activities/${id}/comments`, { text })
     return data
+  }
+
+  function invalidateCache() {
+    clearCache()
+    activities.value = []
   }
 
   return {
     activities, loading, error,
     createActivity, fetchActivities, fetchActivity, deleteActivity,
-    fetchFeed, reactToActivity, removeReaction, fetchComments, addComment
+    fetchFeed, reactToActivity, removeReaction, fetchComments, addComment,
+    invalidateCache
   }
 })
