@@ -23,7 +23,7 @@
             </svg>
             Continue with Google
           </button>
-          <button type="button" class="btn btn-social">
+          <button type="button" class="btn btn-social" @click="handleAppleSignIn">
             <i class="bi bi-apple"></i>
             Continue with Apple
           </button>
@@ -243,9 +243,14 @@ const onSubmit = async (e) => {
 
 onUnmounted(() => clearInterval(lockTimer))
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
 const handleGoogleSignIn = () => {
-  console.log('Google sign-in clicked')
-  // TODO: Implement Google OAuth
+  window.location.href = `${API_URL}/auth/oauth/google`
+}
+
+const handleAppleSignIn = () => {
+  window.location.href = `${API_URL}/auth/oauth/apple`
 }
 </script>
 

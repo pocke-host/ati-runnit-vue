@@ -245,9 +245,10 @@ const submit = async () => {
   }
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
 const onSocial = (provider) => {
-  console.log(`Social signup: ${provider}`)
-  // TODO: Implement OAuth flow
+  window.location.href = `${API_URL}/auth/oauth/${provider}`
 }
 </script>
 

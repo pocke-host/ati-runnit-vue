@@ -61,6 +61,9 @@ const routes = [
   { path: '/coaches',         name: 'FindCoaches',    component: () => import('@/views/FindCoaches.vue'),    meta: { requiresAuth: true } },
   { path: '/my-coach',        name: 'MyCoach',        component: () => import('@/views/MyCoach.vue'),        meta: { requiresAuth: true } },
 
+  // OAuth callback — public, no auth required
+  { path: '/oauth-callback', name: 'OAuthCallback', component: () => import('@/views/OAuthCallback.vue') },
+
   // Public live share (no auth)
   { path: '/live/:token', name: 'LiveShare', component: () => import('@/views/LiveShare.vue') },
 
@@ -78,19 +81,20 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  const storedUser = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null } })()
+  const isAuthenticated = !!storedUser
   const onboardingDone = localStorage.getItem('onboarding_complete') === 'true'
   const needsOnboarding = sessionStorage.getItem('needs_onboarding') === 'true'
-  const userRole = localStorage.getItem('userRole') || 'athlete'
+  const userRole = storedUser?.role || localStorage.getItem('userRole') || 'athlete'
   const homeDash = userRole === 'coach' ? '/coach/dashboard' : '/dashboard'
 
-  if (to.meta.requiresAuth && !token) return next('/join-us')
+  if (to.meta.requiresAuth && !isAuthenticated) return next('/join-us')
 
   // Already-onboarded users must not be able to revisit /onboard
-  if (to.path === '/onboard' && token && !needsOnboarding) return next(homeDash)
+  if (to.path === '/onboard' && isAuthenticated && !needsOnboarding) return next(homeDash)
 
   // Only send to onboarding if this session was started by a fresh registration
-  if (token && needsOnboarding && to.meta.requiresAuth && to.path !== '/onboard') {
+  if (isAuthenticated && needsOnboarding && to.meta.requiresAuth && to.path !== '/onboard') {
     return next('/onboard')
   }
 
