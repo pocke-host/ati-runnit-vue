@@ -5,15 +5,23 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
-// Send cookies with every request (httpOnly JWT cookie auth)
+// Send cookies with every cross-origin request
 axios.defaults.withCredentials = true
+
+// Restore Bearer header on page refresh if token exists in localStorage
+const _storedToken = localStorage.getItem('token')
+if (_storedToken) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${_storedToken}`
+}
 
 const clearLocalState = () => {
   localStorage.removeItem('user')
+  localStorage.removeItem('token')
   localStorage.removeItem('onboarding_complete')
   localStorage.removeItem('userRole')
   localStorage.removeItem('subscriptionTier')
   localStorage.removeItem('unitSystem')
+  delete axios.defaults.headers.common['Authorization']
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -41,6 +49,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(email, password) {
     const { data } = await axios.post(`${API_URL}/auth/login`, { email, password })
+    if (data.token) {
+      localStorage.setItem('token', data.token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+    }
     setAuth(data.user)
     try { await fetchCurrentUser() } catch { /* silent */ }
   }
@@ -49,6 +61,10 @@ export const useAuthStore = defineStore('auth', () => {
     const { data } = await axios.post(`${API_URL}/auth/register`, {
       email, password, displayName, role: userRole
     })
+    if (data.token) {
+      localStorage.setItem('token', data.token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+    }
     setAuth(data.user)
   }
 
