@@ -212,9 +212,10 @@ textarea.field-input { resize: vertical; }
   letter-spacing: 0.08em;
 }
 .btn-create {
-  background: #000; color: #fff; border: none; border-radius: 0;
+  background: #0052FF; color: #fff; border: none; border-radius: 0;
   padding: 9px 22px; font-size: 13px; cursor: pointer; font-family: inherit;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.15s;
 }
+.btn-create:hover:not(:disabled) { background: #003ECC; }
 .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

@@ -646,17 +646,17 @@ onMounted(init)
   font-family: inherit;
 }
 .btn-primary {
-  background: #000;
+  background: #0052FF;
   color: white;
 }
-.btn-primary:hover:not(:disabled) { background: #2a2a2a; }
+.btn-primary:hover:not(:disabled) { background: #003ECC; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-follow {
-  background: #000;
+  background: #0052FF;
   color: white;
   flex-shrink: 0;
 }
-.btn-follow:hover:not(:disabled) { background: #2a2a2a; }
+.btn-follow:hover:not(:disabled) { background: #003ECC; }
 .btn-follow:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-following-sm {
   background: #f0f0f0;

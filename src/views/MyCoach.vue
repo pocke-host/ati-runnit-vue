@@ -239,11 +239,11 @@ onMounted(async () => {
 .no-coach-title { font-size: 1.2rem; font-weight: 900; margin: 0 0 12px; }
 .no-coach-desc { font-size: 0.88rem; color: #767676; max-width: 360px; margin: 0 0 24px; line-height: 1.6; }
 .btn-find-coach {
-  height: 44px; padding: 0 32px; background: #000; color: #fff; border: none;
+  height: 44px; padding: 0 32px; background: #0052FF; color: #fff; border: none;
   font-size: 0.80rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   text-decoration: none; display: inline-flex; align-items: center; cursor: pointer;
 }
-.btn-find-coach:hover { background: #222; }
+.btn-find-coach:hover { background: #003ECC; }
 
 /* Pending */
 .pending-card {

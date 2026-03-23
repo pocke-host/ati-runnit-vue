@@ -1490,7 +1490,7 @@ watch(zipcode, () => {
   height: 34px;
   padding: 0 14px;
   border: none;
-  background: #000;
+  background: #0052FF;
   color: #fff;
   font-size: 0.76rem;
   font-weight: 700;
@@ -1499,7 +1499,7 @@ watch(zipcode, () => {
   align-items: center;
   transition: background 0.15s;
 }
-.btn-register:hover { background: #222; }
+.btn-register:hover { background: #003ECC; }
 
 /* Error */
 .events-error {

@@ -126,8 +126,8 @@ onMounted(() => {
 .banner-body { display: flex; align-items: center; gap: 12px; }
 .coach-avatar-sm { width: 36px; height: 36px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; }
 .banner-name { font-weight: 700; font-size: 0.95rem; flex: 1; }
-.btn-dm { padding: 8px 18px; background: #000; color: #fff; border: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
-.btn-dm:hover { background: #222; }
+.btn-dm { padding: 8px 18px; background: #0052FF; color: #fff; border: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.btn-dm:hover { background: #003ECC; }
 
 /* Coach grid */
 .coach-grid { display: flex; flex-direction: column; gap: 12px; }
@@ -140,11 +140,11 @@ onMounted(() => {
 .sport-chip { padding: 3px 10px; border: 1px solid #E5E5E5; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #000; }
 .coach-action { display: flex; align-items: center; padding-top: 4px; }
 .btn-request {
-  padding: 10px 20px; background: #000; color: #fff; border: none;
+  padding: 10px 20px; background: #0052FF; color: #fff; border: none;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   cursor: pointer; white-space: nowrap;
 }
-.btn-request:hover { background: #222; }
+.btn-request:hover { background: #003ECC; }
 .btn-request:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-requested {
   padding: 10px 20px; background: #fff; color: #767676;

@@ -169,7 +169,7 @@ const handlePortal = async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #000;
+  background: #0052FF;
   color: #fff;
   font-weight: 700;
   font-size: 0.82rem;
@@ -184,7 +184,7 @@ const handlePortal = async () => {
   width: fit-content;
   min-width: 200px;
 }
-.btn-billing-primary:hover:not(:disabled) { background: #333; }
+.btn-billing-primary:hover:not(:disabled) { background: #003ECC; }
 .btn-billing-primary:disabled { background: #E5E5E5; color: #767676; cursor: not-allowed; }
 
 .btn-spinner {

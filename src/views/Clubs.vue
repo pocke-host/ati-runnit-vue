@@ -1060,7 +1060,7 @@ onMounted(() => {
   padding: 8px 18px;
   border: none;
   border-radius: 0;
-  background: var(--r-black, #0F1210);
+  background: #0052FF;
   color: white;
   font-family: inherit;
   font-weight: 600;
@@ -1070,7 +1070,7 @@ onMounted(() => {
 }
 
 .btn-join:hover:not(:disabled) {
-  background: #2a2a2a;
+  background: #003ECC;
   transform: translateY(-1px);
   box-shadow: none;
 }
@@ -1228,8 +1228,8 @@ onMounted(() => {
 .btn-cta {
   display: inline-block;
   padding: 14px 40px;
-  background: white;
-  color: var(--r-olive-deep);
+  background: #0052FF;
+  color: #fff;
   text-decoration: none;
   border: none;
   border-radius: 0;
@@ -1241,7 +1241,7 @@ onMounted(() => {
 }
 
 .btn-cta:hover {
-  background: rgba(255,255,255,0.88);
+  background: #003ECC;
   transform: none;
   box-shadow: none;
 }
@@ -1636,7 +1636,7 @@ onMounted(() => {
 .btn-create {
   height: 44px;
   padding: 0 28px;
-  background: #000;
+  background: #0052FF;
   color: #fff;
   border: none;
   border-radius: 0;
@@ -1650,7 +1650,7 @@ onMounted(() => {
   font-family: inherit;
   transition: background 0.15s;
 }
-.btn-create:hover:not(:disabled) { background: #222; }
+.btn-create:hover:not(:disabled) { background: #003ECC; }
 .btn-create:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* slide-up transition for modal */

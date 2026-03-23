@@ -372,11 +372,11 @@ const devices = ['Garmin', 'Apple Watch', 'COROS', 'Wahoo', 'Suunto', 'Zwift', '
 .btn-cta-primary {
   display: inline-block;
   padding: 14px 28px;
-  background: #fff; color: #000;
+  background: #0052FF; color: #fff;
   font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   text-decoration: none; border: none; cursor: pointer;
 }
-.btn-cta-primary:hover { background: #e5e5e5; }
+.btn-cta-primary:hover { background: #003ECC; color: #fff; }
 .btn-cta-ghost {
   display: inline-block;
   padding: 14px 28px;

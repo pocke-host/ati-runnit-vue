@@ -272,8 +272,8 @@ onMounted(() => {
 .req-name { font-weight: 600; font-size: 0.9rem; }
 .req-meta { font-size: 0.75rem; color: #767676; margin-top: 2px; }
 .req-actions { display: flex; gap: 8px; }
-.btn-approve { padding: 8px 16px; background: #000; color: #fff; border: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
-.btn-approve:hover { background: #222; }
+.btn-approve { padding: 8px 16px; background: #0052FF; color: #fff; border: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.btn-approve:hover { background: #003ECC; }
 .btn-decline { padding: 8px 16px; background: #fff; color: #000; border: 1px solid #E5E5E5; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
 .btn-decline:hover { border-color: #000; }
 
@@ -365,11 +365,11 @@ onMounted(() => {
 select.field-input { cursor: pointer; }
 .modal-error { font-size: 0.82rem; color: #dc2626; }
 .btn-create {
-  height: 48px; background: #000; color: #fff; border: none;
+  height: 48px; background: #0052FF; color: #fff; border: none;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.10em;
   text-transform: uppercase; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
-.btn-create:hover:not(:disabled) { background: #222; }
+.btn-create:hover:not(:disabled) { background: #003ECC; }
 .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
