@@ -41,10 +41,10 @@
           <div class="perf-num">{{ totalStats.duration }}<span class="perf-unit">hrs</span></div>
           <div class="perf-change">All activities</div>
         </div>
-        <div class="perf-cell">
-          <div class="perf-label">Day Streak</div>
+        <div class="perf-cell" :class="{ 'streak-at-risk': totalStats.streak > 0 && !activityToday }">
+          <div class="perf-label">🔥 Day Streak</div>
           <div class="perf-num">{{ totalStats.streak }}<span class="perf-unit">days</span></div>
-          <div class="perf-change">Keep going</div>
+          <div class="perf-change">{{ streakSubtitle }}</div>
         </div>
         <div class="perf-cell">
           <div class="perf-label">Following</div>
@@ -853,6 +853,23 @@ const currentStreak = computed(() => {
     }
   }
   return streak
+})
+
+const activityToday = computed(() => {
+  const today = new Date(); today.setHours(0,0,0,0)
+  return (activities.value || []).some(a => {
+    const d = new Date(a.createdAt); d.setHours(0,0,0,0)
+    return d.getTime() === today.getTime()
+  })
+})
+
+const streakSubtitle = computed(() => {
+  if (currentStreak.value === 0) return 'Start your streak!'
+  if (!activityToday.value) return '⚠️ Log today to keep it!'
+  if (currentStreak.value >= 30) return '🏆 Elite consistency!'
+  if (currentStreak.value >= 14) return 'On fire! Keep going'
+  if (currentStreak.value >= 7) return '1 week strong!'
+  return 'Keep going!'
 })
 
 // Training insights (compact CTL/ATL/ACWR for sidebar widget)
@@ -1801,6 +1818,7 @@ textarea.form-control{resize:vertical;min-height:72px}
 .mic-btn:hover{background:#333}
 .mic-btn--active{background:#ef4444;animation:mic-pulse 1s ease-in-out infinite}
 @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+.streak-at-risk .perf-num { color: #f97316; }
 @media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}.perf-strip{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
 @media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.dash-greeting{flex-direction:column;align-items:flex-start;gap:16px}.greeting-right{flex-direction:row;align-items:center;width:100%;justify-content:space-between}.greeting-headline{font-size:1.8rem}.top-actions{width:auto}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}

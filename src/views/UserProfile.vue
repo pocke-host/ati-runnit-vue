@@ -48,6 +48,8 @@
               </span>
             </div>
 
+            <div v-if="profile.bio" class="hero-bio">{{ profile.bio }}</div>
+
             <div class="hero-stats">
               <div class="hstat">
                 <div class="hstat-val">{{ activitiesCount }}</div>
@@ -72,6 +74,11 @@
               <div class="hstat">
                 <div class="hstat-val" :style="{ color: disciplineData.levelColor }">{{ disciplineData.level }}</div>
                 <div class="hstat-label">Discipline</div>
+              </div>
+              <div class="hstat-divider"></div>
+              <div class="hstat">
+                <div class="hstat-val">{{ currentStreak > 0 ? '🔥' : '' }}{{ currentStreak }}</div>
+                <div class="hstat-label">Day Streak</div>
               </div>
             </div>
 
@@ -149,6 +156,9 @@
           <button :class="['ctab', { active: tab === 'events' }]" @click="switchToEvents">
             <i class="bi bi-collection me-2"></i>Events
             <span class="ctab-count">{{ profileEvents.length }}</span>
+          </button>
+          <button :class="['ctab', { active: tab === 'records' }]" @click="switchToRecords">
+            <i class="bi bi-trophy-fill me-2"></i>PRs
           </button>
         </div>
       </div>
@@ -324,6 +334,50 @@
           </div>
         </div>
 
+        <!-- ── RECORDS TAB ── -->
+        <div v-if="tab === 'records'">
+          <div v-if="recordsLoading" class="tab-loading">
+            <div class="spinner-border spinner-border-sm"></div>
+            <span>Loading records…</span>
+          </div>
+          <div v-else-if="!personalRecords || !hasAnyRecord" class="tab-empty">
+            <i class="bi bi-trophy"></i>
+            <p>No personal records yet. Log races or time trials to set PRs.</p>
+          </div>
+          <div v-else class="records-grid">
+            <div class="pr-card" v-if="personalRecords.best_5k">
+              <div class="pr-distance">5K</div>
+              <div class="pr-time">{{ formatSecondsToTime(personalRecords.best_5k) }}</div>
+              <div class="pr-label">Personal Best</div>
+            </div>
+            <div class="pr-card" v-if="personalRecords.best_10k">
+              <div class="pr-distance">10K</div>
+              <div class="pr-time">{{ formatSecondsToTime(personalRecords.best_10k) }}</div>
+              <div class="pr-label">Personal Best</div>
+            </div>
+            <div class="pr-card" v-if="personalRecords.best_half">
+              <div class="pr-distance">Half Marathon</div>
+              <div class="pr-time">{{ formatSecondsToTime(personalRecords.best_half) }}</div>
+              <div class="pr-label">Personal Best</div>
+            </div>
+            <div class="pr-card" v-if="personalRecords.best_marathon">
+              <div class="pr-distance">Marathon</div>
+              <div class="pr-time">{{ formatSecondsToTime(personalRecords.best_marathon) }}</div>
+              <div class="pr-label">Personal Best</div>
+            </div>
+            <div class="pr-card pr-card-distance" v-if="personalRecords.longest_run">
+              <div class="pr-distance">Longest Run</div>
+              <div class="pr-time">{{ formatDistance(personalRecords.longest_run) }}</div>
+              <div class="pr-label">All Time</div>
+            </div>
+            <div class="pr-card pr-card-distance" v-if="personalRecords.fastest_pace">
+              <div class="pr-distance">Fastest Pace</div>
+              <div class="pr-time">{{ formatPace(personalRecords.fastest_pace) }}</div>
+              <div class="pr-label">Per mile/km</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </template>
 
@@ -384,7 +438,7 @@ const achievementStore = useAchievementStore()
 const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
 
-const { formatDistance, formatDuration, formatElevation } = useUnits()
+const { formatDistance, formatDuration, formatElevation, formatPace } = useUnits()
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
@@ -425,6 +479,56 @@ const totalDistanceMeters = computed(() => profileActivities.value.reduce((s, a)
 const disciplineData  = computed(() => useDisciplineScore(profileActivities.value))
 const archetypeData   = computed(() => useArchetype(profileActivities.value))
 const growthTimeline  = computed(() => useGrowthTimeline(profileActivities.value))
+
+// Streak
+const currentStreak = computed(() => {
+  const acts = profileActivities.value || []
+  if (!acts.length) return 0
+  const uniqueDays = [...new Set(
+    acts.map(a => { const d = new Date(a.createdAt); d.setHours(0,0,0,0); return d.getTime() })
+  )].sort((a, b) => b - a)
+  let streak = 0
+  let cursor = new Date(); cursor.setHours(0,0,0,0)
+  for (const ts of uniqueDays) {
+    const diff = Math.round((cursor.getTime() - ts) / 86400000)
+    if (diff <= 1) { streak++; cursor = new Date(ts) } else break
+  }
+  return streak
+})
+
+// Personal Records
+const personalRecords = ref(null)
+const recordsLoading = ref(false)
+const recordsLoaded = ref(false)
+const hasAnyRecord = computed(() => personalRecords.value && Object.values(personalRecords.value).some(v => v))
+
+const formatSecondsToTime = (s) => {
+  if (!s) return '—'
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = s % 60
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+  return `${m}:${String(sec).padStart(2,'0')}`
+}
+
+const loadPersonalRecords = async () => {
+  if (recordsLoaded.value) return
+  recordsLoading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/personal-records`, { headers: getAuthHeaders() })
+    personalRecords.value = data
+    recordsLoaded.value = true
+  } catch {
+    personalRecords.value = null
+  } finally {
+    recordsLoading.value = false
+  }
+}
+
+const switchToRecords = () => {
+  tab.value = 'records'
+  loadPersonalRecords()
+}
 
 const joinedDate = computed(() => {
   if (!profile.value.createdAt) return ''
@@ -1207,5 +1311,47 @@ onMounted(init)
   color: #767676;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.hero-bio {
+  font-size: 0.88rem;
+  color: #555;
+  margin: 8px 0 4px;
+  max-width: 480px;
+  line-height: 1.5;
+}
+.records-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 24px;
+  max-width: 900px;
+}
+.pr-card {
+  border: 1px solid #E5E5E5;
+  padding: 20px 16px;
+  text-align: center;
+}
+.pr-card:hover { border-color: #0052FF; }
+.pr-distance {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 8px;
+}
+.pr-time {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0052FF;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.pr-label {
+  font-size: 0.68rem;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 </style>
