@@ -427,14 +427,14 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #000;
-  border-color: #000;
+  background: #0052FF;
+  border-color: #0052FF;
   color: #fff;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #222;
-  border-color: #222;
+  background: #003ECC;
+  border-color: #003ECC;
 }
 
 .btn-primary:disabled {

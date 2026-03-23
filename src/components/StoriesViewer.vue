@@ -883,13 +883,13 @@
   }
   
   .btn-primary {
-    background: #000;
-    border-color: #000;
+    background: #0052FF;
+    border-color: #0052FF;
     color: white;
   }
-  
+
   .btn-primary:hover:not(:disabled) {
-    background: #2a2a2a;
+    background: #003ECC;
   }
   
   .btn-primary:disabled {
