@@ -731,8 +731,8 @@ onUnmounted(() => {
   transition: color 0.15s, border-color 0.15s;
   font-family: inherit;
 }
-.feed-action-btn:hover { color: #000; border-color: #000; }
-.feed-action-btn.active { color: #000; border-color: #000; background: #000; color: #fff; }
+.feed-action-btn:hover { color: #0052FF; border-color: #0052FF; }
+.feed-action-btn.active { border-color: #0052FF; background: #0052FF; color: #fff; }
 
 .feed-container {
   max-width: 1400px;

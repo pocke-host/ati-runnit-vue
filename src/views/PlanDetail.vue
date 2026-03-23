@@ -570,8 +570,8 @@ onMounted(async () => {
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: #000; border-color: transparent; color: white; }
-.btn-primary:hover:not(:disabled) { background: #333; }
+.btn-primary { background: #0052FF; border-color: transparent; color: white; }
+.btn-primary:hover:not(:disabled) { background: #003ECC; }
 .btn-outline-danger { background: rgba(255,255,255,0.70); border-color: rgba(220,38,38,0.30); color: #dc2626; }
 .btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }

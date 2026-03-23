@@ -222,18 +222,18 @@ const articles = [
 }
 .contact-btn {
   display: inline-block;
-  background: #fff;
-  color: #000;
+  background: #0052FF;
+  color: #fff;
   text-decoration: none;
   padding: 12px 24px;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
   flex-shrink: 0;
 }
-.contact-btn:hover { opacity: 0.85; }
+.contact-btn:hover { background: #003ECC; }
 
 @media (max-width: 640px) {
   .articles-grid { grid-template-columns: 1fr; }
