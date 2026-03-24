@@ -966,8 +966,8 @@ onMounted(async () => {
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: #0F1210; border-color: #0F1210; color: white; }
-.btn-primary:hover:not(:disabled) { background: #2a2a2a; }
+.btn-primary { background: #0052FF; border-color: #0052FF; color: white; }
+.btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
 .btn-ghost { background: transparent; border-color: rgba(15,18,16,0.14); }
 .btn-ghost:hover:not(:disabled) { background: rgba(15,18,16,0.04); }
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; }

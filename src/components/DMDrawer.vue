@@ -478,8 +478,8 @@ watch(() => dmStore.messages.length, async () => {
 }
 .dm-input:focus { border-color: #000; }
 .dm-send-btn {
-  border: 1px solid #000;
-  background: #000;
+  border: 1px solid #0052FF;
+  background: #0052FF;
   color: white;
   width: 42px;
   height: 42px;
@@ -492,7 +492,7 @@ watch(() => dmStore.messages.length, async () => {
   transition: background 0.15s;
   flex-shrink: 0;
 }
-.dm-send-btn:hover:not(:disabled) { background: #333; border-color: #333; }
+.dm-send-btn:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
 .dm-send-btn:disabled { background: #E5E5E5; border-color: #E5E5E5; color: #767676; cursor: not-allowed; }
 
 /* Transitions */

@@ -1660,12 +1660,12 @@ watch(zipcode, () => {
 .rd-btn-outline:hover { border-color: #000; }
 .rd-btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 100%; height: 44px; background: #000; color: #fff;
+  width: 100%; height: 44px; background: #0052FF; color: #fff;
   border: none; font-size: 0.82rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
   font-family: inherit; transition: background 0.15s;
 }
-.rd-btn-primary:hover:not(:disabled) { background: #222; }
+.rd-btn-primary:hover:not(:disabled) { background: #003ECC; }
 .rd-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .rd-links { display: flex; gap: 10px; }

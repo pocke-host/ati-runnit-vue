@@ -861,11 +861,11 @@ onMounted(init)
 }
 .btn:hover { background: rgba(255,255,255,0.25); }
 .btn-primary {
-  background: var(--r-black, #0F1210);
-  border-color: var(--r-black, #0F1210);
+  background: #0052FF;
+  border-color: #0052FF;
   color: white;
 }
-.btn-primary:hover:not(:disabled) { background: #2a2a2a; border-color: #2a2a2a; }
+.btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-following {
   background: rgba(16,185,129,0.20);

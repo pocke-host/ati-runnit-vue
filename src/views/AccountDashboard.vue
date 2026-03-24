@@ -1724,8 +1724,8 @@ onMounted(async () => {
 .upgrade-banner{margin-top:16px;padding:20px;background:#000;border-radius:0}
 .upgrade-label{font-size:0.75rem;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.55);margin-bottom:8px}
 .upgrade-desc{font-size:0.82rem;color:rgba(255,255,255,0.70);margin:0 0 16px;line-height:1.5}
-.upgrade-btn{display:inline-block;background:#000;color:#fff;font-weight:700;font-size:0.75rem;letter-spacing:0.10em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:0;transition:background 0.15s}
-.upgrade-btn:hover{background:#A3581F}
+.upgrade-btn{display:inline-block;background:#0052FF;color:#fff;font-weight:700;font-size:0.75rem;letter-spacing:0.10em;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:0;transition:background 0.15s}
+.upgrade-btn:hover{background:#003ECC}
 .manage-sub-link{margin-top:16px;padding:12px 0}
 .manage-sub-link a{font-size:0.82rem;color:#767676;text-decoration:none;display:flex;align-items:center;transition:color 0.15s}
 .manage-sub-link a:hover{color:#000}
@@ -1769,8 +1769,8 @@ onMounted(async () => {
 .goal-fill{height:100%;background:#0052FF;border-radius:0;transition:width 0.3s}
 .btn{border:1px solid #E5E5E5;background:#fff;color:#000;border-radius:0;height:44px;padding:0 16px;font-weight:900;letter-spacing:0.02em;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all 0.2s}
 .btn:hover{transform:translateY(-1px);border-color:rgba(15,18,16,0.18);background:rgba(255,255,255,0.72)}
-.btn-primary{background:#000;border-color:#000;color:#fff}
-.btn-primary:hover{background:#2a2a2a;border-color:#2a2a2a}
+.btn-primary{background:#0052FF;border-color:#0052FF;color:#fff}
+.btn-primary:hover{background:#003ECC;border-color:#003ECC}
 .btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .btn-outline{background:rgba(255,255,255,0.50);border-color:rgba(15,18,16,0.16)}
 .btn-ghost{background:rgba(255,255,255,0.40);border-color:rgba(15,18,16,0.10)}

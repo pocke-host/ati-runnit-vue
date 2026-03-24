@@ -927,7 +927,7 @@ onMounted(init)
   width: 44px;
   height: 44px;
   border-radius: 0;
-  background: #000;
+  background: #0052FF;
   border: none;
   color: white;
   cursor: pointer;
@@ -938,7 +938,7 @@ onMounted(init)
   transition: all 0.2s;
   flex-shrink: 0;
 }
-.comment-submit:hover:not(:disabled) { background: #2a2a2a; }
+.comment-submit:hover:not(:disabled) { background: #003ECC; }
 .comment-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* PR Banner */

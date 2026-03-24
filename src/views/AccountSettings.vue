@@ -660,11 +660,11 @@ onMounted(() => {
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn-primary {
-  background: var(--r-black, #0F1210);
-  border-color: var(--r-black, #0F1210);
+  background: #0052FF;
+  border-color: #0052FF;
   color: white;
 }
-.btn-primary:hover:not(:disabled) { background: #2a2a2a; border-color: #2a2a2a; }
+.btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
 .btn-outline-danger {
   background: transparent;
   border-color: rgba(220,38,38,0.30);

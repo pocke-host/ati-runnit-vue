@@ -835,8 +835,8 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
-.control-btn-start  { background: #000; color: #fff; }
-.control-btn-start:hover:not(:disabled)  { background: #222; }
+.control-btn-start  { background: #0052FF; color: #fff; }
+.control-btn-start:hover:not(:disabled)  { background: #003ECC; }
 .control-btn-pause  { background: #555; color: #fff; }
 .control-btn-pause:hover  { background: #333; }
 .control-btn-finish { background: #dc2626; color: #fff; }

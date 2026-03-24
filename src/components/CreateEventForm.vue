@@ -236,6 +236,7 @@ onMounted(async () => {
 
 .cef-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid #E5E5E5; }
 .btn-ghost { padding: 10px 20px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #E5E5E5; background: #fff; cursor: pointer; }
-.btn-primary { padding: 10px 24px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; background: #000; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-primary { padding: 10px 24px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; background: #0052FF; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-primary:hover { background: #003ECC; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
