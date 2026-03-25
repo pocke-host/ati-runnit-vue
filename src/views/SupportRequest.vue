@@ -235,10 +235,10 @@ textarea.form-control{
 
 /* Button */
 .btn-primary{
-  --bs-btn-bg: #000;
-  --bs-btn-border-color: #000;
-  --bs-btn-hover-bg: #333;
-  --bs-btn-hover-border-color: #333;
+  --bs-btn-bg: #0052FF;
+  --bs-btn-border-color: #0052FF;
+  --bs-btn-hover-bg: #003ECC;
+  --bs-btn-hover-border-color: #003ECC;
 
   font-weight: 900;
   letter-spacing: .02em;

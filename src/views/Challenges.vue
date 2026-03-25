@@ -834,7 +834,7 @@ onMounted(() => {
   height: 42px;
   border: none;
   border-radius: 0;
-  background: var(--r-black, #0F1210);
+  background: #0052FF;
   color: white;
   font-weight: 600;
   font-size: 14px;
@@ -844,7 +844,7 @@ onMounted(() => {
 }
 
 .btn-join:hover:not(:disabled) {
-  background: #2a2a2a;
+  background: #003ECC;
   transform: translateY(-1px);
   box-shadow: none;
 }

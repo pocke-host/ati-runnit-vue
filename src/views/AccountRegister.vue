@@ -450,7 +450,7 @@ const onSocial = (provider) => {
 /* Primary Button */
 .btn-primary {
   height: 48px;
-  background: #000;
+  background: #0052FF;
   border: none;
   border-radius: 0;
   color: white;
@@ -461,7 +461,7 @@ const onSocial = (provider) => {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #333;
+  background: #003ECC;
   transform: none;
   box-shadow: none;
 }

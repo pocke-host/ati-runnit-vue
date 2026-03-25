@@ -370,10 +370,10 @@ const handleCheckout = async (tier) => {
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-.plan-btn-primary { background: #000; color: #fff; }
-.plan-btn-primary:hover:not(:disabled) { background: #333; border-color: #333; color: #fff; text-decoration: none; }
+.plan-btn-primary { background: #0052FF; color: #fff; }
+.plan-btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; color: #fff; text-decoration: none; }
 .plan-btn-outline { background: #fff; color: #000; }
-.plan-btn-outline:hover:not(:disabled) { background: #000; color: #fff; text-decoration: none; }
+.plan-btn-outline:hover:not(:disabled) { background: #0052FF; color: #fff; border-color: #0052FF; text-decoration: none; }
 .plan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .plan-fine {
@@ -458,19 +458,19 @@ const handleCheckout = async (tier) => {
   justify-content: center;
   gap: 8px;
   padding: 16px 48px;
-  background: #fff;
-  color: #000;
+  background: #0052FF;
+  color: #fff;
   font-family: inherit;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
-  border: 2px solid #fff;
+  border: 2px solid #0052FF;
   cursor: pointer;
   transition: background 0.15s;
 }
-.cta-btn:hover:not(:disabled) { background: #e5e5e5; border-color: #e5e5e5; color: #000; text-decoration: none; }
+.cta-btn:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; color: #fff; text-decoration: none; }
 .cta-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .cta-fine {
   font-size: 0.72rem;

@@ -122,6 +122,16 @@
                 <span class="act-stat-chip" v-if="item.avgHeartRate"><i class="bi bi-heart me-1"></i>{{ item.avgHeartRate }} bpm</span>
                 <span class="act-stat-chip" v-if="item.elevationGain"><i class="bi bi-graph-up me-1"></i>{{ Math.round(item.elevationGain) }}m</span>
               </div>
+              <div class="act-reactions" @click.stop>
+                <button
+                  v-for="rxn in [{type:'LIKE',emoji:'👍'},{type:'FIRE',emoji:'🔥'},{type:'CLAP',emoji:'👏'}]"
+                  :key="rxn.type"
+                  :class="['act-rxn-btn', {active: getActivityReaction(item.id) === rxn.type}]"
+                  @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
+                >
+                  {{ rxn.emoji }} <span class="rxn-count">{{ getActivityReactionCount(item.id, rxn.type) }}</span>
+                </button>
+              </div>
             </router-link>
           </template>
         </article>
@@ -356,6 +366,40 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+// Activity reactions in feed
+const activityReactionMap = ref({}) // { [activityId]: { userReaction: null, counts: {LIKE:0, FIRE:0, CLAP:0} } }
+
+const getActivityReaction = (id) => activityReactionMap.value[id]?.userReaction || null
+const getActivityReactionCount = (id, type) => activityReactionMap.value[id]?.counts?.[type] || 0
+
+const initActivityReactions = (activity) => {
+  if (activityReactionMap.value[activity.id]) return
+  activityReactionMap.value[activity.id] = {
+    userReaction: activity.userReaction || null,
+    counts: activity.reactionCounts || { LIKE: 0, FIRE: 0, CLAP: 0 }
+  }
+}
+
+const toggleActivityReaction = async (activityId, type) => {
+  const current = activityReactionMap.value[activityId] || { userReaction: null, counts: { LIKE: 0, FIRE: 0, CLAP: 0 } }
+  const prev = current.userReaction
+  try {
+    if (prev === type) {
+      // Remove reaction
+      await axios.delete(`${API_URL}/activities/${activityId}/reactions`, { headers: getAuthHeaders() })
+      current.counts[type] = Math.max(0, (current.counts[type] || 0) - 1)
+      current.userReaction = null
+    } else {
+      // Add/change reaction
+      await axios.post(`${API_URL}/activities/${activityId}/reactions`, { type }, { headers: getAuthHeaders() })
+      if (prev) current.counts[prev] = Math.max(0, (current.counts[prev] || 0) - 1)
+      current.counts[type] = (current.counts[type] || 0) + 1
+      current.userReaction = type
+    }
+    activityReactionMap.value[activityId] = { ...current }
+  } catch { /* silent */ }
+}
+
 // Combine moments and activities into unified feed
 const feedItems = computed(() => {
   const momentItems = moments.value.map(m => ({ ...m, type: 'moment' }))
@@ -457,6 +501,7 @@ const fetchFeed = async () => {
       if (!seen.has(a.id)) { seen.add(a.id); merged.push(a) }
     }
     activities.value = merged
+    for (const a of merged) initActivityReactions(a)
   } finally {
     loading.value = false
   }
@@ -731,8 +776,8 @@ onUnmounted(() => {
   transition: color 0.15s, border-color 0.15s;
   font-family: inherit;
 }
-.feed-action-btn:hover { color: #000; border-color: #000; }
-.feed-action-btn.active { color: #000; border-color: #000; background: #000; color: #fff; }
+.feed-action-btn:hover { color: #0052FF; border-color: #0052FF; }
+.feed-action-btn.active { border-color: #0052FF; background: #0052FF; color: #fff; }
 
 .feed-container {
   max-width: 1400px;
@@ -1591,4 +1636,26 @@ onUnmounted(() => {
   font-size: 1.1rem; font-weight: 900; text-transform: uppercase;
   letter-spacing: 0.06em; margin: 0 0 20px;
 }
+
+.act-reactions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid #f0f0f0;
+}
+.act-rxn-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid #E5E5E5;
+  background: none;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.act-rxn-btn:hover { border-color: #0052FF; color: #0052FF; }
+.act-rxn-btn.active { background: #0052FF; border-color: #0052FF; color: #fff; }
+.rxn-count { font-size: 0.72rem; font-weight: 600; }
 </style>

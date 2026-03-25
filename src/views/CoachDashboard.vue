@@ -215,11 +215,11 @@ onMounted(async () => {
 .req-actions { display: flex; gap: 8px; }
 .btn-approve {
   padding: 8px 16px;
-  background: #000; color: #fff; border: none;
+  background: #0052FF; color: #fff; border: none;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; cursor: pointer;
 }
-.btn-approve:hover { background: #222; }
+.btn-approve:hover { background: #003ECC; }
 .btn-approve:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-decline {
   padding: 8px 16px;

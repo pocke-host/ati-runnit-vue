@@ -1376,7 +1376,7 @@ textarea.form-control { resize: vertical; min-height: 60px; }
 .btn-cancel:hover { border-color: #000; }
 .btn-save {
   flex: 2;
-  background: #000;
+  background: #0052FF;
   color: #fff;
   border: none;
   padding: 9px;
@@ -1385,7 +1385,9 @@ textarea.form-control { resize: vertical; min-height: 60px; }
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
+  transition: background 0.15s;
 }
+.btn-save:hover:not(:disabled) { background: #003ECC; }
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* WEEK PLAN MODAL */

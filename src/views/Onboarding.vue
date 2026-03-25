@@ -605,7 +605,7 @@ async function goToDashboard() {
   display: block;
   width: 100%;
   padding: 16px 24px;
-  background: #000;
+  background: #0052FF;
   color: #fff;
   border: none;
   border-radius: 0;
@@ -618,7 +618,7 @@ async function goToDashboard() {
 }
 
 .btn-cta:hover:not(:disabled) {
-  background: #222;
+  background: #003ECC;
 }
 
 .btn-cta:disabled {

@@ -1,16 +1,18 @@
 # Runnit Views — Claude Instructions
 
-## Design System (lululemon aesthetic — non-negotiable)
+## Design System
 - `border-radius: 0` everywhere — no rounded corners
 - `box-shadow: none` — no shadows on cards, drawers, hovers
 - No CSS gradients except on map/image overlays
-- Page background: `#fff` (never `--rk-paper` or `#FAF8FF`)
+- Page background: `#fff`
 - Hero sections: `background: #000`
-- Buttons: black bg, uppercase, `letter-spacing: 0.10em`
+- **Primary buttons: `background: #0052FF`, white text, uppercase, `letter-spacing: 0.12em`, `font-weight: 600`, `font-size: 0.78rem`, `border: 2px solid #0052FF`**
+- **Primary button hover: `background: #003ECC`, `border-color: #003ECC`**
+- Secondary/ghost buttons: white bg, border `1px solid #E5E5E5`
+- Danger buttons: keep red (`#dc2626` / `#ef4444`)
 - Font: `Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, ...`
 - Active state: `border-bottom: 2px solid #000` (underline, not filled)
 - Borders: `1px solid #E5E5E5`
-- No purple `#8B2BE2` / `--rk-signal` / `--rk-void` / `--rk-paper` tokens anywhere
 
 ## Design Tokens
 ```css
