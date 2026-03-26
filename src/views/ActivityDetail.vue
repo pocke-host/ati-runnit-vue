@@ -70,6 +70,22 @@
         </div>
       </div>
 
+      <!-- HERO MAP — full width, above columns -->
+      <div v-if="hasCoords" class="hero-map-section">
+        <div class="hero-map-inner">
+          <RouteViewer :activity="activity" />
+        </div>
+        <div v-if="elevationPoints.length > 1" class="elev-strip">
+          <div class="elev-meta">
+            <span class="elev-meta-label">ELEVATION PROFILE</span>
+            <span class="elev-meta-gain">↑ {{ elevationDisplay }}</span>
+          </div>
+          <div class="elev-chart-wrap">
+            <canvas ref="elevChart"></canvas>
+          </div>
+        </div>
+      </div>
+
       <!-- MAIN LAYOUT -->
       <div class="detail-layout">
 
@@ -132,20 +148,19 @@
           </div>
 
           <!-- PR Banner -->
-          <div v-if="activityPRs.length > 0" class="det-card pr-banner">
-            <div class="pr-banner-header">🎉 Personal Record{{ activityPRs.length > 1 ? 's' : '' }}!</div>
+          <div v-if="activityPRs.length > 0" class="pr-banner">
+            <div class="pr-banner-glow"></div>
+            <div class="pr-banner-content">
+              <div class="pr-banner-trophy">🏆</div>
+              <div class="pr-banner-text">
+                <div class="pr-banner-title">PERSONAL RECORD{{ activityPRs.length > 1 ? 'S' : '' }}</div>
+                <div class="pr-banner-sub">You crushed it{{ activityPRs.length > 1 ? ` — ${activityPRs.length} new bests` : '' }}!</div>
+              </div>
+            </div>
             <div class="pr-pills">
               <span v-for="prId in activityPRs" :key="prId" class="pr-pill">
-                <i class="bi bi-trophy-fill me-1"></i>{{ getPRLabel(prId) }}
+                {{ getPRLabel(prId) }}
               </span>
-            </div>
-          </div>
-
-          <!-- Route map -->
-          <div v-if="hasCoords" class="det-card map-card">
-            <h3 class="det-section-title">Route</h3>
-            <div class="map-wrap">
-              <RouteViewer :activity="activity" />
             </div>
           </div>
 
@@ -243,7 +258,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
@@ -256,6 +271,8 @@ import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
 import { useNotificationStore } from '@/stores/notification'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
+import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables)
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -291,6 +308,25 @@ const deleteLoading = ref(false)
 const activityId = computed(() => route.params.id)
 const parentEvent = ref(null)
 const activityPRs = ref([])
+
+// Elevation profile chart
+const elevChart = ref(null)
+let elevChartInstance = null
+
+const elevationPoints = computed(() => {
+  const a = activity.value
+  if (!a) return []
+  const coords = a.coords || a.gpsCoords || a.route || []
+  if (!Array.isArray(coords) || coords.length < 2) return []
+  return coords.map(c => {
+    if (Array.isArray(c) && c.length >= 3) return Number(c[2])
+    if (c && typeof c === 'object') {
+      const alt = c.altitude ?? c.alt ?? c.ele ?? null
+      return alt != null ? Number(alt) : null
+    }
+    return null
+  }).filter(v => v !== null && !isNaN(v))
+})
 
 const isOwn = computed(() =>
   activity.value?.userId && user.value?.id &&
@@ -366,6 +402,74 @@ const formatTime = (d) => {
   if (hours < 24) return `${hours}h ago`
   if (days < 7) return `${days}d ago`
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+// Confetti burst on PR
+const triggerConfetti = () => {
+  if (!document.getElementById('rk-confetti-style')) {
+    const s = document.createElement('style')
+    s.id = 'rk-confetti-style'
+    s.textContent = `@keyframes rkConfettiFall{0%{transform:translateY(-10px) rotate(var(--r));opacity:1}100%{transform:translateY(105vh) rotate(calc(var(--r) + 600deg));opacity:0}}`
+    document.head.appendChild(s)
+  }
+  const colors = ['#0052FF','#FFD700','#FF3366','#00CC88','#FF6B35','#9B59B6','#fff']
+  const wrap = document.createElement('div')
+  wrap.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;'
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div')
+    const color = colors[i % colors.length]
+    const x = Math.random() * 100
+    const w = Math.random() * 10 + 5
+    const r = Math.random() * 360
+    const dur = Math.random() * 2.5 + 1.5
+    const delay = Math.random() * 0.8
+    p.style.cssText = `position:absolute;left:${x}%;top:0;width:${w}px;height:${w * 0.42}px;background:${color};--r:${r}deg;animation:rkConfettiFall ${dur}s ${delay}s ease-in forwards;`
+    wrap.appendChild(p)
+  }
+  document.body.appendChild(wrap)
+  setTimeout(() => wrap.remove(), 5000)
+}
+
+// Elevation profile chart
+const initElevChart = async () => {
+  await nextTick()
+  if (!elevChart.value || elevationPoints.value.length < 2) return
+  if (elevChartInstance) { elevChartInstance.destroy(); elevChartInstance = null }
+  const pts = elevationPoints.value
+  elevChartInstance = new Chart(elevChart.value, {
+    type: 'line',
+    data: {
+      labels: pts.map((_, i) => i),
+      datasets: [{
+        data: pts,
+        fill: true,
+        borderColor: '#0052FF',
+        backgroundColor: 'rgba(0,82,255,0.12)',
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: { display: false },
+        y: {
+          display: true,
+          grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false },
+          ticks: {
+            maxTicksLimit: 3,
+            font: { size: 10 },
+            color: 'rgba(0,0,0,0.38)',
+            callback: v => Math.round(v) + ' m'
+          },
+          border: { display: false }
+        }
+      }
+    }
+  })
 }
 
 // Data loading
@@ -495,6 +599,8 @@ const handleDelete = async () => {
 const getPRLabel = (prId) => PR_CATALOG.find(p => p.id === prId)?.label || prId
 
 watch(activityId, () => init())
+watch(activityPRs, (prs) => { if (prs.length > 0) triggerConfetti() })
+watch(activity, async (a) => { if (a && elevationPoints.value.length > 1) await initElevChart() })
 onMounted(init)
 </script>
 
@@ -779,13 +885,42 @@ onMounted(init)
   margin: 0;
 }
 
-/* Map */
-.map-card { padding-bottom: 20px; }
-.map-wrap {
-  height: 300px;
-  border-radius: 0;
+/* HERO MAP */
+.hero-map-section {
+  width: 100%;
+  background: #000;
+}
+.hero-map-inner {
+  height: 440px;
   overflow: hidden;
-  background: rgba(15,18,16,0.05);
+  position: relative;
+}
+.elev-strip {
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 10px 24px 14px;
+}
+.elev-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.elev-meta-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(0,0,0,0.38);
+  text-transform: uppercase;
+}
+.elev-meta-gain {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0052FF;
+}
+.elev-chart-wrap {
+  height: 80px;
+  position: relative;
 }
 
 /* Reactions */
@@ -943,14 +1078,46 @@ onMounted(init)
 
 /* PR Banner */
 .pr-banner {
-  background: var(--rk-signal, #0052FF);
-  border-color: var(--rk-signal, #0052FF) !important;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 1px solid rgba(0,82,255,0.35);
+  margin-bottom: 20px;
+  padding: 24px;
 }
-.pr-banner-header {
-  font-weight: 900;
+.pr-banner-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(0,82,255,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.pr-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.pr-banner-trophy {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.pr-banner-text {}
+.pr-banner-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #FFD700;
+  margin-bottom: 4px;
+}
+.pr-banner-sub {
   font-size: 1.05rem;
-  color: var(--rk-void, #000000);
-  margin-bottom: 12px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.01em;
 }
 .pr-pills {
   display: flex;
@@ -960,13 +1127,14 @@ onMounted(init)
 .pr-pill {
   display: inline-flex;
   align-items: center;
-  background: rgba(0,0,0,0.10);
-  border: 1px solid rgba(0,0,0,0.18);
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.35);
   border-radius: 0;
   padding: 6px 14px;
-  font-size: 0.82rem;
-  font-weight: 900;
-  color: var(--rk-void, #000000);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #FFD700;
+  letter-spacing: 0.04em;
 }
 
 /* Utilities */
@@ -995,6 +1163,8 @@ onMounted(init)
   .detail-layout { padding: 20px 16px 48px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .top-date { display: none; }
+  .hero-map-inner { height: 280px; }
+  .elev-strip { padding: 8px 16px 12px; }
 }
 
 @media (max-width: 480px) {
