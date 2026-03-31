@@ -419,7 +419,7 @@ const sortedFeedItems = computed(() => {
   } else if (activeTab.value === 'mine') {
     filtered = feedItems.value.filter(item => item.user.id === user.value?.id)
   } else if (activeTab.value === 'following') {
-    filtered = feedItems.value.filter(item => item.user.id !== user.value?.id)
+    filtered = feedItems.value.filter(item => followingIds.value.has(item.user?.id))
   }
 
   if (sortOrder.value === 'newest') {

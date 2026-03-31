@@ -149,14 +149,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { role } = storeToRefs(authStore)
+const { role, isAuthenticated } = storeToRefs(authStore)
+
+onMounted(() => {
+  if (isAuthenticated.value) {
+    router.replace(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
+  }
+})
 
 const email = ref('')
 const password = ref('')
