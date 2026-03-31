@@ -82,6 +82,7 @@
           <span class="summary-value">{{ coachSelections.athleteCount }}</span>
         </div>
       </div>
+      <div v-if="saveError" class="save-error">{{ saveError }}</div>
       <button class="btn-cta" :disabled="saving" @click="goToCoachDashboard">
         <span v-if="!saving">Open Coaching Hub</span>
         <span v-else><span class="spinner-border spinner-border-sm me-2"></span>Saving...</span>
@@ -215,6 +216,7 @@
           <span class="summary-value">{{ selections.units === 'imperial' ? 'Miles & feet' : 'Kilometers & meters' }}</span>
         </div>
       </div>
+      <div v-if="saveError" class="save-error">{{ saveError }}</div>
       <button class="btn-cta" :disabled="saving" @click="goToDashboard">
         <span v-if="!saving">Start training</span>
         <span v-else><span class="spinner-border spinner-border-sm me-2"></span>Saving...</span>
@@ -229,6 +231,8 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
+
+const saveError = ref('')
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -346,30 +350,41 @@ function finishCoach() {
 
 async function goToCoachDashboard() {
   saving.value = true
-  axios.patch(`${API_URL}/users/me/preferences`, {
-    sportsCoached: coachSelections.sports,
-    athleteCount: coachSelections.athleteCount,
-  }).catch(() => {})
-  sessionStorage.removeItem('needs_onboarding')
-  authStore.completeOnboarding()
-  router.push('/coach/dashboard')
+  saveError.value = ''
+  try {
+    await axios.patch(`${API_URL}/users/me/preferences`, {
+      sportsCoached: coachSelections.sports,
+      athleteCount: coachSelections.athleteCount,
+    })
+    sessionStorage.removeItem('needs_onboarding')
+    authStore.completeOnboarding()
+    router.push('/coach/dashboard')
+  } catch {
+    saveError.value = 'Failed to save your preferences. Please try again.'
+  } finally {
+    saving.value = false
+  }
 }
 
 async function goToDashboard() {
   saving.value = true
+  saveError.value = ''
   authStore.setUnitSystem(selections.units)
-
-  // Fire-and-forget preferences save
-  axios.patch(`${API_URL}/users/me/preferences`, {
-    sport: selections.sport,
-    goal: selections.goal,
-    level: selections.level,
-    trainingDays: selections.days,
-  }).catch(() => {})
-
-  sessionStorage.removeItem('needs_onboarding')
-  authStore.completeOnboarding()
-  router.push('/dashboard')
+  try {
+    await axios.patch(`${API_URL}/users/me/preferences`, {
+      sport: selections.sport,
+      goal: selections.goal,
+      level: selections.level,
+      trainingDays: selections.days,
+    })
+    sessionStorage.removeItem('needs_onboarding')
+    authStore.completeOnboarding()
+    router.push('/dashboard')
+  } catch {
+    saveError.value = 'Failed to save your preferences. Please try again.'
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -674,6 +689,18 @@ async function goToDashboard() {
   color: #000;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* ── Save error ── */
+.save-error {
+  width: 100%;
+  padding: 12px 16px;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  color: #DC2626;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-bottom: 16px;
 }
 
 /* ── Responsive ── */
