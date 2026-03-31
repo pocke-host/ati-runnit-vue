@@ -147,7 +147,7 @@
 
         <p class="text-center text-muted small mt-4 mb-0">
           Already have an account?
-          <router-link to="/login" class="link">Sign in</router-link>
+          <router-link to="/join-us" class="link">Sign in</router-link>
         </p>
       </div>
     </section>
@@ -189,12 +189,20 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { isAuthenticated, role } = storeToRefs(authStore)
+
+onMounted(() => {
+  if (isAuthenticated.value) {
+    router.replace(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
+  }
+})
 
 const displayName = ref('')
 const email = ref('')

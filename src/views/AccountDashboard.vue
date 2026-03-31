@@ -53,6 +53,39 @@
         </div>
       </section>
 
+      <!-- WEEK CALENDAR STRIP -->
+      <section class="week-strip">
+        <div class="week-strip-inner">
+          <div class="week-strip-label">THIS WEEK</div>
+          <div class="week-days">
+            <div
+              v-for="day in weekCalendar"
+              :key="day.date"
+              :class="['week-day', { 'is-today': day.isToday, 'has-activity': day.activities.length > 0, 'is-future': day.isFuture }]"
+            >
+              <div class="wday-label">{{ day.letter }}</div>
+              <div class="wday-dot-wrap">
+                <router-link
+                  v-if="day.activities.length === 1"
+                  :to="`/activity/${day.activities[0].id}`"
+                  class="wday-dot wday-done"
+                  :title="day.activities[0].sportType"
+                >{{ getSportEmoji(day.activities[0].sportType) }}</router-link>
+                <div v-else-if="day.activities.length > 1" class="wday-dot wday-multi">{{ day.activities.length }}</div>
+                <div v-else-if="!day.isFuture" class="wday-dot wday-empty"></div>
+                <div v-else class="wday-dot wday-future"></div>
+              </div>
+              <div class="wday-date">{{ day.dayNum }}</div>
+            </div>
+          </div>
+          <div class="week-strip-totals">
+            <span class="wst-item">{{ weekActivities }} workout{{ weekActivities !== 1 ? 's' : '' }}</span>
+            <span class="wst-dot">·</span>
+            <span class="wst-item">{{ formatDistance(weekDistance) }}</span>
+          </div>
+        </div>
+      </section>
+
       <!-- MAIN GRID -->
       <section class="dashboard-grid">
         <!-- LEFT: Charts -->
@@ -862,6 +895,49 @@ const activityToday = computed(() => {
     return d.getTime() === today.getTime()
   })
 })
+
+const getSportEmoji = (sport) => {
+  const map = { RUN: '🏃', RUNNING: '🏃', BIKE: '🚴', CYCLING: '🚴', SWIM: '🏊', SWIMMING: '🏊', HIKE: '🥾', HIKING: '🥾', WALK: '🚶', WALKING: '🚶' }
+  return map[sport?.toUpperCase()] || '⚡'
+}
+
+const weekCalendar = computed(() => {
+  const acts = activities.value || []
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  // Get Monday of current week
+  const monday = new Date(today)
+  const dow = today.getDay()
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1))
+  monday.setHours(0, 0, 0, 0)
+
+  return ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((letter, i) => {
+    const date = new Date(monday)
+    date.setDate(monday.getDate() + i)
+    date.setHours(0, 0, 0, 0)
+    const dateStr = date.toDateString()
+    const dayActs = acts.filter(a => {
+      const d = new Date(a.createdAt); d.setHours(0, 0, 0, 0)
+      return d.toDateString() === dateStr
+    })
+    return {
+      letter,
+      date: date.toISOString(),
+      dayNum: date.getDate(),
+      isToday: date.getTime() === today.getTime(),
+      isFuture: date.getTime() > today.getTime(),
+      activities: dayActs
+    }
+  })
+})
+
+const weekActivities = computed(() =>
+  weekCalendar.value.reduce((sum, d) => sum + d.activities.length, 0)
+)
+
+const weekDistance = computed(() =>
+  weekCalendar.value.reduce((sum, d) =>
+    sum + d.activities.reduce((s, a) => s + (a.distanceMeters || 0), 0), 0)
+)
 
 const streakSubtitle = computed(() => {
   if (currentStreak.value === 0) return 'Start your streak!'
@@ -1823,4 +1899,119 @@ textarea.form-control{resize:vertical;min-height:72px}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
 @media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.dash-greeting{flex-direction:column;align-items:flex-start;gap:16px}.greeting-right{flex-direction:row;align-items:center;width:100%;justify-content:space-between}.greeting-headline{font-size:1.8rem}.top-actions{width:auto}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
 @media(max-width:375px){.perf-strip{grid-template-columns:repeat(2,1fr)}.profile-stats-mini{grid-template-columns:repeat(2,1fr)}.top-actions .btn{font-size:0.72rem;padding:10px 12px}}
+
+/* ── Week Calendar Strip ─────────────────────────────────────────── */
+.week-strip {
+  background: #000;
+  border-bottom: 1px solid #1a1a1a;
+}
+.week-strip-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 24px 16px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.week-strip-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.week-days {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  max-width: 52px;
+}
+.wday-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase;
+}
+.week-day.is-today .wday-label { color: #0052FF; }
+.wday-dot-wrap {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wday-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.wday-done {
+  background: rgba(0, 82, 255, 0.18);
+  border: 2px solid #0052FF;
+}
+.wday-done:hover { transform: scale(1.12); }
+.week-day.is-today .wday-done {
+  background: #0052FF;
+  border-color: #0052FF;
+}
+.wday-empty {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.10);
+}
+.wday-future {
+  background: transparent;
+  border: 1.5px dashed rgba(255,255,255,0.10);
+}
+.wday-multi {
+  background: #0052FF;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: default;
+  border: 2px solid #0052FF;
+}
+.wday-date {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.25);
+  font-weight: 600;
+}
+.week-day.is-today .wday-date { color: #0052FF; font-weight: 700; }
+.week-strip-totals {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.wst-item {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+}
+.wst-dot { color: rgba(255,255,255,0.20); font-size: 0.9rem; }
+@media (max-width: 600px) {
+  .week-strip-inner { padding: 14px 16px 12px; gap: 12px; }
+  .week-strip-label { display: none; }
+  .week-strip-totals { display: none; }
+  .wday-dot { width: 32px; height: 32px; font-size: 0.9rem; }
+  .wday-dot-wrap { width: 34px; height: 34px; }
+}
 </style>
