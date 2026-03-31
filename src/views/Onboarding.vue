@@ -7,14 +7,12 @@
 
     <!-- Header row (steps 2–6, athlete only) -->
     <div class="onboard-header" v-if="!isCoach && step >= 2 && step <= 6">
-      <button class="btn-back" @click="back" v-if="step > 2">← Back</button>
-      <span v-else></span>
+      <button class="btn-back" @click="back">← Back</button>
       <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 05</span>
     </div>
     <!-- Header row for coach steps -->
     <div class="onboard-header" v-if="isCoach && step >= 2 && step <= 3">
-      <button class="btn-back" @click="back" v-if="step > 2">← Back</button>
-      <span v-else></span>
+      <button class="btn-back" @click="back">← Back</button>
       <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 02</span>
     </div>
 
@@ -241,7 +239,8 @@ const { user, role } = storeToRefs(authStore)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const step = ref(1)
-const TOTAL_STEPS = 5
+const ATHLETE_STEPS = 5  // steps 2–6 are the 5 choice screens
+const COACH_STEPS = 2    // steps 2–3 are the 2 coach choice screens
 const saving = ref(false)
 
 const isCoach = computed(() => role.value === 'coach')
@@ -266,8 +265,10 @@ const firstName = computed(() => {
 
 const progressWidth = computed(() => {
   if (step.value <= 1) return '0%'
-  const filled = Math.min(step.value - 1, TOTAL_STEPS)
-  return `${(filled / TOTAL_STEPS) * 100}%`
+  const total = isCoach.value ? COACH_STEPS : ATHLETE_STEPS
+  // step 2 = 1/total filled, step 6 (or 3 for coach) = total/total = 100%
+  const filled = Math.min(step.value - 1, total)
+  return `${(filled / total) * 100}%`
 })
 
 const sportOptions = [

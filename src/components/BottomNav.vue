@@ -10,7 +10,7 @@
       <span class="tab-label">Feed</span>
     </router-link>
 
-    <router-link to="/track" class="tab-item tab-track">
+    <router-link to="/track" class="tab-item tab-track" active-class="tab-track--active">
       <div class="track-circle">
         <i class="bi bi-play-fill"></i>
       </div>
@@ -121,6 +121,11 @@ const userId = computed(() => user.value?.id)
 .tab-track:hover .track-circle,
 .tab-track.router-link-active .track-circle {
   transform: scale(1.06);
+}
+
+/* Active state: highlight label blue like other tabs */
+.tab-track--active .tab-label {
+  color: #0052FF;
 }
 
 .tab-track .tab-label {

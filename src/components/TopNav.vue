@@ -78,7 +78,7 @@
               </div>
               <div v-else class="notif-list">
                 <div
-                  v-for="n in notifications.slice(0, 12)"
+                  v-for="n in notifications"
                   :key="n.id"
                   :class="['notif-item', { unread: !n.read }]"
                   @click="handleNotifClick(n)"
@@ -92,9 +92,6 @@
                   </div>
                   <div v-if="!n.read" class="notif-dot"></div>
                 </div>
-              </div>
-              <div v-if="notifications.length > 12" class="notif-footer">
-                {{ notifications.length - 12 }} more notifications
               </div>
             </div>
           </div>
@@ -371,6 +368,7 @@ const handleNotifClick = async (n) => {
   if (n.type === 'NEW_FOLLOWER' && n.actorId) router.push(`/profile/${n.actorId}`)
   else if (n.type === 'REACTION' || n.type === 'COMMENT') router.push('/feed')
   else if (n.type === 'CLUB_INVITE') router.push('/clubs')
+  else if (n.type === 'CHALLENGE') router.push('/challenges')
 }
 
 const handleOutsideClick = (e) => {
