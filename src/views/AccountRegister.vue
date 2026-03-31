@@ -196,11 +196,11 @@ import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const { isAuthenticated, role } = storeToRefs(authStore)
+const { isAuthenticated } = storeToRefs(authStore)
 
 onMounted(() => {
   if (isAuthenticated.value) {
-    router.replace(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
+    router.replace(authStore.role === 'coach' ? '/coach/dashboard' : '/dashboard')
   }
 })
 
