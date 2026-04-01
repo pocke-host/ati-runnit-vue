@@ -50,6 +50,18 @@
 
     <div class="stats-content">
 
+      <!-- EMPTY STATE -->
+      <EmptyState
+        v-if="!hasActivities"
+        icon="bi-lightning-charge"
+        title="No activities yet"
+        message="Log your first run, ride, or workout to unlock your full stats dashboard."
+        actionLabel="Log Activity"
+        actionTo="/activities/new"
+      />
+
+      <template v-if="hasActivities">
+
       <!-- PERFORMANCE INTELLIGENCE -->
       <section id="stats-overview" class="section" v-if="performanceMetrics">
         <div class="section-header">
@@ -451,6 +463,8 @@
         </div>
       </section>
 
+      </template><!-- end v-if="hasActivities" -->
+
     </div>
   </div>
 </template>
@@ -476,7 +490,8 @@ const { classifyActivity } = useWorkoutClassifier()
 
 const activityStore = useActivityStore()
 const prStore = usePRStore()
-const { activities } = storeToRefs(activityStore)
+const { activities, loading } = storeToRefs(activityStore)
+const hasActivities = computed(() => loading.value || activities.value.length > 0)
 
 const {
   isImperial,
