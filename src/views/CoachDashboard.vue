@@ -286,4 +286,9 @@ onMounted(async () => {
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 .me-2 { margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  .hero-bar { padding: 28px 16px 24px; }
+  .content-wrap { padding: 24px 16px; gap: 32px; }
+}
 </style>
