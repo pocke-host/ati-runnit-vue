@@ -19,6 +19,10 @@
     </div>
 
     <div class="content-wrap">
+      <div v-if="actionError" class="action-error">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>{{ actionError }}
+      </div>
+
       <!-- Pending Requests Tab -->
       <template v-if="tab === 'requests'">
         <div v-if="pendingRequests.length === 0" class="empty-state">
@@ -151,6 +155,7 @@ const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
 const tab = ref('roster')
 const expanded = ref([])
 const athletePlans = ref({})
+const actionError = ref('')
 
 const createModal = reactive({
   open: false,
@@ -187,10 +192,20 @@ const formatTime = (d) => {
 }
 
 const approve = async (reqId) => {
-  try { await coachStore.approveRequest(reqId) } catch {}
+  actionError.value = ''
+  try {
+    await coachStore.approveRequest(reqId)
+  } catch {
+    actionError.value = 'Failed to approve request. Please try again.'
+  }
 }
 const decline = async (reqId) => {
-  try { await coachStore.rejectRequest(reqId) } catch {}
+  actionError.value = ''
+  try {
+    await coachStore.rejectRequest(reqId)
+  } catch {
+    actionError.value = 'Failed to decline request. Please try again.'
+  }
 }
 
 const openCreatePlan = (athleteId) => {
@@ -263,6 +278,7 @@ onMounted(() => {
 }
 
 .content-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+.action-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; display: flex; align-items: center; margin-bottom: 16px; }
 
 /* Requests */
 .request-list { display: flex; flex-direction: column; gap: 10px; }

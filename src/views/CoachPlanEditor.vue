@@ -24,6 +24,16 @@
       </div>
     </div>
 
+    <!-- Error banners -->
+    <div v-if="saveError" class="editor-error">
+      <i class="bi bi-exclamation-circle-fill me-2"></i>{{ saveError }}
+      <button class="editor-error-dismiss" @click="saveError = ''"><i class="bi bi-x"></i></button>
+    </div>
+    <div v-if="deleteError" class="editor-error">
+      <i class="bi bi-exclamation-circle-fill me-2"></i>{{ deleteError }}
+      <button class="editor-error-dismiss" @click="deleteError = ''"><i class="bi bi-x"></i></button>
+    </div>
+
     <!-- Week Tabs -->
     <div class="week-tabs-wrap">
       <div class="week-tabs">
@@ -137,15 +147,18 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePlanStore } from '@/stores/plan'
 
 const route = useRoute()
+const router = useRouter()
 const planStore = usePlanStore()
 
 const plan = ref(null)
 const loading = ref(true)
 const saving = ref(false)
+const saveError = ref('')
+const deleteError = ref('')
 const isDirty = ref(false)
 const planName = ref('')
 const activeWeek = ref(1)
@@ -162,20 +175,25 @@ const markDirty = () => { isDirty.value = true }
 
 const savePlan = async () => {
   saving.value = true
+  saveError.value = ''
   try {
     await planStore.updatePlan(plan.value.id, { name: planName.value })
     isDirty.value = false
-  } catch {}
-  saving.value = false
+  } catch {
+    saveError.value = 'Failed to save plan. Please try again.'
+  } finally {
+    saving.value = false
+  }
 }
 
 const saveWeekTheme = async () => {
-  // Save week theme — send patch for plan with week data
   try {
     await planStore.updatePlan(plan.value.id, {
       weekThemes: { [activeWeek.value]: currentWeekData.value?.theme }
     })
-  } catch {}
+  } catch (err) {
+    console.error('Failed to save week theme:', err)
+  }
 }
 
 const saveWorkout = async (workout) => {
@@ -189,7 +207,10 @@ const saveWorkout = async (workout) => {
       duration: workout.duration,
       description: workout.description,
     })
-  } catch {}
+  } catch (err) {
+    console.error('Failed to save workout:', err)
+    saveError.value = 'A workout change could not be saved. Please refresh and try again.'
+  }
 }
 
 const addWorkout = async () => {
@@ -226,7 +247,9 @@ const doDelete = async () => {
   try {
     await planStore.deleteWorkout(plan.value.id, workout.id)
     weekData.value[activeWeek.value].workouts = weekData.value[activeWeek.value].workouts.filter(w => w.id !== workout.id)
-  } catch {}
+  } catch {
+    deleteError.value = 'Failed to delete workout. Please try again.'
+  }
 }
 
 const autoResize = (e) => {
@@ -260,8 +283,11 @@ onMounted(async () => {
     plan.value = data
     planName.value = data.name || ''
     buildWeekData(data)
-  } catch {}
-  loading.value = false
+  } catch {
+    router.replace('/coach/dashboard')
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
@@ -324,6 +350,27 @@ onMounted(async () => {
 }
 .btn-save:hover { background: #e5e5e5; }
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.editor-error {
+  background: rgba(239,68,68,0.08);
+  border-bottom: 1px solid rgba(239,68,68,0.20);
+  color: #dc2626;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.editor-error-dismiss {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 1rem;
+  line-height: 1;
+}
 
 /* Week tabs */
 .week-tabs-wrap { border-bottom: 1px solid #E5E5E5; overflow-x: auto; }

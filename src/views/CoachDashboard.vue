@@ -25,6 +25,10 @@
     </section>
 
     <div class="content-wrap">
+      <div v-if="actionError" class="action-error">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>{{ actionError }}
+      </div>
+
       <!-- Pending Requests -->
       <section v-if="pendingRequests.length > 0" class="section">
         <div class="section-header">
@@ -99,6 +103,7 @@ const { user } = storeToRefs(authStore)
 const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
 
 const actionLoading = ref(null)
+const actionError = ref('')
 
 const plansAssigned = computed(() =>
   athletes.value.filter(a => a.activePlan).length
@@ -118,12 +123,23 @@ const formatTime = (d) => {
 
 const approve = async (reqId) => {
   actionLoading.value = reqId
-  try { await coachStore.approveRequest(reqId) } catch {}
-  actionLoading.value = null
+  actionError.value = ''
+  try {
+    await coachStore.approveRequest(reqId)
+  } catch {
+    actionError.value = 'Failed to approve request. Please try again.'
+  } finally {
+    actionLoading.value = null
+  }
 }
 
 const decline = async (reqId) => {
-  try { await coachStore.rejectRequest(reqId) } catch {}
+  actionError.value = ''
+  try {
+    await coachStore.rejectRequest(reqId)
+  } catch {
+    actionError.value = 'Failed to decline request. Please try again.'
+  }
 }
 
 onMounted(async () => {
@@ -171,6 +187,7 @@ onMounted(async () => {
 
 /* Content */
 .content-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px; display: flex; flex-direction: column; gap: 48px; }
+.action-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; display: flex; align-items: center; margin-bottom: -32px; }
 
 .section {}
 .section-header {
