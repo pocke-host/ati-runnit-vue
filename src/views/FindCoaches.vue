@@ -20,6 +20,11 @@
         </div>
       </div>
 
+      <!-- Request error -->
+      <div v-if="requestError" class="request-error">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>{{ requestError }}
+      </div>
+
       <!-- Loading -->
       <div v-if="loading" class="empty-state">
         <div class="spinner-border spinner-border-sm me-2"></div> Loading coaches...
@@ -80,13 +85,18 @@ const dmStore = useDMStore()
 const { coaches, myCoach, requestSentToId, loading } = storeToRefs(athleteStore)
 
 const actionLoading = ref(null)
+const requestError = ref('')
 
 const sendRequest = async (coachId) => {
   actionLoading.value = coachId
+  requestError.value = ''
   try {
     await athleteStore.sendRequest(coachId)
-  } catch {}
-  actionLoading.value = null
+  } catch {
+    requestError.value = 'Failed to send request. Please try again.'
+  } finally {
+    actionLoading.value = null
+  }
 }
 
 const openDM = () => {
@@ -151,6 +161,7 @@ onMounted(() => {
   border: 1px solid #E5E5E5; font-size: 0.78rem; font-weight: 600; cursor: not-allowed;
 }
 
+.request-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; }
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 24px; color: #767676; text-align: center; }
 .empty-icon { font-size: 2.5rem; }
 .empty-state p { font-size: 0.9rem; margin: 0; }

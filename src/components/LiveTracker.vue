@@ -453,7 +453,9 @@ const fetchContacts = async () => {
       headers: { Authorization: `Bearer ${token}` },
     })
     sosContacts.value = data
-  } catch {}
+  } catch (err) {
+    console.error('Failed to load SOS contacts:', err)
+  }
 }
 
 watch(isTracking, (val) => {

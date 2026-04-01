@@ -120,20 +120,18 @@
         </div>
       </section>
 
-      <!-- ── PRIVACY (placeholder) ──────────────── -->
+      <!-- ── PRIVACY ────────────────────────────── -->
       <section class="settings-section">
         <div class="section-label">Privacy</div>
         <div class="settings-card">
           <div class="field-row">
-            <label class="field-label">Account Visibility</label>
-            <select class="field-select" disabled>
-              <option>Public</option>
-              <option>Friends Only</option>
-              <option>Private</option>
-            </select>
-          </div>
-          <div class="coming-soon-note">
-            <i class="bi bi-lock me-2"></i>Privacy controls coming soon
+            <div>
+              <div class="field-label">Profile Visibility</div>
+              <div class="field-hint">Control who can see your profile and activities.</div>
+            </div>
+            <button class="btn btn-sm" @click="router.push('/profile/edit')">
+              <i class="bi bi-pencil me-1"></i>Edit in Profile
+            </button>
           </div>
         </div>
       </section>
@@ -274,7 +272,7 @@ const saveProfile = async () => {
       { displayName: displayName.value.trim() },
       { headers: getAuthHeaders() }
     )
-    authStore.setAuth(localStorage.getItem('token'), { ...user.value, displayName: displayName.value.trim(), ...data })
+    authStore.setAuth({ ...user.value, displayName: displayName.value.trim(), ...data })
     showProfileStatus('Profile updated!')
   } catch (err) {
     console.error('Failed to update profile:', err)
@@ -308,7 +306,9 @@ const loadContacts = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/emergency-contacts`, { headers: getAuthHeaders() })
     contacts.value = data
-  } catch {}
+  } catch (err) {
+    console.error('Failed to load emergency contacts:', err)
+  }
 }
 
 const addContact = async () => {
@@ -508,18 +508,6 @@ onMounted(() => {
   font-size: 0.95rem;
   color: rgba(15,18,16,0.55);
 }
-.field-select {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid #E5E5E5;
-  border-radius: 0;
-  background: var(--rk-paper, #ffffff);
-  font-family: inherit;
-  font-size: 0.95rem;
-  cursor: not-allowed;
-  opacity: 0.60;
-}
-
 .field-status {
   display: flex;
   align-items: center;
@@ -531,17 +519,6 @@ onMounted(() => {
 }
 .field-status.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.20); color: #047857; }
 .field-status.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; }
-
-.coming-soon-note {
-  font-size: 0.85rem;
-  color: rgba(15,18,16,0.45);
-  display: flex;
-  align-items: center;
-  padding: 10px 14px;
-  background: rgba(15,18,16,0.03);
-  border-radius: 0;
-  border: 1px dashed rgba(15,18,16,0.14);
-}
 
 /* ── Unit Cards ── */
 .unit-cards {

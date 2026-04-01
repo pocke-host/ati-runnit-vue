@@ -95,11 +95,18 @@
         <h2 class="modal-title">Delete event?</h2>
         <p style="color:#767676;font-size:.9rem">This won't delete the individual activities.</p>
         <div class="modal-actions">
-          <button class="btn-ghost-sm" @click="confirmDelete = false">Cancel</button>
-          <button class="btn-danger-sm" @click="deleteEvent">Delete</button>
+          <button class="btn-ghost-sm" @click="confirmDelete = false" :disabled="deleting">Cancel</button>
+          <button class="btn-danger-sm" @click="deleteEvent" :disabled="deleting">
+            <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+            {{ deleting ? 'Deleting…' : 'Delete' }}
+          </button>
         </div>
       </div>
     </div>
+
+  <div v-if="deleteError" class="delete-error-banner">
+    <i class="bi bi-exclamation-circle-fill me-2"></i>{{ deleteError }}
+  </div>
 
   </div>
 
@@ -127,6 +134,8 @@ const event        = ref(null)
 const loading      = ref(true)
 const showEdit     = ref(false)
 const confirmDelete = ref(false)
+const deleteError  = ref('')
+const deleting     = ref(false)
 
 const isOwner = computed(() => event.value?.userId === user.value?.id)
 
@@ -167,13 +176,19 @@ async function loadEvent() {
 }
 
 async function deleteEvent() {
+  deleting.value = true
+  deleteError.value = ''
   try {
     const token = localStorage.getItem('token')
     await axios.delete(`${API_URL}/multisport-events/${route.params.id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     router.push('/feed')
-  } catch {}
+  } catch {
+    deleteError.value = 'Failed to delete event. Please try again.'
+    deleting.value = false
+    confirmDelete.value = false
+  }
 }
 
 function onSaved(updated) {
@@ -252,6 +267,19 @@ onMounted(loadEvent)
 .notes-text { font-size: 0.9rem; color: #333; line-height: 1.6; white-space: pre-wrap; }
 
 /* Modal */
+.delete-error-banner {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.20);
+  color: #dc2626;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  max-width: 760px;
+  margin: 0 auto 16px;
+}
+
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
   display: flex; align-items: center; justify-content: center;

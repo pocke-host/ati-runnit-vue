@@ -83,7 +83,7 @@
               <textarea
                 v-model="form.bio"
                 class="pe-input pe-textarea"
-                placeholder="A few words about you and your running..."
+                placeholder="A few words about you and your training..."
                 maxlength="300"
                 rows="4"
               ></textarea>
@@ -168,7 +168,13 @@
             <div class="danger-title">Delete Account</div>
             <div class="danger-sub">Permanently delete your account and all data. This cannot be undone.</div>
           </div>
-          <button class="btn-danger" @click="confirmDelete">Delete Account</button>
+          <button class="btn-danger" @click="confirmDelete" :disabled="deleting">
+            <span v-if="deleting" class="btn-spinner"></span>
+            {{ deleting ? 'Deleting…' : 'Delete Account' }}
+          </button>
+        </div>
+        <div v-if="deleteError" class="pe-banner pe-banner-error" style="margin-top: 12px;">
+          <i class="bi bi-exclamation-circle-fill"></i> {{ deleteError }}
         </div>
       </div>
 
@@ -311,11 +317,20 @@ const saveProfile = async () => {
   }
 }
 
-const confirmDelete = () => {
-  if (confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
-    // TODO: call DELETE /users/me then logout
+const deleting = ref(false)
+const deleteError = ref('')
+
+const confirmDelete = async () => {
+  if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await axios.delete(`${API_URL}/users/me`, { headers: getAuthHeaders() })
     authStore.logout()
     router.push('/')
+  } catch {
+    deleteError.value = 'Failed to delete account. Please try again or contact support.'
+    deleting.value = false
   }
 }
 

@@ -83,11 +83,13 @@
                 </div>
               </div>
 
-              <div class="moment-song-compact">
+              <div v-if="item.caption" class="moment-caption">{{ item.caption }}</div>
+
+              <div v-if="item.songTitle" class="moment-song-compact">
                 <i class="bi bi-music-note-beamed me-2"></i>
                 <div class="song-text">
                   <span class="song-title">{{ item.songTitle }}</span>
-                  <span class="song-artist">{{ item.songArtist }}</span>
+                  <span v-if="item.songArtist" class="song-artist">{{ item.songArtist }}</span>
                 </div>
               </div>
             </div>
@@ -214,15 +216,17 @@
               </button>
             </div>
 
-            <div class="moment-song-full">
+            <div v-if="selectedMoment.caption" class="moment-caption-full">{{ selectedMoment.caption }}</div>
+
+            <div v-if="selectedMoment.songTitle" class="moment-song-full">
               <div class="song-icon">🎵</div>
               <div class="song-info">
                 <div class="song-title-full">{{ selectedMoment.songTitle }}</div>
-                <div class="song-artist-full">{{ selectedMoment.songArtist }}</div>
-                <a 
-                  v-if="selectedMoment.songLink" 
-                  :href="selectedMoment.songLink" 
-                  target="_blank" 
+                <div v-if="selectedMoment.songArtist" class="song-artist-full">{{ selectedMoment.songArtist }}</div>
+                <a
+                  v-if="selectedMoment.songLink"
+                  :href="selectedMoment.songLink"
+                  target="_blank"
                   class="song-link"
                 >
                   <i class="bi bi-spotify me-1"></i>Listen on Spotify
@@ -1040,6 +1044,15 @@ onUnmounted(() => {
   color: rgba(15,18,16,0.50);
 }
 
+.moment-caption {
+  font-size: 0.9rem;
+  color: rgba(15,18,16,0.85);
+  line-height: 1.5;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .moment-song-compact {
   display: flex;
   align-items: center;
@@ -1259,6 +1272,16 @@ onUnmounted(() => {
   font-weight: 900;
   color: white;
   font-size: 1.2rem;
+}
+
+.moment-caption-full {
+  padding: 16px 24px;
+  font-size: 1rem;
+  color: rgba(15,18,16,0.88);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-bottom: 1px solid rgba(15,18,16,0.08);
 }
 
 .moment-song-full {

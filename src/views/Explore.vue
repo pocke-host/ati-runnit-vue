@@ -20,10 +20,10 @@
             <option value="WALK">Walking</option>
           </select>
           <select v-model="radiusKm" class="filter-select" @change="loadNearby">
-            <option :value="10">10 km</option>
-            <option :value="25">25 km</option>
-            <option :value="50">50 km</option>
-            <option :value="100">100 km</option>
+            <option :value="isImperial ? 16 : 10">{{ isImperial ? '10 mi' : '10 km' }}</option>
+            <option :value="isImperial ? 40 : 25">{{ isImperial ? '25 mi' : '25 km' }}</option>
+            <option :value="isImperial ? 80 : 50">{{ isImperial ? '50 mi' : '50 km' }}</option>
+            <option :value="isImperial ? 160 : 100">{{ isImperial ? '100 mi' : '100 km' }}</option>
           </select>
         </div>
       </div>
@@ -50,6 +50,12 @@
       <div class="list-panel">
         <div v-if="loading" class="list-loading">
           <div class="spinner-border" style="width:1.2rem;height:1.2rem;border-color:#E5E5E5;border-top-color:#000"></div>
+        </div>
+
+        <div v-else-if="loadError" class="list-empty">
+          <i class="bi bi-exclamation-circle" style="font-size:2rem;color:#E5E5E5"></i>
+          <p>{{ loadError }}</p>
+          <button class="retry-btn" @click="loadNearby">Try Again</button>
         </div>
 
         <div v-else-if="!activities.length" class="list-empty">
@@ -150,6 +156,7 @@ const userLng = ref(null)
 const selectedSport = ref('')
 const radiusKm = ref(50)
 const loading = ref(false)
+const loadError = ref('')
 const activities = ref([])
 
 // ── Computed: unique athletes from the activity list ──────────────
@@ -228,6 +235,7 @@ function dimPin(id) {
 async function loadNearby() {
   if (!userLat.value) return
   loading.value = true
+  loadError.value = ''
   try {
     const token = localStorage.getItem('token')
     const params = new URLSearchParams({
@@ -243,7 +251,8 @@ async function loadNearby() {
     })
     activities.value = data.content || data || []
     plotActivities()
-  } catch (e) {
+  } catch {
+    loadError.value = 'Could not load nearby activities. Check your connection and try again.'
     activities.value = []
   } finally {
     loading.value = false
@@ -258,7 +267,9 @@ async function followAthlete(athlete) {
       headers: { Authorization: `Bearer ${token}` },
     })
     athlete.isFollowing = true
-  } catch {}
+  } catch {
+    loadError.value = 'Failed to follow athlete. Please try again.'
+  }
 }
 
 // ── Navigation ────────────────────────────────────────────────────
@@ -430,6 +441,21 @@ onBeforeUnmount(() => { map?.remove() })
   color: #767676;
   font-size: 0.85rem;
 }
+
+.retry-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.retry-btn:hover { background: #222; }
 
 /* Athletes strip */
 .nearby-athletes {

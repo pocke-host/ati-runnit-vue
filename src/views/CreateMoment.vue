@@ -42,37 +42,57 @@
           />
         </div>
 
-        <!-- Song Info -->
+        <!-- Caption -->
         <div class="form-group">
-          <label class="form-label">Song Title *</label>
-          <input 
-            v-model="form.songTitle" 
-            type="text" 
-            class="form-control"
-            placeholder="What's your workout song?"
-            required 
-          />
+          <label class="form-label">Caption <span class="optional">(optional)</span></label>
+          <textarea
+            v-model="form.caption"
+            class="form-control form-textarea"
+            placeholder="What's on your mind?"
+            maxlength="500"
+            rows="3"
+          ></textarea>
+          <div class="char-count">{{ form.caption?.length ?? 0 }} / 500</div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Artist *</label>
-          <input 
-            v-model="form.songArtist" 
-            type="text" 
-            class="form-control"
-            placeholder="Artist name"
-            required 
-          />
-        </div>
+        <!-- Song Info (optional) -->
+        <div class="song-section">
+          <button type="button" class="song-toggle" @click="showSong = !showSong">
+            <i :class="showSong ? 'bi bi-chevron-up' : 'bi bi-music-note-beamed'"></i>
+            {{ showSong ? 'Hide song info' : 'Add a song' }}
+          </button>
 
-        <div class="form-group">
-          <label class="form-label">Song Link <span class="optional">(optional)</span></label>
-          <input 
-            v-model="form.songLink" 
-            type="url" 
-            class="form-control"
-            placeholder="https://spotify.com/..."
-          />
+          <div v-if="showSong" class="song-fields">
+            <div class="form-group">
+              <label class="form-label">Song Title</label>
+              <input
+                v-model="form.songTitle"
+                type="text"
+                class="form-control"
+                placeholder="What's your workout song?"
+                maxlength="255"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Artist</label>
+              <input
+                v-model="form.songArtist"
+                type="text"
+                class="form-control"
+                placeholder="Artist name"
+                maxlength="255"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Song Link <span class="optional">(optional)</span></label>
+              <input
+                v-model="form.songLink"
+                type="url"
+                class="form-control"
+                placeholder="https://spotify.com/..."
+              />
+            </div>
+          </div>
         </div>
 
         <!-- Error Display -->
@@ -106,10 +126,13 @@ const uploadStore = useUploadStore()
 
 const { uploading, progress: uploadProgress } = storeToRefs(uploadStore)
 
+const showSong = ref(false)
+
 const form = ref({
   activityId: route.query.activityId || null,
   photoUrl: '',
   routeSnapshotUrl: '',
+  caption: '',
   songTitle: '',
   songArtist: '',
   songLink: ''
@@ -309,6 +332,49 @@ const handleSubmit = async () => {
 .form-control::placeholder {
   color: rgba(15,18,16,0.40);
 }
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 0.78rem;
+  color: rgba(15,18,16,0.40);
+  margin-top: 4px;
+}
+
+.song-section {
+  margin-bottom: 24px;
+  border: 1px solid #E5E5E5;
+  padding: 16px;
+}
+
+.song-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(15,18,16,0.65);
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.song-toggle:hover { color: #000; }
+
+.song-fields {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.song-fields .form-group { margin-bottom: 16px; }
 
 .alert {
   padding: 14px 16px;
