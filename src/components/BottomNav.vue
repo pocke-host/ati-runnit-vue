@@ -85,7 +85,7 @@ const userId = computed(() => user.value?.id)
 }
 
 .tab-label {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;

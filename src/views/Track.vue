@@ -32,7 +32,7 @@
   
   .page-container {
     min-height: 100vh;
-    padding: 100px 20px 40px;
+    padding: calc(var(--nav-h, 64px) + 24px) 20px 40px;
     max-width: 1200px;
     margin: 0 auto;
   }
@@ -66,5 +66,17 @@
     font-weight: 900;
     font-size: 2rem;
     margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .page-container {
+      padding: calc(var(--nav-h, 64px) + 12px) 16px 32px;
+    }
+    .page-header h1 {
+      font-size: 1.4rem;
+    }
+    .page-header {
+      margin-bottom: 20px;
+    }
   }
   </style>

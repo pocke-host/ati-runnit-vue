@@ -152,7 +152,7 @@ onMounted(() => {
 .btn-request {
   padding: 10px 20px; background: #0052FF; color: #fff; border: none;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  cursor: pointer; white-space: nowrap;
+  cursor: pointer;
 }
 .btn-request:hover { background: #003ECC; }
 .btn-request:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -170,4 +170,12 @@ onMounted(() => {
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 .me-2 { margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  .hero { padding: 36px 16px 28px; }
+  .content-wrap { padding: 24px 16px; }
+  .coach-card { flex-direction: column; gap: 12px; }
+  .coach-action { padding-top: 0; }
+  .btn-request, .btn-requested { width: 100%; justify-content: center; }
+}
 </style>

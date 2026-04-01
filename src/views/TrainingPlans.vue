@@ -986,4 +986,14 @@ onMounted(async () => {
   .goal-tab { padding: 12px 14px; min-width: 72px; }
   .phase-breakdown { flex-wrap: wrap; }
 }
+
+@media (max-width: 480px) {
+  .hero { padding: 28px 16px 20px; }
+  .plans-body { padding: 24px 16px 80px; }
+  .new-plan-section { padding: 0; }
+  .goal-tab { min-width: 64px; padding: 10px 10px; }
+  .preview-start { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .preview-actions { justify-content: stretch; }
+  .preview-actions .btn { flex: 1; justify-content: center; }
+}
 </style>

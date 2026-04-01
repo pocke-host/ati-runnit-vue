@@ -447,4 +447,19 @@ const handleSubmit = async () => {
 .me-2 {
   margin-right: 8px;
 }
+
+@media (max-width: 600px) {
+  .create-moment-page {
+    padding: calc(var(--nav-h, 64px) + 12px) 12px 32px;
+  }
+  .moment-card {
+    padding: 20px 16px;
+  }
+  .upload-area {
+    padding: 32px 16px;
+  }
+  .moment-header h2 {
+    font-size: 1.2rem;
+  }
+}
 </style>

@@ -1715,6 +1715,9 @@ onMounted(async () => {
   .section-title { font-size: 1.1rem; }
   .pr-card { padding: 16px; }
   .pr-value { font-size: 1.3rem; }
+  .perf-grid { grid-template-columns: 1fr; }
+  .hero { padding: 32px 16px 28px; }
+  .stats-content { padding: 20px 12px 80px; }
 }
 
 /* ── Athlete Archetype ── */
