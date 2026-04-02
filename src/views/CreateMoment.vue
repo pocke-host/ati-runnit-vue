@@ -12,7 +12,7 @@
         <!-- Photo Upload -->
         <div class="form-group">
           <label class="form-label">Photo *</label>
-          <div v-if="!photoPreview" class="upload-area" @click="triggerFileInput">
+          <div v-if="!photoPreview" class="upload-area" @click="pickPhoto">
             <i class="bi bi-camera" style="font-size: 48px;"></i>
             <p>Tap to take photo or upload</p>
           </div>
@@ -118,6 +118,10 @@ import { useRouter, useRoute } from 'vue-router'
 import { useMomentStore } from '@/stores/moment'
 import { useUploadStore } from '@/stores/upload'
 import { storeToRefs } from 'pinia'
+import { Capacitor } from '@capacitor/core'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
+
+const isNative = Capacitor.isNativePlatform()
 
 const router = useRouter()
 const route = useRoute()
@@ -144,20 +148,48 @@ const routeFile = ref(null)
 const error = ref('')
 const fileInput = ref(null)
 
-const triggerFileInput = () => {
-  fileInput.value.click()
+// Convert a base64 data URI to a File object for the upload store
+const base64ToFile = (base64, mimeType = 'image/jpeg') => {
+  const byteString = atob(base64)
+  const ab = new ArrayBuffer(byteString.length)
+  const ia = new Uint8Array(ab)
+  for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i)
+  const ext = mimeType.split('/')[1] || 'jpg'
+  return new File([ab], `moment_${Date.now()}.${ext}`, { type: mimeType })
+}
+
+const pickPhoto = async () => {
+  if (isNative) {
+    // Native iOS/Android: show action sheet — camera or library
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 85,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Prompt,   // prompts: Take Photo / Choose Photo
+        correctOrientation: true,
+        width: 1080,
+      })
+      const mimeType = `image/${photo.format}`
+      const file = base64ToFile(photo.base64String, mimeType)
+      photoFile.value = file
+      photoPreview.value = `data:${mimeType};base64,${photo.base64String}`
+    } catch (err) {
+      if (!err.message?.includes('cancelled')) {
+        console.error('Camera error:', err)
+      }
+    }
+  } else {
+    // Web fallback: hidden file input
+    fileInput.value.click()
+  }
 }
 
 const handlePhotoSelect = (event) => {
   const file = event.target.files[0]
   if (!file) return
-  
   photoFile.value = file
-  
   const reader = new FileReader()
-  reader.onload = (e) => {
-    photoPreview.value = e.target.result
-  }
+  reader.onload = (e) => { photoPreview.value = e.target.result }
   reader.readAsDataURL(file)
 }
 
