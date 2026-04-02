@@ -421,6 +421,8 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(139,43,226,0.20);
   box-shadow: none;
   transition: background 0.3s ease, border-color 0.3s ease;
+  /* Push content below the status bar / Dynamic Island on iOS */
+  padding-top: env(safe-area-inset-top, 0px);
 }
 .navbar--scrolled {
   background: rgba(13, 5, 18, 0.82);
@@ -434,7 +436,7 @@ onUnmounted(() => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
-  height: var(--nav-h, 64px);
+  height: 64px; /* fixed content height — safe area is handled by .navbar padding-top */
   display: flex;
   align-items: center;
 }

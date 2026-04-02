@@ -11,7 +11,8 @@
 
 :root {
   /* ── Layout ── */
-  --nav-h: 64px;
+  /* Include safe-area-inset-top so pages padding-top: var(--nav-h) clears the notch */
+  --nav-h: calc(64px + env(safe-area-inset-top, 0px));
   --tab-h: 64px;
 
   /* ── RUNNIT Electric Palette ── */
@@ -149,7 +150,7 @@ a:hover { text-decoration: none; }
 .runnit-card     { background: #fff; border: 1px solid var(--rk-rule); border-radius: 0; box-shadow: none; }
 .runnit-overline { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--rk-signal); }
 
-/* ── Mobile bottom nav padding ── */
+/* ── Mobile bottom nav padding — includes home indicator safe area ── */
 @media (max-width: 768px) {
-  body { padding-bottom: var(--tab-h, 64px); }
+  body { padding-bottom: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px)); }
 }

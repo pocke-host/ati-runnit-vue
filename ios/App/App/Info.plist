@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Runnit</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+
+	<!-- ── Orientation: portrait only (fitness app) ── -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+
+	<!-- ── Launch ── -->
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+
+	<!-- ── Status bar: light icons on dark nav ── -->
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+
+	<!-- ── Location: GPS tracking ── -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Runnit uses your location to track runs, rides, and workouts in real-time.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Runnit needs background location access to continue tracking your activity when you switch apps mid-run.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Runnit needs background location access to continue tracking your activity when you switch apps mid-run.</string>
+
+	<!-- ── Camera: Moment photo capture ── -->
+	<key>NSCameraUsageDescription</key>
+	<string>Runnit uses your camera to capture and share workout moments.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Runnit can access your photo library to choose images for workout moments.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Runnit can save your workout photos to your photo library.</string>
+
+	<!-- ── Microphone: voice notes (future) ── -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Runnit can record voice notes during your workouts.</string>
+
+	<!-- ── Contacts: find athlete friends ── -->
+	<key>NSContactsUsageDescription</key>
+	<string>Runnit can find your contacts who are also on Runnit so you can train together.</string>
+
+	<!-- ── Motion: step count and cadence ── -->
+	<key>NSMotionUsageDescription</key>
+	<string>Runnit uses motion data to track your step cadence and automatically detect your activity type.</string>
+
+	<!-- ── Bluetooth: heart rate monitors and sensors ── -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Runnit connects to Bluetooth heart rate monitors and fitness sensors during workouts.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Runnit connects to Bluetooth heart rate monitors and fitness sensors during workouts.</string>
+</dict>
+</plist>
