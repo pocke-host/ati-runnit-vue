@@ -193,6 +193,10 @@ import { useUnits } from '@/composables/useUnits'
 import { useActivityStore } from '@/stores/activity'
 import { useVoiceNote } from '@/composables/useVoiceNote'
 import axios from 'axios'
+import { Capacitor } from '@capacitor/core'
+import { Geolocation } from '@capacitor/geolocation'
+
+const isNative = Capacitor.isNativePlatform()
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
@@ -504,17 +508,37 @@ const sendSos = async () => {
 
 // ── Tracking controls ─────────────────────────────────────────────────────────
 
-const startTracking = () => {
+const startTracking = async () => {
   gpsError.value = ''
   isTracking.value = true
   hasStarted.value = true
   startEpoch = Date.now() - pausedMs
 
-  watchId = navigator.geolocation.watchPosition(
-    handlePositionUpdate,
-    handlePositionError,
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  )
+  if (isNative) {
+    // Native: uses OS-level GPS — continues in background when app is minimized
+    watchId = await Geolocation.watchPosition(
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      (position, err) => {
+        if (err) { handlePositionError(err); return }
+        // Wrap in the same shape as browser GeolocationPosition
+        handlePositionUpdate({
+          coords: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            altitude: position.coords.altitude,
+            accuracy: position.coords.accuracy,
+            speed: position.coords.speed,
+          }
+        })
+      }
+    )
+  } else {
+    watchId = navigator.geolocation.watchPosition(
+      handlePositionUpdate,
+      handlePositionError,
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+  }
 
   timerInterval = setInterval(() => {
     elapsedTime.value = Math.floor((Date.now() - startEpoch) / 1000)
@@ -529,7 +553,8 @@ const pauseTracking = () => {
   pausedMs = elapsedTime.value * 1000
 
   if (watchId !== null) {
-    navigator.geolocation.clearWatch(watchId)
+    if (isNative) Geolocation.clearWatch({ id: watchId })
+    else navigator.geolocation.clearWatch(watchId)
     watchId = null
   }
   clearInterval(timerInterval)
@@ -625,7 +650,10 @@ const encodeVal = (v) => {
 onMounted(initializeMap)
 
 onUnmounted(() => {
-  if (watchId !== null) navigator.geolocation.clearWatch(watchId)
+  if (watchId !== null) {
+    if (isNative) Geolocation.clearWatch({ id: watchId })
+    else navigator.geolocation.clearWatch(watchId)
+  }
   if (timerInterval) clearInterval(timerInterval)
   if (map.value) map.value.remove()
 })

@@ -17,7 +17,9 @@
     "@capacitor/android": "^6.0.0",
     "@capacitor/camera": "^6.0.0",
     "@capacitor/core": "^6.0.0",
+    "@capacitor/geolocation": "^6.1.1",
     "@capacitor/ios": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.3",
     "@stripe/stripe-js": "^8.9.0",
     "@unhead/vue": "^2.1.12",
     "@vercel/analytics": "^1.6.1",
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
     "@vitejs/plugin-vue": "^6.0.1",
+    "typescript": "^6.0.2",
     "vite": "^7.0.6",
     "vite-plugin-vue-devtools": "^8.0.0"
   }
