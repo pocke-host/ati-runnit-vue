@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <style>
+      .letter {
+        font-family: 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', sans-serif;
+        font-weight: 800;
+        font-size: 580px;
+        fill: #ffffff;
+        letter-spacing: -0.02em;
+      }
+    </style>
+  </defs>
+
+  <!-- Black background (App Store requires no transparency) -->
+  <rect width="1024" height="1024" fill="#000000" />
+
+  <!-- Large R centered -->
+  <text x="512" y="760" class="letter" text-anchor="middle">R</text>
+
+  <!-- Blue underline accent -->
+  <rect x="200" y="820" width="624" height="28" fill="#0052FF" />
+</svg>

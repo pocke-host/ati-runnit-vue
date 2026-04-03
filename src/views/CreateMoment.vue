@@ -117,6 +117,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useMomentStore } from '@/stores/moment'
 import { useUploadStore } from '@/stores/upload'
+import { useToast } from '@/composables/useToast'
 import { storeToRefs } from 'pinia'
 import { Capacitor } from '@capacitor/core'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
@@ -127,6 +128,7 @@ const router = useRouter()
 const route = useRoute()
 const momentStore = useMomentStore()
 const uploadStore = useUploadStore()
+const { showToast } = useToast()
 
 const { uploading, progress: uploadProgress } = storeToRefs(uploadStore)
 
@@ -179,7 +181,8 @@ const pickPhoto = async () => {
       }
     }
   } else {
-    // Web fallback: hidden file input
+    // Reset so re-selecting the same file fires @change
+    if (fileInput.value) fileInput.value.value = ''
     fileInput.value.click()
   }
 }
@@ -210,19 +213,21 @@ const handleRouteSelect = (event) => {
 
 const handleSubmit = async () => {
   error.value = ''
-  
+
   try {
     form.value.photoUrl = await uploadStore.uploadImage(photoFile.value)
-    
+
     if (routeFile.value) {
       form.value.routeSnapshotUrl = await uploadStore.uploadImage(routeFile.value)
     }
-    
+
     await momentStore.createMoment(form.value)
+    showToast('Moment shared!', 'success')
     router.push('/feed')
-    
   } catch (err) {
-    error.value = err.message || 'Failed to create moment'
+    const msg = err.response?.data?.error || err.message || 'Failed to share moment'
+    error.value = msg
+    showToast(msg, 'error')
   }
 }
 </script>

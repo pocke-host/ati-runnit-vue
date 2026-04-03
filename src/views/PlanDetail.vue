@@ -68,11 +68,19 @@
         </div>
       </div>
 
-      <!-- Status toast -->
-      <div v-if="statusMessage" :class="['status-toast', statusType]">
-        <i :class="statusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
-        {{ statusMessage }}
-      </div>
+      <!-- Delete confirm modal -->
+      <Teleport to="body">
+        <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="showDeleteConfirm = false">
+          <div class="confirm-modal">
+            <div class="confirm-title">Delete Plan</div>
+            <p class="confirm-body">Delete <strong>{{ plan.name }}</strong>? This can't be undone.</p>
+            <div class="confirm-actions">
+              <button class="confirm-btn-cancel" @click="showDeleteConfirm = false">Cancel</button>
+              <button class="confirm-btn-danger" @click="doDelete">Delete</button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
 
       <!-- Week selector tabs -->
       <div class="week-tabs-wrapper">
@@ -211,6 +219,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usePlanStore } from '@/stores/plan.js'
 import { useUnits } from '@/composables/useUnits'
+import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth.js'
 import { storeToRefs } from 'pinia'
 
@@ -221,23 +230,16 @@ const { formatDistance } = useUnits()
 const authStore = useAuthStore()
 const { unitSystem } = storeToRefs(authStore)
 
+const { showToast } = useToast()
+
 const plan = ref(null)
 const loading = ref(false)
 const selectedWeek = ref(1)
 const workoutLoading = ref({})
 const actionLoading = ref(false)
-const statusMessage = ref('')
-const statusType = ref('success')
-let statusTimer = null
+const showDeleteConfirm = ref(false)
 
 // ── Helpers ──────────────────────────────────────
-
-const showStatus = (msg, type = 'success') => {
-  clearTimeout(statusTimer)
-  statusMessage.value = msg
-  statusType.value = type
-  statusTimer = setTimeout(() => { statusMessage.value = '' }, 4000)
-}
 
 const getSportIcon = (sport) => {
   return { Running: '🏃', Cycling: '🚴', Swimming: '🏊', Hiking: '🥾', Walking: '🚶' }[sport] || '🏋️'
@@ -350,7 +352,7 @@ const toggleWorkout = async (workout) => {
     }
     workout.completed = !workout.completed
   } catch {
-    showStatus('Failed to update workout.', 'error')
+    showToast('Failed to update workout.', 'error')
   } finally {
     delete workoutLoading.value[workout.id]
   }
@@ -361,22 +363,26 @@ const setActive = async () => {
   try {
     await planStore.setActivePlan(plan.value.id)
     plan.value.isActive = true
-    showStatus('Plan set as active!')
+    showToast('Plan set as active!', 'success')
   } catch {
-    showStatus('Failed to set active.', 'error')
+    showToast('Failed to set active.', 'error')
   } finally {
     actionLoading.value = false
   }
 }
 
-const confirmDelete = async () => {
-  if (!confirm(`Delete "${plan.value.name}"? This can't be undone.`)) return
+const confirmDelete = () => {
+  showDeleteConfirm.value = true
+}
+
+const doDelete = async () => {
+  showDeleteConfirm.value = false
   actionLoading.value = true
   try {
     await planStore.deletePlan(plan.value.id)
     router.push('/plans')
   } catch {
-    showStatus('Failed to delete plan.', 'error')
+    showToast('Failed to delete plan. Try again.', 'error')
     actionLoading.value = false
   }
 }
@@ -444,17 +450,30 @@ onMounted(async () => {
 }
 .phase-banner-sub { font-size: 0.83rem; font-weight: 600; color: rgba(255,255,255,0.90); }
 
-/* Status toast */
-.status-toast {
-  position: fixed; top: 90px; right: 24px; z-index: 9000;
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 20px; border-radius: 0;
-  font-weight: 700; font-size: 0.9rem; box-shadow: none;
-  animation: slideInRight 0.3s ease;
+/* ── Delete confirm modal ── */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 24px;
 }
-.status-toast.success { background: #047857; color: white; }
-.status-toast.error   { background: #dc2626; color: white; }
-@keyframes slideInRight { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+.confirm-modal {
+  background: #fff; width: 100%; max-width: 400px; padding: 28px;
+  display: flex; flex-direction: column; gap: 12px;
+  font-family: Futura, "Avenir Next", system-ui, sans-serif;
+}
+.confirm-title { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; }
+.confirm-body { font-size: 0.88rem; color: #555; margin: 0; }
+.confirm-actions { display: flex; gap: 10px; margin-top: 8px; }
+.confirm-btn-cancel {
+  flex: 1; height: 44px; border: 1px solid #E5E5E5; background: #fff;
+  color: #767676; font-family: inherit; font-weight: 700; font-size: 0.82rem;
+  text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
+}
+.confirm-btn-danger {
+  flex: 1; height: 44px; border: none; background: #dc2626; color: #fff;
+  font-family: inherit; font-weight: 700; font-size: 0.82rem;
+  text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
+}
+.confirm-btn-danger:hover { background: #b91c1c; }
 
 /* ── Week Tabs ── */
 .week-tabs-wrapper {

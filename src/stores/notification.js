@@ -5,18 +5,23 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
+const CACHE_KEY = 'runnit_notifications_cache'
+const loadCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] } }
+const saveCache = (data) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)) } catch {} }
+
 export const useNotificationStore = defineStore('notification', () => {
-  const notifications = ref([])
+  const notifications = ref(loadCache())
   const loading = ref(false)
   let pollTimer = null
 
   const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
 
   async function fetchNotifications() {
-    loading.value = true
+    if (!notifications.value.length) loading.value = true
     try {
       const { data } = await axios.get(`${API_URL}/notifications`)
       notifications.value = Array.isArray(data) ? data : (data.content || [])
+      saveCache(notifications.value)
     } catch (err) {
       if (err.response?.status === 403 || err.response?.status === 404) {
         stopPolling()
@@ -45,7 +50,7 @@ export const useNotificationStore = defineStore('notification', () => {
     try {
       await axios.patch(`${API_URL}/notifications/${id}/read`, {})
       const n = notifications.value.find(n => n.id === id)
-      if (n) n.read = true
+      if (n) { n.read = true; saveCache(notifications.value) }
     } catch { /* silent */ }
   }
 
@@ -53,6 +58,7 @@ export const useNotificationStore = defineStore('notification', () => {
     try {
       await axios.patch(`${API_URL}/notifications/read-all`, {})
       notifications.value.forEach(n => { n.read = true })
+      saveCache(notifications.value)
     } catch { /* silent */ }
   }
 

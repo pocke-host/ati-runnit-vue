@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <style>
+      .wordmark {
+        font-family: 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', sans-serif;
+        font-weight: 800;
+        font-size: 72px;
+        letter-spacing: 0.10em;
+        fill: #000000;
+      }
+      .dot {
+        fill: #0052FF;
+      }
+    </style>
+  </defs>
+
+  <!-- Wordmark -->
+  <text x="8" y="88" class="wordmark">RUNNIT</text>
+
+  <!-- Blue accent bar under the N — signals pace/stride -->
+  <rect x="8" y="98" width="54" height="5" class="dot" />
+</svg>

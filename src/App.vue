@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import { storeToRefs } from 'pinia'
 import TopNav from './components/TopNav.vue'
 import BottomNav from './components/BottomNav.vue'
@@ -11,9 +12,9 @@ const route  = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const { isAuthenticated } = storeToRefs(authStore)
+const { toasts, dismissToast, showToast } = useToast()
 
 const showChrome = computed(() => route.path !== '/onboard')
-const sessionToast = ref(false)
 
 // ── Session helpers ──────────────────────────────────────────────────────────
 const INACTIVITY_MS = 30 * 60 * 1000  // 30 minutes
@@ -26,13 +27,10 @@ const isJWTExpired = (t) => {
   } catch { return true }
 }
 
-const expireSession = (showToast = true) => {
+const expireSession = (notify = true) => {
   if (!isAuthenticated.value) return
   authStore.logout()
-  if (showToast) {
-    sessionToast.value = true
-    setTimeout(() => { sessionToast.value = false }, 4000)
-  }
+  if (notify) showToast('Session expired — please sign in again.', 'error')
   router.push('/join-us')
 }
 
@@ -76,6 +74,12 @@ onUnmounted(() => {
   clearTimeout(idleTimer)
   clearInterval(jwtInterval)
 })
+
+const toastIcon = (type) => ({
+  success: 'bi bi-check-circle-fill',
+  error:   'bi bi-exclamation-circle-fill',
+  info:    'bi bi-info-circle-fill',
+}[type] || 'bi bi-info-circle-fill')
 </script>
 
 <template>
@@ -84,35 +88,62 @@ onUnmounted(() => {
   <router-view />
   <Footer v-if="showChrome" />
 
-  <!-- Session expired toast -->
+  <!-- Global toast stack -->
   <Teleport to="body">
-    <div v-if="sessionToast" class="session-toast">
-      <i class="bi bi-shield-lock-fill me-2"></i>
-      Session expired — please sign in again.
+    <div class="toast-stack">
+      <TransitionGroup name="toast">
+        <div
+          v-for="t in toasts"
+          :key="t.id"
+          :class="['app-toast', `app-toast--${t.type}`]"
+          @click="dismissToast(t.id)"
+        >
+          <i :class="['me-2', toastIcon(t.type)]"></i>
+          {{ t.message }}
+        </div>
+      </TransitionGroup>
     </div>
   </Teleport>
 </template>
 
 <style>
-/* ── Session Toast ── */
-.session-toast {
+/* ── Global Toast Stack ── */
+.toast-stack {
   position: fixed;
-  bottom: 80px;
+  bottom: 88px;
   left: 50%;
   transform: translateX(-50%);
-  background: #000;
-  color: #fff;
-  padding: 12px 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.app-toast {
+  display: flex;
+  align-items: center;
+  padding: 11px 20px;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  z-index: 9999;
+  letter-spacing: 0.05em;
   white-space: nowrap;
-  animation: toast-in 0.25s ease, toast-out 0.25s ease 3.75s forwards;
+  cursor: pointer;
+  pointer-events: all;
   font-family: Futura, "Avenir Next", system-ui, sans-serif;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
 }
-@keyframes toast-in  { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-@keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
+
+.app-toast--info    { background: #000; color: #fff; }
+.app-toast--success { background: #16a34a; color: #fff; }
+.app-toast--error   { background: #dc2626; color: #fff; }
+
+/* TransitionGroup animations */
+.toast-enter-active { transition: all 0.22s ease; }
+.toast-leave-active { transition: all 0.18s ease; }
+.toast-enter-from   { opacity: 0; transform: translateY(10px); }
+.toast-leave-to     { opacity: 0; transform: translateY(-6px); }
 
 /* ── Scroll Reveal ── */
 [data-reveal] {
