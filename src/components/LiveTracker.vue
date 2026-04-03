@@ -57,6 +57,18 @@
       </div>
     </div>
 
+    <!-- Draft Recovery Banner -->
+    <div v-if="showDraftBanner" class="draft-banner">
+      <div class="draft-banner-text">
+        <i class="bi bi-clock-history me-2"></i>
+        <span>You have an unfinished run from {{ draftAge }}. Resume it?</span>
+      </div>
+      <div class="draft-banner-actions">
+        <button class="draft-btn-resume" type="button" @click="resumeDraft">Resume</button>
+        <button class="draft-btn-discard" type="button" @click="discardDraft">Discard</button>
+      </div>
+    </div>
+
     <!-- Save error -->
     <div v-if="saveError" class="save-error">
       <i class="bi bi-exclamation-circle me-2"></i>{{ saveError }}
@@ -198,6 +210,7 @@ import { Geolocation } from '@capacitor/geolocation'
 
 const isNative = Capacitor.isNativePlatform()
 
+const DRAFT_KEY   = 'runnit_tracking_draft'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 const router = useRouter()
@@ -237,6 +250,10 @@ const notesSubmitting  = ref(false)
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
+// Draft recovery state
+const showDraftBanner = ref(false)
+const draftAge        = ref('')
+
 // Live sharing state
 const shareToken   = ref(null)
 const isSharing    = ref(false)
@@ -248,10 +265,11 @@ let lastShareUpdate = 0
 const showSosModal = ref(false)
 const sosContacts  = ref([])
 
-let watchId       = null
-let timerInterval = null
-let startEpoch    = null   // Date.now() at start (adjusted for pauses)
-let pausedMs      = 0      // cumulative paused milliseconds
+let watchId         = null
+let timerInterval   = null
+let autosaveInterval = null
+let startEpoch      = null   // Date.now() at start (adjusted for pauses)
+let pausedMs        = 0      // cumulative paused milliseconds
 
 // ── Computed ────────────────────────────────────────────────────────────────
 
@@ -506,6 +524,57 @@ const sendSos = async () => {
   }, { headers: { Authorization: `Bearer ${token}` } }).catch(() => {})
 }
 
+// ── Draft recovery ────────────────────────────────────────────────────────────
+
+const saveDraft = () => {
+  if (!hasStarted.value || routeCoordinates.value.length === 0) return
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      coordinates:  routeCoordinates.value,
+      elapsedTime:  elapsedTime.value,
+      totalDistance: totalDistance.value,
+      elevationGain: elevationGain.value,
+      sport:        selectedSport.value,
+      savedAt:      Date.now(),
+    }))
+  } catch {}
+}
+
+const clearDraft = () => {
+  try { localStorage.removeItem(DRAFT_KEY) } catch {}
+}
+
+const formatDraftAge = (savedAt) => {
+  const mins = Math.floor((Date.now() - savedAt) / 60000)
+  if (mins < 1)  return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  return `${hrs}h ${mins % 60}m ago`
+}
+
+const resumeDraft = () => {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return
+    const draft = JSON.parse(raw)
+    routeCoordinates.value = draft.coordinates  || []
+    elapsedTime.value      = draft.elapsedTime  || 0
+    totalDistance.value    = draft.totalDistance || 0
+    elevationGain.value    = draft.elevationGain || 0
+    selectedSport.value    = draft.sport        || 'RUN'
+    pausedMs               = elapsedTime.value * 1000
+    // Redraw saved route on map
+    updateRouteOnMap()
+  } catch {}
+  showDraftBanner.value = false
+  // User taps Start to continue
+}
+
+const discardDraft = () => {
+  clearDraft()
+  showDraftBanner.value = false
+}
+
 // ── Tracking controls ─────────────────────────────────────────────────────────
 
 const startTracking = async () => {
@@ -544,6 +613,9 @@ const startTracking = async () => {
     elapsedTime.value = Math.floor((Date.now() - startEpoch) / 1000)
   }, 1000)
 
+  // Autosave GPS draft every 30s — survives app crash or phone call
+  autosaveInterval = setInterval(saveDraft, 30000)
+
   // Ensure GeolocateControl is tracking
   if (geolocateControl.value) geolocateControl.value.trigger()
 }
@@ -559,6 +631,9 @@ const pauseTracking = () => {
   }
   clearInterval(timerInterval)
   timerInterval = null
+  clearInterval(autosaveInterval)
+  autosaveInterval = null
+  saveDraft()   // persist immediately on pause
   lastPosition.value = null   // don't connect dots across a pause
 }
 
@@ -583,6 +658,7 @@ const stopTracking = async () => {
     })
     savedActivityId.value = activity?.id ?? null
     saving.value = false
+    clearDraft()   // run saved — kill the crash recovery draft
     showNotesStep.value = true
   } catch (err) {
     console.error('Save failed:', err)
@@ -647,7 +723,27 @@ const encodeVal = (v) => {
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
-onMounted(initializeMap)
+onMounted(() => {
+  initializeMap()
+
+  // Check for crash recovery draft
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (raw) {
+      const draft = JSON.parse(raw)
+      // Only surface drafts that have actual GPS data and are < 24h old
+      const ageMs = Date.now() - (draft.savedAt || 0)
+      if (draft.coordinates?.length > 0 && ageMs < 86_400_000) {
+        draftAge.value = formatDraftAge(draft.savedAt)
+        showDraftBanner.value = true
+      } else {
+        clearDraft()
+      }
+    }
+  } catch {
+    clearDraft()
+  }
+})
 
 onUnmounted(() => {
   if (watchId !== null) {
@@ -655,6 +751,7 @@ onUnmounted(() => {
     else navigator.geolocation.clearWatch(watchId)
   }
   if (timerInterval) clearInterval(timerInterval)
+  if (autosaveInterval) clearInterval(autosaveInterval)
   if (map.value) map.value.remove()
 })
 </script>
@@ -871,6 +968,58 @@ onUnmounted(() => {
 .control-btn-pause:hover  { background: #333; }
 .control-btn-finish { background: #dc2626; color: #fff; }
 .control-btn-finish:hover:not(:disabled) { background: #b91c1c; }
+
+/* ── Draft recovery banner ── */
+.draft-banner {
+  background: #fffbeb;
+  border: 1px solid #fbbf24;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.draft-banner-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+}
+
+.draft-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.draft-btn-resume {
+  padding: 6px 14px;
+  background: #000;
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.draft-btn-discard {
+  padding: 6px 14px;
+  background: #fff;
+  color: #767676;
+  border: 1px solid #E5E5E5;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
 
 /* ── Save error ── */
 .save-error {

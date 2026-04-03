@@ -107,8 +107,12 @@ export function getActivityPRs(activityId, prs) {
     .map(([key]) => key)
 }
 
+const CACHE_KEY = 'runnit_prs_cache'
+const loadCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}') } catch { return {} } }
+const saveCache = (data) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)) } catch {} }
+
 export const usePRStore = defineStore('pr', () => {
-  const prs = ref({})
+  const prs = ref(loadCache())
   const loading = ref(false)
 
   const allPRs = computed(() =>
@@ -120,11 +124,13 @@ export const usePRStore = defineStore('pr', () => {
   )
 
   async function fetchPRs(activities = []) {
-    loading.value = true
+    if (!Object.keys(prs.value).length) loading.value = true
     try {
       const { data } = await axios.get(`${API_URL}/personal-records`, { headers: getAuthHeaders() })
       prs.value = data
+      saveCache(data)
     } catch {
+      // Fall back to client-side computation if API fails
       prs.value = computePRs(activities)
     } finally {
       loading.value = false

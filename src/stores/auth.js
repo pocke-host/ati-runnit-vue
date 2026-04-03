@@ -20,7 +20,7 @@ const clearLocalState = () => {
   localStorage.removeItem('onboarding_complete')
   localStorage.removeItem('userRole')
   localStorage.removeItem('subscriptionTier')
-  localStorage.removeItem('unitSystem')
+  // unitSystem intentionally preserved — it's a preference, not session data
   delete axios.defaults.headers.common['Authorization']
 }
 

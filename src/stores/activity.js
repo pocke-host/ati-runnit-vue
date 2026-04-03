@@ -6,28 +6,14 @@ import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const CACHE_KEY = 'runnit_activities_cache'
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
+// No TTL — always load from cache. Background fetch keeps it fresh.
 const loadCache = () => {
-  try {
-    const raw = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}')
-    if (raw.fetchedAt && Date.now() - raw.fetchedAt < CACHE_TTL_MS) {
-      return raw.data || []
-    }
-    return []
-  } catch { return [] }
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] }
 }
-
 const saveCache = (list) => {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: list, fetchedAt: Date.now() }))
-  } catch {}
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(list)) } catch {}
 }
-
-const clearCache = () => {
-  try { localStorage.removeItem(CACHE_KEY) } catch {}
-}
-
 export const useActivityStore = defineStore('activity', () => {
   const activities = ref(loadCache())
   const loading = ref(false)
@@ -50,21 +36,18 @@ export const useActivityStore = defineStore('activity', () => {
   }
 
   async function fetchActivities(page = 0) {
-    loading.value = true
+    // Only show spinner on first load — if cache exists show it instantly
+    if (!activities.value.length) loading.value = true
     error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/activities?page=${page}`)
       const result = Array.isArray(data) ? data : (data.content || [])
-      if (result.length > 0) {
-        activities.value = result
-        saveCache(result)
-      } else if (activities.value.length === 0) {
-        activities.value = result
-      }
+      activities.value = result
+      saveCache(result)
       return activities.value
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch activities'
-      // Keep cached data visible on network failure
+      // Silently keep showing cached data on network failure
     } finally {
       loading.value = false
     }
@@ -112,15 +95,9 @@ export const useActivityStore = defineStore('activity', () => {
     return data
   }
 
-  function invalidateCache() {
-    clearCache()
-    activities.value = []
-  }
-
   return {
     activities, loading, error,
     createActivity, fetchActivities, fetchActivity, deleteActivity,
     fetchFeed, reactToActivity, removeReaction, fetchComments, addComment,
-    invalidateCache
   }
 })

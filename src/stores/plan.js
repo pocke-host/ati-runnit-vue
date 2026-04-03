@@ -10,19 +10,24 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+const CACHE_KEY = 'runnit_plans_cache'
+const loadCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] } }
+const saveCache = (list) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(list)) } catch {} }
+
 export const usePlanStore = defineStore('plan', () => {
-  const plans = ref([])
-  const activePlan = ref(null)
+  const plans = ref(loadCache())
+  const activePlan = ref(plans.value.find(p => p.isActive) || null)
   const loading = ref(false)
   const error = ref(null)
 
   async function fetchPlans() {
-    loading.value = true
+    if (!plans.value.length) loading.value = true
     error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/plans`, { headers: getAuthHeaders() })
       plans.value = Array.isArray(data) ? data : (data.content || [])
       activePlan.value = plans.value.find(p => p.isActive) || null
+      saveCache(plans.value)
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch plans'
     } finally {
@@ -51,6 +56,7 @@ export const usePlanStore = defineStore('plan', () => {
       const { data } = await axios.post(`${API_URL}/plans`, planData, { headers: getAuthHeaders() })
       plans.value.unshift(data)
       if (data.isActive) activePlan.value = data
+      saveCache(plans.value)
       return data
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to create plan'
@@ -65,6 +71,7 @@ export const usePlanStore = defineStore('plan', () => {
       const { data } = await axios.patch(`${API_URL}/plans/${id}/activate`, {}, { headers: getAuthHeaders() })
       plans.value = plans.value.map(p => ({ ...p, isActive: p.id === id }))
       activePlan.value = plans.value.find(p => p.id === id) || null
+      saveCache(plans.value)
       return data
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to set active plan'
@@ -77,6 +84,7 @@ export const usePlanStore = defineStore('plan', () => {
       await axios.delete(`${API_URL}/plans/${id}`, { headers: getAuthHeaders() })
       plans.value = plans.value.filter(p => p.id !== id)
       if (activePlan.value?.id === id) activePlan.value = null
+      saveCache(plans.value)
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to delete plan'
       throw err

@@ -5,9 +5,14 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
+const FEED_CACHE_KEY = 'runnit_moments_feed_cache'
+const USER_CACHE_KEY = 'runnit_moments_user_cache'
+const loadCache = (key) => { try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] } }
+const saveCache = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)) } catch {} }
+
 export const useMomentStore = defineStore('moment', () => {
-  const feed = ref([])
-  const userMoments = ref([])
+  const feed = ref(loadCache(FEED_CACHE_KEY))
+  const userMoments = ref(loadCache(USER_CACHE_KEY))
   const loading = ref(false)
   const error = ref(null)
   
@@ -16,6 +21,8 @@ export const useMomentStore = defineStore('moment', () => {
     error.value = null
     try {
       const response = await axios.post(`${API_URL}/moments`, data)
+      feed.value.unshift(response.data)
+      saveCache(FEED_CACHE_KEY, feed.value)
       return response.data
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to create moment'
@@ -26,28 +33,28 @@ export const useMomentStore = defineStore('moment', () => {
   }
   
   async function fetchFeed(page = 0) {
-    loading.value = true
+    if (!feed.value.length) loading.value = true
     error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/moments/feed?page=${page}`)
-      feed.value = data.content
+      feed.value = data.content || data
+      saveCache(FEED_CACHE_KEY, feed.value)
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch feed'
-      throw err
     } finally {
       loading.value = false
     }
   }
-  
+
   async function fetchUserMoments(userId, page = 0) {
-    loading.value = true
+    if (!userMoments.value.length) loading.value = true
     error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/moments/user/${userId}?page=${page}`)
-      userMoments.value = data.content
+      userMoments.value = data.content || data
+      saveCache(USER_CACHE_KEY, userMoments.value)
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch moments'
-      throw err
     } finally {
       loading.value = false
     }
