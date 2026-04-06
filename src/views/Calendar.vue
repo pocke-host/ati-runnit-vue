@@ -396,6 +396,14 @@
       </div>
     </div>
 
+  <ConfirmModal
+    v-model="showDeleteWorkoutConfirm"
+    title="Remove Workout"
+    body="This will remove the workout from your calendar."
+    confirm-label="Remove"
+    :danger="true"
+    @confirm="doDeleteEvent"
+  />
   </div>
 </template>
 
@@ -406,8 +414,10 @@ import { useGroupEventStore } from '@/stores/groupEvent'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useAiWorkout } from '@/composables/useAiWorkout'
+import { useToast } from '@/composables/useToast'
 import { initWeather, getWeatherForDate } from '@/composables/useWeather'
 import axios from 'axios'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 import CreateGroupEventModal from '@/components/CreateGroupEventModal.vue'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -436,8 +446,11 @@ const aiLoading    = ref(false)
 const aiVariant    = ref(0)
 const showCreateForm = ref(false)
 const editingEvent   = ref(null)
+const { showToast } = useToast()
 const saveLoading    = ref(false)
 const formError      = ref('')
+const showDeleteWorkoutConfirm = ref(false)
+const pendingDeleteId = ref(null)
 const showWeekPlanModal = ref(false)
 const weekPlanItems     = ref([])
 const weekPlanLoading   = ref(false)
@@ -678,12 +691,21 @@ async function saveEvent() {
   }
 }
 
-async function deleteEvent(id) {
-  if (!confirm('Remove this workout?')) return
+function deleteEvent(id) {
+  pendingDeleteId.value = id
+  showDeleteWorkoutConfirm.value = true
+}
+
+async function doDeleteEvent() {
+  showDeleteWorkoutConfirm.value = false
+  const id = pendingDeleteId.value
   try {
     await axios.delete(`${API}/workout-events/${id}`)
     events.value = events.value.filter(e => e.id !== id)
-  } catch { /* silent */ }
+    showToast('Workout removed.', 'info')
+  } catch {
+    showToast('Failed to remove workout. Try again.', 'error')
+  }
 }
 
 function editEvent(ev) {

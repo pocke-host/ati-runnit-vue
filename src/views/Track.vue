@@ -9,20 +9,29 @@
       </div>
   
       <LiveTracker />
+
+      <ConfirmModal
+        v-model="showStopConfirm"
+        title="Stop Tracking?"
+        body="Your current session will end and you'll return to the dashboard. Any unsaved data will be lost."
+        confirm-label="Stop & Exit"
+        :danger="true"
+        @confirm="doGoBack"
+      />
     </div>
   </template>
   
   <script setup>
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import LiveTracker from '@/components/LiveTracker.vue'
-  
+  import ConfirmModal from '@/components/ConfirmModal.vue'
+
   const router = useRouter()
-  
-  const handleBack = () => {
-    if (confirm('Stop tracking and return to dashboard?')) {
-      router.push('/dashboard')
-    }
-  }
+  const showStopConfirm = ref(false)
+
+  const handleBack = () => { showStopConfirm.value = true }
+  const doGoBack = () => { showStopConfirm.value = false; router.push('/dashboard') }
   </script>
   
   <style scoped>

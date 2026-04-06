@@ -179,6 +179,15 @@
       </div>
 
     </div>
+
+  <ConfirmModal
+    v-model="showDeleteAccountConfirm"
+    title="Delete Account"
+    body="This will permanently delete your account and all your data. There is no going back."
+    confirm-label="Yes, Delete My Account"
+    :danger="true"
+    @confirm="doDeleteAccount"
+  />
   </div>
 </template>
 
@@ -186,9 +195,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import UserAvatar from '@/components/UserAvatar.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const router = useRouter()
@@ -317,11 +328,15 @@ const saveProfile = async () => {
   }
 }
 
+const { showToast } = useToast()
 const deleting = ref(false)
 const deleteError = ref('')
+const showDeleteAccountConfirm = ref(false)
 
-const confirmDelete = async () => {
-  if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return
+const confirmDelete = () => { showDeleteAccountConfirm.value = true }
+
+const doDeleteAccount = async () => {
+  showDeleteAccountConfirm.value = false
   deleting.value = true
   deleteError.value = ''
   try {
@@ -330,6 +345,7 @@ const confirmDelete = async () => {
     router.push('/')
   } catch {
     deleteError.value = 'Failed to delete account. Please try again or contact support.'
+    showToast('Account deletion failed. Contact support if this continues.', 'error')
     deleting.value = false
   }
 }
