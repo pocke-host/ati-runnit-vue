@@ -280,6 +280,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const getAuthHeaders = () => ({ Authorization: 'Bearer ' + localStorage.getItem('token') })
@@ -317,7 +320,7 @@ async function fetchChallenges() {
     if (!res.ok) throw new Error('Failed to fetch challenges')
     allChallenges.value = await res.json()
   } catch (err) {
-    console.error('fetchChallenges:', err)
+    showToast('Failed to load challenges.', 'error')
     allChallenges.value = []
   } finally {
     loading.value = false
@@ -332,7 +335,7 @@ async function fetchMyChallenges() {
     if (!res.ok) throw new Error('Failed to fetch my challenges')
     myChallenges.value = await res.json()
   } catch (err) {
-    console.error('fetchMyChallenges:', err)
+    showToast('Failed to load your challenges.', 'error')
     myChallenges.value = []
   }
 }
@@ -347,7 +350,7 @@ async function enterChallenge(id) {
     if (!res.ok) throw new Error('Failed to enter challenge')
     await fetchMyChallenges()
   } catch (err) {
-    console.error('enterChallenge:', err)
+    showToast('Failed to join challenge. Try again.', 'error')
   } finally {
     enteringId.value = null
   }
@@ -365,7 +368,7 @@ async function leaveChallenge(id) {
     // If the leaderboard drawer is open for this challenge, close it
     if (lbChallenge.value?.id === id) lbOpen.value = false
   } catch (err) {
-    console.error('leaveChallenge:', err)
+    showToast('Failed to leave challenge. Try again.', 'error')
   } finally {
     enteringId.value = null
   }
@@ -381,7 +384,7 @@ async function fetchLeaderboard(id) {
     if (!res.ok) throw new Error('Failed to fetch leaderboard')
     leaderboard.value = await res.json()
   } catch (err) {
-    console.error('fetchLeaderboard:', err)
+    showToast('Failed to load leaderboard.', 'error')
     leaderboard.value = []
   } finally {
     lbLoading.value = false

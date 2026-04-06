@@ -188,12 +188,22 @@
     :danger="true"
     @confirm="doDeleteAccount"
   />
+
+  <ConfirmModal
+    v-model="showUnsavedConfirm"
+    title="Unsaved Changes"
+    body="You have unsaved changes. Leave anyway?"
+    confirm-label="Leave"
+    :danger="true"
+    @confirm="confirmLeave"
+    @update:modelValue="(v) => { if (!v) cancelLeave() }"
+  />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { storeToRefs } from 'pinia'
@@ -320,6 +330,7 @@ const saveProfile = async () => {
       authStore.user.isPublic   = data.isPublic   ?? form.value.isPublic
     }
     saved.value = true
+    initialForm.value = { ...form.value }
     setTimeout(() => { saved.value = false }, 4000)
   } catch (e) {
     error.value = 'Failed to save changes. Please try again.'
@@ -329,6 +340,38 @@ const saveProfile = async () => {
 }
 
 const { showToast } = useToast()
+
+// ── Unsaved changes guard ─────────────────────────────────────
+const initialForm = ref(null)
+const isDirty = computed(() => {
+  if (!initialForm.value) return false
+  const f = form.value
+  const i = initialForm.value
+  return f.displayName !== i.displayName || f.bio !== i.bio || f.location !== i.location ||
+    f.primarySport !== i.primarySport || f.unitSystem !== i.unitSystem || f.isPublic !== i.isPublic
+})
+
+const showUnsavedConfirm = ref(false)
+let pendingNavigation = null
+
+onBeforeRouteLeave((to, from, next) => {
+  if (isDirty.value && !saving.value) {
+    showUnsavedConfirm.value = true
+    pendingNavigation = next
+    return
+  }
+  next()
+})
+
+const confirmLeave = () => {
+  showUnsavedConfirm.value = false
+  if (pendingNavigation) { pendingNavigation(); pendingNavigation = null }
+}
+const cancelLeave = () => {
+  showUnsavedConfirm.value = false
+  if (pendingNavigation) { pendingNavigation(false); pendingNavigation = null }
+}
+
 const deleting = ref(false)
 const deleteError = ref('')
 const showDeleteAccountConfirm = ref(false)
@@ -358,6 +401,7 @@ onMounted(() => {
     form.value.primarySport = user.value.primarySport || 'running'
     form.value.unitSystem = user.value.unitSystem || localStorage.getItem('unitSystem') || 'imperial'
     form.value.isPublic = user.value.isPublic ?? true
+    initialForm.value = { ...form.value }
   }
 })
 </script>

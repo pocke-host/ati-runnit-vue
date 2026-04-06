@@ -420,6 +420,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
@@ -437,6 +438,7 @@ const authStore = useAuthStore()
 const achievementStore = useAchievementStore()
 const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
+const { showToast } = useToast()
 
 const { formatDistance, formatDuration, formatElevation, formatPace } = useUnits()
 
@@ -594,7 +596,8 @@ const loadActivities = async (reset = true) => {
     const items = data.content || data || []
     profileActivities.value = reset ? items : [...profileActivities.value, ...items]
     hasMoreActivities.value = data.totalPages ? activitiesPage.value < data.totalPages - 1 : items.length === 12
-  } catch {
+  } catch (err) {
+    showToast(err.response?.data?.error || 'Failed to load activities.', 'error')
     profileActivities.value = []
   } finally {
     activitiesLoading.value = false
@@ -611,7 +614,8 @@ const loadMoments = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/users/${profileId.value}/moments`, { headers: getAuthHeaders() })
     moments.value = data.content || data || []
-  } catch {
+  } catch (err) {
+    showToast(err.response?.data?.error || 'Failed to load moments.', 'error')
     moments.value = []
   } finally {
     momentsLoading.value = false
@@ -650,7 +654,9 @@ const toggleFollow = async () => {
         actorName: user.value?.displayName
       })
     }
-  } catch { /* silent */ } finally {
+  } catch (err) {
+    showToast(err.response?.data?.error || 'Failed to update follow. Try again.', 'error')
+  } finally {
     followLoading.value = false
   }
 }

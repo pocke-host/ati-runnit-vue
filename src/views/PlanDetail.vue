@@ -84,10 +84,11 @@
 
       <!-- Week selector tabs -->
       <div class="week-tabs-wrapper">
-        <div class="week-tabs">
+        <div class="week-tabs" ref="weekTabsEl">
           <button
             v-for="w in plan.weeks"
             :key="w.weekNumber"
+            :data-week="w.weekNumber"
             :class="['week-tab', {
               active: selectedWeek === w.weekNumber,
               current: w.weekNumber === currentWeek,
@@ -215,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usePlanStore } from '@/stores/plan.js'
 import { useUnits } from '@/composables/useUnits'
@@ -235,9 +236,18 @@ const { showToast } = useToast()
 const plan = ref(null)
 const loading = ref(false)
 const selectedWeek = ref(1)
+const weekTabsEl = ref(null)
 const workoutLoading = ref({})
 const actionLoading = ref(false)
 const showDeleteConfirm = ref(false)
+
+function scrollToActiveTab() {
+  nextTick(() => {
+    if (!weekTabsEl.value) return
+    const activeBtn = weekTabsEl.value.querySelector('[data-week="' + selectedWeek.value + '"]')
+    if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  })
+}
 
 // ── Helpers ──────────────────────────────────────
 
@@ -395,6 +405,7 @@ onMounted(async () => {
     const data = await planStore.fetchPlan(route.params.id)
     plan.value = data
     selectedWeek.value = currentWeek.value
+    scrollToActiveTab()
   } catch {
     plan.value = null
   } finally {
