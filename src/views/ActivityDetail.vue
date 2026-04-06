@@ -558,7 +558,9 @@ const toggleFollow = async () => {
         actorName: user.value?.displayName
       })
     }
-  } catch { /* silent */ } finally {
+  } catch (err) {
+    showToast(err.response?.data?.error || 'Failed to update follow. Try again.', 'error')
+  } finally {
     followLoading.value = false
   }
 }
@@ -579,7 +581,9 @@ const toggleReaction = async (type) => {
       reactionCounts.value[type] = (reactionCounts.value[type] || 0) + 1
       userReaction.value = type
     }
-  } catch { /* silent */ } finally {
+  } catch (err) {
+    showToast(err.response?.data?.error || 'Failed to save reaction. Try again.', 'error')
+  } finally {
     reactionLoading.value = false
   }
 }
@@ -591,7 +595,9 @@ const submitComment = async () => {
     const data = await activityStore.addComment(activityId.value, newComment.value.trim())
     comments.value.push(data)
     newComment.value = ''
-  } catch { /* silent */ } finally {
+  } catch (err) {
+    showToast(err.response?.data?.error || 'Failed to post comment. Try again.', 'error')
+  } finally {
     commentLoading.value = false
   }
 }

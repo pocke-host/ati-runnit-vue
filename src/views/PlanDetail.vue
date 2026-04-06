@@ -357,10 +357,12 @@ const toggleWorkout = async (workout) => {
   try {
     if (workout.completed) {
       await planStore.uncompleteWorkout(plan.value.id, workout.id)
+      workout.completed = false
     } else {
       await planStore.completeWorkout(plan.value.id, workout.id)
+      workout.completed = true
+      showToast('Workout complete!', 'success')
     }
-    workout.completed = !workout.completed
   } catch {
     showToast('Failed to update workout.', 'error')
   } finally {
