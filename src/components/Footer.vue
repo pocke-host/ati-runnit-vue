@@ -9,7 +9,7 @@
         </a>
       </div>
 
-      <nav class="footer-nav">
+      <nav class="footer-nav" @click.capture="scrollTop">
         <div class="footer-col">
           <div class="footer-col-label">Explore</div>
           <router-link to="/maps" class="footer-link">Maps</router-link>
@@ -42,6 +42,10 @@
     </div>
   </footer>
 </template>
+
+<script setup>
+const scrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+</script>
 
 <style scoped>
 .site-footer {
