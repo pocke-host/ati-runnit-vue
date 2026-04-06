@@ -67,7 +67,7 @@
               <div class="wday-dot-wrap">
                 <router-link
                   v-if="day.activities.length === 1"
-                  :to="`/activity/${day.activities[0].id}`"
+                  :to="`/activities/${day.activities[0].id}`"
                   class="wday-dot wday-done"
                   :title="day.activities[0].sportType"
                 >{{ getSportEmoji(day.activities[0].sportType) }}</router-link>
@@ -769,6 +769,7 @@ import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
 import { useAthleteStore } from '@/stores/athlete'
 import AppSpinner from '@/components/AppSpinner.vue'
+import StoriesViewer from '@/components/StoriesViewer.vue'
 
 Chart.register(...registerables)
 
