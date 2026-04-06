@@ -7,7 +7,12 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const FOLLOWING_CACHE_KEY = 'runnit_following_cache'
 const FOLLOWERS_CACHE_KEY = 'runnit_followers_cache'
-const loadCache = (key) => { try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] } }
+const loadCache = (key) => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch { return [] }
+}
 const saveCache = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)) } catch {} }
 
 export const useFollowStore = defineStore('follow', () => {
