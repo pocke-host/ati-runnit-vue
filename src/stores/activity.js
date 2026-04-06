@@ -9,7 +9,11 @@ const CACHE_KEY = 'runnit_activities_cache'
 
 // No TTL — always load from cache. Background fetch keeps it fresh.
 const loadCache = () => {
-  try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] }
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]')
+    // Guard against old sessions that cached a paginated object {content:[...]} instead of a plain array
+    return Array.isArray(parsed) ? parsed : (parsed.content || [])
+  } catch { return [] }
 }
 const saveCache = (list) => {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify(list)) } catch {}

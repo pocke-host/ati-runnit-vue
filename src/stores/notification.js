@@ -6,7 +6,12 @@ import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const CACHE_KEY = 'runnit_notifications_cache'
-const loadCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '[]') } catch { return [] } }
+const loadCache = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch { return [] }
+}
 const saveCache = (data) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)) } catch {} }
 
 export const useNotificationStore = defineStore('notification', () => {
