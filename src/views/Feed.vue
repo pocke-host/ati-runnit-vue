@@ -31,6 +31,12 @@
             ><i class="bi bi-fire"></i></button>
           </div>
         </div>
+        <div class="feed-period-bar">
+          <button :class="['period-pill', {active: timePeriod === 'week'}]"  @click="timePeriod = 'week'">Past Week</button>
+          <button :class="['period-pill', {active: timePeriod === 'month'}]" @click="timePeriod = 'month'">Past Month</button>
+          <button :class="['period-pill', {active: timePeriod === 'year'}]"  @click="timePeriod = 'year'">Past Year</button>
+          <button :class="['period-pill', {active: timePeriod === 'all'}]"   @click="timePeriod = 'all'">All Time</button>
+        </div>
       </div>
     </div>
 
@@ -356,6 +362,7 @@ const feedDateline = computed(() => {
 })
 
 const activeTab = ref('all')
+const timePeriod = ref('all')
 const sortOrder = ref('newest')
 const loading = ref(false)
 const showCreateEvent = ref(false)
@@ -424,9 +431,17 @@ const feedItems = computed(() => {
   return [...momentItems, ...activityItems]
 })
 
+const getTimeCutoff = () => {
+  const now = new Date()
+  if (timePeriod.value === 'week')  return new Date(now - 7   * 24 * 60 * 60 * 1000)
+  if (timePeriod.value === 'month') return new Date(now - 30  * 24 * 60 * 60 * 1000)
+  if (timePeriod.value === 'year')  return new Date(now - 365 * 24 * 60 * 60 * 1000)
+  return null
+}
+
 const sortedFeedItems = computed(() => {
   let filtered = []
-  
+
   if (activeTab.value === 'all') {
     filtered = feedItems.value
   } else if (activeTab.value === 'activities') {
@@ -437,6 +452,12 @@ const sortedFeedItems = computed(() => {
     filtered = feedItems.value.filter(item => item.user.id === user.value?.id)
   } else if (activeTab.value === 'following') {
     filtered = feedItems.value.filter(item => followingIds.value.has(item.user?.id))
+  }
+
+  // Apply time period filter
+  const cutoff = getTimeCutoff()
+  if (cutoff) {
+    filtered = filtered.filter(item => new Date(item.createdAt) >= cutoff)
   }
 
   if (sortOrder.value === 'newest') {
@@ -795,10 +816,33 @@ onUnmounted(() => {
 .feed-action-btn:hover { color: #0052FF; border-color: #0052FF; }
 .feed-action-btn.active { border-color: #0052FF; background: #0052FF; color: #fff; }
 
+.feed-period-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid #E5E5E5;
+}
+.period-pill {
+  padding: 4px 14px;
+  border: 1px solid #E5E5E5;
+  background: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #767676;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.period-pill:hover { color: #000; border-color: #000; }
+.period-pill.active { background: #000; color: #fff; border-color: #000; }
+
 .feed-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 140px 24px 60px;
+  padding: 182px 24px 60px;
 }
 
 .feed-loading {
