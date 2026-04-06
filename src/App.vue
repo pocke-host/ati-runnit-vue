@@ -9,6 +9,8 @@ import BottomNav from './components/BottomNav.vue'
 import Footer from './components/Footer.vue'
 import { Capacitor } from '@capacitor/core'
 import { StatusBar, Style } from '@capacitor/status-bar'
+import { usePushNotifications } from '@/composables/usePushNotifications'
+import { useDeepLinks } from '@/composables/useDeepLinks'
 
 const route  = useRoute()
 const router = useRouter()
@@ -67,9 +69,15 @@ async function initStatusBar() {
   } catch { /* non-fatal on platforms that don't support it */ }
 }
 
+// ── Native plugins (push + deep links) ───────────────────────────────────────
+const { init: initPush, cleanup: cleanupPush }       = usePushNotifications()
+const { init: initDeepLinks, cleanup: cleanupDeepLinks } = useDeepLinks()
+
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
   initStatusBar()
+  initDeepLinks()
+  if (isAuthenticated.value) initPush()
 
   // Backend warm-up
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -87,6 +95,8 @@ onUnmounted(() => {
   IDLE_EVENTS.forEach(e => window.removeEventListener(e, resetIdleTimer))
   clearTimeout(idleTimer)
   clearInterval(jwtInterval)
+  cleanupPush()
+  cleanupDeepLinks()
 })
 
 const toastIcon = (type) => ({

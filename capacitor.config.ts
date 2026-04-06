@@ -13,10 +13,20 @@ const config: CapacitorConfig = {
       iosSplashResourceName: 'Default',
     },
     StatusBar: {
-      style: 'Light',        // white icons on dark nav
+      style: 'Light',
       backgroundColor: '#000000',
       overlaysWebView: false,
     },
+    PushNotifications: {
+      // Show badge, play sound, and display alert banner for foreground notifications
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
+  },
+  // Custom URL scheme for deep links: runnit://activities/123
+  // Universal Links (https://runnit.live/...) require Associated Domains in Xcode:
+  //   Capability → Associated Domains → applinks:runnit.live
+  server: {
+    iosScheme: 'runnit',
   },
 }
 
