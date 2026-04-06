@@ -126,12 +126,23 @@
         <div class="coming-soon-badge">COMING SOON</div>
       </div>
     </div>
+
+  <ConfirmModal
+    v-model="showDisconnectConfirm"
+    title="Disconnect Integration"
+    :body="`Disconnect ${disconnectLabels[pendingDisconnect] || ''}? New activities will no longer sync automatically.`"
+    confirm-label="Disconnect"
+    :danger="true"
+    @confirm="doDisconnect"
+  />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import ConfirmModal from '@/components/ConfirmModal.vue'
+import { useToast } from '@/composables/useToast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -146,6 +157,12 @@ const statusMessage = ref('')
 const statusType = ref('success')
 
 
+
+const { showToast } = useToast()
+const showDisconnectConfirm = ref(false)
+const pendingDisconnect = ref(null) // 'garmin' | 'strava' | 'zwift'
+
+const disconnectLabels = { garmin: 'Garmin', strava: 'Strava', zwift: 'Zwift' }
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -204,17 +221,21 @@ const connectGarmin = async () => {
   }
 }
 
-const disconnectGarmin = async () => {
-  if (!confirm('Are you sure you want to disconnect Garmin?')) return
+const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconnectConfirm.value = true }
+const disconnectStrava = () => { pendingDisconnect.value = 'strava'; showDisconnectConfirm.value = true }
+const disconnectZwift  = () => { pendingDisconnect.value = 'zwift';  showDisconnectConfirm.value = true }
+
+const doDisconnect = async () => {
+  showDisconnectConfirm.value = false
+  const service = pendingDisconnect.value
   try {
-    await axios.delete(`${API_URL}/integrations/garmin/disconnect`, {
-      headers: getAuthHeaders()
-    })
-    garminConnected.value = false
-    garminLastSync.value = null
-    showStatus('Garmin disconnected.')
+    await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
+    if (service === 'garmin') { garminConnected.value = false; garminLastSync.value = null }
+    if (service === 'strava') { stravaConnected.value = false; stravaLastSync.value = null }
+    if (service === 'zwift')  { zwiftConnected.value  = false }
+    showToast(`${disconnectLabels[service]} disconnected.`, 'info')
   } catch {
-    showStatus('Failed to disconnect Garmin.', 'error')
+    showToast(`Failed to disconnect ${disconnectLabels[service]}. Try again.`, 'error')
   }
 }
 
@@ -240,17 +261,6 @@ const connectStrava = async () => {
   }
 }
 
-const disconnectStrava = async () => {
-  if (!confirm('Disconnect Strava? New activities will no longer sync.')) return
-  try {
-    await axios.delete(`${API_URL}/integrations/strava/disconnect`, { headers: getAuthHeaders() })
-    stravaConnected.value = false
-    stravaLastSync.value = null
-    showStatus('Strava disconnected.')
-  } catch {
-    showStatus('Failed to disconnect Strava.', 'error')
-  }
-}
 
 const syncStrava = async () => {
   syncing.value = true
@@ -279,18 +289,6 @@ const connectZwift = async () => {
   }
 }
 
-const disconnectZwift = async () => {
-  if (!confirm('Are you sure you want to disconnect Zwift?')) return
-  try {
-    await axios.delete(`${API_URL}/integrations/zwift/disconnect`, {
-      headers: getAuthHeaders()
-    })
-    zwiftConnected.value = false
-    showStatus('Zwift disconnected.')
-  } catch {
-    showStatus('Failed to disconnect Zwift.', 'error')
-  }
-}
 
 onMounted(() => {
   checkConnectionStatus()

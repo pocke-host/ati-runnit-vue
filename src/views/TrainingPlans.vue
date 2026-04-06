@@ -178,7 +178,10 @@
                     style="max-width: 160px"
                   />
                 </div>
-                <div class="field-hint" v-if="targetSeconds">
+                <div class="field-error" v-if="raceTimeError">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ raceTimeError }}
+                </div>
+                <div class="field-hint" v-else-if="targetSeconds">
                   <i class="bi bi-stopwatch me-1"></i>
                   Pace targets will be calculated for all workout types.
                 </div>
@@ -322,11 +325,12 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { usePlanStore } from '@/stores/plan.js'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useAuthStore } from '@/stores/auth.js'
+import { useToast } from '@/composables/useToast'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 
@@ -336,16 +340,50 @@ const authStore = useAuthStore()
 const { plans } = storeToRefs(planStore)
 const { formatDistance } = useUnits()
 const { unitSystem } = storeToRefs(authStore)
+const { showToast } = useToast()
 
-// ── Status ──────────────────────────────────────────
-const statusMessage = ref('')
-const statusType = ref('success')
-let statusTimer = null
-const showStatus = (msg, type = 'success') => {
-  clearTimeout(statusTimer)
-  statusMessage.value = msg
-  statusType.value = type
-  statusTimer = setTimeout(() => { statusMessage.value = '' }, 4000)
+// ── Status (toast-backed) ────────────────────────────
+const showStatus = (msg, type = 'success') => showToast(msg, type)
+
+// ── Wizard draft persistence ─────────────────────────
+const WIZARD_DRAFT_KEY = 'runnit_wizard_draft'
+
+function saveWizardDraft() {
+  const draft = {
+    wizardStep: wizardStep.value,
+    selectedGoal: selectedGoal.value,
+    targetRaceDate: targetRaceDate.value,
+    justBuildingFitness: justBuildingFitness.value,
+    weeklyMileageInput: weeklyMileageInput.value,
+    recentRaceTimeInput: recentRaceTimeInput.value,
+    availableDays: [...availableDays.value],
+    startDate: startDate.value,
+    savedAt: Date.now(),
+  }
+  localStorage.setItem(WIZARD_DRAFT_KEY, JSON.stringify(draft))
+}
+
+function clearWizardDraft() {
+  localStorage.removeItem(WIZARD_DRAFT_KEY)
+}
+
+function loadWizardDraft() {
+  try {
+    const raw = localStorage.getItem(WIZARD_DRAFT_KEY)
+    if (!raw) return
+    const d = JSON.parse(raw)
+    // Discard drafts older than 7 days
+    if (Date.now() - d.savedAt > 7 * 24 * 3600 * 1000) { clearWizardDraft(); return }
+    wizardStep.value = d.wizardStep || 1
+    selectedGoal.value = d.selectedGoal || null
+    targetRaceDate.value = d.targetRaceDate || ''
+    justBuildingFitness.value = d.justBuildingFitness || false
+    weeklyMileageInput.value = d.weeklyMileageInput || 0
+    recentRaceTimeInput.value = d.recentRaceTimeInput || ''
+    availableDays.value = new Set(d.availableDays || ['Monday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday'])
+    startDate.value = d.startDate || nextMonday()
+    if (d.wizardStep > 1) showToast('Wizard progress restored.', 'info')
+  } catch { clearWizardDraft() }
 }
 
 // ── Wizard state ────────────────────────────────────
@@ -361,6 +399,17 @@ const availableDays = ref(new Set(['Monday', 'Wednesday', 'Thursday', 'Saturday'
 const startDate = ref(nextMonday())
 const preview = ref(null)
 const creating = ref(false)
+
+// ── Pace validation ──────────────────────────────────
+const raceTimeError = ref('')
+watch(recentRaceTimeInput, (val) => {
+  if (!val.trim()) { raceTimeError.value = ''; return }
+  const parts = val.trim().split(':').map(Number)
+  const valid =
+    (parts.length === 2 && parts.every(p => !isNaN(p) && p >= 0) && parts[1] < 60) ||
+    (parts.length === 3 && parts.every(p => !isNaN(p) && p >= 0) && parts[1] < 60 && parts[2] < 60)
+  raceTimeError.value = valid ? '' : 'Use M:SS or H:MM:SS format (e.g. 22:30 or 1:45:00)'
+})
 
 // ── Units ───────────────────────────────────────────
 const distanceUnit = computed(() => unitSystem.value === 'imperial' ? 'mi' : 'km')
@@ -694,6 +743,7 @@ async function confirmCreate() {
     }
 
     const created = await planStore.createPlan(payload)
+    clearWizardDraft()
     showStatus(`"${created.name}" created!`)
     // Reset wizard
     wizardStep.value = 1
@@ -738,13 +788,25 @@ function typeChipColor(wType) {
 
 const plansLoading = ref(false)
 
+// Auto-save wizard draft whenever key fields change
+watch([wizardStep, selectedGoal, targetRaceDate, weeklyMileageInput, recentRaceTimeInput, startDate], saveWizardDraft)
+
 onMounted(async () => {
+  loadWizardDraft()
   plansLoading.value = true
   try {
     await planStore.fetchPlans()
   } finally {
     plansLoading.value = false
   }
+})
+
+// Warn on navigation away mid-wizard (step 2+)
+onBeforeRouteLeave((to, from, next) => {
+  if (wizardStep.value > 1 && !creating.value) {
+    saveWizardDraft()
+  }
+  next()
 })
 </script>
 
@@ -863,6 +925,7 @@ onMounted(async () => {
 .field-input-row { display: flex; align-items: center; gap: 10px; }
 .field-unit { font-size: 0.9rem; font-weight: 700; color: rgba(15,18,16,0.55); white-space: nowrap; }
 .field-hint { font-size: 0.83rem; color: rgba(15,18,16,0.55); margin-top: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.field-error { font-size: 0.83rem; color: #dc2626; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
 .hint-warn { color: #0052FF; }
 .optional-label { font-weight: 400; color: rgba(15,18,16,0.45); font-size: 0.82rem; }
 .mt-2 { margin-top: 8px; }

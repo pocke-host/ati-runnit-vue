@@ -136,7 +136,7 @@
       <button
         v-if="hasStarted"
         class="control-btn control-btn-finish"
-        @click="stopTracking"
+        @click="showFinishConfirm = true"
         :disabled="saving"
       >
         <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
@@ -162,6 +162,14 @@
       <button class="share-stop-btn" @click="stopSharing">Stop Sharing</button>
     </div>
     <div v-if="shareCopied" class="share-copied-toast">Link copied to clipboard!</div>
+
+    <ConfirmModal
+      v-model="showFinishConfirm"
+      title="Finish Activity?"
+      body="Save this workout and end the session."
+      confirm-label="Save & Finish"
+      @confirm="stopTracking"
+    />
 
     <!-- SOS Button -->
     <button v-if="isTracking" class="sos-btn" @click="showSosModal = true">
@@ -204,6 +212,8 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { useUnits } from '@/composables/useUnits'
 import { useActivityStore } from '@/stores/activity'
 import { useVoiceNote } from '@/composables/useVoiceNote'
+import { useToast } from '@/composables/useToast'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 import axios from 'axios'
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
@@ -248,7 +258,10 @@ const postNotes        = ref('')
 const notesSubmitting  = ref(false)
 
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
+const { showToast } = useToast()
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+
+const showFinishConfirm = ref(false)
 
 // Draft recovery state
 const showDraftBanner = ref(false)
@@ -642,7 +655,7 @@ const resumeTracking = () => {
 }
 
 const stopTracking = async () => {
-  if (!confirm('Finish this activity?')) return
+  showFinishConfirm.value = false
   await stopSharing()
   pauseTracking()
   saving.value = true

@@ -254,6 +254,15 @@
 
       </div>
     </template>
+
+    <ConfirmModal
+      v-model="showDeleteConfirm"
+      title="Delete Activity"
+      body="This will permanently delete your activity and all its data. This cannot be undone."
+      confirm-label="Delete"
+      :danger="true"
+      @confirm="doDelete"
+    />
   </div>
 </template>
 
@@ -264,9 +273,11 @@ import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useToast } from '@/composables/useToast'
 import RouteViewer from '@/components/RouteViewer.vue'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
 import { useNotificationStore } from '@/stores/notification'
@@ -303,7 +314,9 @@ const userReaction = ref(null)
 const reactionCounts = ref({})
 const following = ref(false)
 const followLoading = ref(false)
+const { showToast } = useToast()
 const deleteLoading = ref(false)
+const showDeleteConfirm = ref(false)
 
 const activityId = computed(() => route.params.id)
 const parentEvent = ref(null)
@@ -583,14 +596,16 @@ const submitComment = async () => {
   }
 }
 
-const handleDelete = async () => {
-  if (!confirm('Delete this activity? This cannot be undone.')) return
+const handleDelete = () => { showDeleteConfirm.value = true }
+
+const doDelete = async () => {
+  showDeleteConfirm.value = false
   deleteLoading.value = true
   try {
     await activityStore.deleteActivity(activityId.value)
     router.push('/feed')
   } catch {
-    alert('Failed to delete activity')
+    showToast('Failed to delete activity. Try again.', 'error')
   } finally {
     deleteLoading.value = false
   }

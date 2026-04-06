@@ -93,9 +93,9 @@
                   <div v-if="!n.read" class="notif-dot"></div>
                 </div>
               </div>
-              <div v-if="notifications.length > 12" class="notif-footer">
-                {{ notifications.length - 12 }} more notifications
-              </div>
+              <button v-if="notifications.length > 12" class="notif-footer" @click="notifStore.markAllRead(); notifOpen = false">
+                {{ notifications.length - 12 }} more &mdash; mark all read
+              </button>
             </div>
           </div>
 
@@ -369,8 +369,17 @@ const handleNotifClick = async (n) => {
   if (!n.read) await notifStore.markRead(n.id)
   notifOpen.value = false
   if (n.type === 'NEW_FOLLOWER' && n.actorId) router.push(`/profile/${n.actorId}`)
-  else if (n.type === 'REACTION' || n.type === 'COMMENT') router.push('/feed')
+  else if (n.type === 'REACTION' || n.type === 'COMMENT') {
+    if (n.activityId) router.push(`/activities/${n.activityId}`)
+    else router.push('/feed')
+  }
   else if (n.type === 'CLUB_INVITE') router.push('/clubs')
+  else if (n.type === 'ACHIEVEMENT') router.push('/achievements')
+  else if (n.type === 'CHALLENGE') router.push('/challenges')
+  else if (n.type === 'PLAN_ASSIGNED') router.push('/plans')
+  else if (n.type === 'WORKOUT_REMINDER') router.push('/plans')
+  else if (n.type === 'PERSONAL_RECORD') router.push('/stats')
+  // fallback: stay put (modal already closed)
 }
 
 const handleOutsideClick = (e) => {
@@ -662,12 +671,21 @@ onUnmounted(() => {
   margin-top: 6px;
 }
 .notif-footer {
+  display: block;
+  width: 100%;
   padding: 12px 20px;
   text-align: center;
   font-size: 0.75rem;
   color: #767676;
   border-top: 1px solid #E5E5E5;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  transition: background 0.15s;
 }
+.notif-footer:hover { background: #f5f5f5; color: #000; }
 
 /* Profile avatar dropdown */
 .avatar-wrap { position: relative; }

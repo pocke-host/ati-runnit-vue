@@ -315,6 +315,15 @@
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      v-model="showDeleteMomentConfirm"
+      title="Delete Moment"
+      body="This will permanently remove this moment from your feed."
+      confirm-label="Delete"
+      :danger="true"
+      @confirm="doDeleteMoment"
+    />
   </div>
 </template>
 
@@ -325,8 +334,10 @@ import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useToast } from '@/composables/useToast'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 import CreateEventForm from '@/components/CreateEventForm.vue'
@@ -363,7 +374,9 @@ const reactionCounts = ref({})
 
 const followLoading = ref(false)
 const followingIds = ref(new Set())
+const { showToast } = useToast()
 const deleteLoading = ref(false)
+const showDeleteMomentConfirm = ref(false)
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
@@ -611,22 +624,21 @@ const toggleReaction = async (type) => {
   }
 }
 
-const deleteMoment = async () => {
+const deleteMoment = () => {
   if (!selectedMoment.value || deleteLoading.value) return
-  
-  if (!confirm('Are you sure you want to delete this moment?')) return
+  showDeleteMomentConfirm.value = true
+}
 
+const doDeleteMoment = async () => {
+  showDeleteMomentConfirm.value = false
   deleteLoading.value = true
   try {
-    await axios.delete(`${API_URL}/moments/${selectedMoment.value.id}`, {
-      headers: getAuthHeaders()
-    })
-    
+    await axios.delete(`${API_URL}/moments/${selectedMoment.value.id}`, { headers: getAuthHeaders() })
     moments.value = moments.value.filter(m => m.id !== selectedMoment.value.id)
     closeMoment()
-  } catch (err) {
-    console.error('Failed to delete moment:', err)
-    alert('Failed to delete moment')
+    showToast('Moment deleted.', 'info')
+  } catch {
+    showToast('Failed to delete moment. Try again.', 'error')
   } finally {
     deleteLoading.value = false
   }

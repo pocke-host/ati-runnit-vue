@@ -7,6 +7,8 @@ import { storeToRefs } from 'pinia'
 import TopNav from './components/TopNav.vue'
 import BottomNav from './components/BottomNav.vue'
 import Footer from './components/Footer.vue'
+import { Capacitor } from '@capacitor/core'
+import { StatusBar, Style } from '@capacitor/status-bar'
 
 const route  = useRoute()
 const router = useRouter()
@@ -55,8 +57,20 @@ const startJWTCheck = () => {
   }, JWT_CHECK_MS)
 }
 
+// ── StatusBar (iOS native only) ───────────────────────────────────────────────
+async function initStatusBar() {
+  if (!Capacitor.isNativePlatform()) return
+  try {
+    await StatusBar.setStyle({ style: Style.Dark })  // dark icons on light bg
+    await StatusBar.setBackgroundColor({ color: '#ffffff' })
+    await StatusBar.show()
+  } catch { /* non-fatal on platforms that don't support it */ }
+}
+
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
+  initStatusBar()
+
   // Backend warm-up
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
   fetch(`${API_URL}/health`, { method: 'GET' }).catch(() => {})
