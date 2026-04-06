@@ -99,7 +99,7 @@
         <div class="device-icon">⌚</div>
         <h3>Apple Watch</h3>
         <p>Requires the RUNNIT iOS app. Apple Watch syncs automatically once you install and grant HealthKit access.</p>
-        <a href="#" class="btn btn-outline">Get iOS App →</a>
+        <button class="btn btn-outline" @click="showToast('iOS app coming soon — join the waitlist at runnit.app', 'info')">Get iOS App →</button>
       </div>
 
       <!-- COROS (Coming Soon) -->

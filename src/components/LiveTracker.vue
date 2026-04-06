@@ -75,7 +75,7 @@
     </div>
 
     <!-- Post-workout Notes Overlay -->
-    <div v-if="showNotesStep" class="notes-overlay">
+    <div v-if="showNotesStep" class="notes-overlay" :style="{ paddingBottom: keyboardOffset + 'px' }">
       <div class="notes-overlay-inner">
         <div class="notes-overlay-title">WORKOUT SAVED</div>
         <p class="notes-overlay-sub">Add a note while it's fresh</p>
@@ -253,6 +253,25 @@ const saving           = ref(false)
 const saveError        = ref('')
 const gpsError         = ref('')
 const showNotesStep    = ref(false)
+const keyboardOffset   = ref(0)
+
+function syncKeyboard() {
+  if (window.visualViewport) {
+    keyboardOffset.value = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop)
+  }
+}
+
+watch(showNotesStep, (open) => {
+  if (open && window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncKeyboard)
+    window.visualViewport.addEventListener('scroll', syncKeyboard)
+    syncKeyboard()
+  } else {
+    window.visualViewport?.removeEventListener('resize', syncKeyboard)
+    window.visualViewport?.removeEventListener('scroll', syncKeyboard)
+    keyboardOffset.value = 0
+  }
+})
 const savedActivityId  = ref(null)
 const postNotes        = ref('')
 const notesSubmitting  = ref(false)
@@ -1071,14 +1090,15 @@ onUnmounted(() => {
 
 /* ── Post-workout Notes Overlay ── */
 .notes-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: #fff;
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px;
+  padding: 48px 24px 24px;
+  overflow-y: auto;
 }
 .notes-overlay-inner {
   width: 100%;
