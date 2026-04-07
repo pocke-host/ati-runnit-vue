@@ -421,7 +421,9 @@ const toggleActivityReaction = async (activityId, type) => {
       current.userReaction = type
     }
     activityReactionMap.value[activityId] = { ...current }
-  } catch { /* silent */ }
+  } catch {
+    showToast('Failed to save reaction. Please try again.', 'error')
+  }
 }
 
 // Combine moments and activities into unified feed
@@ -639,7 +641,7 @@ const toggleReaction = async (type) => {
       moments.value[momentIndex].reactions = prevCounts
       moments.value[momentIndex].currentUserReaction = prevReaction
     }
-    console.error('Failed to toggle reaction:', err)
+    showToast('Failed to save reaction. Please try again.', 'error')
   } finally {
     reactionLoading.value = false
   }
@@ -692,10 +694,10 @@ const followUser = async (userId) => {
       actorId: user.value?.id,
       actorName: user.value?.displayName
     })
-  } catch (err) {
+  } catch {
     // Rollback
     followingIds.value.delete(userId)
-    console.error('Follow failed:', err)
+    showToast('Failed to follow user. Please try again.', 'error')
   } finally {
     followLoading.value = false
   }

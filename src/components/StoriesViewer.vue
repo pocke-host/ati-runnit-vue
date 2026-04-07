@@ -173,9 +173,12 @@
   <script setup>
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import axios from 'axios'
+  import { useToast } from '@/composables/useToast'
   
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
   
+  const { showToast } = useToast()
+
   const storyGroups = ref([])
   const viewingStory = ref(false)
   const currentUserGroup = ref(null)
@@ -328,8 +331,8 @@
   }
   
   const showViewers = () => {
-    // TODO: Show viewers modal
-    alert(`${currentStory.value.viewCount} people viewed this story`)
+    const count = currentStory.value.viewCount ?? 0
+    showToast(`${count} ${count === 1 ? 'person' : 'people'} viewed this story`, 'info')
   }
   
   // Create Story Functions

@@ -26,6 +26,7 @@ const routes = [
   { path: '/sports/running', name: 'SportsRunning', component: () => import('@/views/sports/SportsRunning.vue') },
   { path: '/sports/ride',    name: 'SportsRide',    component: () => import('@/views/sports/SportsRide.vue') },
   { path: '/sports/swim',    name: 'SportsSwim',    component: () => import('@/views/sports/SportsSwim.vue') },
+  { path: '/sports/hike',    name: 'SportsHike',    component: () => import('@/views/sports/SportsHike.vue') },
 
   // Legal (components/)
   { path: '/privacy',  name: 'PrivacyPolicy',   component: PrivacyPolicy },

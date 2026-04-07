@@ -632,7 +632,9 @@ const loadFollowStatus = async () => {
     try {
       const { data } = await axios.get(`${API_URL}/follow/following`, { headers: getAuthHeaders() })
       following.value = (Array.isArray(data) ? data : []).some(u => String(u.id) === String(profileId.value))
-    } catch { /* silent */ }
+    } catch {
+      showToast('Could not load follow status.', 'error')
+    }
   }
 }
 

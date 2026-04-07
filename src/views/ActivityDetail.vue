@@ -500,10 +500,10 @@ const init = async () => {
       activityStore.fetchComments(activityId.value).catch(() => [])
     ])
 
-    // Check if this activity is part of a multisport event
+    // Check if this activity is part of a multisport event (best-effort, non-blocking)
     axios.get(`${API_URL}/multisport-events/by-activity/${activityId.value}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    }).then(r => { parentEvent.value = r.data }).catch(() => {})
+    }).then(r => { parentEvent.value = r.data }).catch(() => { /* not part of an event — expected */ })
     activity.value = actData
     comments.value = Array.isArray(commData) ? commData : []
     reactionCounts.value = actData.reactions || {}
