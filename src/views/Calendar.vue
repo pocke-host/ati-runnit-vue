@@ -142,16 +142,22 @@
                 <button
                   class="dge-rsvp-btn dge-rsvp-yes"
                   :class="{ active: ge.myRsvpStatus === 'ACCEPTED' }"
+                  :disabled="rsvpLoading === ge.myInviteId"
                   @click="handleRsvp(ge, 'ACCEPTED')"
-                >Going</button>
+                >
+                  <span v-if="rsvpLoading === ge.myInviteId && ge.myRsvpStatus !== 'ACCEPTED'" class="spinner-border spinner-border-sm me-1"></span>
+                  Going
+                </button>
                 <button
                   class="dge-rsvp-btn dge-rsvp-maybe"
                   :class="{ active: ge.myRsvpStatus === 'MAYBE' }"
+                  :disabled="rsvpLoading === ge.myInviteId"
                   @click="handleRsvp(ge, 'MAYBE')"
                 >Maybe</button>
                 <button
                   class="dge-rsvp-btn dge-rsvp-no"
                   :class="{ active: ge.myRsvpStatus === 'DECLINED' }"
+                  :disabled="rsvpLoading === ge.myInviteId"
                   @click="handleRsvp(ge, 'DECLINED')"
                 >Decline</button>
               </div>
@@ -448,6 +454,7 @@ const showCreateForm = ref(false)
 const editingEvent   = ref(null)
 const { showToast } = useToast()
 const saveLoading    = ref(false)
+const rsvpLoading    = ref(null) // holds inviteId while RSVP in flight
 const formError      = ref('')
 const showDeleteWorkoutConfirm = ref(false)
 const pendingDeleteId = ref(null)
@@ -566,8 +573,15 @@ function sportEmojiForType(type) {
 }
 
 async function handleRsvp(ge, status) {
-  if (!ge.myInviteId) return
-  await groupEventStore.rsvp(ge.myInviteId, status)
+  if (!ge.myInviteId || rsvpLoading.value) return
+  rsvpLoading.value = ge.myInviteId
+  try {
+    await groupEventStore.rsvp(ge.myInviteId, status)
+  } catch {
+    showToast('Failed to update RSVP. Please try again.', 'error')
+  } finally {
+    rsvpLoading.value = null
+  }
 }
 
 function onGroupEventCreated() {

@@ -165,7 +165,7 @@ const toastIcon = (type) => ({
   cursor: pointer;
   pointer-events: all;
   font-family: Futura, "Avenir Next", system-ui, sans-serif;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  box-shadow: none;
 }
 
 .app-toast--info    { background: #000; color: #fff; }

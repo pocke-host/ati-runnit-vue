@@ -8,22 +8,30 @@
         <div class="hero-kicker">RUNNIT // PERFORMANCE</div>
         <h1 class="hero-title">YOUR STATS</h1>
         <div class="hero-chips">
-          <div class="hero-chip">
-            <span class="chip-val">{{ formatDistance(careerMeters) }}</span>
-            <span class="chip-label">Total Distance</span>
-          </div>
-          <div class="hero-chip">
-            <span class="chip-val">{{ activities.length }}</span>
-            <span class="chip-label">Activities</span>
-          </div>
-          <div class="hero-chip">
-            <span class="chip-val">{{ formatDuration(careerSeconds) }}</span>
-            <span class="chip-label">Total Time</span>
-          </div>
-          <div class="hero-chip hero-chip-block" :style="{ borderColor: trainingBlock.color }">
-            <span class="chip-val" :style="{ color: trainingBlock.color }">{{ trainingBlock.label }}</span>
-            <span class="chip-label">Training Phase</span>
-          </div>
+          <template v-if="loading">
+            <div class="hero-chip" v-for="n in 4" :key="n">
+              <span class="chip-val chip-skeleton"></span>
+              <span class="chip-label chip-skeleton chip-skeleton-sm"></span>
+            </div>
+          </template>
+          <template v-else>
+            <div class="hero-chip">
+              <span class="chip-val">{{ formatDistance(careerMeters) }}</span>
+              <span class="chip-label">Total Distance</span>
+            </div>
+            <div class="hero-chip">
+              <span class="chip-val">{{ activities.length }}</span>
+              <span class="chip-label">Activities</span>
+            </div>
+            <div class="hero-chip">
+              <span class="chip-val">{{ formatDuration(careerSeconds) }}</span>
+              <span class="chip-label">Total Time</span>
+            </div>
+            <div class="hero-chip hero-chip-block" :style="{ borderColor: trainingBlock.color }">
+              <span class="chip-val" :style="{ color: trainingBlock.color }">{{ trainingBlock.label }}</span>
+              <span class="chip-label">Training Phase</span>
+            </div>
+          </template>
         </div>
       </div>
     </section>
@@ -988,6 +996,25 @@ onMounted(async () => {
   color: rgba(255,255,255,0.55);
   text-transform: uppercase;
   letter-spacing: 0.10em;
+}
+
+.chip-skeleton {
+  display: block;
+  background: linear-gradient(90deg, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 75%);
+  background-size: 400px 100%;
+  animation: chip-shimmer 1.4s infinite;
+  border-radius: 0;
+  width: 80px;
+  height: 1.6rem;
+}
+.chip-skeleton-sm {
+  width: 60px;
+  height: 0.75rem;
+  margin-top: 4px;
+}
+@keyframes chip-shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position:  400px 0; }
 }
 
 /* JUMP NAV */
