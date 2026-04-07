@@ -229,11 +229,18 @@ import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Features — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/features' }],
   meta: [
     { name: 'description', content: 'GPS tracking, periodized training plans, Garmin & Strava sync, personal records, clubs, challenges, and more. Everything you need to train and race smarter.' },
     { property: 'og:title', content: 'Features — Runnit' },
     { property: 'og:description', content: 'GPS tracking, periodized training plans, Garmin & Strava sync, personal records, clubs, challenges, and more.' },
     { property: 'og:url', content: 'https://runnit.live/features' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Features — Runnit' },
+    { name: 'twitter:description', content: 'GPS tracking, periodized training plans, Garmin & Strava sync, personal records, clubs, challenges, and more.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

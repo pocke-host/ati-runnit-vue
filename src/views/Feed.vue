@@ -42,7 +42,9 @@
 
     <!-- Feed Content -->
     <div class="feed-container">
-      <AppSpinner v-if="loading" label="Loading feed…" />
+      <div v-if="loading" class="feed-grid">
+        <SkeletonCard v-for="n in 6" :key="n" variant="feed" />
+      </div>
 
       <div v-else-if="sortedFeedItems.length" class="feed-grid">
         <!-- Activity Card -->
@@ -342,6 +344,7 @@ import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { useToast } from '@/composables/useToast'
 import AppSpinner from '@/components/AppSpinner.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import { useNotificationStore } from '@/stores/notification'

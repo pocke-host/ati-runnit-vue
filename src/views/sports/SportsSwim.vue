@@ -81,6 +81,23 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Swimming — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/sports/swim' }],
+  meta: [
+    { name: 'description', content: 'Track pool and open-water swims with auto-splits, lap pace, and GPS mapping. Build swim training plans on Runnit.' },
+    { property: 'og:title', content: 'Swimming — Runnit' },
+    { property: 'og:description', content: 'Track pool and open-water swims with auto-splits, lap pace, and GPS mapping.' },
+    { property: 'og:url', content: 'https://runnit.live/sports/swim' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Swimming — Runnit' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
+
 const feats = [
   { t: 'Auto-splits', d: 'See per-lap pace, rest, and trends for every set.' },
   { t: 'Open-water GPS', d: 'Map your swims, conditions, and routes outdoors.' },

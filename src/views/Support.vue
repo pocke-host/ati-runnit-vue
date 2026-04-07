@@ -49,11 +49,18 @@
 import { useHead } from '@unhead/vue'
 useHead({
   title: 'Support — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/support' }],
   meta: [
     { name: 'description', content: 'Get help with Runnit. Browse help articles on GPS tracking, Garmin sync, training plans, billing, and more — or submit a support request.' },
     { property: 'og:title', content: 'Support — Runnit' },
     { property: 'og:description', content: 'Find answers to common questions about Runnit, or contact our support team directly.' },
     { property: 'og:url', content: 'https://runnit.live/support' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Support — Runnit' },
+    { name: 'twitter:description', content: 'Find answers to common questions about Runnit, or contact our support team directly.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

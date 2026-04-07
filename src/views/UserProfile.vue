@@ -168,9 +168,8 @@
 
         <!-- ── ACTIVITIES TAB ── -->
         <div v-if="tab === 'activities'">
-          <div v-if="activitiesLoading" class="tab-loading">
-            <div class="spinner-border spinner-border-sm"></div>
-            <span>Loading activities…</span>
+          <div v-if="activitiesLoading" class="sk-activity-list">
+            <SkeletonCard v-for="n in 5" :key="n" variant="activity-row" />
           </div>
 
           <div v-else-if="profileActivities.length === 0" class="tab-empty">
@@ -219,9 +218,8 @@
 
         <!-- ── MOMENTS TAB ── -->
         <div v-if="tab === 'moments'">
-          <div v-if="momentsLoading" class="tab-loading">
-            <div class="spinner-border spinner-border-sm"></div>
-            <span>Loading moments…</span>
+          <div v-if="momentsLoading" class="moments-grid">
+            <SkeletonCard v-for="n in 9" :key="n" variant="moment-tile" />
           </div>
 
           <div v-else-if="moments.length === 0" class="tab-empty">
@@ -429,6 +427,7 @@ import { useArchetype } from '@/composables/useArchetype'
 import { useGrowthTimeline } from '@/composables/useGrowthTimeline'
 import { useAchievementStore, BADGE_CATALOG, computeEarnedBadges } from '@/stores/achievement'
 import { useNotificationStore } from '@/stores/notification'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 

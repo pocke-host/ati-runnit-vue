@@ -74,11 +74,10 @@
       <div class="container-xxl">
 
         <!-- Loading state -->
-        <div v-if="loading" class="loading-state">
-          <div class="spinner-border text-olive" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div v-if="loading" class="row g-4">
+          <div v-for="n in 6" :key="n" class="col-12 col-md-6 col-lg-4">
+            <SkeletonCard variant="challenge" />
           </div>
-          <p class="loading-text">Loading challenges...</p>
         </div>
 
         <template v-else>
@@ -281,6 +280,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 
 const { showToast } = useToast()
 
