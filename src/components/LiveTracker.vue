@@ -454,8 +454,7 @@ const handlePositionUpdate = (position) => {
   pushShareUpdate(latitude, longitude)
 }
 
-const handlePositionError = (err) => {
-  console.warn('GPS error', err)
+const handlePositionError = () => {
   gpsError.value = 'GPS signal lost — move to an open area.'
   setTimeout(() => { gpsError.value = '' }, 4000)
 }
@@ -472,8 +471,8 @@ const startSharing = async () => {
     try { await navigator.clipboard.writeText(data.shareUrl) } catch {}
     shareCopied.value = true
     setTimeout(() => { shareCopied.value = false }, 3000)
-  } catch (e) {
-    console.error('startSharing error', e)
+  } catch {
+    // sharing failed silently — user can retry
   }
 }
 
@@ -507,8 +506,8 @@ const fetchContacts = async () => {
       headers: { Authorization: `Bearer ${token}` },
     })
     sosContacts.value = data
-  } catch (err) {
-    console.error('Failed to load SOS contacts:', err)
+  } catch {
+    // SOS contacts failed, list stays empty
   }
 }
 
@@ -692,8 +691,7 @@ const stopTracking = async () => {
     saving.value = false
     clearDraft()   // run saved — kill the crash recovery draft
     showNotesStep.value = true
-  } catch (err) {
-    console.error('Save failed:', err)
+  } catch {
     saveError.value = 'Failed to save. Tap Finish again to retry.'
     saving.value = false
     startTracking()
@@ -711,8 +709,8 @@ async function finishWithNotes() {
         { notes: postNotes.value.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       )
-    } catch (e) {
-      console.warn('[LiveTracker] notes patch failed:', e)
+    } catch {
+      // notes patch is best-effort
     } finally {
       notesSubmitting.value = false
     }

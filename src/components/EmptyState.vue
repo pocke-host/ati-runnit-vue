@@ -63,13 +63,13 @@ defineEmits(['action'])
   align-items: center;
   height: 40px;
   padding: 0 24px;
-  border: 1px solid var(--rk-signal, #0052FF);
+  border: 2px solid var(--rk-signal, #0052FF);
   background: transparent;
   color: var(--rk-signal, #0052FF);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   cursor: pointer;
   text-decoration: none;
   border-radius: 0;

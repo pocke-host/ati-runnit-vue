@@ -570,7 +570,6 @@ const loadProfile = async () => {
     profile.value = data
   } catch (err) {
     const status = err.response?.status
-    console.error('Profile load error:', status, err.message)
     if (status === 404) {
       notFound.value = true
     } else {

@@ -429,6 +429,9 @@
 import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
@@ -540,8 +543,8 @@ async function fetchClubs() {
   try {
     const res = await fetch(`${API_URL}/clubs`, { headers: getAuthHeaders() })
     if (res.ok) allClubs.value = await res.json()
-  } catch (e) {
-    console.error('fetchClubs error', e)
+  } catch {
+    // clubs failed to load
   } finally {
     loading.value = false
   }
@@ -551,8 +554,8 @@ async function fetchMyClubs() {
   try {
     const res = await fetch(`${API_URL}/clubs/my`, { headers: getAuthHeaders() })
     if (res.ok) myClubs.value = await res.json()
-  } catch (e) {
-    console.error('fetchMyClubs error', e)
+  } catch {
+    // non-critical
   }
 }
 
@@ -572,8 +575,8 @@ async function joinClub(id) {
         club[key] = (club[key] ?? 0) + 1
       }
     }
-  } catch (e) {
-    console.error('joinClub error', e)
+  } catch {
+    showToast('Failed to join club. Please try again.', 'error')
   } finally {
     joiningId.value = null
   }
@@ -595,8 +598,8 @@ async function leaveClub(id) {
       }
       if (chatClub.value?.id === id) chatOpen.value = false
     }
-  } catch (e) {
-    console.error('leaveClub error', e)
+  } catch {
+    showToast('Failed to leave club. Please try again.', 'error')
   } finally {
     joiningId.value = null
   }
@@ -621,8 +624,8 @@ async function loadMessages() {
       messages.value = await res.json()
       scrollToBottom()
     }
-  } catch (e) {
-    console.error('loadMessages error', e)
+  } catch {
+    // messages failed to load
   } finally {
     messagesLoading.value = false
   }
@@ -646,8 +649,7 @@ async function sendMessage() {
     } else {
       newMessage.value = text // restore on failure
     }
-  } catch (e) {
-    console.error('sendMessage error', e)
+  } catch {
     newMessage.value = text
   } finally {
     sendingMsg.value = false
@@ -711,8 +713,8 @@ async function loadMapClubs() {
     mapClubsNoLocation.value = all.filter(c => !c.latitude).length
     await nextTick()
     initClubMap(clubs)
-  } catch (e) {
-    console.error('loadMapClubs error', e)
+  } catch {
+    // map clubs failed to load
   } finally {
     mapClubsLoading.value = false
   }

@@ -174,10 +174,12 @@
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import axios from 'axios'
   import { useToast } from '@/composables/useToast'
-  
+  import { useUploadStore } from '@/stores/upload'
+
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-  
+
   const { showToast } = useToast()
+  const uploadStore = useUploadStore()
 
   const storyGroups = ref([])
   const viewingStory = ref(false)
@@ -232,8 +234,8 @@
         headers: getAuthHeaders()
       })
       storyGroups.value = data
-    } catch (err) {
-      console.error('Failed to fetch stories:', err)
+    } catch {
+      // stories are non-critical, ring stays empty
     }
   }
   
@@ -325,8 +327,8 @@
         { headers: getAuthHeaders() }
       )
       currentStory.value.hasViewed = true
-    } catch (err) {
-      console.error('Failed to mark story as viewed:', err)
+    } catch {
+      // view tracking is best-effort
     }
   }
   
@@ -380,35 +382,27 @@
   const handleCreateStory = async () => {
     storyLoading.value = true
     storyError.value = ''
-  
+
     try {
-      // Upload media to S3
-      const formData = new FormData()
-      formData.append('file', storyFile.value)
-  
-      const uploadRes = await axios.post(`${API_URL}/upload`, formData, {
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-  
-      // Create story
+      // Upload via presigned S3 URL (same flow as CreateMoment/ProfileEdit)
+      const mediaUrl = await uploadStore.uploadImage(storyFile.value)
+
+      // Create story record
       await axios.post(
         `${API_URL}/stories`,
         {
-          mediaUrl: uploadRes.data.url,
+          mediaUrl,
           mediaType: storyMediaType.value,
           caption: storyCaption.value || null,
           visibility: storyVisibility.value
         },
         { headers: getAuthHeaders() }
       )
-  
+
       closeCreateStoryModal()
       fetchStories()
     } catch (err) {
-      storyError.value = err.response?.data?.error || 'Failed to create story'
+      storyError.value = err.response?.data?.message || err.response?.data?.error || 'Failed to upload story. Please try again.'
     } finally {
       storyLoading.value = false
     }

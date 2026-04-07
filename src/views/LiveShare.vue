@@ -60,6 +60,7 @@ let map = null
 let marker = null
 let markerEl = null
 let pollInterval = null
+let updateInterval = null
 
 const sportEmoji = computed(() => {
   const map = { RUN: '🏃', RIDE: '🚴', SWIM: '🏊', HIKE: '🥾', WALK: '🚶', TRIATHLON: '🏅' }
@@ -140,13 +141,14 @@ onMounted(async () => {
 
   await fetchShare()
   pollInterval = setInterval(fetchShare, 5000)
-  setInterval(() => {
+  updateInterval = setInterval(() => {
     if (share.value?.updatedAt) lastUpdate.value = timeSince(share.value.updatedAt)
   }, 5000)
 })
 
 onUnmounted(() => {
   if (pollInterval) clearInterval(pollInterval)
+  if (updateInterval) clearInterval(updateInterval)
   if (map) map.remove()
 })
 </script>

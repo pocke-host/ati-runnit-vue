@@ -70,8 +70,7 @@ export async function initWeather(lat, lng) {
     })
 
     cache[key] = byDate
-  } catch (e) {
-    console.warn('[useWeather] fetch error:', e)
+  } catch {
     cache[key] = {} // mark as attempted so we don't retry
   } finally {
     weatherLoading.value = false

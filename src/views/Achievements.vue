@@ -4,7 +4,7 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">🏆 Achievements</h1>
+        <h1 class="hero-title">Achievements</h1>
         <p class="hero-sub">
           <template v-if="achievementStore.loading">Loading badges…</template>
           <template v-else>
@@ -87,10 +87,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useAchievementStore, BADGE_CATALOG } from '@/stores/achievement'
 import { useActivityStore } from '@/stores/activity'
 import { storeToRefs } from 'pinia'
+import { useUnits } from '@/composables/useUnits'
 
 const achievementStore = useAchievementStore()
 const activityStore = useActivityStore()
 const { activities } = storeToRefs(activityStore)
+const { formatDistance } = useUnits()
 
 const activeCategory = ref('all')
 const total = BADGE_CATALOG.length
@@ -123,10 +125,10 @@ function getProgress(badgeId) {
   return achievementStore.getBadgeProgress(badgeId)
 }
 
-// Distance badges show "km", count badges show count
+// Distance badges respect unit system; count badges show count
 function formatProgressVal(badgeId, val) {
   const distanceBadges = ['first_km', '5k_club', '10k_club', 'half_marathon', 'marathon', 'total_100km', 'total_500km']
-  if (distanceBadges.includes(badgeId)) return `${val} km`
+  if (distanceBadges.includes(badgeId)) return formatDistance(val * 1000)
   const strideBadges = ['streak_3', 'streak_7', 'streak_30']
   if (strideBadges.includes(badgeId)) return `${val} days`
   return val

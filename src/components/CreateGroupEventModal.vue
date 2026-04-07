@@ -117,8 +117,8 @@ onMounted(async () => {
   try {
     const { data } = await axios.get('/api/follow/following')
     following.value = data
-  } catch (e) {
-    console.error(e)
+  } catch {
+    // following list non-critical for invite flow
   } finally {
     loadingFollowing.value = false
   }
