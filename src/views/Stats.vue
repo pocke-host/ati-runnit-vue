@@ -121,11 +121,12 @@
           </div>
 
           <div class="perf-preds" v-if="performanceMetrics.racePreds">
-            <div class="perf-label" style="margin-bottom:12px">Race Predictions</div>
+            <div class="perf-label" style="margin-bottom:4px">Race Predictions</div>
+            <div class="perf-sub" style="margin-bottom:12px">Riegel formula estimate from your best recent effort</div>
             <div class="pred-grid">
               <div class="pred-item" v-for="(time, dist) in performanceMetrics.racePreds" :key="dist">
                 <div class="pred-dist">{{ dist }}</div>
-                <div class="pred-time">{{ time }}</div>
+                <div class="pred-time">~{{ time }}</div>
               </div>
             </div>
           </div>
@@ -386,7 +387,7 @@
             <div class="pr-label">{{ pr.label }}</div>
             <template v-if="pr.data">
               <div class="pr-value">{{ formatPRValue(pr) }}</div>
-              <router-link :to="`/activities/${pr.data.id}`" class="pr-link">View activity →</router-link>
+              <router-link v-if="pr.data.id" :to="`/activities/${pr.data.id}`" class="pr-link">View activity →</router-link>
             </template>
             <template v-else>
               <div class="pr-empty">No record yet</div>

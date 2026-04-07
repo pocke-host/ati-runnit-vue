@@ -362,10 +362,10 @@
             <div class="goal-item">
               <div class="goal-label">
                 <span>Activities</span>
-                <span class="goal-progress-text">{{ activities?.length || 0 }}/20</span>
+                <span class="goal-progress-text">{{ monthlyActivityCount }}/20 this month</span>
               </div>
               <div class="goal-bar">
-                <div class="goal-fill" :style="{width: `${Math.min((activities?.length || 0) * 5, 100)}%`}"></div>
+                <div class="goal-fill" :style="{width: `${Math.min(monthlyActivityCount * 5, 100)}%`}"></div>
               </div>
             </div>
           </div>
@@ -1069,12 +1069,22 @@ const monthlyDistanceMeters = computed(() => {
   return acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
 })
 
+const monthlyActivityCount = computed(() => {
+  const now = new Date()
+  return (activities.value || []).filter(a => {
+    const d = new Date(a.createdAt)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  }).length
+})
+
 const monthlyDistance = computed(() => {
   return (monthlyDistanceMeters.value / 1000).toFixed(1)
 })
 
+// 100 km (metric) or 100 mi (imperial) expressed in meters so the division is unit-consistent
 const monthlyGoalProgress = computed(() => {
-  return Math.min(Math.round((parseFloat(monthlyDistance.value) / 100) * 100), 100)
+  const goalMeters = isImperial.value ? 160934 : 100000
+  return Math.min(Math.round((monthlyDistanceMeters.value / goalMeters) * 100), 100)
 })
 
 const sportBreakdown = computed(() => {
