@@ -127,8 +127,20 @@ export const usePRStore = defineStore('pr', () => {
     if (!Object.keys(prs.value).length) loading.value = true
     try {
       const { data } = await axios.get(`${API_URL}/personal-records`, { headers: getAuthHeaders() })
-      prs.value = data
-      saveCache(data)
+      // Normalize API raw-number format into the same shape as computePRs objects
+      // so formatPRValue works regardless of where data came from
+      const normalized = {
+        best_5k:       data.best_5k       != null ? { estTime: data.best_5k }       : null,
+        best_10k:      data.best_10k      != null ? { estTime: data.best_10k }       : null,
+        best_half:     data.best_half     != null ? { estTime: data.best_half }      : null,
+        best_marathon: data.best_marathon != null ? { estTime: data.best_marathon }  : null,
+        longest_run:   data.longest_run   != null ? { distanceMeters: data.longest_run }   : null,
+        longest_ride:  data.longest_ride  != null ? { distanceMeters: data.longest_ride }  : null,
+        most_elevation:data.most_elevation!= null ? { elevationMeters: data.most_elevation } : null,
+        fastest_pace:  data.fastest_pace  != null ? { pace: data.fastest_pace }      : null,
+      }
+      prs.value = normalized
+      saveCache(normalized)
     } catch {
       // Fall back to client-side computation if API fails
       prs.value = computePRs(activities)

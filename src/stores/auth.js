@@ -26,7 +26,11 @@ const clearLocalState = () => {
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref((() => {
-    try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { clearLocalState(); return null }
+    try { return JSON.parse(localStorage.getItem('user') || 'null') } catch {
+      clearLocalState()
+      sessionStorage.setItem('session_corrupted', 'true')
+      return null
+    }
   })())
   const unitSystem = ref(localStorage.getItem('unitSystem') || 'imperial')
   const onboardingComplete = ref(localStorage.getItem('onboarding_complete') === 'true')

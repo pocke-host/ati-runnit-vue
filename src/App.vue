@@ -75,6 +75,11 @@ const { init: initDeepLinks, cleanup: cleanupDeepLinks } = useDeepLinks()
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
+  if (sessionStorage.getItem('session_corrupted') === 'true') {
+    sessionStorage.removeItem('session_corrupted')
+    showToast('Your session data was corrupted and you were signed out. Please sign in again.', 'error')
+  }
+
   initStatusBar()
   initDeepLinks()
   if (isAuthenticated.value) initPush()

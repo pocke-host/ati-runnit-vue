@@ -574,7 +574,7 @@ onUnmounted(() => {
   width: 360px;
   background: white;
   border-radius: 0;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: none;
   border: 1px solid #E5E5E5;
   overflow: hidden;
   animation: dropIn 0.15s ease;
@@ -712,7 +712,7 @@ onUnmounted(() => {
   width: 220px;
   background: white;
   border: 1px solid #E5E5E5;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  box-shadow: none;
   border-radius: 0;
   overflow: hidden;
   animation: dropIn 0.15s ease;

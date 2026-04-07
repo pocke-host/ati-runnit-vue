@@ -30,7 +30,7 @@
 
           <div class="col-12 col-lg-6">
             <!-- same box, new feel -->
-            <div class="hero-art rounded-4" aria-hidden="true">
+            <div class="hero-art" aria-hidden="true">
               <div class="hud">
                 <div class="hud-kicker">RUN MODE</div>
                 <div class="hud-row">
@@ -85,7 +85,7 @@
             </ul>
           </div>
           <div class="col-12 col-lg-7">
-            <div class="media-tile rounded-4"></div>
+            <div class="media-tile"></div>
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@
         <div class="row g-4">
           <div class="col-12 col-md-6 col-lg-4" v-for="(f, i) in featureList" :key="i">
             <div class="card h-100 feature-card">
-              <div class="feature-img rounded-top"></div>
+              <div class="feature-img"></div>
               <div class="card-body">
                 <h5 class="card-title mb-2">{{ f.title }}</h5>
                 <p class="card-text text-muted mb-0">{{ f.body }}</p>
@@ -116,7 +116,7 @@
         <div class="row g-4">
           <div class="col-12 col-lg-4" v-for="(s, i) in steps" :key="i">
             <div class="how-card">
-              <span class="step badge rounded-pill">{{ i + 1 }}</span>
+              <span class="step badge">{{ i + 1 }}</span>
               <h5 class="mb-2">{{ s.title }}</h5>
               <p class="text-muted mb-0">{{ s.body }}</p>
             </div>

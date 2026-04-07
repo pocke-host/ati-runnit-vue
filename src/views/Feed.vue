@@ -54,7 +54,7 @@
           <!-- MOMENT CARD -->
           <template v-if="item.type === 'moment'">
             <div class="moment-image" @click="openMoment(item)">
-              <img :src="item.photoUrl" :alt="`${item.user.displayName}'s moment`" />
+              <img :src="item.photoUrl" :alt="`${item.user.displayName}'s moment`" loading="lazy" />
               <div class="moment-overlay">
                 <div class="moment-stats">
                   <span class="stat-item">
@@ -421,7 +421,9 @@ const toggleActivityReaction = async (activityId, type) => {
       current.userReaction = type
     }
     activityReactionMap.value[activityId] = { ...current }
-  } catch { /* silent */ }
+  } catch {
+    showToast('Failed to save reaction. Please try again.', 'error')
+  }
 }
 
 // Combine moments and activities into unified feed
@@ -523,9 +525,9 @@ const fetchFeed = async () => {
   loading.value = true
   try {
     const [momentsRes, activitiesRes, ownActivitiesRes] = await Promise.all([
-      safeFetch(`${API_URL}/moments/feed`),
+      safeFetch(`${API_URL}/moments/feed?page=0&size=100`),
       safeFetch(`${API_URL}/activities/feed`),
-      safeFetch(`${API_URL}/activities?page=0&size=30`),
+      safeFetch(`${API_URL}/activities?page=0&size=200`),
     ])
 
     moments.value = momentsRes.data.content || momentsRes.data || []
@@ -639,7 +641,7 @@ const toggleReaction = async (type) => {
       moments.value[momentIndex].reactions = prevCounts
       moments.value[momentIndex].currentUserReaction = prevReaction
     }
-    console.error('Failed to toggle reaction:', err)
+    showToast('Failed to save reaction. Please try again.', 'error')
   } finally {
     reactionLoading.value = false
   }
@@ -692,10 +694,10 @@ const followUser = async (userId) => {
       actorId: user.value?.id,
       actorName: user.value?.displayName
     })
-  } catch (err) {
+  } catch {
     // Rollback
     followingIds.value.delete(userId)
-    console.error('Follow failed:', err)
+    showToast('Failed to follow user. Please try again.', 'error')
   } finally {
     followLoading.value = false
   }

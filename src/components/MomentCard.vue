@@ -18,7 +18,7 @@
 
     <!-- Photo -->
     <div class="moment-photo">
-      <img :src="moment.photoUrl" :alt="`${moment.userDisplayName}'s moment`" />
+      <img :src="moment.photoUrl" :alt="`${moment.userDisplayName}'s moment`" loading="lazy" />
     </div>
 
     <!-- Song Info -->
@@ -100,9 +100,10 @@ const formatDate = (dateString) => {
 <style scoped>
 .moment-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: none;
+  border: 1px solid #E5E5E5;
 }
 
 .moment-header {

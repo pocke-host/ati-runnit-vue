@@ -21,13 +21,14 @@ export function useArchetype(activities) {
   const cutoff90 = now - 90 * 86400000
   const cutoff8w  = now - 8 * 7 * 86400000
 
-  const getTime = (a) => new Date(a.startTime || a.activityDate || 0).getTime()
+  // Use createdAt as the activity timestamp (the actual field returned by the API)
+  const getTime = (a) => new Date(a.createdAt || 0).getTime()
 
   const recent = arr.filter(a => getTime(a) >= cutoff90)
 
   // ── Sport diversity in last 90 days ─────────────────────────────────────
   const recentSports = new Set(
-    recent.map(a => (a.activityType || '').toLowerCase()).filter(Boolean)
+    recent.map(a => (a.sportType || '').toUpperCase()).filter(Boolean)
   )
 
   // ── Average distance (miles) ──────────────────────────────────────────────
@@ -41,14 +42,11 @@ export function useArchetype(activities) {
 
   // ── Average pace on recent runs (secs/mile) ──────────────────────────────
   const runPaces = recent
-    .filter(a => {
-      const t = (a.activityType || '').toLowerCase()
-      return t === 'run' || t === 'running' || t === 'trail'
-    })
+    .filter(a => a.sportType === 'RUN')
     .map(a => {
       const miles = (a.distanceMeters || 0) / 1609.34
-      return miles >= 0.5 && a.movingTimeSeconds
-        ? a.movingTimeSeconds / miles
+      return miles >= 0.5 && a.durationSeconds
+        ? a.durationSeconds / miles
         : null
     })
     .filter(p => p !== null)
@@ -72,16 +70,12 @@ export function useArchetype(activities) {
   })).size
   const consistencyPct = activeWeeks / 8
 
-  // ── Trail / outdoor presence ──────────────────────────────────────────────
-  const hasTrail = arr.some(a => {
-    const t = (a.activityType || '').toLowerCase()
-    const n = (a.name || '').toLowerCase()
-    return t === 'trail' || n.includes('trail') || n.includes('mountain') || n.includes('hike')
-  })
+  // ── Trail / outdoor presence (HIKE sport type) ────────────────────────────
+  const hasTrail = arr.some(a => a.sportType === 'HIKE')
 
   // ── Unique sport type count (all-time) ───────────────────────────────────
   const allSports = new Set(
-    arr.map(a => (a.activityType || '').toLowerCase()).filter(Boolean)
+    arr.map(a => (a.sportType || '').toUpperCase()).filter(Boolean)
   ).size
 
   // ── Score each archetype ─────────────────────────────────────────────────

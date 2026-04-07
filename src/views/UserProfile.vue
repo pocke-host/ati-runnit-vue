@@ -236,7 +236,7 @@
               class="moment-thumb"
               @click="openMoment(m)"
             >
-              <img :src="m.photoUrl" :alt="`${profile.displayName}'s moment`" />
+              <img :src="m.photoUrl" :alt="`${profile.displayName}'s moment`" loading="lazy" />
               <div class="moment-thumb-overlay">
                 <span><i class="bi bi-heart-fill me-1"></i>{{ getTotalReactions(m) }}</span>
                 <span><i class="bi bi-chat-fill me-1"></i>{{ m.commentCount || 0 }}</span>
@@ -389,7 +389,7 @@
         </button>
         <div class="moment-modal-inner">
           <div class="moment-modal-img">
-            <img :src="selectedMoment.photoUrl" />
+            <img :src="selectedMoment.photoUrl" loading="lazy" />
           </div>
           <div class="moment-modal-side">
             <div class="moment-modal-user">
@@ -632,7 +632,9 @@ const loadFollowStatus = async () => {
     try {
       const { data } = await axios.get(`${API_URL}/follow/following`, { headers: getAuthHeaders() })
       following.value = (Array.isArray(data) ? data : []).some(u => String(u.id) === String(profileId.value))
-    } catch { /* silent */ }
+    } catch {
+      showToast('Could not load follow status.', 'error')
+    }
   }
 }
 
