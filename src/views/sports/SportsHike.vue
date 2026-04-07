@@ -28,7 +28,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <div class="hero-art rounded-4" aria-hidden="true">
+            <div class="hero-art" aria-hidden="true">
               <div class="hud">
                 <div class="hud-kicker">HIKE MODE</div>
                 <div class="hud-row">
@@ -122,7 +122,7 @@ const feats = [
 /* Glass hero art */
 .hero-art{
   height:320px;
-  border-radius:18px;
+  border-radius:0;
   position:relative;
   overflow:hidden;
 
@@ -196,7 +196,7 @@ const feats = [
   display:inline-flex;
   align-items:center;
   padding:8px 12px;
-  border-radius:999px;
+  border-radius:0;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.18);
   color: rgba(255,255,255,0.88);
@@ -207,7 +207,7 @@ const feats = [
 .features{ padding:64px 0; background:#fff; }
 .feature-card{
   border:1px solid rgba(15,18,16,0.10);
-  border-radius:16px;
+  border-radius:0;
   overflow:hidden;
   box-shadow: none;
 }

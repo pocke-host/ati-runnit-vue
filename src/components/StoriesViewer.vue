@@ -529,10 +529,10 @@
     max-width: 500px;
     height: 90vh;
     background: black;
-    border-radius: 20px;
+    border-radius: 0;
     overflow: hidden;
   }
-  
+
   .story-progress {
     position: absolute;
     top: 0;
@@ -548,7 +548,7 @@
     flex: 1;
     height: 3px;
     background: rgba(255,255,255,0.3);
-    border-radius: 2px;
+    border-radius: 0;
     overflow: hidden;
   }
   
@@ -695,7 +695,7 @@
     left: 20px;
     padding: 8px 16px;
     background: rgba(0,0,0,0.6);
-    border-radius: 20px;
+    border-radius: 0;
     color: white;
     font-size: 0.9rem;
     font-weight: 600;
@@ -724,7 +724,7 @@
   
   .modal-card {
     background: rgba(255,255,255,0.98);
-    border-radius: 24px;
+    border-radius: 0;
     max-width: 500px;
     width: 100%;
     max-height: 90vh;
@@ -789,7 +789,7 @@
     width: 100%;
     padding: 12px 14px;
     border: 1px solid rgba(15,18,16,0.16);
-    border-radius: 12px;
+    border-radius: 0;
     background: rgba(255,255,255,0.70);
     font-family: inherit;
     font-size: 0.95rem;
@@ -805,7 +805,7 @@
   
   .upload-area {
     border: 2px dashed rgba(15,18,16,0.20);
-    border-radius: 16px;
+    border-radius: 0;
     padding: 60px 20px;
     text-align: center;
     cursor: pointer;
@@ -830,7 +830,7 @@
   
   .story-preview {
     position: relative;
-    border-radius: 16px;
+    border-radius: 0;
     overflow: hidden;
     border: 1px solid rgba(15,18,16,0.12);
   }
@@ -850,7 +850,7 @@
   
   .alert {
     padding: 12px 14px;
-    border-radius: 12px;
+    border-radius: 0;
     margin-bottom: 16px;
   }
   
@@ -873,7 +873,7 @@
   
   .btn {
     height: 44px;
-    border-radius: 14px;
+    border-radius: 0;
     font-weight: 900;
     display: inline-flex;
     align-items: center;

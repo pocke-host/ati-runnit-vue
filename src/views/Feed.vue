@@ -54,7 +54,7 @@
           <!-- MOMENT CARD -->
           <template v-if="item.type === 'moment'">
             <div class="moment-image" @click="openMoment(item)">
-              <img :src="item.photoUrl" :alt="`${item.user.displayName}'s moment`" />
+              <img :src="item.photoUrl" :alt="`${item.user.displayName}'s moment`" loading="lazy" />
               <div class="moment-overlay">
                 <div class="moment-stats">
                   <span class="stat-item">

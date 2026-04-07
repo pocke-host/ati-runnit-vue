@@ -620,7 +620,7 @@ const handleAppleSignIn = () => {
   font-size: 72px;
   color: rgba(255, 255, 255, 0.2);
   line-height: 1;
-  font-family: Georgia, serif;
+  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, sans-serif;
 }
 
 .quote-text {

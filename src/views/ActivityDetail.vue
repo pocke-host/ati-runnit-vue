@@ -609,7 +609,8 @@ const doDelete = async () => {
   deleteLoading.value = true
   try {
     await activityStore.deleteActivity(activityId.value)
-    router.push('/feed')
+    if (window.history.length > 2) router.back()
+    else router.push('/feed')
   } catch {
     showToast('Failed to delete activity. Try again.', 'error')
   } finally {
