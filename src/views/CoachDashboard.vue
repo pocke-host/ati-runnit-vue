@@ -74,7 +74,14 @@
           <div v-for="athlete in athletes" :key="athlete.id" class="athlete-card">
             <div class="ath-avatar">{{ (athlete.displayName || '?')[0].toUpperCase() }}</div>
             <div class="ath-info">
-              <div class="ath-name">{{ athlete.displayName }}</div>
+              <div class="ath-name-row">
+                <div class="ath-name">{{ athlete.displayName }}</div>
+                <span
+                  v-if="athleteCompliance[athlete.id] != null"
+                  class="ath-compliance-badge"
+                  :class="complianceClass(athleteCompliance[athlete.id])"
+                >{{ athleteCompliance[athlete.id] }}%</span>
+              </div>
               <div class="ath-plan">{{ athlete.activePlan?.name || 'No active plan' }}</div>
               <div v-if="athlete.activePlan" class="ath-progress-wrap">
                 <div class="ath-progress-bar">
@@ -83,7 +90,7 @@
                 <span class="ath-progress-pct">{{ athlete.activePlan.progress || 0 }}%</span>
               </div>
             </div>
-            <router-link to="/coach/athletes" class="ath-link">View →</router-link>
+            <router-link :to="`/coach/athletes/${athlete.id}`" class="ath-link">View →</router-link>
           </div>
         </div>
       </section>
@@ -104,10 +111,18 @@ const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
 
 const actionLoading = ref(null)
 const actionError = ref('')
+// keyed by athlete.id → compliance % (0–100), null if not yet loaded
+const athleteCompliance = ref({})
 
 const plansAssigned = computed(() =>
   athletes.value.filter(a => a.activePlan).length
 )
+
+function complianceClass(pct) {
+  if (pct >= 80) return 'compliance-good'
+  if (pct >= 50) return 'compliance-mid'
+  return 'compliance-low'
+}
 
 const formatTime = (d) => {
   if (!d) return ''
@@ -144,6 +159,15 @@ const decline = async (reqId) => {
 
 onMounted(async () => {
   await Promise.all([coachStore.fetchAthletes(), coachStore.fetchRequests()])
+  // Load compliance for each athlete in parallel (non-blocking)
+  athletes.value.forEach(async (athlete) => {
+    const weeks = await coachStore.fetchAthleteCompliance(athlete.id, 4)
+    if (weeks.length) {
+      const total = weeks.reduce((s, w) => s + (w.planned || 0), 0)
+      const done = weeks.reduce((s, w) => s + (w.completed || 0), 0)
+      athleteCompliance.value[athlete.id] = total > 0 ? Math.round((done / total) * 100) : null
+    }
+  })
 })
 </script>
 
@@ -261,7 +285,18 @@ onMounted(async () => {
   font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
 }
 .ath-info { flex: 1; min-width: 0; }
+.ath-name-row { display: flex; align-items: center; gap: 8px; }
 .ath-name { font-weight: 700; font-size: 0.9rem; }
+.ath-compliance-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.compliance-good { background: rgba(22,163,74,0.12); color: #16a34a; }
+.compliance-mid  { background: rgba(245,158,11,0.12); color: #b45309; }
+.compliance-low  { background: rgba(239,68,68,0.12);  color: #dc2626; }
 .ath-plan { font-size: 0.78rem; color: #767676; margin-top: 2px; }
 .ath-progress-wrap { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .ath-progress-bar { flex: 1; height: 2px; background: #E5E5E5; }

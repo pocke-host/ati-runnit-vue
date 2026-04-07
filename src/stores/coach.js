@@ -57,8 +57,42 @@ export const useCoachStore = defineStore('coach', () => {
     athletes.value = athletes.value.filter(a => a.id !== athleteId)
   }
 
+  async function fetchAthleteCalendar(athleteId, weeks = 4) {
+    try {
+      const { data } = await axios.get(`${API_URL}/coach/athletes/${athleteId}/calendar`, {
+        params: { weeks },
+        headers: getAuthHeaders()
+      })
+      return Array.isArray(data) ? data : []
+    } catch {
+      return []
+    }
+  }
+
+  async function addWorkoutToAthleteCalendar(athleteId, workout) {
+    const { data } = await axios.post(
+      `${API_URL}/coach/athletes/${athleteId}/calendar`,
+      workout,
+      { headers: getAuthHeaders() }
+    )
+    return data
+  }
+
+  async function fetchAthleteCompliance(athleteId, weeks = 4) {
+    try {
+      const { data } = await axios.get(`${API_URL}/coach/athletes/${athleteId}/compliance`, {
+        params: { weeks },
+        headers: getAuthHeaders()
+      })
+      return Array.isArray(data) ? data : []
+    } catch {
+      return []
+    }
+  }
+
   return {
     athletes, pendingRequests, loading, error,
-    fetchAthletes, fetchRequests, approveRequest, rejectRequest, removeAthlete
+    fetchAthletes, fetchRequests, approveRequest, rejectRequest, removeAthlete,
+    fetchAthleteCalendar, addWorkoutToAthleteCalendar, fetchAthleteCompliance
   }
 })
