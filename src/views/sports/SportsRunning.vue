@@ -137,6 +137,23 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Running — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/sports/running' }],
+  meta: [
+    { name: 'description', content: 'Track every run with GPS, pace splits, elevation, and heart rate. Sync with Garmin, Apple Watch, and COROS. Join the Runnit running community.' },
+    { property: 'og:title', content: 'Running — Runnit' },
+    { property: 'og:description', content: 'Track every run with GPS, pace splits, and elevation. Sync with Garmin, Apple Watch, and COROS.' },
+    { property: 'og:url', content: 'https://runnit.live/sports/running' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Running — Runnit' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
+
 const featureList = [
   { title: 'Routes & Maps', body: 'Find the best places to run with surfaces, elevation, and saved routes.' },
   { title: 'Pace & Splits', body: 'Auto-splits and trends that show improvement over time.' },

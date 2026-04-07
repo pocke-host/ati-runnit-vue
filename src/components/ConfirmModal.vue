@@ -3,7 +3,7 @@
   <Teleport to="body">
     <Transition name="confirm-fade">
       <div v-if="modelValue" class="confirm-overlay" @click.self="cancel">
-        <div class="confirm-modal" role="dialog" :aria-label="title">
+        <div class="confirm-modal" role="dialog" aria-modal="true" :aria-label="title">
           <div class="confirm-title">{{ title }}</div>
           <p v-if="body" class="confirm-body">{{ body }}</p>
           <div class="confirm-actions">

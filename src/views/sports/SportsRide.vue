@@ -81,6 +81,23 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Cycling — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/sports/ride' }],
+  meta: [
+    { name: 'description', content: 'Log road, gravel, and MTB rides. Track power, segments, PRs, and training load. Sync with Garmin, Wahoo, and COROS on Runnit.' },
+    { property: 'og:title', content: 'Cycling — Runnit' },
+    { property: 'og:description', content: 'Log road, gravel, and MTB rides. Track power, segments, and PRs with Garmin and Wahoo sync.' },
+    { property: 'og:url', content: 'https://runnit.live/sports/ride' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Cycling — Runnit' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
+
 const feats = [
   { t: 'Segments & PRs', d: 'Compare efforts, chase personal records, and climb leaderboards.' },
   { t: 'Route Builder', d: 'Plan road, gravel, or MTB with surfaces and elevation.' },

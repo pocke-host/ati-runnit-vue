@@ -7,9 +7,9 @@
       <div class="cal-hero-inner">
         <div class="cal-nav-row">
           <div class="cal-month-nav">
-            <button class="nav-btn" @click="prevMonth"><i class="bi bi-chevron-left"></i></button>
+            <button class="nav-btn" @click="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button>
             <h1 class="cal-month-title">{{ monthLabel }}</h1>
-            <button class="nav-btn" @click="nextMonth"><i class="bi bi-chevron-right"></i></button>
+            <button class="nav-btn" @click="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
           </div>
           <div class="cal-hero-actions">
             <button class="hero-btn-ghost" @click="goToday">Today</button>

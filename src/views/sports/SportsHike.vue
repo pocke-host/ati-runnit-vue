@@ -83,6 +83,23 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Hiking — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/sports/hike' }],
+  meta: [
+    { name: 'description', content: 'Track hikes with trail maps, elevation profiles, and offline route support. Share your adventures and stay safe with Runnit\'s live beacon.' },
+    { property: 'og:title', content: 'Hiking — Runnit' },
+    { property: 'og:description', content: 'Track hikes with trail maps, elevation profiles, and offline route support.' },
+    { property: 'og:url', content: 'https://runnit.live/sports/hike' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Hiking — Runnit' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
+
 const feats = [
   { t: 'Trail maps', d: 'Popular paths with elevation and surfaces.' },
   { t: 'Offline routes', d: 'Keep maps handy without signal.' },

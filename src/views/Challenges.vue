@@ -74,11 +74,10 @@
       <div class="container-xxl">
 
         <!-- Loading state -->
-        <div v-if="loading" class="loading-state">
-          <div class="spinner-border text-olive" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div v-if="loading" class="row g-4">
+          <div v-for="n in 6" :key="n" class="col-12 col-md-6 col-lg-4">
+            <SkeletonCard variant="challenge" />
           </div>
-          <p class="loading-text">Loading challenges...</p>
         </div>
 
         <template v-else>
@@ -224,13 +223,13 @@
 
     <!-- LEADERBOARD DRAWER -->
     <Transition name="lb-slide">
-      <div v-if="lbOpen" class="lb-drawer">
+      <div v-if="lbOpen" class="lb-drawer" role="dialog" aria-modal="true" aria-label="Leaderboard">
         <div class="lb-header">
           <div>
             <div class="lb-label">Leaderboard</div>
             <h2 class="lb-title">{{ lbChallenge?.name }}</h2>
           </div>
-          <button class="lb-close" @click="lbOpen = false">
+          <button class="lb-close" @click="lbOpen = false" aria-label="Close leaderboard">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
@@ -281,6 +280,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 
 const { showToast } = useToast()
 

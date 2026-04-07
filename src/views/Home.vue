@@ -215,11 +215,18 @@ import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Runnit — Train Smarter. Race Faster.',
+  link: [{ rel: 'canonical', href: 'https://runnit.live' }],
   meta: [
     { name: 'description', content: 'Runnit is a modern training platform for runners and triathletes. Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
     { property: 'og:title', content: 'Runnit — Train Smarter. Race Faster.' },
     { property: 'og:description', content: 'Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
     { property: 'og:url', content: 'https://runnit.live' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Runnit — Train Smarter. Race Faster.' },
+    { name: 'twitter:description', content: 'Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

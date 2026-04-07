@@ -196,6 +196,68 @@
         </div>
       </section>
 
+      <!-- ── SECURITY ──────────────────────────── -->
+      <section class="settings-section">
+        <div class="section-label">Security</div>
+        <div class="section-sublabel">Change your password. You'll need your current password to confirm.</div>
+
+        <div class="settings-card">
+          <div class="field-row">
+            <label class="field-label" for="current-password">Current Password</label>
+            <input
+              id="current-password"
+              v-model="currentPassword"
+              type="password"
+              class="field-input"
+              placeholder="Current password"
+              autocomplete="current-password"
+              :disabled="savingPassword"
+            />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="new-password">New Password</label>
+            <input
+              id="new-password"
+              v-model="newPassword"
+              type="password"
+              class="field-input"
+              placeholder="At least 8 characters"
+              autocomplete="new-password"
+              :disabled="savingPassword"
+            />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="confirm-password">Confirm Password</label>
+            <div class="field-input-wrap">
+              <input
+                id="confirm-password"
+                v-model="confirmPassword"
+                type="password"
+                class="field-input"
+                placeholder="Repeat new password"
+                autocomplete="new-password"
+                :disabled="savingPassword"
+              />
+              <button
+                class="btn btn-primary btn-sm"
+                @click="changePassword"
+                :disabled="savingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 8"
+              >
+                <span v-if="savingPassword" class="spinner-border spinner-border-sm me-1"></span>
+                Update
+              </button>
+            </div>
+          </div>
+          <div v-if="newPassword && confirmPassword && newPassword !== confirmPassword" class="field-status error">
+            <i class="bi bi-exclamation-circle-fill"></i> Passwords don't match
+          </div>
+          <div v-if="passwordStatus" :class="['field-status', passwordStatusType]">
+            <i :class="passwordStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
+            {{ passwordStatus }}
+          </div>
+        </div>
+      </section>
+
       <!-- ── DANGER ZONE ────────────────────────── -->
       <section class="settings-section">
         <div class="section-label danger-label">Account</div>
@@ -217,10 +279,11 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
+import { useToast } from '@/composables/useToast'
 import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -229,6 +292,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { user, unitSystem } = storeToRefs(authStore)
 const { formatDistance, formatPace, formatElevation } = useUnits()
+const { showToast } = useToast()
 
 const displayName = ref(user.value?.displayName || '')
 const savingProfile = ref(false)
@@ -338,6 +402,51 @@ const removeContact = async (id) => {
     showContactStatus('Failed to remove contact.', 'error')
   }
 }
+
+/* ── Password Change ── */
+const currentPassword  = ref('')
+const newPassword      = ref('')
+const confirmPassword  = ref('')
+const savingPassword   = ref(false)
+const passwordStatus   = ref('')
+const passwordStatusType = ref('success')
+let passwordTimer = null
+
+const showPasswordStatus = (msg, type = 'success') => {
+  clearTimeout(passwordTimer)
+  passwordStatus.value = msg
+  passwordStatusType.value = type
+  passwordTimer = setTimeout(() => { passwordStatus.value = '' }, 3500)
+}
+
+const changePassword = async () => {
+  if (newPassword.value !== confirmPassword.value) return
+  if (newPassword.value.length < 8) return
+  savingPassword.value = true
+  try {
+    await axios.post(
+      `${API_URL}/auth/change-password`,
+      { currentPassword: currentPassword.value, newPassword: newPassword.value },
+      { headers: getAuthHeaders() }
+    )
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+    showPasswordStatus('Password updated successfully!')
+  } catch (err) {
+    const msg = err.response?.data?.error || 'Failed to update password. Check your current password.'
+    showPasswordStatus(msg, 'error')
+  } finally {
+    savingPassword.value = false
+  }
+}
+
+/* ── Unsaved display-name guard ── */
+onBeforeRouteLeave(() => {
+  if (displayName.value !== user.value?.displayName) {
+    return window.confirm('You have unsaved changes to your display name. Leave anyway?')
+  }
+})
 
 onMounted(() => {
   loadContacts()

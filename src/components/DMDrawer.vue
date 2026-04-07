@@ -6,19 +6,19 @@
     </Transition>
 
     <Transition name="dm-slide">
-      <div v-if="dmStore.isOpen" class="dm-drawer" @click.stop>
+      <div v-if="dmStore.isOpen" class="dm-drawer" role="dialog" aria-modal="true" aria-label="Messages" @click.stop>
         <!-- Header -->
         <div class="dm-header">
-          <button v-if="dmStore.view !== 'list'" class="dm-back" @click="dmStore.backToList()" title="Back">
+          <button v-if="dmStore.view !== 'list'" class="dm-back" @click="dmStore.backToList()" title="Back" aria-label="Back">
             <i class="bi bi-arrow-left"></i>
           </button>
           <span class="dm-title">
             {{ dmStore.view === 'thread' ? dmStore.activeUserName : dmStore.view === 'compose' ? 'NEW MESSAGE' : 'MESSAGES' }}
           </span>
-          <button v-if="dmStore.view === 'list'" class="dm-compose-btn" @click="dmStore.openCompose()" title="New message">
+          <button v-if="dmStore.view === 'list'" class="dm-compose-btn" @click="dmStore.openCompose()" title="New message" aria-label="New message">
             <i class="bi bi-pencil-square"></i>
           </button>
-          <button class="dm-close" @click="dmStore.close()" title="Close">
+          <button class="dm-close" @click="dmStore.close()" title="Close" aria-label="Close messages">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>

@@ -128,11 +128,18 @@
 import { useHead } from '@unhead/vue'
 useHead({
   title: 'About — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/about' }],
   meta: [
     { name: 'description', content: 'Runnit is built for athletes who show up. Our mission: make consistency easier than motivation through community, structure, and data you own.' },
     { property: 'og:title', content: 'About — Runnit' },
     { property: 'og:description', content: 'Built for the people who show up — even when motivation isn\'t loud. Runnit turns daily training into a moment you can feel, track, and share.' },
     { property: 'og:url', content: 'https://runnit.live/about' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'About — Runnit' },
+    { name: 'twitter:description', content: 'Built for the people who show up. Runnit turns daily training into a moment you can feel, track, and share.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

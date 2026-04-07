@@ -114,7 +114,11 @@ const toastIcon = (type) => ({
 <template>
   <TopNav v-if="showChrome" />
   <BottomNav v-if="showChrome" />
-  <router-view />
+  <router-view v-slot="{ Component }">
+    <Transition name="page" mode="out-in">
+      <component :is="Component" />
+    </Transition>
+  </router-view>
   <Footer v-if="showChrome" />
 
   <!-- Global toast stack -->
@@ -167,6 +171,12 @@ const toastIcon = (type) => ({
 .app-toast--info    { background: #000; color: #fff; }
 .app-toast--success { background: #16a34a; color: #fff; }
 .app-toast--error   { background: #dc2626; color: #fff; }
+
+/* ── Page transition ── */
+.page-enter-active { transition: opacity 0.15s ease; }
+.page-leave-active { transition: opacity 0.1s ease; }
+.page-enter-from,
+.page-leave-to     { opacity: 0; }
 
 /* TransitionGroup animations */
 .toast-enter-active { transition: all 0.22s ease; }

@@ -72,11 +72,18 @@ import axios from 'axios'
 import { useHead } from '@unhead/vue'
 useHead({
   title: 'Blog — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/blog' }],
   meta: [
     { name: 'description', content: 'Training intel for serious athletes. Science, strategy, and stories on running, racing, periodization, and everything in between.' },
     { property: 'og:title', content: 'Blog — Runnit' },
     { property: 'og:description', content: 'Science, stories, and strategy for athletes who take their training seriously.' },
     { property: 'og:url', content: 'https://runnit.live/blog' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Blog — Runnit' },
+    { name: 'twitter:description', content: 'Science, stories, and strategy for athletes who take their training seriously.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 
