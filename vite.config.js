@@ -15,4 +15,16 @@ export default defineConfig(({ mode }) => ({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue':    ['vue', 'vue-router', 'pinia'],
+          'vendor-map':    ['mapbox-gl'],
+          'vendor-charts': ['chart.js'],
+          'vendor-stripe': ['@stripe/stripe-js'],
+        },
+      },
+    },
+  },
 }))
