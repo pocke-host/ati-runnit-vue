@@ -224,13 +224,13 @@
 
     <!-- LEADERBOARD DRAWER -->
     <Transition name="lb-slide">
-      <div v-if="lbOpen" class="lb-drawer">
+      <div v-if="lbOpen" class="lb-drawer" role="dialog" aria-modal="true" aria-label="Leaderboard">
         <div class="lb-header">
           <div>
             <div class="lb-label">Leaderboard</div>
             <h2 class="lb-title">{{ lbChallenge?.name }}</h2>
           </div>
-          <button class="lb-close" @click="lbOpen = false">
+          <button class="lb-close" @click="lbOpen = false" aria-label="Close leaderboard">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
