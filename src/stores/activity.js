@@ -39,15 +39,33 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
-  async function fetchActivities(page = 0) {
+  async function fetchActivities() {
     // Only show spinner on first load — if cache exists show it instantly
     if (!activities.value.length) loading.value = true
     error.value = null
     try {
-      const { data } = await axios.get(`${API_URL}/activities?page=${page}`)
-      const result = Array.isArray(data) ? data : (data.content || [])
-      activities.value = result
-      saveCache(result)
+      // Fetch all activities in batches so stats are accurate over full history.
+      // size=200 covers most users in one request; loop handles edge cases.
+      const PAGE_SIZE = 200
+      const first = await axios.get(`${API_URL}/activities?page=0&size=${PAGE_SIZE}`)
+      const firstData = first.data
+      let all = Array.isArray(firstData) ? firstData : (firstData.content || [])
+      const totalPages = firstData.totalPages ?? 1
+
+      if (totalPages > 1) {
+        const remaining = []
+        for (let p = 1; p < totalPages; p++) {
+          remaining.push(axios.get(`${API_URL}/activities?page=${p}&size=${PAGE_SIZE}`))
+        }
+        const results = await Promise.all(remaining)
+        for (const res of results) {
+          const batch = Array.isArray(res.data) ? res.data : (res.data.content || [])
+          all = all.concat(batch)
+        }
+      }
+
+      activities.value = all
+      saveCache(all)
       return activities.value
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch activities'

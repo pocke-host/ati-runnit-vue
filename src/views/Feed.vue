@@ -523,9 +523,9 @@ const fetchFeed = async () => {
   loading.value = true
   try {
     const [momentsRes, activitiesRes, ownActivitiesRes] = await Promise.all([
-      safeFetch(`${API_URL}/moments/feed`),
+      safeFetch(`${API_URL}/moments/feed?page=0&size=100`),
       safeFetch(`${API_URL}/activities/feed`),
-      safeFetch(`${API_URL}/activities?page=0&size=30`),
+      safeFetch(`${API_URL}/activities?page=0&size=200`),
     ])
 
     moments.value = momentsRes.data.content || momentsRes.data || []

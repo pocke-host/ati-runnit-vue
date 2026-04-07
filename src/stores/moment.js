@@ -32,29 +32,36 @@ export const useMomentStore = defineStore('moment', () => {
     }
   }
   
-  async function fetchFeed(page = 0) {
+  async function fetchFeed(page = 0, size = 100) {
     if (!feed.value.length) loading.value = true
     error.value = null
     try {
-      const { data } = await axios.get(`${API_URL}/moments/feed?page=${page}`)
-      feed.value = data.content || data
+      const { data } = await axios.get(`${API_URL}/moments/feed?page=${page}&size=${size}`)
+      const items = data.content || data
+      // Append on paginated loads, replace on first load
+      feed.value = page === 0 ? items : [...feed.value, ...items]
       saveCache(FEED_CACHE_KEY, feed.value)
+      return { totalPages: data.totalPages ?? 1 }
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch feed'
+      return { totalPages: 1 }
     } finally {
       loading.value = false
     }
   }
 
-  async function fetchUserMoments(userId, page = 0) {
+  async function fetchUserMoments(userId, page = 0, size = 100) {
     if (!userMoments.value.length) loading.value = true
     error.value = null
     try {
-      const { data } = await axios.get(`${API_URL}/moments/user/${userId}?page=${page}`)
-      userMoments.value = data.content || data
+      const { data } = await axios.get(`${API_URL}/moments/user/${userId}?page=${page}&size=${size}`)
+      const items = data.content || data
+      userMoments.value = page === 0 ? items : [...userMoments.value, ...items]
       saveCache(USER_CACHE_KEY, userMoments.value)
+      return { totalPages: data.totalPages ?? 1 }
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to fetch moments'
+      return { totalPages: 1 }
     } finally {
       loading.value = false
     }

@@ -1088,21 +1088,31 @@ const monthlyGoalProgress = computed(() => {
 })
 
 const sportBreakdown = computed(() => {
-  const acts = activities.value || []
+  const now = new Date()
+  let cutoff = null
+  if (breakdownPeriod.value === 'week') {
+    cutoff = new Date(now); cutoff.setDate(now.getDate() - 7)
+  } else if (breakdownPeriod.value === 'month') {
+    cutoff = new Date(now.getFullYear(), now.getMonth(), 1)
+  } else if (breakdownPeriod.value === 'year') {
+    cutoff = new Date(now.getFullYear(), 0, 1)
+  }
+
+  const acts = (activities.value || []).filter(a => !cutoff || new Date(a.createdAt) >= cutoff)
   const breakdown = {}
   const colors = {
-    RUN: '#0052FF',   // --r-accent
-    BIKE: '#000',  // --r-olive
-    SWIM: '#000',  // --r-olive-deep
-    HIKE: '#A0875A',  // warm earth
-    WALK: '#C8B49A',  // light earth
-    OTHER: '#E0D5C5'  // offwhite-tan
+    RUN:   '#0052FF',
+    BIKE:  '#C46A2A',
+    SWIM:  '#16a34a',
+    HIKE:  '#A0875A',
+    WALK:  '#767676',
+    OTHER: '#E0D5C5',
   }
-  
+
   acts.forEach(a => {
     breakdown[a.sportType] = (breakdown[a.sportType] || 0) + 1
   })
-  
+
   return Object.entries(breakdown).map(([type, count]) => ({
     type,
     count,
@@ -1500,6 +1510,10 @@ const updateCharts = () => {
 
 watch(chartView, () => {
   initWeeklyChart()
+})
+
+watch(breakdownPeriod, () => {
+  nextTick(initPieChart)
 })
 
 watch(activities, () => {
