@@ -126,8 +126,8 @@ async function loadActivities() {
         { padding: 80, maxZoom: 12, duration: 1200 }
       )
     }
-  } catch (e) {
-    console.error('Heatmap load failed:', e)
+  } catch {
+    // heatmap load failed, map stays empty
   } finally {
     loading.value = false
   }

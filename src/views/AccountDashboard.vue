@@ -1102,7 +1102,7 @@ const sportBreakdown = computed(() => {
   const breakdown = {}
   const colors = {
     RUN:   '#0052FF',
-    BIKE:  '#C46A2A',
+    BIKE:  '#3b82f6',
     SWIM:  '#16a34a',
     HIKE:  '#A0875A',
     WALK:  '#767676',
@@ -1310,8 +1310,7 @@ const handleSearch = async () => {
       headers: getAuthHeaders()
     })
     searchResults.value = data.filter(u => u.id !== user.value.id)
-  } catch (err) {
-    console.error('Search failed:', err)
+  } catch {
     searchResults.value = []
   } finally {
     searchLoading.value = false
@@ -1329,8 +1328,8 @@ const loadFollowData = async () => {
     followingList.value = followingRes.data
     followersList.value = followersRes.data
     followingIds.value = new Set(followingList.value.map(f => f.id))
-  } catch (err) {
-    console.error('Failed to load follow data:', err)
+  } catch {
+    // follow data is non-critical, silent fail
   } finally {
     friendsLoading.value = false
   }
@@ -1348,8 +1347,8 @@ const followUser = async (userId) => {
     })
     followingIds.value.add(userId)
     await loadFollowData()
-  } catch (err) {
-    console.error('Follow failed:', err)
+  } catch {
+    showToast('Failed to follow user. Please try again.', 'error')
   } finally {
     followLoading.value = false
   }
@@ -1363,8 +1362,8 @@ const unfollowUser = async (userId) => {
     })
     followingIds.value.delete(userId)
     await loadFollowData()
-  } catch (err) {
-    console.error('Unfollow failed:', err)
+  } catch {
+    showToast('Failed to unfollow user. Please try again.', 'error')
   } finally {
     followLoading.value = false
   }
@@ -1465,7 +1464,7 @@ const initProgressChart = () => {
         label: 'Distance',
         data: [15, 28, 42, parseFloat(monthlyDistance.value)],
         borderColor: '#0052FF',
-        backgroundColor: 'rgba(196,106,42,0.07)',
+        backgroundColor: 'rgba(0,82,255,0.07)',
         tension: 0.3,
         fill: true,
         borderWidth: 2,
@@ -1521,20 +1520,23 @@ watch(activities, () => {
 }, { deep: true })
 
 onMounted(async () => {
-  try {
-    await activityStore.fetchActivities()
-    await loadFollowData()
-    await Promise.all([
-      planStore.fetchPlans(),
-      achievementStore.fetchAchievements(activities.value),
-      prStore.fetchPRs(activities.value),
-      athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
-    ])
-    await nextTick()
-    updateCharts()
-  } catch (err) {
-    console.error('Failed to load data:', err)
-  }
+  // Render empty charts immediately so the canvas elements appear at once
+  await nextTick()
+  updateCharts()
+
+  // Kick off all independent data fetches in parallel
+  await Promise.all([
+    activityStore.fetchActivities(),
+    loadFollowData(),
+    planStore.fetchPlans(),
+    athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
+  ])
+
+  // Achievements and PRs depend on activities being loaded
+  await Promise.all([
+    achievementStore.fetchAchievements(activities.value),
+    prStore.fetchPRs(activities.value)
+  ])
 })
 </script>
 

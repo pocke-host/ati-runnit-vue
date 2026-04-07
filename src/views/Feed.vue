@@ -573,8 +573,7 @@ const loadComments = async (momentId) => {
       headers: getAuthHeaders()
     })
     comments.value = data
-  } catch (err) {
-    console.error('Failed to load comments:', err)
+  } catch {
     comments.value = []
   } finally {
     commentsLoading.value = false
@@ -598,8 +597,8 @@ const addComment = async () => {
     if (momentIndex !== -1) {
       moments.value[momentIndex].commentCount = (moments.value[momentIndex].commentCount || 0) + 1
     }
-  } catch (err) {
-    console.error('Failed to add comment:', err)
+  } catch {
+    showToast('Failed to post comment. Please try again.', 'error')
   } finally {
     commentLoading.value = false
   }
@@ -676,8 +675,8 @@ const loadFollowStatus = async () => {
       headers: getAuthHeaders()
     })
     followingIds.value = new Set(data.map(f => f.id))
-  } catch (err) {
-    console.error('Failed to load follow status:', err)
+  } catch {
+    // non-critical, follow buttons default to unfollowed state
   }
 }
 

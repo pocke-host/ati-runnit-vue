@@ -4,7 +4,7 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">🏆 Achievements</h1>
+        <h1 class="hero-title">Achievements</h1>
         <p class="hero-sub">
           <template v-if="achievementStore.loading">Loading badges…</template>
           <template v-else>

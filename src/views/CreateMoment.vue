@@ -177,7 +177,7 @@ const pickPhoto = async () => {
       photoPreview.value = `data:${mimeType};base64,${photo.base64String}`
     } catch (err) {
       if (!err.message?.includes('cancelled')) {
-        console.error('Camera error:', err)
+        showToast('Camera failed to open. Please try again.', 'error')
       }
     }
   } else {

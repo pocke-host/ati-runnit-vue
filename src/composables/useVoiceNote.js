@@ -22,8 +22,7 @@ export function useVoiceNote() {
       if (transcript) onResult(transcript)
     }
 
-    recognition.onerror = (event) => {
-      console.warn('[useVoiceNote] error:', event.error)
+    recognition.onerror = () => {
       isListening.value = false
     }
 

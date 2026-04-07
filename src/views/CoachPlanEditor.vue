@@ -191,8 +191,8 @@ const saveWeekTheme = async () => {
     await planStore.updatePlan(plan.value.id, {
       weekThemes: { [activeWeek.value]: currentWeekData.value?.theme }
     })
-  } catch (err) {
-    console.error('Failed to save week theme:', err)
+  } catch {
+    // week theme save failed, non-blocking
   }
 }
 
@@ -207,8 +207,7 @@ const saveWorkout = async (workout) => {
       duration: workout.duration,
       description: workout.description,
     })
-  } catch (err) {
-    console.error('Failed to save workout:', err)
+  } catch {
     saveError.value = 'A workout change could not be saved. Please refresh and try again.'
   }
 }

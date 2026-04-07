@@ -9,8 +9,8 @@ export const useGroupEventStore = defineStore('groupEvent', () => {
     try {
       const { data } = await axios.get('/api/group-events/my')
       events.value = data
-    } catch (e) {
-      console.error('fetchMyEvents error', e)
+    } catch {
+      // non-critical
     }
   }
 

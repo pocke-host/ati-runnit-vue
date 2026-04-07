@@ -338,8 +338,7 @@ const saveProfile = async () => {
     )
     authStore.setAuth({ ...user.value, displayName: displayName.value.trim(), ...data })
     showProfileStatus('Profile updated!')
-  } catch (err) {
-    console.error('Failed to update profile:', err)
+  } catch {
     showProfileStatus('Failed to update profile.', 'error')
   } finally {
     savingProfile.value = false
@@ -370,8 +369,8 @@ const loadContacts = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/emergency-contacts`, { headers: getAuthHeaders() })
     contacts.value = data
-  } catch (err) {
-    console.error('Failed to load emergency contacts:', err)
+  } catch {
+    // non-critical, contacts section will show empty
   }
 }
 
