@@ -1777,9 +1777,32 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
   .cal-week-days { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
 }
 @media (max-width: 600px) {
-  .stats-row { gap: 20px; }
-  .compliance-summary { gap: 20px; }
+  .hero-bar { padding: 24px 16px 20px; }
+  .hero-name { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+  .stats-row { gap: 16px; flex-wrap: wrap; }
+  .stat-item { flex: 0 0 calc(50% - 8px); }
+  .compliance-summary { gap: 16px; flex-wrap: wrap; }
+  .tab-bar {
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-bar .tab { flex-shrink: 0; font-size: 0.68rem; padding: 10px 10px; }
+  .tab-content { padding: 16px; }
   .cal-week-days { grid-template-columns: 1fr; }
-  .tab-bar { gap: 0; }
+  .cal-week-day { min-height: 52px; }
+  .pmc-stat-row { gap: 16px; flex-wrap: wrap; }
+  .pmc-stat { flex: 0 0 calc(33% - 12px); }
+  .zones-form { gap: 12px; }
+  .zone-row { flex-direction: column; gap: 8px; }
+  .zone-inputs { flex-wrap: wrap; gap: 6px; }
+  .overview-grid { gap: 16px; }
+  .activity-list { gap: 8px; }
+  .activity-card { padding: 10px 12px; }
+  .race-list { gap: 8px; }
+  .race-card { flex-wrap: wrap; gap: 6px; }
 }
 </style>

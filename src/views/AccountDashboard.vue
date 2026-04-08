@@ -86,6 +86,28 @@
         </div>
       </section>
 
+      <!-- TODAY'S WORKOUT -->
+      <section v-if="todayWorkout" class="today-workout-strip">
+        <div class="tw-eyebrow">TODAY'S WORKOUT</div>
+        <div class="tw-body">
+          <div class="tw-left">
+            <div class="tw-name">{{ todayWorkout.name || todayWorkout.type }}</div>
+            <div class="tw-meta">
+              <span v-if="todayWorkout.type" class="tw-tag">{{ todayWorkout.type }}</span>
+              <span v-if="todayWorkout.distance" class="tw-sep">·</span>
+              <span v-if="todayWorkout.distance">{{ formatDistance(todayWorkout.distance * (isImperial ? 1609.34 : 1000)) }}</span>
+              <span v-if="todayWorkout.duration" class="tw-sep">·</span>
+              <span v-if="todayWorkout.duration">{{ todayWorkout.duration }}min</span>
+            </div>
+            <p v-if="todayWorkout.description" class="tw-desc">{{ todayWorkout.description }}</p>
+          </div>
+          <div class="tw-right">
+            <span v-if="todayWorkout.isCompleted" class="tw-done-badge">✓ DONE</span>
+            <router-link :to="`/plans/${activePlan.id}`" class="tw-view-btn">View Plan →</router-link>
+          </div>
+        </div>
+      </section>
+
       <!-- MAIN GRID -->
       <section class="dashboard-grid">
         <!-- LEFT: Charts -->
@@ -795,6 +817,7 @@ const { latestEarned } = storeToRefs(achievementStore)
 const { topPRs } = storeToRefs(prStore)
 const { myCoach } = storeToRefs(athleteStore)
 const myCoachLoaded = ref(false)
+const fullActivePlan = ref(null)
 const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 
@@ -980,6 +1003,27 @@ const dashInsights = computed(() => {
   const acwr = ctl > 0 ? Math.round((atl / ctl) * 100) / 100 : null
 
   return { fitnessScore, fatigueScore, formScore, acwr }
+})
+
+const todayWorkout = computed(() => {
+  const plan = fullActivePlan.value || activePlan.value
+  if (!plan?.weeks?.length || !plan.startDate) return null
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const start = new Date(plan.startDate)
+  start.setHours(0, 0, 0, 0)
+
+  const daysDiff = Math.floor((today - start) / 86400000)
+  if (daysDiff < 0) return null
+
+  const weekNum = Math.floor(daysDiff / 7) + 1
+  const DOW_MAP = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const todayName = DOW_MAP[today.getDay()]
+
+  const week = plan.weeks.find(w => (w.weekNumber ?? (plan.weeks.indexOf(w) + 1)) === weekNum)
+  if (!week) return null
+  return (week.workouts || []).find(w => w.day === todayName) || null
 })
 
 const disciplineData = computed(() => useDisciplineScore(activities.value))
@@ -1532,6 +1576,10 @@ onMounted(async () => {
     athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
   ])
 
+  if (activePlan.value?.id) {
+    planStore.fetchPlan(activePlan.value.id).then(data => { fullActivePlan.value = data }).catch(() => {})
+  }
+
   // Achievements and PRs depend on activities being loaded
   await Promise.all([
     achievementStore.fetchAchievements(activities.value),
@@ -2041,4 +2089,80 @@ textarea.form-control{resize:vertical;min-height:72px}
   .wday-dot { width: 32px; height: 32px; font-size: 0.9rem; }
   .wday-dot-wrap { width: 34px; height: 34px; }
 }
+
+/* TODAY'S WORKOUT STRIP */
+.today-workout-strip {
+  background: #000;
+  color: #fff;
+  padding: 20px 24px;
+}
+.tw-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.tw-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.tw-left { flex: 1; min-width: 0; }
+.tw-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.tw-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.60);
+  flex-wrap: wrap;
+}
+.tw-tag {
+  background: rgba(255,255,255,0.10);
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tw-sep { color: rgba(255,255,255,0.25); }
+.tw-desc {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.50);
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+.tw-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.tw-done-badge {
+  background: rgba(34,197,94,0.15);
+  color: #4ade80;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  padding: 4px 10px;
+}
+.tw-view-btn {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  padding-bottom: 1px;
+}
+.tw-view-btn:hover { border-bottom-color: #fff; color: #fff; }
 </style>

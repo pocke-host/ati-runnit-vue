@@ -16,7 +16,21 @@
         <div class="editor-meta">
           <span v-if="plan.athleteName" class="athlete-chip">{{ plan.athleteName }}</span>
           <span v-if="plan.sport" class="sport-badge">{{ plan.sport }}</span>
+          <div class="race-date-wrap">
+            <label class="race-date-label">RACE</label>
+            <input
+              v-model="raceDate"
+              type="date"
+              class="race-date-input"
+              @change="saveRaceDate"
+              title="Target race date"
+            />
+          </div>
         </div>
+        <button class="btn-save-template" @click="saveAsTemplate" :disabled="savingTemplate" title="Save as reusable template">
+          <span v-if="savingTemplate" class="spinner-border spinner-border-sm"></span>
+          <span v-else><i class="bi bi-bookmark-star me-1"></i>Template</span>
+        </button>
         <button class="btn-save" @click="savePlan" :disabled="saving">
           <span v-if="saving" class="spinner-border spinner-border-sm"></span>
           <span v-else>Save</span>
@@ -49,6 +63,9 @@
           <button class="week-action-btn" @click="showCopyWeek = !showCopyWeek" title="Copy this week">
             <i class="bi bi-files"></i> Copy Week
           </button>
+          <button class="week-action-btn" @click="showAutoVolume = !showAutoVolume" title="Auto volume progression">
+            <i class="bi bi-graph-up"></i> Auto Vol
+          </button>
           <router-link to="/coach/library" class="week-action-btn">
             <i class="bi bi-collection"></i> Library
           </router-link>
@@ -70,18 +87,41 @@
       </div>
     </div>
 
+    <!-- Auto Volume Panel -->
+    <div v-if="showAutoVolume" class="auto-vol-bar">
+      <span class="copy-week-label">BASE VOL ({{ distLabel }})</span>
+      <input v-model.number="autoVolBase" type="number" min="0" step="1" class="auto-vol-input" />
+      <span class="copy-week-label">+%/WK</span>
+      <input v-model.number="autoVolPct" type="number" min="0" max="30" step="1" class="auto-vol-input-sm" />
+      <button class="copy-target-btn" @click="applyAutoVolume">Apply</button>
+      <button class="copy-close-btn" @click="showAutoVolume = false"><i class="bi bi-x"></i></button>
+    </div>
+
     <!-- Week Content -->
     <div class="week-content" v-if="currentWeekData">
-      <!-- Week Theme -->
+      <!-- Week Theme + Phase -->
       <div class="week-theme-row">
-        <label class="field-label">WEEK THEME</label>
-        <input
-          v-model="currentWeekData.theme"
-          class="theme-input"
-          type="text"
-          placeholder="e.g. Base building, Recovery…"
-          @blur="saveWeekTheme"
-        />
+        <div class="week-meta-left">
+          <label class="field-label">PHASE</label>
+          <select
+            v-model="currentWeekData.phase"
+            class="phase-select"
+            @change="saveWeekTheme"
+          >
+            <option value="">—</option>
+            <option v-for="p in phases" :key="p.value" :value="p.value">{{ p.label }}</option>
+          </select>
+        </div>
+        <div class="week-meta-right">
+          <label class="field-label">WEEK THEME</label>
+          <input
+            v-model="currentWeekData.theme"
+            class="theme-input"
+            type="text"
+            placeholder="e.g. Base building, Recovery…"
+            @blur="saveWeekTheme"
+          />
+        </div>
       </div>
 
       <!-- Workout Cards -->
@@ -199,6 +239,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePlanStore } from '@/stores/plan'
 import { useWorkoutLibraryStore } from '@/stores/workoutLibrary'
 import { useToast } from '@/composables/useToast'
+import { useUnits } from '@/composables/useUnits'
 import WorkoutStepBuilder from '@/components/WorkoutStepBuilder.vue'
 
 const route = useRoute()
@@ -206,6 +247,8 @@ const router = useRouter()
 const planStore = usePlanStore()
 const libStore  = useWorkoutLibraryStore()
 const { showToast } = useToast()
+const { isImperial } = useUnits()
+const distLabel = computed(() => isImperial.value ? 'mi' : 'km')
 
 const plan = ref(null)
 const loading = ref(true)
@@ -218,6 +261,19 @@ const activeWeek = ref(1)
 const weeks = ref([])
 const weekData = ref({}) // { [weekNum]: { theme, workouts[] } }
 const deleteTarget = ref(null)
+const raceDate = ref('')
+const savingTemplate = ref(false)
+const showAutoVolume = ref(false)
+const autoVolBase = ref(30)
+const autoVolPct = ref(5)
+
+const phases = [
+  { value: 'BASE',     label: 'Base' },
+  { value: 'BUILD',    label: 'Build' },
+  { value: 'PEAK',     label: 'Peak' },
+  { value: 'TAPER',    label: 'Taper' },
+  { value: 'RECOVERY', label: 'Recovery' },
+]
 
 // Steps builder state
 const expandedSteps = ref(new Set())
@@ -257,10 +313,11 @@ const savePlan = async () => {
 const saveWeekTheme = async () => {
   try {
     await planStore.updatePlan(plan.value.id, {
-      weekThemes: { [activeWeek.value]: currentWeekData.value?.theme }
+      weekThemes: { [activeWeek.value]: currentWeekData.value?.theme },
+      weekPhases: { [activeWeek.value]: currentWeekData.value?.phase },
     })
   } catch {
-    // week theme save failed, non-blocking
+    // non-blocking
   }
 }
 
@@ -376,6 +433,44 @@ const saveWorkoutToLibrary = async (workout) => {
   }
 }
 
+const saveRaceDate = async () => {
+  try {
+    await planStore.updatePlan(plan.value.id, { raceDate: raceDate.value })
+  } catch {
+    // non-blocking
+  }
+}
+
+const saveAsTemplate = async () => {
+  savingTemplate.value = true
+  try {
+    await planStore.updatePlan(plan.value.id, { isTemplate: true })
+    showToast('Saved as template.', 'success')
+  } catch {
+    showToast('Failed to save template.', 'error')
+  } finally {
+    savingTemplate.value = false
+  }
+}
+
+const applyAutoVolume = () => {
+  const base = autoVolBase.value || 0
+  const pct  = autoVolPct.value || 0
+  weeks.value.forEach((w, i) => {
+    const vol = Math.round(base * Math.pow(1 + pct / 100, i) * 10) / 10
+    if (!weekData.value[w]) weekData.value[w] = { theme: '', phase: '', workouts: [] }
+    // Set volume label on the week theme if no theme set
+    if (!weekData.value[w].theme) {
+      weekData.value[w].theme = `${vol} ${distLabel.value}`
+      planStore.updatePlan(plan.value.id, {
+        weekThemes: { [w]: weekData.value[w].theme }
+      }).catch(() => {})
+    }
+  })
+  showToast('Volume targets applied to week themes.', 'success')
+  showAutoVolume.value = false
+}
+
 const buildWeekData = (planData) => {
   const numWeeks = planData.durationWeeks || (planData.weeks?.length) || 4
   weeks.value = Array.from({ length: numWeeks }, (_, i) => i + 1)
@@ -384,14 +479,16 @@ const buildWeekData = (planData) => {
     planData.weeks.forEach((w, i) => {
       weekData.value[i + 1] = {
         theme: w.theme || '',
+        phase: w.phase || '',
         workouts: Array.isArray(w.workouts) ? w.workouts : []
       }
     })
   } else {
     weeks.value.forEach(w => {
-      weekData.value[w] = { theme: '', workouts: [] }
+      weekData.value[w] = { theme: '', phase: '', workouts: [] }
     })
   }
+  if (planData.raceDate) raceDate.value = planData.raceDate.slice(0, 10)
 }
 
 onMounted(async () => {
@@ -646,4 +743,93 @@ onMounted(async () => {
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 .me-2 { margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Race date input in editor bar */
+.race-date-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.race-date-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: rgba(255,255,255,0.40);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.race-date-input {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.20);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.race-date-input:focus { outline: none; border-color: rgba(255,255,255,0.50); }
+
+/* Save as template button */
+.btn-save-template {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); border: 1px solid rgba(255,255,255,0.18);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+}
+.btn-save-template:hover { background: rgba(255,255,255,0.15); }
+.btn-save-template:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Week theme row with phase */
+.week-theme-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 24px 0;
+  flex-wrap: wrap;
+}
+.week-meta-left { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.week-meta-right { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
+.phase-select {
+  background: #fff;
+  border: 1px solid #E5E5E5;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #000;
+  min-width: 120px;
+}
+.phase-select:focus { outline: none; border-color: #000; }
+
+/* Auto volume panel */
+.auto-vol-bar {
+  background: #F5F5F5;
+  border-top: 1px solid #E5E5E5;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.auto-vol-input {
+  width: 70px;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  text-align: center;
+}
+.auto-vol-input-sm {
+  width: 52px;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  text-align: center;
+}
 </style>

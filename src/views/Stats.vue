@@ -41,6 +41,7 @@
       <div class="jumpnav-inner">
         <button v-for="s in [
           { id: 'overview',   label: 'Overview'   },
+          { id: 'pmc',        label: 'Fitness Chart' },
           { id: 'block',      label: 'Block'       },
           { id: 'discipline', label: 'Discipline'  },
           { id: 'archetype',  label: 'Archetype'   },
@@ -137,6 +138,42 @@
                 <div class="pred-time">~{{ time }}</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PMC CHART -->
+      <section id="stats-pmc" class="section" v-if="pmcTimeSeries.length">
+        <div class="section-header">
+          <span class="section-kicker">Performance Management Chart</span>
+        </div>
+        <div class="pmc-card">
+          <div class="pmc-stat-row">
+            <div class="pmc-stat">
+              <div class="pmc-stat-label">CTL (Fitness)</div>
+              <div class="pmc-stat-val" style="color:#0052FF">{{ pmcTimeSeries[pmcTimeSeries.length - 1]?.ctl ?? '—' }}</div>
+              <div class="pmc-stat-sub">42-day load</div>
+            </div>
+            <div class="pmc-stat">
+              <div class="pmc-stat-label">ATL (Fatigue)</div>
+              <div class="pmc-stat-val" style="color:#ef4444">{{ pmcTimeSeries[pmcTimeSeries.length - 1]?.atl ?? '—' }}</div>
+              <div class="pmc-stat-sub">7-day load</div>
+            </div>
+            <div class="pmc-stat">
+              <div class="pmc-stat-label">TSB (Form)</div>
+              <div class="pmc-stat-val" :style="{ color: (pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? 0) >= 0 ? '#22c55e' : '#ef4444' }">
+                {{ (pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? 0) > 0 ? '+' : '' }}{{ pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? '—' }}
+              </div>
+              <div class="pmc-stat-sub">CTL − ATL</div>
+            </div>
+          </div>
+          <div class="pmc-chart-wrap">
+            <canvas ref="pmcChartRef" height="220"></canvas>
+          </div>
+          <div class="pmc-legend-row">
+            <span class="pmc-legend-dot" style="background:#0052FF"></span>CTL = chronic training load (fitness, 42-day)
+            <span class="pmc-legend-dot" style="background:#ef4444; margin-left:16px"></span>ATL = acute training load (fatigue, 7-day)
+            <span class="pmc-legend-dot" style="background:#22c55e; margin-left:16px"></span>TSB = training stress balance (form)
           </div>
         </div>
       </section>
@@ -515,8 +552,10 @@ const {
 
 const weeklyChartRef = ref(null)
 const pieChartRef = ref(null)
+const pmcChartRef = ref(null)
 let weeklyChartInstance = null
 let pieChartInstance = null
+let pmcChartInstance = null
 
 const chartPeriod = ref('monthly') // 'monthly' | 'weekly'
 
@@ -653,6 +692,50 @@ const consistencyLabel = computed(() => {
   if (c >= 50) return 'Building routine'
   if (c >= 30) return 'Inconsistent'
   return 'Just getting started'
+})
+
+// PMC time series — 90 days of CTL, ATL, TSB
+const pmcTimeSeries = computed(() => {
+  const acts = activities.value || []
+  if (!acts.length) return []
+
+  const today = new Date()
+  today.setHours(23, 59, 59, 999)
+  const dayMs = 86400000
+  const DAYS = 90
+
+  const IF_BY_TYPE = {
+    RUN: 0.85, Running: 0.85,
+    BIKE: 0.75, Cycling: 0.75,
+    SWIM: 0.70, Swimming: 0.70,
+  }
+
+  const dailyTss = new Array(DAYS).fill(0)
+  for (const a of acts) {
+    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
+    if (daysAgo >= 0 && daysAgo < DAYS) {
+      const ifFactor = IF_BY_TYPE[a.sportType] || 0.75
+      const tss = ((a.durationSeconds || 0) * ifFactor * ifFactor) / 3600
+      dailyTss[DAYS - 1 - daysAgo] += tss
+    }
+  }
+
+  const ctlK = 2 / 43, atlK = 2 / 8
+  let ctl = 0, atl = 0
+  const base = new Date(); base.setHours(0, 0, 0, 0)
+
+  return dailyTss.map((tss, i) => {
+    ctl = ctl * (1 - ctlK) + tss * ctlK
+    atl = atl * (1 - atlK) + tss * atlK
+    const tsb = ctl - atl
+    const d = new Date(base.getTime() - (DAYS - 1 - i) * dayMs)
+    return {
+      date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      ctl: Math.round(ctl * 10) / 10,
+      atl: Math.round(atl * 10) / 10,
+      tsb: Math.round(tsb * 10) / 10,
+    }
+  })
 })
 
 // ACWR (Acute:Chronic Workload Ratio)
@@ -921,12 +1004,71 @@ function initPieChart() {
   })
 }
 
+function initPmcChart() {
+  if (!pmcChartRef.value || !pmcTimeSeries.value.length) return
+  if (pmcChartInstance) { pmcChartInstance.destroy(); pmcChartInstance = null }
+  const pts = pmcTimeSeries.value
+  const stride = Math.max(1, Math.floor(pts.length / 15))
+  const labels = pts.map((p, i) => i % stride === 0 ? p.date : '')
+  const ctx = pmcChartRef.value.getContext('2d')
+  pmcChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'CTL (Fitness)',
+          data: pts.map(p => p.ctl),
+          borderColor: '#0052FF',
+          backgroundColor: 'rgba(0,82,255,0.05)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 0,
+        },
+        {
+          label: 'ATL (Fatigue)',
+          data: pts.map(p => p.atl),
+          borderColor: '#ef4444',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 0,
+        },
+        {
+          label: 'TSB (Form)',
+          data: pts.map(p => p.tsb),
+          borderColor: '#22c55e',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          borderWidth: 2,
+          borderDash: [4, 3],
+          pointRadius: 0,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } },
+        y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { maxTicksLimit: 6 } }
+      }
+    }
+  })
+}
+
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
   await prStore.fetchPRs(activities.value)
   await nextTick()
   initWeeklyChart()
   initPieChart()
+  initPmcChart()
 })
 </script>
 
@@ -1894,5 +2036,55 @@ onMounted(async () => {
   .archetype-card { grid-template-columns: 1fr; }
   .arch-card-left { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; }
   .arch-big-icon { font-size: 1.6rem; margin-bottom: 0; }
+}
+
+/* PMC Chart */
+.pmc-card {
+  border: 1px solid #E5E5E5;
+  padding: 24px;
+}
+.pmc-stat-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.pmc-stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: #767676;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.pmc-stat-val {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.pmc-stat-sub {
+  font-size: 0.7rem;
+  color: #999;
+}
+.pmc-chart-wrap {
+  height: 220px;
+  position: relative;
+}
+.pmc-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 0.72rem;
+  color: #767676;
+  flex-wrap: wrap;
+}
+.pmc-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
 }
 </style>

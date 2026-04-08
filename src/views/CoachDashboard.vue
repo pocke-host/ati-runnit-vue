@@ -328,6 +328,14 @@ onMounted(async () => {
 
 @media (max-width: 600px) {
   .hero-bar { padding: 28px 16px 24px; }
-  .content-wrap { padding: 24px 16px; gap: 32px; }
+  .hero-name { font-size: clamp(1.8rem, 7vw, 2.8rem); }
+  .hero-stats { gap: 16px; flex-wrap: wrap; }
+  .content-wrap { padding: 20px 16px; gap: 28px; }
+  .request-card { flex-wrap: wrap; gap: 10px; padding: 12px; }
+  .req-actions { width: 100%; display: flex; gap: 8px; }
+  .btn-approve, .btn-decline { flex: 1; text-align: center; }
+  .athlete-card { flex-wrap: wrap; gap: 10px; padding: 12px; }
+  .ath-info { flex: 0 0 calc(100% - 60px); }
+  .section-links { gap: 8px; }
 }
 </style>

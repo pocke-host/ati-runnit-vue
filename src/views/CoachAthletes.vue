@@ -388,4 +388,20 @@ select.field-input { cursor: pointer; }
 }
 .btn-create:hover:not(:disabled) { background: #003ECC; }
 .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 600px) {
+  .page-header { padding: 28px 16px 24px; }
+  .header-title { font-size: clamp(1.8rem, 7vw, 2.5rem); }
+  .content-wrap { padding: 20px 16px; }
+  .request-card { flex-wrap: wrap; gap: 10px; padding: 14px 12px; }
+  .req-actions { width: 100%; display: flex; gap: 8px; }
+  .btn-approve, .btn-decline { flex: 1; }
+  .athlete-card { flex-wrap: wrap; gap: 10px; padding: 14px 12px; }
+  .ath-info { min-width: calc(100% - 60px); }
+  .plan-list { gap: 8px; }
+  .plan-card { padding: 12px; }
+  .modal-box { width: 94vw; padding: 24px 16px; }
+  .tab-bar { gap: 0; }
+  .tab { padding: 10px 14px; font-size: 0.72rem; }
+}
 </style>

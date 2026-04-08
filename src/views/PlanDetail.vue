@@ -181,6 +181,40 @@
               </div>
 
               <p class="workout-desc" v-if="workout.description">{{ workout.description }}</p>
+
+              <!-- Structured steps -->
+              <template v-if="workout.steps?.length">
+                <!-- Step chips preview strip -->
+                <div class="steps-preview-strip">
+                  <div
+                    v-for="(step, i) in workout.steps"
+                    :key="i"
+                    class="step-chip-mini"
+                    :style="{ background: stepColor(step.type) }"
+                    :title="`${step.type}: ${step.duration}${step.durationType === 'TIME' ? 'min' : ' ' + distLabel}${step.repeat > 1 ? ' ×' + step.repeat : ''}`"
+                  ></div>
+                </div>
+                <!-- Expand toggle -->
+                <button class="steps-toggle" @click.stop="toggleSteps(workout.id)">
+                  <i :class="expandedSteps.has(workout.id) ? 'bi bi-chevron-up' : 'bi bi-list-ul'"></i>
+                  {{ expandedSteps.has(workout.id) ? 'Hide steps' : `${workout.steps.length} structured steps` }}
+                </button>
+                <!-- Expanded steps -->
+                <div v-if="expandedSteps.has(workout.id)" class="steps-expanded">
+                  <div v-for="(step, i) in workout.steps" :key="i" class="step-row">
+                    <div class="step-dot" :style="{ background: stepColor(step.type) }"></div>
+                    <div class="step-info">
+                      <span class="step-type">{{ step.type }}</span>
+                      <span class="step-dur">{{ step.duration }}{{ step.durationType === 'TIME' ? ' min' : ' ' + distLabel }}{{ step.repeat > 1 ? ' × ' + step.repeat : '' }}</span>
+                      <span v-if="step.targetType === 'ZONE'" class="step-target">Zone {{ step.targetZone }}</span>
+                      <span v-else-if="step.targetType === 'RPE'" class="step-target">RPE {{ step.targetRpe }}</span>
+                      <span v-else-if="step.targetType === 'PACE'" class="step-target">{{ step.targetPaceMin }}–{{ step.targetPaceMax }} min/{{ distLabel }}</span>
+                      <span v-else-if="step.targetType === 'HR_PCT'" class="step-target">{{ step.targetHrMin }}–{{ step.targetHrMax }}% HR</span>
+                    </div>
+                    <span v-if="step.notes" class="step-notes">{{ step.notes }}</span>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -227,7 +261,23 @@ import { storeToRefs } from 'pinia'
 const router = useRouter()
 const route = useRoute()
 const planStore = usePlanStore()
-const { formatDistance } = useUnits()
+const { formatDistance, isImperial } = useUnits()
+const distLabel = computed(() => isImperial.value ? 'mi' : 'km')
+
+// Structured steps state
+const expandedSteps = ref(new Set())
+const toggleSteps = (workoutId) => {
+  const s = new Set(expandedSteps.value)
+  s.has(workoutId) ? s.delete(workoutId) : s.add(workoutId)
+  expandedSteps.value = s
+}
+
+const STEP_COLORS = {
+  WARMUP:'#fb923c', EASY:'#22c55e', AEROBIC:'#4ade80', TEMPO:'#f59e0b',
+  THRESHOLD:'#ef4444', VO2MAX:'#8b5cf6', INTERVAL:'#3b82f6',
+  SPRINT:'#dc2626', RECOVERY:'#60a5fa', COOLDOWN:'#94a3b8'
+}
+const stepColor = (t) => STEP_COLORS[t] || '#9ca3af'
 const authStore = useAuthStore()
 const { unitSystem } = storeToRefs(authStore)
 
@@ -578,6 +628,27 @@ onMounted(async () => {
 }
 
 .workout-desc { font-size: 0.85rem; color: rgba(15,18,16,0.55); margin: 0; line-height: 1.5; font-style: italic; }
+
+/* Structured steps in plan */
+.steps-preview-strip { display: flex; gap: 2px; margin-top: 8px; }
+.step-chip-mini { width: 16px; height: 5px; border-radius: 2px; }
+.steps-toggle {
+  display: flex; align-items: center; gap: 5px; margin-top: 6px;
+  background: none; border: none; font-family: inherit;
+  font-size: 0.72rem; font-weight: 700; color: #767676;
+  cursor: pointer; padding: 0; text-transform: uppercase; letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+.steps-toggle:hover { color: #000; }
+.steps-expanded { margin-top: 8px; border: 1px solid #F0F0F0; padding: 8px; background: #FAFAFA; }
+.step-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F5F5F5; flex-wrap: wrap; }
+.step-row:last-child { border-bottom: none; }
+.step-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.step-info { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.step-type { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.step-dur { font-size: 0.7rem; color: #767676; }
+.step-target { font-size: 0.68rem; background: rgba(15,18,16,0.06); padding: 1px 5px; color: #555; font-weight: 600; }
+.step-notes { font-size: 0.68rem; color: #999; font-style: italic; }
 
 /* Week summary */
 .week-summary {
