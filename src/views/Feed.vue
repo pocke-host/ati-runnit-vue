@@ -56,7 +56,12 @@
           <!-- MOMENT CARD -->
           <template v-if="item.type === 'moment'">
             <div class="moment-image" @click="openMoment(item)">
-              <img :src="item.photoUrl" :alt="`${item.user.displayName}'s moment`" loading="lazy" />
+              <img
+                :src="item.photoUrl"
+                :alt="`${item.user.displayName}'s moment`"
+                loading="lazy"
+                @error="(e) => e.target.style.display='none'"
+              />
               <div class="moment-overlay">
                 <div class="moment-stats">
                   <span class="stat-item">
@@ -191,7 +196,12 @@
 
         <div class="moment-modal-content">
           <div class="moment-modal-image">
-            <img :src="selectedMoment.photoUrl" :alt="`${selectedMoment.user.displayName}'s moment`" />
+            <img
+              :src="selectedMoment.photoUrl"
+              :alt="`${selectedMoment.user.displayName}'s moment`"
+              @error="(e) => { e.target.parentElement.classList.add('img-error') }"
+            />
+            <div class="img-error-msg"><i class="bi bi-image me-2"></i>Image unavailable</div>
           </div>
 
           <div class="moment-modal-sidebar">
@@ -1305,6 +1315,14 @@ onUnmounted(() => {
   height: 100%;
   object-fit: contain;
 }
+.img-error-msg {
+  display: none;
+  color: #767676;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.img-error img { display: none; }
+.img-error .img-error-msg { display: flex; align-items: center; }
 
 .moment-modal-sidebar {
   display: flex;

@@ -64,11 +64,12 @@
   
           <!-- Story Media -->
           <div class="story-media" @click="nextStory">
-            <img 
-              v-if="currentStory.mediaType === 'PHOTO'" 
-              :src="currentStory.mediaUrl" 
-              :alt="currentStory.userDisplayName" 
+            <img
+              v-if="currentStory.mediaType === 'PHOTO'"
+              :src="currentStory.mediaUrl"
+              :alt="currentStory.userDisplayName"
               @load="onMediaLoad"
+              @error="(e) => { e.target.style.display='none'; onMediaLoad() }"
             />
             <video 
               v-else-if="currentStory.mediaType === 'VIDEO'"
