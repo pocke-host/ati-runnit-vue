@@ -57,7 +57,10 @@
       <section class="section">
         <div class="section-header">
           <h2 class="section-title">ATHLETES</h2>
-          <router-link to="/coach/athletes" class="section-link">View all →</router-link>
+          <div class="section-links">
+            <router-link to="/coach/library" class="section-link">Library →</router-link>
+            <router-link to="/coach/athletes" class="section-link">View all →</router-link>
+          </div>
         </div>
 
         <div v-if="loading" class="empty-state">
@@ -223,6 +226,7 @@ onMounted(async () => {
   padding-bottom: 12px;
 }
 .section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; color: #767676; margin: 0; }
+.section-links { display: flex; gap: 14px; align-items: center; }
 .section-link { font-size: 0.82rem; font-weight: 600; color: #000; text-decoration: none; }
 .section-link:hover { text-decoration: underline; }
 .badge-count {

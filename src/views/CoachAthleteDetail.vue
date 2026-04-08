@@ -53,6 +53,8 @@
           <button :class="['tab', { active: tab === 'calendar' }]"    @click="switchTab('calendar')">Calendar</button>
           <button :class="['tab', { active: tab === 'plans' }]"       @click="switchTab('plans')">Plans</button>
           <button :class="['tab', { active: tab === 'compliance' }]"  @click="switchTab('compliance')">Compliance</button>
+          <button :class="['tab', { active: tab === 'pmc' }]"         @click="switchTab('pmc')">PMC</button>
+          <button :class="['tab', { active: tab === 'zones' }]"       @click="switchTab('zones')">Zones</button>
           <button :class="['tab', { active: tab === 'messages' }]"    @click="switchTab('messages')">
             Messages
             <span v-if="unreadCount > 0" class="tab-badge">{{ unreadCount }}</span>
@@ -100,7 +102,30 @@
             </div>
           </div>
 
-          <!-- Recent Activities -->
+          <!-- Race Targets -->
+          <div class="overview-card">
+            <div class="card-label-row">
+              <div class="card-label">TARGET RACES</div>
+              <button class="link-btn" @click="showAddRace = true">+ Add</button>
+            </div>
+            <div v-if="races.length === 0" class="no-data">No target races set.</div>
+            <div v-else class="race-list">
+              <div v-for="race in races" :key="race.id" class="race-row">
+                <span class="race-priority" :class="`priority-${race.priority?.toLowerCase()}`">{{ race.priority || 'A' }}</span>
+                <div class="race-info">
+                  <div class="race-name">{{ race.name }}</div>
+                  <div class="race-meta">{{ formatDateShort(race.raceDate) }} · {{ race.distance || race.type }}</div>
+                </div>
+                <div class="race-days">
+                  <span class="race-days-val">{{ daysUntil(race.raceDate) }}</span>
+                  <span class="race-days-lbl">days</span>
+                </div>
+                <button class="race-del-btn" @click="removeRace(race.id)" title="Remove"><i class="bi bi-x"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activities with annotations -->
           <div class="overview-card overview-card--wide">
             <div class="card-label">RECENT ACTIVITIES</div>
             <div v-if="loadingActivities" class="no-data">
@@ -108,28 +133,97 @@
             </div>
             <div v-else-if="activities.length === 0" class="no-data">No activities yet.</div>
             <div v-else class="activity-list">
-              <router-link
+              <div
                 v-for="act in activities.slice(0, 8)"
                 :key="act.id"
-                :to="`/activities/${act.id}`"
-                class="act-row"
+                class="act-row-wrap"
               >
-                <span class="act-icon">{{ sportIcon(act.sportType) }}</span>
-                <div class="act-info">
-                  <div class="act-name">{{ act.name || act.sportType }}</div>
-                  <div class="act-meta">
-                    {{ formatDistShort(act.distanceMeters) }}
-                    <span v-if="act.durationSeconds"> · {{ formatDurShort(act.durationSeconds) }}</span>
-                    <span class="act-date"> · {{ formatDateShort(act.createdAt) }}</span>
+                <router-link :to="`/activities/${act.id}`" class="act-row">
+                  <span class="act-icon">{{ sportIcon(act.sportType) }}</span>
+                  <div class="act-info">
+                    <div class="act-name">{{ act.name || act.sportType }}</div>
+                    <div class="act-meta">
+                      {{ formatDistShort(act.distanceMeters) }}
+                      <span v-if="act.durationSeconds"> · {{ formatDurShort(act.durationSeconds) }}</span>
+                      <span class="act-date"> · {{ formatDateShort(act.createdAt) }}</span>
+                    </div>
                   </div>
+                  <i class="bi bi-chevron-right act-arrow"></i>
+                </router-link>
+                <!-- Coach annotation -->
+                <div class="annotation-wrap">
+                  <div v-if="annotations[act.id]" class="annotation-saved">
+                    <i class="bi bi-chat-quote annotation-icon"></i>
+                    <span class="annotation-text">{{ annotations[act.id] }}</span>
+                    <button class="annotation-edit-btn" @click="startAnnotation(act.id)"><i class="bi bi-pencil"></i></button>
+                  </div>
+                  <div v-else-if="annotatingId === act.id" class="annotation-input-row">
+                    <textarea
+                      v-model="annotationDraft"
+                      class="annotation-input"
+                      placeholder="Leave feedback for this workout…"
+                      rows="2"
+                      @keydown.enter.ctrl.prevent="saveAnnotation(act.id)"
+                    ></textarea>
+                    <div class="annotation-input-actions">
+                      <button class="btn-annot-cancel" @click="annotatingId = null">Cancel</button>
+                      <button class="btn-annot-save" @click="saveAnnotation(act.id)" :disabled="!annotationDraft.trim()">Save Note</button>
+                    </div>
+                  </div>
+                  <button v-else class="btn-annotate" @click="startAnnotation(act.id)">
+                    <i class="bi bi-chat-left-text me-1"></i> Add Note
+                  </button>
                 </div>
-                <i class="bi bi-chevron-right act-arrow"></i>
-              </router-link>
+              </div>
             </div>
           </div>
 
         </div>
       </template>
+
+      <!-- ── ADD RACE MODAL ─────────────────────────────────── -->
+      <div v-if="showAddRace" class="modal-overlay" @click.self="showAddRace = false">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Add Target Race</h3>
+            <button class="modal-close" @click="showAddRace = false"><i class="bi bi-x-lg"></i></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-field">
+              <label class="field-label">Race Name</label>
+              <input v-model="raceForm.name" class="field-input" placeholder="e.g. Boston Marathon 2026" />
+            </div>
+            <div class="form-row-2">
+              <div class="form-field">
+                <label class="field-label">Race Date</label>
+                <input type="date" v-model="raceForm.raceDate" class="field-input" :min="todayStr" />
+              </div>
+              <div class="form-field">
+                <label class="field-label">Priority</label>
+                <div class="priority-pills">
+                  <button
+                    v-for="p in ['A', 'B', 'C']" :key="p"
+                    :class="['priority-pill', { active: raceForm.priority === p }]"
+                    @click="raceForm.priority = p"
+                  >{{ p }}</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="field-label">Distance / Type</label>
+              <input v-model="raceForm.distance" class="field-input" placeholder="e.g. Marathon, 10K, Half" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-ghost-sm" @click="showAddRace = false">Cancel</button>
+            <button class="btn-primary-sm" @click="addRace"
+              :disabled="addingRace || !raceForm.name.trim() || !raceForm.raceDate">
+              <span v-if="addingRace" class="spinner-border spinner-border-sm me-1"></span>
+              Add Race
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- ── CALENDAR TAB ──────────────────────────────────── -->
       <template v-else-if="tab === 'calendar'">
@@ -163,26 +257,50 @@
                 v-for="day in week.days"
                 :key="day.date"
                 class="cal-day"
-                :class="{ 'cal-day--today': day.isToday, 'cal-day--past': day.isPast }"
+                :class="{
+                  'cal-day--today': day.isToday,
+                  'cal-day--past': day.isPast,
+                  'cal-day--drag-over': dragOverDate === day.date
+                }"
+                @dragover.prevent="dragOverDate = day.date"
+                @dragleave="dragOverDate = null"
+                @drop.prevent="onDrop(day.date)"
               >
+                <!-- Race indicator on calendar -->
+                <div v-if="raceOnDate(day.date)" class="cal-race-flag" :class="`priority-${raceOnDate(day.date).priority?.toLowerCase()}`">
+                  {{ raceOnDate(day.date).priority || 'A' }} RACE
+                </div>
+
                 <div class="cal-day-header">
                   <span class="cal-day-dow">{{ day.dow }}</span>
                   <span class="cal-day-num" :class="{ 'today-num': day.isToday }">{{ day.dayNum }}</span>
                 </div>
                 <div class="cal-day-events">
-                  <!-- Planned workouts -->
+                  <!-- Planned workouts (draggable) -->
                   <div
                     v-for="ev in day.events"
                     :key="ev.id"
                     class="cal-event cal-event--planned"
+                    :class="{ 'cal-event--dragging': dragEventId === ev.id }"
                     :style="{ borderLeftColor: typeColor(ev.workoutType) }"
+                    draggable="true"
+                    @dragstart="onDragStart(ev, day.date)"
+                    @dragend="dragEventId = null; dragOverDate = null"
                   >
-                    <div class="cal-event-type">{{ ev.workoutType?.replace('_', ' ') || 'WORKOUT' }}</div>
-                    <div class="cal-event-detail" v-if="ev.distanceMeters || ev.durationMinutes">
-                      <span v-if="ev.distanceMeters">{{ formatDistShort(ev.distanceMeters) }}</span>
-                      <span v-if="ev.durationMinutes"> · {{ ev.durationMinutes }}min</span>
+                    <div class="cal-event-drag-handle"><i class="bi bi-grip-vertical"></i></div>
+                    <div class="cal-event-body">
+                      <div class="cal-event-type">{{ ev.workoutType?.replace('_', ' ') || 'WORKOUT' }}</div>
+                      <div class="cal-event-detail" v-if="ev.distanceMeters || ev.durationMinutes">
+                        <span v-if="ev.distanceMeters">{{ formatDistShort(ev.distanceMeters) }}</span>
+                        <span v-if="ev.durationMinutes"> · {{ ev.durationMinutes }}min</span>
+                      </div>
+                      <div class="cal-event-title" v-if="ev.title">{{ ev.title }}</div>
                     </div>
-                    <div class="cal-event-title" v-if="ev.title">{{ ev.title }}</div>
+                    <button
+                      class="cal-event-del"
+                      @click.stop="deleteCalEvent(ev)"
+                      title="Remove"
+                    ><i class="bi bi-x"></i></button>
                   </div>
                   <!-- Completed activities -->
                   <div
@@ -418,6 +536,114 @@
         </div>
       </template>
 
+      <!-- ── PMC TAB ────────────────────────────────────────── -->
+      <template v-else-if="tab === 'pmc'">
+        <div class="pmc-header">
+          <div class="pmc-header-stats">
+            <div class="pmc-stat">
+              <div class="pmc-stat-val">{{ pmcCurrent.ctl }}</div>
+              <div class="pmc-stat-lbl">Fitness (CTL)</div>
+            </div>
+            <div class="pmc-stat">
+              <div class="pmc-stat-val" :class="pmcCurrent.atl > pmcCurrent.ctl ? 'val-red' : ''">{{ pmcCurrent.atl }}</div>
+              <div class="pmc-stat-lbl">Fatigue (ATL)</div>
+            </div>
+            <div class="pmc-stat">
+              <div class="pmc-stat-val" :class="pmcCurrent.tsb >= 0 ? 'val-green' : 'val-red'">{{ pmcCurrent.tsb > 0 ? '+' : '' }}{{ pmcCurrent.tsb }}</div>
+              <div class="pmc-stat-lbl">Form (TSB)</div>
+            </div>
+            <div class="pmc-stat pmc-stat--explain">
+              <div class="pmc-form-label" :class="formLabel.cls">{{ formLabel.text }}</div>
+              <div class="pmc-stat-lbl">Training Phase</div>
+            </div>
+          </div>
+          <div class="pmc-legend">
+            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#3b82f6"></span>Fitness (CTL)</span>
+            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#ef4444"></span>Fatigue (ATL)</span>
+            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#22c55e"></span>Form (TSB)</span>
+          </div>
+        </div>
+        <div class="pmc-chart-wrap">
+          <canvas ref="pmcCanvas" class="pmc-canvas"></canvas>
+        </div>
+        <div class="pmc-explainer">
+          <div class="pmc-ex-item"><strong>CTL (Fitness)</strong> — 42-day rolling avg of training load. Higher = more fitness.</div>
+          <div class="pmc-ex-item"><strong>ATL (Fatigue)</strong> — 7-day rolling avg of training load. Spikes after hard weeks.</div>
+          <div class="pmc-ex-item"><strong>TSB (Form)</strong> — Fitness minus Fatigue. Positive = fresh, Negative = fatigued.</div>
+          <div class="pmc-ex-item pmc-ex-phases">
+            <span class="phase-chip phase-fresh">TSB +25 → +5: Fresh / Taper</span>
+            <span class="phase-chip phase-optimal">TSB +5 → -10: Optimal</span>
+            <span class="phase-chip phase-tired">TSB -10 → -30: Tired</span>
+            <span class="phase-chip phase-overtrain">TSB &lt; -30: Overreaching</span>
+          </div>
+        </div>
+      </template>
+
+      <!-- ── ZONES TAB ──────────────────────────────────────── -->
+      <template v-else-if="tab === 'zones'">
+        <div class="zones-wrap">
+          <div class="zones-section">
+            <div class="zones-section-title">HR ZONES <span class="zones-subtitle">— Based on max HR or LTHR</span></div>
+            <div class="zones-max-row">
+              <div class="form-field">
+                <label class="field-label">Max Heart Rate (bpm)</label>
+                <input v-model.number="zonesForm.maxHr" type="number" min="100" max="220" class="field-input zones-input" placeholder="180" @input="calcHrZones" />
+              </div>
+              <div class="form-field">
+                <label class="field-label">Lactate Threshold HR (bpm) <span class="optional">optional</span></label>
+                <input v-model.number="zonesForm.lthr" type="number" min="100" max="210" class="field-input zones-input" placeholder="165" />
+              </div>
+            </div>
+            <div class="zones-table">
+              <div class="zones-table-header">
+                <span>Zone</span><span>Name</span><span>BPM Range</span><span>% Max HR</span>
+              </div>
+              <div v-for="z in zonesForm.hrZones" :key="z.zone" class="zones-row" :style="{ borderLeft: `3px solid ${zoneColor(z.zone)}` }">
+                <span class="z-zone" :style="{ color: zoneColor(z.zone) }">Z{{ z.zone }}</span>
+                <span class="z-name">{{ z.name }}</span>
+                <div class="z-range">
+                  <input v-model.number="z.min" type="number" class="z-input" /> – <input v-model.number="z.max" type="number" class="z-input" />
+                </div>
+                <span class="z-pct">{{ zonesForm.maxHr ? `${Math.round(z.min / zonesForm.maxHr * 100)}–${Math.round(z.max / zonesForm.maxHr * 100)}%` : '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="zones-section">
+            <div class="zones-section-title">PACE ZONES <span class="zones-subtitle">— min/{{ distanceLabel }}</span></div>
+            <div class="zones-max-row">
+              <div class="form-field">
+                <label class="field-label">Threshold Pace (min/{{ distanceLabel }})</label>
+                <input v-model="zonesForm.thresholdPace" class="field-input zones-input" placeholder="7:30" @input="calcPaceZones" />
+              </div>
+            </div>
+            <div class="zones-table">
+              <div class="zones-table-header">
+                <span>Zone</span><span>Name</span><span>Pace Range</span><span>Effort</span>
+              </div>
+              <div v-for="z in zonesForm.paceZones" :key="z.zone" class="zones-row" :style="{ borderLeft: `3px solid ${zoneColor(z.zone)}` }">
+                <span class="z-zone" :style="{ color: zoneColor(z.zone) }">Z{{ z.zone }}</span>
+                <span class="z-name">{{ z.name }}</span>
+                <div class="z-range">
+                  <input v-model="z.min" class="z-input z-pace" placeholder="8:30" /> – <input v-model="z.max" class="z-input z-pace" placeholder="9:00" />
+                </div>
+                <span class="z-pct">{{ z.effort }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="zonesSaveError" class="form-error">{{ zonesSaveError }}</div>
+
+          <div class="zones-actions">
+            <button class="btn-primary-sm" @click="saveZones" :disabled="savingZones">
+              <span v-if="savingZones" class="spinner-border spinner-border-sm me-1"></span>
+              Save Zones
+            </button>
+            <div v-if="zonesSaved" class="zones-saved-msg">Zones saved.</div>
+          </div>
+        </div>
+      </template>
+
       <!-- ── MESSAGES TAB ──────────────────────────────────── -->
       <template v-else-if="tab === 'messages'">
         <div class="messages-wrap">
@@ -461,7 +687,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCoachStore } from '@/stores/coach'
@@ -470,6 +696,7 @@ import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useToast } from '@/composables/useToast'
 import axios from 'axios'
+import Chart from 'chart.js/auto'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const route  = useRoute()
@@ -532,6 +759,52 @@ const createPlanForm   = ref({ name: '', sport: 'RUN', durationWeeks: 8, daysPer
 // Compliance
 const complianceData   = ref([])
 const loadingCompliance = ref(false)
+
+// Drag-drop calendar
+const dragEventId  = ref(null)
+const dragSrcDate  = ref(null)
+const dragOverDate = ref(null)
+
+// Race targets
+const races        = ref([])
+const showAddRace  = ref(false)
+const addingRace   = ref(false)
+const raceForm     = ref({ name: '', raceDate: '', priority: 'A', distance: '' })
+
+// Coach annotations on activities
+const annotations    = ref({}) // activityId → note string
+const annotatingId   = ref(null)
+const annotationDraft = ref('')
+
+// PMC chart
+const pmcCanvas = ref(null)
+let pmcChart = null
+
+// Zones
+const savingZones    = ref(false)
+const zonesSaveError = ref('')
+const zonesSaved     = ref(false)
+const ZONE_COLORS_MAP = { 1: '#60a5fa', 2: '#22c55e', 3: '#f59e0b', 4: '#ef4444', 5: '#8b5cf6' }
+const zoneColor = (z) => ZONE_COLORS_MAP[z] || '#767676'
+const zonesForm = ref({
+  maxHr: null,
+  lthr: null,
+  thresholdPace: '',
+  hrZones: [
+    { zone: 1, name: 'Active Recovery', min: 0,   max: 0 },
+    { zone: 2, name: 'Aerobic',         min: 0,   max: 0 },
+    { zone: 3, name: 'Tempo',           min: 0,   max: 0 },
+    { zone: 4, name: 'Threshold',       min: 0,   max: 0 },
+    { zone: 5, name: 'VO₂Max',          min: 0,   max: 0 },
+  ],
+  paceZones: [
+    { zone: 1, name: 'Active Recovery', min: '', max: '', effort: 'Very Easy'    },
+    { zone: 2, name: 'Aerobic',         min: '', max: '', effort: 'Easy'         },
+    { zone: 3, name: 'Tempo',           min: '', max: '', effort: 'Moderate'     },
+    { zone: 4, name: 'Threshold',       min: '', max: '', effort: 'Hard'         },
+    { zone: 5, name: 'VO₂Max',          min: '', max: '', effort: 'Very Hard'    },
+  ],
+})
 
 // ── Computed ──────────────────────────────────────────────────
 const activePlan = computed(() =>
@@ -640,6 +913,45 @@ const thisWeekCompliance = computed(() => {
   return { planned, completed, pct: Math.round(Math.min(completed / planned, 1) * 100) }
 })
 
+// ── PMC computed ──────────────────────────────────────────────
+const IF_BY_TYPE = { EASY: 0.75, LONG_RUN: 0.78, TEMPO: 0.85, INTERVAL: 0.93, RECOVERY: 0.60, RUN: 0.75, BIKE: 0.72, SWIM: 0.70, HIKE: 0.65, WALK: 0.60 }
+
+const pmcPoints = computed(() => {
+  const tssMap = {}
+  activities.value.forEach(a => {
+    const dateStr = a.createdAt?.slice(0, 10)
+    if (!dateStr) return
+    const durationHours = (a.durationSeconds || 0) / 3600
+    const ifactor = IF_BY_TYPE[a.type || a.sportType || 'RUN'] || 0.75
+    const tss = Math.round(durationHours * 100 * ifactor * ifactor)
+    tssMap[dateStr] = (tssMap[dateStr] || 0) + tss
+  })
+  const today = new Date()
+  const points = []
+  let ctl = 0, atl = 0
+  for (let i = 89; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(today.getDate() - i)
+    const dateStr = d.toISOString().slice(0, 10)
+    const tss = tssMap[dateStr] || 0
+    ctl = ctl + (tss - ctl) / 42
+    atl = atl + (tss - atl) / 7
+    points.push({ date: dateStr, ctl: Math.round(ctl), atl: Math.round(atl), tsb: Math.round(ctl - atl) })
+  }
+  return points
+})
+
+const pmcCurrent = computed(() => pmcPoints.value[pmcPoints.value.length - 1] || { ctl: 0, atl: 0, tsb: 0 })
+
+const formLabel = computed(() => {
+  const tsb = pmcCurrent.value.tsb
+  if (tsb > 25) return { text: 'Fresh / Taper', cls: 'form-fresh' }
+  if (tsb > 5)  return { text: 'Fresh / Ready', cls: 'form-fresh' }
+  if (tsb >= -10) return { text: 'Optimal Training', cls: 'form-optimal' }
+  if (tsb >= -30) return { text: 'Tired', cls: 'form-tired' }
+  return { text: 'Overreaching', cls: 'form-over' }
+})
+
 // ── Fetch ─────────────────────────────────────────────────────
 const fetchAthlete = async () => {
   loadingAthlete.value = true
@@ -686,6 +998,21 @@ const fetchCompliance = async () => {
   loadingCompliance.value = false
 }
 
+const fetchRaces = async () => {
+  races.value = await coachStore.fetchAthleteRaces(athleteId.value)
+}
+
+const fetchZones = async () => {
+  const data = await coachStore.fetchAthleteZones(athleteId.value)
+  if (data) {
+    if (data.maxHr) zonesForm.value.maxHr = data.maxHr
+    if (data.lthr)  zonesForm.value.lthr  = data.lthr
+    if (data.thresholdPace) zonesForm.value.thresholdPace = data.thresholdPace
+    if (data.hrZones?.length)   zonesForm.value.hrZones   = data.hrZones
+    if (data.paceZones?.length) zonesForm.value.paceZones = data.paceZones
+  }
+}
+
 const fetchMessages = async () => {
   loadingMessages.value = true
   try {
@@ -720,6 +1047,8 @@ const switchTab = async (t) => {
     !calendarEvents.value.length ? fetchCalendar() : Promise.resolve(),
     fetchCompliance()
   ])
+  if (t === 'pmc') nextTick(() => renderPmcChart())
+  if (t === 'zones') await fetchZones()
   if (t === 'messages') { await fetchMessages(); await markRead() }
 }
 
@@ -812,6 +1141,209 @@ const scrollToBottom = () => {
   nextTick(() => { if (threadRef.value) threadRef.value.scrollTop = threadRef.value.scrollHeight })
 }
 
+// ── Drag-drop calendar ─────────────────────────────────────────
+const onDragStart = (event, dateStr) => {
+  dragEventId.value = event.id
+  dragSrcDate.value = dateStr
+}
+
+const onDrop = async (targetDate) => {
+  dragOverDate.value = null
+  if (!dragEventId.value || dragSrcDate.value === targetDate) {
+    dragEventId.value = null
+    return
+  }
+  const evId = dragEventId.value
+  dragEventId.value = null
+  try {
+    await coachStore.moveCalendarEvent(athleteId.value, evId, targetDate)
+    const ev = calendarEvents.value.find(e => e.id === evId)
+    if (ev) ev.scheduledDate = targetDate
+    showToast('Workout moved.', 'success')
+  } catch {
+    showToast('Failed to move workout.', 'error')
+  }
+}
+
+const deleteCalEvent = async (ev) => {
+  try {
+    await coachStore.deleteCalendarEvent(athleteId.value, ev.id)
+    calendarEvents.value = calendarEvents.value.filter(e => e.id !== ev.id)
+  } catch {
+    showToast('Failed to remove workout.', 'error')
+  }
+}
+
+// ── Annotations ────────────────────────────────────────────────
+const startAnnotation = (activityId) => {
+  annotatingId.value = activityId
+  annotationDraft.value = annotations.value[activityId] || ''
+}
+
+const saveAnnotation = async (activityId) => {
+  if (!annotationDraft.value.trim()) return
+  try {
+    await coachStore.addActivityAnnotation(activityId, annotationDraft.value.trim())
+    annotations.value[activityId] = annotationDraft.value.trim()
+    annotatingId.value = null
+    showToast('Note saved.', 'success')
+  } catch {
+    showToast('Failed to save note.', 'error')
+  }
+}
+
+// ── Race targets ───────────────────────────────────────────────
+const addRace = async () => {
+  if (!raceForm.value.name.trim() || !raceForm.value.raceDate) return
+  addingRace.value = true
+  try {
+    const race = await coachStore.addAthleteRace(athleteId.value, { ...raceForm.value })
+    races.value.push(race || { ...raceForm.value, id: Date.now() })
+    races.value.sort((a, b) => new Date(a.raceDate) - new Date(b.raceDate))
+    showAddRace.value = false
+    raceForm.value = { name: '', raceDate: '', priority: 'A', distance: '' }
+  } catch {
+    showToast('Failed to add race.', 'error')
+  } finally {
+    addingRace.value = false
+  }
+}
+
+const removeRace = async (raceId) => {
+  try {
+    await coachStore.deleteAthleteRace(athleteId.value, raceId)
+    races.value = races.value.filter(r => r.id !== raceId)
+  } catch {
+    showToast('Failed to remove race.', 'error')
+  }
+}
+
+const raceOnDate = (dateStr) => races.value.find(r => r.raceDate?.slice(0, 10) === dateStr)
+
+const daysUntil = (dateStr) => {
+  if (!dateStr) return '?'
+  const diff = new Date(dateStr) - new Date()
+  return Math.max(0, Math.ceil(diff / 86400000))
+}
+
+// ── Zones ──────────────────────────────────────────────────────
+const calcHrZones = () => {
+  const max = zonesForm.value.maxHr
+  if (!max) return
+  const pcts = [[0.50, 0.60], [0.60, 0.70], [0.70, 0.80], [0.80, 0.90], [0.90, 1.00]]
+  pcts.forEach(([lo, hi], i) => {
+    zonesForm.value.hrZones[i].min = Math.round(max * lo)
+    zonesForm.value.hrZones[i].max = Math.round(max * hi)
+  })
+}
+
+const calcPaceZones = () => {
+  const tp = zonesForm.value.thresholdPace
+  if (!tp || !tp.includes(':')) return
+  const [m, s] = tp.split(':').map(Number)
+  if (isNaN(m) || isNaN(s)) return
+  const threshSecs = m * 60 + s
+  // Zone multipliers relative to threshold pace
+  const mults = [[1.20, 1.30], [1.10, 1.20], [1.02, 1.10], [0.97, 1.02], [0.90, 0.97]]
+  mults.forEach(([lo, hi], i) => {
+    const toStr = (secs) => `${Math.floor(secs / 60)}:${String(Math.round(secs % 60)).padStart(2, '0')}`
+    zonesForm.value.paceZones[i].min = toStr(threshSecs * lo)
+    zonesForm.value.paceZones[i].max = toStr(threshSecs * hi)
+  })
+}
+
+const saveZones = async () => {
+  savingZones.value = true
+  zonesSaveError.value = ''
+  zonesSaved.value = false
+  try {
+    await coachStore.saveAthleteZones(athleteId.value, { ...zonesForm.value })
+    zonesSaved.value = true
+    setTimeout(() => { zonesSaved.value = false }, 3000)
+  } catch {
+    zonesSaveError.value = 'Failed to save zones. Please try again.'
+  } finally {
+    savingZones.value = false
+  }
+}
+
+// ── PMC Chart ─────────────────────────────────────────────────
+const renderPmcChart = () => {
+  if (!pmcCanvas.value || !pmcPoints.value.length) return
+  if (pmcChart) { pmcChart.destroy(); pmcChart = null }
+  const pts = pmcPoints.value
+  pmcChart = new Chart(pmcCanvas.value, {
+    type: 'line',
+    data: {
+      labels: pts.map(p => p.date),
+      datasets: [
+        {
+          label: 'Fitness (CTL)',
+          data: pts.map(p => p.ctl),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          borderWidth: 2,
+        },
+        {
+          label: 'Fatigue (ATL)',
+          data: pts.map(p => p.atl),
+          borderColor: '#ef4444',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          pointRadius: 0,
+          borderWidth: 2,
+        },
+        {
+          label: 'Form (TSB)',
+          data: pts.map(p => p.tsb),
+          borderColor: '#22c55e',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          pointRadius: 0,
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            title: (items) => items[0]?.label,
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            maxTicksLimit: 10,
+            font: { size: 11 },
+            color: '#767676',
+          }
+        },
+        y: {
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: { font: { size: 11 }, color: '#767676' },
+        }
+      }
+    }
+  })
+}
+
+// Re-render PMC when activities change and tab is visible
+watch(activities, () => {
+  if (tab.value === 'pmc') nextTick(() => renderPmcChart())
+})
+
 // ── Helpers ───────────────────────────────────────────────────
 const formatDistShort = (m) => {
   if (!m) return '—'
@@ -838,8 +1370,10 @@ const sportIcon = (t) => {
 // ── Lifecycle ─────────────────────────────────────────────────
 onMounted(async () => {
   await fetchAthlete()
-  await Promise.all([fetchActivities(), fetchPlans(), fetchUnreadCount(), fetchCalendar()])
+  await Promise.all([fetchActivities(), fetchPlans(), fetchUnreadCount(), fetchCalendar(), fetchRaces()])
 })
+
+onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 </script>
 
 <style scoped>
@@ -1114,6 +1648,118 @@ onMounted(async () => {
   font-size: 0.68rem; font-weight: 600; cursor: pointer; font-family: inherit;
 }
 .btn-ghost-xs:hover { border-color: #000; color: #000; }
+
+/* ── DRAG-DROP CALENDAR ──────────────────────────────────── */
+.cal-day--drag-over { background: rgba(0,82,255,0.05); outline: 1px dashed #0052FF; }
+.cal-event--dragging { opacity: 0.4; }
+.cal-event--planned { display: flex; align-items: flex-start; gap: 4px; cursor: grab; }
+.cal-event--planned:active { cursor: grabbing; }
+.cal-event-drag-handle { color: #BDBDBD; font-size: 0.7rem; padding-top: 1px; flex-shrink: 0; }
+.cal-event-body { flex: 1; min-width: 0; }
+.cal-event-del {
+  background: none; border: none; color: #BDBDBD; cursor: pointer;
+  font-size: 0.7rem; padding: 0 2px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s;
+}
+.cal-event--planned:hover .cal-event-del { opacity: 1; }
+.cal-event-del:hover { color: #ef4444; }
+
+/* Race flag on calendar */
+.cal-race-flag {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 5px; margin-bottom: 4px;
+  display: inline-block;
+}
+.priority-a { background: rgba(239,68,68,0.12); color: #dc2626; }
+.priority-b { background: rgba(245,158,11,0.12); color: #b45309; }
+.priority-c { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+
+/* ── ANNOTATIONS ─────────────────────────────────────────── */
+.act-row-wrap { border-bottom: 1px solid #F5F5F5; }
+.act-row-wrap:last-child { border-bottom: none; }
+.annotation-wrap { padding: 0 12px 10px 44px; }
+.annotation-saved { display: flex; align-items: flex-start; gap: 8px; padding: 6px 10px; background: rgba(59,130,246,0.06); border-left: 2px solid #3b82f6; }
+.annotation-icon { color: #3b82f6; font-size: 0.82rem; flex-shrink: 0; margin-top: 1px; }
+.annotation-text { font-size: 0.78rem; color: #555; font-style: italic; flex: 1; }
+.annotation-edit-btn { background: none; border: none; color: #767676; cursor: pointer; font-size: 0.75rem; padding: 0 4px; flex-shrink: 0; }
+.annotation-edit-btn:hover { color: #000; }
+.annotation-input-row { display: flex; flex-direction: column; gap: 6px; }
+.annotation-input {
+  width: 100%; padding: 8px 10px; border: 1px solid #E5E5E5;
+  font-family: inherit; font-size: 0.82rem; resize: none; outline: none; border-radius: 0; box-sizing: border-box;
+}
+.annotation-input:focus { border-color: #0052FF; }
+.annotation-input-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.btn-annot-cancel { padding: 5px 12px; background: #fff; color: #767676; border: 1px solid #E5E5E5; font-family: inherit; font-size: 0.72rem; cursor: pointer; }
+.btn-annot-save { padding: 5px 12px; background: #0052FF; color: #fff; border: none; font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+.btn-annot-save:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-annotate { background: none; border: none; color: #BDBDBD; cursor: pointer; font-family: inherit; font-size: 0.72rem; font-weight: 600; padding: 4px 0; display: flex; align-items: center; gap: 4px; }
+.btn-annotate:hover { color: #767676; }
+
+/* ── RACE TARGETS ────────────────────────────────────────── */
+.card-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.card-label-row .card-label { margin-bottom: 0; }
+.race-list { display: flex; flex-direction: column; gap: 8px; }
+.race-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #E5E5E5; }
+.race-priority { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+.race-info { flex: 1; min-width: 0; }
+.race-name { font-weight: 700; font-size: 0.85rem; }
+.race-meta { font-size: 0.72rem; color: #767676; margin-top: 1px; }
+.race-days { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.race-days-val { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+.race-days-lbl { font-size: 0.6rem; color: #767676; text-transform: uppercase; letter-spacing: 0.06em; }
+.race-del-btn { background: none; border: none; color: #BDBDBD; cursor: pointer; font-size: 0.85rem; padding: 4px; flex-shrink: 0; }
+.race-del-btn:hover { color: #ef4444; }
+.priority-pills { display: flex; gap: 6px; }
+.priority-pill { width: 38px; height: 34px; border: 1px solid #E5E5E5; background: #fff; font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; border-radius: 0; transition: all 0.15s; }
+.priority-pill.active { background: #000; color: #fff; border-color: #000; }
+
+/* ── PMC CHART ───────────────────────────────────────────── */
+.pmc-header { padding: 24px; border-bottom: 1px solid #E5E5E5; }
+.pmc-header-stats { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 16px; }
+.pmc-stat { display: flex; flex-direction: column; gap: 2px; }
+.pmc-stat-val { font-size: 2rem; font-weight: 800; line-height: 1; }
+.pmc-stat-lbl { font-size: 0.7rem; color: #767676; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.pmc-stat--explain { border-left: 1px solid #E5E5E5; padding-left: 24px; }
+.pmc-form-label { font-size: 1.1rem; font-weight: 700; padding: 4px 10px; }
+.form-fresh   { background: rgba(34,197,94,0.12);  color: #16a34a; }
+.form-optimal { background: rgba(0,82,255,0.10);   color: #0052FF; }
+.form-tired   { background: rgba(245,158,11,0.12); color: #b45309; }
+.form-over    { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.pmc-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.pmc-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; color: #555; }
+.pmc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.pmc-chart-wrap { padding: 24px; height: 260px; }
+.pmc-canvas { width: 100% !important; height: 100% !important; }
+.pmc-explainer { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 6px; }
+.pmc-ex-item { font-size: 0.78rem; color: #767676; }
+.pmc-ex-item strong { color: #000; }
+.pmc-ex-phases { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.phase-chip { padding: 4px 10px; font-size: 0.7rem; font-weight: 700; }
+.phase-fresh    { background: rgba(34,197,94,0.10);  color: #16a34a; }
+.phase-optimal  { background: rgba(0,82,255,0.08);   color: #0052FF; }
+.phase-tired    { background: rgba(245,158,11,0.10); color: #b45309; }
+.phase-overtrain { background: rgba(239,68,68,0.10); color: #dc2626; }
+
+/* ── ZONES ───────────────────────────────────────────────── */
+.zones-wrap { padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+.zones-section { display: flex; flex-direction: column; gap: 16px; }
+.zones-section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #000; }
+.zones-subtitle { font-weight: 400; color: #767676; text-transform: none; letter-spacing: 0; }
+.zones-max-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.zones-input { max-width: 200px; }
+.zones-table { border: 1px solid #E5E5E5; }
+.zones-table-header { display: grid; grid-template-columns: 50px 150px 1fr 80px; padding: 8px 12px; background: #F5F5F5; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #767676; gap: 12px; }
+.zones-row { display: grid; grid-template-columns: 50px 150px 1fr 80px; padding: 10px 12px; border-top: 1px solid #F0F0F0; gap: 12px; align-items: center; }
+.z-zone { font-size: 0.82rem; font-weight: 700; }
+.z-name { font-size: 0.78rem; font-weight: 600; }
+.z-range { display: flex; align-items: center; gap: 4px; }
+.z-input { width: 56px; padding: 4px 6px; border: 1px solid #E5E5E5; font-family: inherit; font-size: 0.78rem; text-align: center; outline: none; border-radius: 0; }
+.z-input:focus { border-color: #000; }
+.z-pace { width: 52px; }
+.z-pct { font-size: 0.72rem; color: #767676; font-weight: 600; }
+.zones-actions { display: flex; align-items: center; gap: 16px; }
+.zones-saved-msg { font-size: 0.78rem; font-weight: 700; color: #16a34a; }
+.form-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; font-size: 0.82rem; font-weight: 600; padding: 10px 12px; }
 
 /* ── SHARED STATES ───────────────────────────────────────── */
 .loading-state { display: flex; justify-content: center; padding: 60px; }

@@ -58,7 +58,8 @@ const routes = [
   { path: '/coach/dashboard', name: 'CoachDashboard', component: () => import('@/views/CoachDashboard.vue'), meta: { requiresAuth: true, requiresCoach: true } },
   { path: '/coach/athletes',  name: 'CoachAthletes',  component: () => import('@/views/CoachAthletes.vue'),  meta: { requiresAuth: true, requiresCoach: true } },
   { path: '/coach/athletes/:id', name: 'CoachAthleteDetail', component: () => import('@/views/CoachAthleteDetail.vue'), meta: { requiresAuth: true, requiresCoach: true } },
-  { path: '/coach/plans/:planId/edit', name: 'CoachPlanEditor', component: () => import('@/views/CoachPlanEditor.vue'), meta: { requiresAuth: true, requiresCoach: true } },
+  { path: '/coach/plans/:planId/edit', name: 'CoachPlanEditor',    component: () => import('@/views/CoachPlanEditor.vue'),    meta: { requiresAuth: true, requiresCoach: true } },
+  { path: '/coach/library',            name: 'WorkoutLibrary',      component: () => import('@/views/WorkoutLibrary.vue'),      meta: { requiresAuth: true, requiresCoach: true } },
   { path: '/coaches',         name: 'FindCoaches',    component: () => import('@/views/FindCoaches.vue'),    meta: { requiresAuth: true } },
   { path: '/my-coach',        name: 'MyCoach',        component: () => import('@/views/MyCoach.vue'),        meta: { requiresAuth: true } },
 
