@@ -183,10 +183,10 @@
               <i class="bi bi-chat-dots-fill"></i> Messages
               <span v-if="dmStore.unreadCount > 0" class="drawer-badge">{{ dmStore.unreadCount }}</span>
             </button>
-            <button class="drawer-link" @click="toggleNotifDropdown(); mobileMenuOpen = false">
+            <router-link to="/notifications" class="drawer-link" @click="mobileMenuOpen = false">
               <i class="bi bi-bell-fill"></i> Notifications
               <span v-if="unreadCount > 0" class="drawer-badge">{{ unreadCount }}</span>
-            </button>
+            </router-link>
             <div class="drawer-divider"></div>
 
             <!-- Coach drawer links -->

@@ -516,7 +516,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useActivityStore } from '@/stores/activity'
 import { usePRStore } from '@/stores/pr'
 import { storeToRefs } from 'pinia'
@@ -1069,6 +1069,12 @@ onMounted(async () => {
   initWeeklyChart()
   initPieChart()
   initPmcChart()
+})
+
+onUnmounted(() => {
+  if (weeklyChartInstance) { weeklyChartInstance.destroy(); weeklyChartInstance = null }
+  if (pieChartInstance)    { pieChartInstance.destroy();    pieChartInstance    = null }
+  if (pmcChartInstance)    { pmcChartInstance.destroy();    pmcChartInstance    = null }
 })
 </script>
 

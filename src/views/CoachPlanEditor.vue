@@ -459,15 +459,12 @@ const applyAutoVolume = () => {
   weeks.value.forEach((w, i) => {
     const vol = Math.round(base * Math.pow(1 + pct / 100, i) * 10) / 10
     if (!weekData.value[w]) weekData.value[w] = { theme: '', phase: '', workouts: [] }
-    // Set volume label on the week theme if no theme set
-    if (!weekData.value[w].theme) {
-      weekData.value[w].theme = `${vol} ${distLabel.value}`
-      planStore.updatePlan(plan.value.id, {
-        weekThemes: { [w]: weekData.value[w].theme }
-      }).catch(() => {})
-    }
+    weekData.value[w].theme = `${vol} ${distLabel.value}`
+    planStore.updatePlan(plan.value.id, {
+      weekThemes: { [w]: weekData.value[w].theme }
+    }).catch(() => {})
   })
-  showToast('Volume targets applied to week themes.', 'success')
+  showToast(`Volume progression applied across ${weeks.value.length} weeks.`, 'success')
   showAutoVolume.value = false
 }
 

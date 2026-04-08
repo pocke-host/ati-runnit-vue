@@ -103,7 +103,7 @@
           </div>
           <div class="tw-right">
             <span v-if="todayWorkout.isCompleted" class="tw-done-badge">✓ DONE</span>
-            <router-link :to="`/plans/${activePlan.id}`" class="tw-view-btn">View Plan →</router-link>
+            <router-link :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="tw-view-btn">View Plan →</router-link>
           </div>
         </div>
       </section>
