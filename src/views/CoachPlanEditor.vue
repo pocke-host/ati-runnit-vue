@@ -36,13 +36,37 @@
 
     <!-- Week Tabs -->
     <div class="week-tabs-wrap">
-      <div class="week-tabs">
-        <button
-          v-for="w in weeks"
-          :key="w"
-          :class="['week-tab', { active: activeWeek === w }]"
-          @click="activeWeek = w"
-        >W{{ w }}</button>
+      <div class="week-tabs-scroll">
+        <div class="week-tabs">
+          <button
+            v-for="w in weeks"
+            :key="w"
+            :class="['week-tab', { active: activeWeek === w }]"
+            @click="activeWeek = w"
+          >W{{ w }}</button>
+        </div>
+        <div class="week-tab-actions">
+          <button class="week-action-btn" @click="showCopyWeek = !showCopyWeek" title="Copy this week">
+            <i class="bi bi-files"></i> Copy Week
+          </button>
+          <router-link to="/coach/library" class="week-action-btn">
+            <i class="bi bi-collection"></i> Library
+          </router-link>
+        </div>
+      </div>
+      <!-- Copy-week panel -->
+      <div v-if="showCopyWeek" class="copy-week-bar">
+        <span class="copy-week-label">Copy W{{ activeWeek }} to:</span>
+        <div class="copy-week-targets">
+          <button
+            v-for="w in weeks.filter(w => w !== activeWeek)"
+            :key="w"
+            class="copy-target-btn"
+            @click="copyWeek(w)"
+            :disabled="copyingWeek"
+          >W{{ w }}</button>
+        </div>
+        <button class="copy-close-btn" @click="showCopyWeek = false"><i class="bi bi-x"></i></button>
       </div>
     </div>
 
@@ -116,6 +140,30 @@
             ></textarea>
           </div>
         </div>
+
+        <!-- Structured Steps -->
+        <div class="workout-steps-section">
+          <button
+            class="steps-toggle-btn"
+            @click="toggleSteps(workout.id)"
+          >
+            <i :class="expandedSteps.has(workout.id) ? 'bi bi-chevron-up' : 'bi bi-list-ul'"></i>
+            {{ expandedSteps.has(workout.id) ? 'Hide Steps' : `Build Steps${workout.steps?.length ? ' (' + workout.steps.length + ')' : ''}` }}
+          </button>
+          <div v-if="expandedSteps.has(workout.id)" class="steps-wrap">
+            <WorkoutStepBuilder
+              :steps="workout.steps || []"
+              @update:steps="(s) => { workout.steps = s; saveWorkout(workout) }"
+            />
+            <div class="steps-lib-row">
+              <button class="btn-save-lib" @click="saveWorkoutToLibrary(workout)" :disabled="savingToLib === workout.id">
+                <span v-if="savingToLib === workout.id" class="spinner-border spinner-border-sm me-1"></span>
+                <i v-else class="bi bi-bookmark me-1"></i>
+                Save to Library
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Add Workout Row -->
@@ -149,10 +197,15 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePlanStore } from '@/stores/plan'
+import { useWorkoutLibraryStore } from '@/stores/workoutLibrary'
+import { useToast } from '@/composables/useToast'
+import WorkoutStepBuilder from '@/components/WorkoutStepBuilder.vue'
 
 const route = useRoute()
 const router = useRouter()
 const planStore = usePlanStore()
+const libStore  = useWorkoutLibraryStore()
+const { showToast } = useToast()
 
 const plan = ref(null)
 const loading = ref(true)
@@ -165,6 +218,21 @@ const activeWeek = ref(1)
 const weeks = ref([])
 const weekData = ref({}) // { [weekNum]: { theme, workouts[] } }
 const deleteTarget = ref(null)
+
+// Steps builder state
+const expandedSteps = ref(new Set())
+const toggleSteps = (workoutId) => {
+  const s = new Set(expandedSteps.value)
+  s.has(workoutId) ? s.delete(workoutId) : s.add(workoutId)
+  expandedSteps.value = s
+}
+
+// Copy week state
+const showCopyWeek  = ref(false)
+const copyingWeek   = ref(false)
+
+// Save to library state
+const savingToLib = ref(null)
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const workoutTypes = ['Easy Run', 'Tempo Run', 'Long Run', 'Interval', 'Recovery Run', 'Cross Train', 'Strength', 'Rest']
@@ -200,12 +268,13 @@ const saveWorkout = async (workout) => {
   if (!workout.id) return
   try {
     await planStore.updateWorkout(plan.value.id, workout.id, {
-      name: workout.name,
-      type: workout.type,
-      day: workout.day,
-      distance: workout.distance,
-      duration: workout.duration,
+      name:        workout.name,
+      type:        workout.type,
+      day:         workout.day,
+      distance:    workout.distance,
+      duration:    workout.duration,
       description: workout.description,
+      steps:       workout.steps || [],
     })
   } catch {
     saveError.value = 'A workout change could not be saved. Please refresh and try again.'
@@ -255,6 +324,56 @@ const autoResize = (e) => {
   const el = e.target
   el.style.height = 'auto'
   el.style.height = el.scrollHeight + 'px'
+}
+
+const copyWeek = async (targetWeek) => {
+  const src = weekData.value[activeWeek.value]
+  if (!src?.workouts?.length) {
+    showToast('No workouts to copy in this week.', 'error')
+    return
+  }
+  copyingWeek.value = true
+  try {
+    const copies = await Promise.all(
+      src.workouts.map(w =>
+        planStore.addWorkout(plan.value.id, targetWeek, {
+          name:        w.name,
+          type:        w.type,
+          day:         w.day,
+          distance:    w.distance,
+          duration:    w.duration,
+          description: w.description,
+          steps:       w.steps || [],
+        })
+      )
+    )
+    if (!weekData.value[targetWeek]) weekData.value[targetWeek] = { theme: '', workouts: [] }
+    copies.forEach(c => weekData.value[targetWeek].workouts.push(c || { id: Date.now(), ...src.workouts[0] }))
+    showToast(`Week ${activeWeek.value} copied to Week ${targetWeek}.`, 'success')
+    showCopyWeek.value = false
+  } catch {
+    showToast('Failed to copy week. Please try again.', 'error')
+  } finally {
+    copyingWeek.value = false
+  }
+}
+
+const saveWorkoutToLibrary = async (workout) => {
+  savingToLib.value = workout.id
+  try {
+    await libStore.saveWorkout({
+      name:        workout.name || workout.type,
+      sport:       plan.value?.sport || 'RUN',
+      primaryType: workout.type,
+      description: workout.description || '',
+      steps:       workout.steps || [],
+    })
+    showToast('Saved to library.', 'success')
+  } catch {
+    showToast('Failed to save to library.', 'error')
+  } finally {
+    savingToLib.value = null
+  }
 }
 
 const buildWeekData = (planData) => {
@@ -372,8 +491,44 @@ onMounted(async () => {
 }
 
 /* Week tabs */
-.week-tabs-wrap { border-bottom: 1px solid #E5E5E5; overflow-x: auto; }
-.week-tabs { display: flex; gap: 0; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.week-tabs-wrap { border-bottom: 1px solid #E5E5E5; }
+.week-tabs-scroll { display: flex; align-items: center; max-width: 1100px; margin: 0 auto; padding: 0 24px; overflow-x: auto; scrollbar-width: none; }
+.week-tabs-scroll::-webkit-scrollbar { display: none; }
+.week-tabs { display: flex; gap: 0; }
+.week-tab-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; padding-left: 16px; flex-shrink: 0; }
+.week-action-btn {
+  padding: 6px 12px;
+  background: #fff; border: 1px solid #E5E5E5; color: #767676;
+  font-family: inherit; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+  display: flex; align-items: center; gap: 5px; text-decoration: none;
+  transition: all 0.15s;
+}
+.week-action-btn:hover { border-color: #000; color: #000; }
+.copy-week-bar {
+  background: #F5F5F5;
+  border-top: 1px solid #E5E5E5;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.copy-week-label { font-size: 0.75rem; font-weight: 700; color: #767676; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+.copy-week-targets { display: flex; gap: 6px; flex-wrap: wrap; }
+.copy-target-btn {
+  padding: 6px 14px;
+  background: #fff; border: 1px solid #E5E5E5; color: #000;
+  font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+  transition: all 0.15s;
+}
+.copy-target-btn:hover { border-color: #0052FF; color: #0052FF; }
+.copy-target-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.copy-close-btn {
+  margin-left: auto; background: none; border: none; color: #767676;
+  cursor: pointer; font-size: 1rem; padding: 0 4px;
+}
+.copy-close-btn:hover { color: #000; }
 .week-tab {
   padding: 12px 20px;
   background: none; border: none; border-bottom: 2px solid transparent;
@@ -432,6 +587,28 @@ onMounted(async () => {
   min-height: 60px; border-radius: 0;
 }
 .desc-textarea:focus { border-color: #000; }
+
+/* Step builder in workout card */
+.workout-steps-section { border-top: 1px solid #F0F0F0; padding-top: 12px; }
+.steps-toggle-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; font-family: inherit;
+  font-size: 0.72rem; font-weight: 700; color: #767676;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  cursor: pointer; padding: 0; transition: color 0.15s;
+}
+.steps-toggle-btn:hover { color: #000; }
+.steps-wrap { margin-top: 12px; }
+.steps-lib-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+.btn-save-lib {
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 14px; background: #fff; color: #767676;
+  border: 1px solid #E5E5E5; font-family: inherit;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+}
+.btn-save-lib:hover { border-color: #000; color: #000; }
+.btn-save-lib:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Add workout */
 .btn-add-workout {

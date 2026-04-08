@@ -90,9 +90,78 @@ export const useCoachStore = defineStore('coach', () => {
     }
   }
 
+  async function moveCalendarEvent(athleteId, eventId, newDate) {
+    const { data } = await axios.patch(
+      `${API_URL}/coach/athletes/${athleteId}/calendar/${eventId}`,
+      { scheduledDate: newDate },
+      { headers: getAuthHeaders() }
+    )
+    return data
+  }
+
+  async function deleteCalendarEvent(athleteId, eventId) {
+    await axios.delete(
+      `${API_URL}/coach/athletes/${athleteId}/calendar/${eventId}`,
+      { headers: getAuthHeaders() }
+    )
+  }
+
+  async function fetchAthleteZones(athleteId) {
+    try {
+      const { data } = await axios.get(`${API_URL}/coach/athletes/${athleteId}/zones`, { headers: getAuthHeaders() })
+      return data
+    } catch {
+      return null
+    }
+  }
+
+  async function saveAthleteZones(athleteId, zones) {
+    const { data } = await axios.put(
+      `${API_URL}/coach/athletes/${athleteId}/zones`,
+      zones,
+      { headers: getAuthHeaders() }
+    )
+    return data
+  }
+
+  async function fetchAthleteRaces(athleteId) {
+    try {
+      const { data } = await axios.get(`${API_URL}/coach/athletes/${athleteId}/races`, { headers: getAuthHeaders() })
+      return Array.isArray(data) ? data : []
+    } catch {
+      return []
+    }
+  }
+
+  async function addAthleteRace(athleteId, race) {
+    const { data } = await axios.post(
+      `${API_URL}/coach/athletes/${athleteId}/races`,
+      race,
+      { headers: getAuthHeaders() }
+    )
+    return data
+  }
+
+  async function deleteAthleteRace(athleteId, raceId) {
+    await axios.delete(`${API_URL}/coach/athletes/${athleteId}/races/${raceId}`, { headers: getAuthHeaders() })
+  }
+
+  async function addActivityAnnotation(activityId, note) {
+    const { data } = await axios.post(
+      `${API_URL}/coach/activities/${activityId}/annotation`,
+      { note },
+      { headers: getAuthHeaders() }
+    )
+    return data
+  }
+
   return {
     athletes, pendingRequests, loading, error,
     fetchAthletes, fetchRequests, approveRequest, rejectRequest, removeAthlete,
-    fetchAthleteCalendar, addWorkoutToAthleteCalendar, fetchAthleteCompliance
+    fetchAthleteCalendar, addWorkoutToAthleteCalendar, fetchAthleteCompliance,
+    moveCalendarEvent, deleteCalendarEvent,
+    fetchAthleteZones, saveAthleteZones,
+    fetchAthleteRaces, addAthleteRace, deleteAthleteRace,
+    addActivityAnnotation,
   }
 })
