@@ -54,13 +54,14 @@
               <span v-if="day.weather" class="cal-weather-icon" :title="day.weather.label">{{ day.weather.icon }}</span>
             </div>
 
-            <!-- Planned events -->
+            <!-- Planned events (self + coach-assigned) -->
             <div
               v-for="ev in day.events"
               :key="ev.id"
-              class="cal-chip"
-              :style="{ background: typeColor(ev.workoutType) }"
+              :class="['cal-chip', ev.source === 'COACH' ? 'cal-chip-coach' : '']"
+              :style="ev.source !== 'COACH' ? { background: typeColor(ev.workoutType) } : {}"
             >
+              <span v-if="ev.source === 'COACH'" class="cal-chip-coach-tag">Coach</span>
               <span class="cal-chip-type">{{ ev.workoutType?.replace('_', ' ') || 'WORKOUT' }}</span>
               <span class="cal-chip-dist" v-if="ev.distanceMeters">
                 {{ formatDistShort(ev.distanceMeters) }}
@@ -417,6 +418,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useActivityStore } from '@/stores/activity'
 import { useGroupEventStore } from '@/stores/groupEvent'
+import { useAthleteStore } from '@/stores/athlete'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useAiWorkout } from '@/composables/useAiWorkout'
@@ -432,6 +434,7 @@ const activityStore = useActivityStore()
 const { activities } = storeToRefs(activityStore)
 const groupEventStore = useGroupEventStore()
 const { events: groupEvents } = storeToRefs(groupEventStore)
+const athleteStore = useAthleteStore()
 const showGroupEventModal = ref(false)
 const { isImperial, distanceLabel } = useUnits()
 const { generateWorkout, generateWeek, typeColor, TYPE_COLORS } = useAiWorkout()
@@ -445,6 +448,7 @@ const currentYear  = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth()) // 0-indexed
 
 const events       = ref([])
+const coachEvents  = ref([]) // workouts pushed by coach to athlete's calendar
 const raceBookmarks = ref([])
 const selectedDate = ref(null)
 const aiSuggestion = ref(null)
@@ -503,13 +507,18 @@ function _makeDay(date, isCurrentMonth) {
   const fullDate = date.toISOString().slice(0, 10)
   const today    = new Date()
   today.setHours(23, 59, 59, 999)
+  // Merge self-created events + coach-assigned events (coach events have source: 'COACH')
+  const allEvents = [
+    ...events.value.filter(e => e.plannedDate === fullDate),
+    ...coachEvents.value.filter(e => (e.scheduledDate || e.plannedDate) === fullDate).map(e => ({ ...e, source: 'COACH', plannedDate: fullDate }))
+  ]
   return {
     date: date.getDate(),
     fullDate,
     isCurrentMonth,
     isToday: fullDate === todayStr,
     isPast:  date < new Date(todayStr),
-    events:      events.value.filter(e => e.plannedDate === fullDate),
+    events:      allEvents,
     activities:  (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
     races:       raceBookmarks.value.filter(r => r.raceDate === fullDate),
     groupEvents: groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === fullDate),
@@ -661,12 +670,12 @@ async function fetchEvents() {
   const m = currentMonth.value
   const start = new Date(y, m, 1).toISOString().slice(0, 10)
   const end   = new Date(y, m + 1, 0).toISOString().slice(0, 10)
-  try {
-    const { data } = await axios.get(`${API}/workout-events`, { params: { start, end } })
-    events.value = Array.isArray(data) ? data : []
-  } catch {
-    events.value = []
-  }
+  const [selfData, coachData] = await Promise.all([
+    axios.get(`${API}/workout-events`, { params: { start, end } }).then(r => r.data).catch(() => []),
+    athleteStore.fetchCoachCalendar(start, end),
+  ])
+  events.value      = Array.isArray(selfData)  ? selfData  : []
+  coachEvents.value = Array.isArray(coachData) ? coachData : []
 }
 
 async function saveEvent() {
@@ -1113,6 +1122,21 @@ watch([currentYear, currentMonth], fetchEvents)
   background: #ef4444 !important;
 }
 .cal-chip-race .cal-chip-type { color: #fff; }
+.cal-chip-coach {
+  background: rgba(0,82,255,0.10) !important;
+  border: 1px solid rgba(0,82,255,0.25) !important;
+}
+.cal-chip-coach .cal-chip-type { color: #0052FF; }
+.cal-chip-coach-tag {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #0052FF;
+  display: block;
+  line-height: 1;
+  margin-bottom: 1px;
+}
 .cal-plus {
   position: absolute;
   bottom: 4px;

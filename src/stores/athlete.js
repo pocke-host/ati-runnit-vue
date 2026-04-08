@@ -47,8 +47,22 @@ export const useAthleteStore = defineStore('athlete', () => {
     }
   }
 
+  // Fetch workouts pushed to athlete's calendar by their coach
+  async function fetchCoachCalendar(start, end) {
+    try {
+      const { data } = await axios.get(`${API_URL}/athlete/coach/calendar`, {
+        params: { start, end },
+        headers: getAuthHeaders()
+      })
+      return Array.isArray(data) ? data : []
+    } catch {
+      return []
+    }
+  }
+
   return {
     coaches, myCoach, requestSentToId, loading,
-    fetchCoaches, sendRequest, cancelRequest, fetchMyCoach
+    fetchCoaches, sendRequest, cancelRequest, fetchMyCoach,
+    fetchCoachCalendar,
   }
 })

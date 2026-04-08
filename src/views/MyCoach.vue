@@ -342,4 +342,16 @@ onMounted(async () => {
 }
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  .page-hero { padding: 28px 16px 24px; }
+  .hero-title { font-size: 2rem; }
+  .content-wrap { padding: 20px 16px 80px; }
+  .coach-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .coach-avatar { width: 52px; height: 52px; font-size: 1.3rem; }
+  .msg-list { max-height: 50vh; }
+  .msg-compose { flex-direction: column; gap: 8px; }
+  .msg-send { width: 100%; padding: 12px; }
+  .msg-input { width: 100%; }
+}
 </style>

@@ -379,9 +379,14 @@
       <template v-else-if="tab === 'plans'">
         <div class="plans-toolbar">
           <div class="plans-toolbar-title">{{ plans.length }} plan{{ plans.length !== 1 ? 's' : '' }}</div>
-          <button class="btn-primary-sm" @click="showCreatePlan = true">
-            <i class="bi bi-plus me-1"></i> New Plan
-          </button>
+          <div class="plans-toolbar-actions">
+            <button class="btn-ghost-sm" @click="openAssignFromLibrary">
+              <i class="bi bi-collection me-1"></i> From Library
+            </button>
+            <button class="btn-primary-sm" @click="showCreatePlan = true">
+              <i class="bi bi-plus me-1"></i> New Plan
+            </button>
+          </div>
         </div>
 
         <div v-if="loadingPlans" class="loading-state">
@@ -424,6 +429,64 @@
               >
                 <span v-if="activatingPlanId === plan.id" class="spinner-border spinner-border-sm"></span>
                 <span v-else>Set Active</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assign from Library Modal -->
+        <div v-if="showAssignPlan" class="modal-overlay" @click.self="showAssignPlan = false">
+          <div class="modal-card modal-card--wide">
+            <div class="modal-header">
+              <h3>Assign Plan from Library</h3>
+              <button class="modal-close" @click="showAssignPlan = false"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="modal-body">
+              <div v-if="loadingCoachPlans" class="modal-loading">
+                <div class="spinner-border spinner-border-sm me-2"></div> Loading plans…
+              </div>
+              <div v-else-if="coachPlans.length === 0" class="modal-empty">
+                <i class="bi bi-collection"></i>
+                <p>No plans in your library yet.</p>
+                <router-link to="/coach/library" class="btn-primary-sm">Go to Library →</router-link>
+              </div>
+              <template v-else>
+                <div class="form-field">
+                  <label class="field-label">Select Plan</label>
+                  <div class="library-plan-list">
+                    <button
+                      v-for="plan in coachPlans"
+                      :key="plan.id"
+                      :class="['library-plan-row', { 'library-plan-row--selected': assignForm.planId === plan.id }]"
+                      @click="assignForm.planId = plan.id"
+                    >
+                      <div class="lp-sel">
+                        <i :class="assignForm.planId === plan.id ? 'bi bi-check-circle-fill' : 'bi bi-circle'"></i>
+                      </div>
+                      <div class="lp-info">
+                        <div class="lp-name">{{ plan.name }}</div>
+                        <div class="lp-meta">{{ plan.sport }} · {{ plan.durationWeeks || plan.totalWeeks }} weeks</div>
+                      </div>
+                      <div v-if="plan.isTemplate" class="lp-badge">Template</div>
+                    </button>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label class="field-label">Start Date</label>
+                  <input type="date" v-model="assignForm.startDate" class="field-input" :min="todayStr" />
+                </div>
+                <div v-if="assignPlanError" class="form-error">{{ assignPlanError }}</div>
+              </template>
+            </div>
+            <div class="modal-footer" v-if="!loadingCoachPlans && coachPlans.length > 0">
+              <button class="btn-ghost-sm" @click="showAssignPlan = false">Cancel</button>
+              <button
+                class="btn-primary-sm"
+                @click="assignPlanToAthlete"
+                :disabled="assigningPlan || !assignForm.planId || !assignForm.startDate"
+              >
+                <span v-if="assigningPlan" class="spinner-border spinner-border-sm me-1"></span>
+                Assign Plan →
               </button>
             </div>
           </div>
@@ -755,6 +818,14 @@ const creatingPlan     = ref(false)
 const createPlanError  = ref('')
 const activatingPlanId = ref(null)
 const createPlanForm   = ref({ name: '', sport: 'RUN', durationWeeks: 8, daysPerWeek: 4 })
+
+// Assign from Library
+const showAssignPlan    = ref(false)
+const coachPlans        = ref([])
+const loadingCoachPlans = ref(false)
+const assigningPlan     = ref(false)
+const assignPlanError   = ref('')
+const assignForm        = ref({ planId: null, startDate: todayStr })
 
 // Compliance
 const complianceData   = ref([])
@@ -1118,6 +1189,49 @@ const activatePlan = async (planId) => {
     showToast('Failed to activate plan.', 'error')
   } finally {
     activatingPlanId.value = null
+  }
+}
+
+const openAssignFromLibrary = async () => {
+  showAssignPlan.value = true
+  assignPlanError.value = ''
+  assignForm.value = { planId: null, startDate: todayStr }
+  if (coachPlans.value.length) return
+  loadingCoachPlans.value = true
+  try {
+    // Fetch coach's own plans (templates) using planStore
+    const data = await planStore.fetchPlans()
+    coachPlans.value = Array.isArray(data) ? data : (planStore.plans || [])
+  } catch {
+    coachPlans.value = []
+  } finally {
+    loadingCoachPlans.value = false
+  }
+}
+
+const assignPlanToAthlete = async () => {
+  if (!assignForm.value.planId || !assignForm.value.startDate) return
+  assigningPlan.value = true
+  assignPlanError.value = ''
+  try {
+    // Fetch the full template plan data
+    const template = await planStore.fetchPlan(assignForm.value.planId)
+    // Clone it for the athlete with the chosen start date
+    const newPlan = await planStore.createPlanForAthlete(athleteId.value, {
+      name: template.name,
+      sport: template.sport,
+      durationWeeks: template.durationWeeks || template.totalWeeks,
+      daysPerWeek: template.daysPerWeek,
+      startDate: assignForm.value.startDate,
+      weeks: template.weeks || [],
+    })
+    showAssignPlan.value = false
+    plans.value.unshift(newPlan)
+    showToast(`"${newPlan.name}" assigned to ${athlete.value?.displayName}.`, 'success')
+  } catch {
+    assignPlanError.value = 'Failed to assign plan. Please try again.'
+  } finally {
+    assigningPlan.value = false
   }
 }
 
@@ -1521,8 +1635,33 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .drawer-footer { padding: 16px 24px; border-top: 1px solid #E5E5E5; display: flex; justify-content: flex-end; gap: 10px; }
 
 /* ── PLANS ───────────────────────────────────────────────── */
-.plans-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.plans-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 12px; }
 .plans-toolbar-title { font-size: 1rem; font-weight: 700; }
+.plans-toolbar-actions { display: flex; gap: 8px; align-items: center; }
+
+/* Library plan picker */
+.modal-card--wide { max-width: 560px; }
+.library-plan-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
+.library-plan-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  border: 1px solid #E5E5E5; background: #fff; cursor: pointer;
+  font-family: inherit; text-align: left; width: 100%; transition: border-color 0.15s;
+}
+.library-plan-row:hover { border-color: #000; }
+.library-plan-row--selected { border-color: #0052FF; background: rgba(0,82,255,0.02); }
+.lp-sel { font-size: 1rem; color: #ccc; flex-shrink: 0; }
+.library-plan-row--selected .lp-sel { color: #0052FF; }
+.lp-info { flex: 1; min-width: 0; }
+.lp-name { font-size: 0.9rem; font-weight: 700; color: #000; }
+.lp-meta { font-size: 0.72rem; color: #767676; margin-top: 2px; }
+.lp-badge {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  background: #f0f0f0; color: #767676; padding: 2px 7px; flex-shrink: 0;
+}
+.modal-loading { display: flex; align-items: center; padding: 24px 0; font-size: 0.85rem; color: #767676; }
+.modal-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 32px 0; color: #767676; text-align: center; }
+.modal-empty i { font-size: 2rem; }
+.modal-empty p { margin: 0; font-size: 0.85rem; }
 
 .plans-list { display: flex; flex-direction: column; gap: 10px; }
 .plan-row {
@@ -1777,9 +1916,32 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
   .cal-week-days { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
 }
 @media (max-width: 600px) {
-  .stats-row { gap: 20px; }
-  .compliance-summary { gap: 20px; }
+  .hero-bar { padding: 24px 16px 20px; }
+  .hero-name { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+  .stats-row { gap: 16px; flex-wrap: wrap; }
+  .stat-item { flex: 0 0 calc(50% - 8px); }
+  .compliance-summary { gap: 16px; flex-wrap: wrap; }
+  .tab-bar {
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-bar .tab { flex-shrink: 0; font-size: 0.68rem; padding: 10px 10px; }
+  .tab-content { padding: 16px; }
   .cal-week-days { grid-template-columns: 1fr; }
-  .tab-bar { gap: 0; }
+  .cal-week-day { min-height: 52px; }
+  .pmc-stat-row { gap: 16px; flex-wrap: wrap; }
+  .pmc-stat { flex: 0 0 calc(33% - 12px); }
+  .zones-form { gap: 12px; }
+  .zone-row { flex-direction: column; gap: 8px; }
+  .zone-inputs { flex-wrap: wrap; gap: 6px; }
+  .overview-grid { gap: 16px; }
+  .activity-list { gap: 8px; }
+  .activity-card { padding: 10px 12px; }
+  .race-list { gap: 8px; }
+  .race-card { flex-wrap: wrap; gap: 6px; }
 }
 </style>
