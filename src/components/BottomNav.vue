@@ -42,9 +42,9 @@
         </div>
         <span class="tab-label">Track</span>
       </router-link>
-      <router-link to="/explore" class="tab-item" active-class="tab-active">
-        <i class="bi bi-compass-fill tab-icon"></i>
-        <span class="tab-label">Explore</span>
+      <router-link to="/plans" class="tab-item" active-class="tab-active">
+        <i class="bi bi-calendar-week-fill tab-icon"></i>
+        <span class="tab-label">Train</span>
       </router-link>
       <router-link :to="userId ? `/profile/${userId}` : '/dashboard'" class="tab-item" active-class="tab-active">
         <i class="bi bi-person-fill tab-icon"></i>

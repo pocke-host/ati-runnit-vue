@@ -84,6 +84,13 @@
 
       <!-- Week selector tabs -->
       <div class="week-tabs-wrapper">
+        <button
+          v-if="currentWeek && selectedWeek !== currentWeek"
+          class="week-jump-today"
+          @click="selectedWeek = currentWeek; scrollToActiveTab()"
+        >
+          <i class="bi bi-arrow-right-circle me-1"></i>Current Week
+        </button>
         <div class="week-tabs" ref="weekTabsEl">
           <button
             v-for="w in plan.weeks"
@@ -736,8 +743,19 @@ onMounted(async () => {
   border-bottom: 1px solid rgba(15,18,16,0.08);
   position: sticky; top: var(--nav-h); z-index: 50;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
+  display: flex; align-items: stretch;
 }
-.week-tabs { display: flex; padding: 0 24px; gap: 4px; min-width: max-content; }
+.week-jump-today {
+  flex-shrink: 0;
+  padding: 0 14px;
+  border: none; border-right: 1px solid #E5E5E5;
+  background: #0052FF; color: #fff;
+  font-size: 0.70rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; font-family: inherit;
+  white-space: nowrap; transition: background 0.15s;
+}
+.week-jump-today:hover { background: #003ECC; }
+.week-tabs { display: flex; padding: 0 24px; gap: 4px; min-width: max-content; flex: 1; }
 .week-tab {
   position: relative; display: flex; flex-direction: column; align-items: center;
   padding: 14px 16px; border: none; background: transparent;

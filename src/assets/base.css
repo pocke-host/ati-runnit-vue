@@ -25,7 +25,7 @@
   --rk-rule:    #E5E5E5;   /* borders */
   --rk-smoke:   #F5F5F5;   /* alternate surface */
 
-  /* ── Legacy aliases (backward compat) ── */
+  /* ── Legacy aliases — DO NOT USE in new code ── */
   --r-black:       var(--rk-void);
   --r-gray-mid:    var(--rk-ash);
   --r-stone:       var(--rk-ash);
@@ -35,7 +35,8 @@
   --r-shadow-sm:   none;
   --r-shadow:      none;
   --r-shadow-lg:   none;
-  --r-olive:       #000000;
+  /* Olive/orange fully retired — mapped to system colors for backward compat only */
+  --r-olive:       var(--rk-void);
   --r-olive-deep:  var(--rk-void);
   --r-accent:      var(--rk-signal);
   --r-warm-gray:   var(--rk-ash);

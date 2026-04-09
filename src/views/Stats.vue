@@ -146,6 +146,14 @@
       <section id="stats-pmc" class="section" v-if="pmcTimeSeries.length">
         <div class="section-header">
           <span class="section-kicker">Performance Management Chart</span>
+          <div class="pmc-range-chips">
+            <button
+              v-for="r in ['4W','3M','6M','1Y','All']"
+              :key="r"
+              :class="['pmc-range-chip', { active: pmcRange === r }]"
+              @click="pmcRange = r"
+            >{{ r }}</button>
+          </div>
         </div>
         <div class="pmc-card">
           <div class="pmc-stat-row">
@@ -516,7 +524,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useActivityStore } from '@/stores/activity'
 import { usePRStore } from '@/stores/pr'
 import { storeToRefs } from 'pinia'
@@ -558,6 +566,8 @@ let pieChartInstance = null
 let pmcChartInstance = null
 
 const chartPeriod = ref('monthly') // 'monthly' | 'weekly'
+const pmcRange = ref('3M') // '4W' | '3M' | '6M' | '1Y' | 'All'
+const PMC_RANGE_DAYS = { '4W': 28, '3M': 90, '6M': 180, '1Y': 365, 'All': 9999 }
 
 function setPeriod(p) {
   chartPeriod.value = p
@@ -694,7 +704,7 @@ const consistencyLabel = computed(() => {
   return 'Just getting started'
 })
 
-// PMC time series — 90 days of CTL, ATL, TSB
+// PMC time series — CTL, ATL, TSB across the selected range
 const pmcTimeSeries = computed(() => {
   const acts = activities.value || []
   if (!acts.length) return []
@@ -702,7 +712,7 @@ const pmcTimeSeries = computed(() => {
   const today = new Date()
   today.setHours(23, 59, 59, 999)
   const dayMs = 86400000
-  const DAYS = 90
+  const DAYS = PMC_RANGE_DAYS[pmcRange.value] || 90
 
   const IF_BY_TYPE = {
     RUN: 0.85, Running: 0.85,
@@ -1052,7 +1062,20 @@ function initPmcChart() {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { mode: 'index', intersect: false }
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            afterBody(items) {
+              const tsb = items.find(i => i.dataset.label?.startsWith('TSB'))?.parsed?.y ?? null
+              if (tsb === null) return []
+              if (tsb >= 10)  return ['→ You\'re fresh and ready to perform']
+              if (tsb >= 0)   return ['→ Well balanced — good for quality training']
+              if (tsb >= -20) return ['→ Accumulated fatigue — manageable']
+              return ['→ High fatigue — recovery recommended']
+            }
+          }
+        }
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } },
@@ -1061,6 +1084,8 @@ function initPmcChart() {
     }
   })
 }
+
+watch(pmcRange, () => nextTick(initPmcChart))
 
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
@@ -1204,6 +1229,10 @@ onUnmounted(() => {
 /* SECTION HEADER */
 .section-header {
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 .section-kicker {
   font-size: 0.68rem;
@@ -1246,7 +1275,7 @@ onUnmounted(() => {
 }
 .block-trend { margin-top: 4px; }
 .trend-up { font-size: 0.78rem; font-weight: 700; color: #16a34a; }
-.trend-down { font-size: 0.78rem; font-weight: 700; color: #C46A2A; }
+.trend-down { font-size: 0.78rem; font-weight: 700; color: #dc2626; }
 .block-card-right {
   display: flex;
   flex-direction: column;
@@ -2045,6 +2074,28 @@ onUnmounted(() => {
 }
 
 /* PMC Chart */
+.pmc-range-chips {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.pmc-range-chip {
+  padding: 4px 10px;
+  font-size: 0.70rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid #E5E5E5;
+  background: transparent;
+  color: #767676;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s;
+}
+.pmc-range-chip.active {
+  border-color: #0052FF;
+  color: #0052FF;
+}
 .pmc-card {
   border: 1px solid #E5E5E5;
   padding: 24px;

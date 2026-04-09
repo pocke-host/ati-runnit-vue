@@ -16,9 +16,13 @@
 
 ## Design Tokens
 ```css
---r-olive: #5A6B4E   (avatar bg only)
---r-accent: #C46A2A  (chart bars, accent text)
---r-offwhite: #F5F6F3
+/* Electric Blue brand system — do NOT use olive or orange */
+--rk-void:    #000000   /* black — hero backgrounds, text */
+--rk-signal:  #0052FF   /* electric blue — primary CTA, active states */
+--rk-signal-light: #EBF0FF  /* tinted surface */
+--rk-ash:     #767676   /* secondary text */
+--rk-rule:    #E5E5E5   /* borders */
+--rk-smoke:   #F5F5F5   /* alternate bg */
 --nav-h: 64px
 --tab-h: 64px
 ```

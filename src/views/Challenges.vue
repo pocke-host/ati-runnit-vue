@@ -236,7 +236,7 @@
 
         <!-- Loading -->
         <div v-if="lbLoading" class="lb-loading">
-          <div class="spinner-border text-olive" role="status">
+          <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
           <p class="mt-3 mb-0" style="color:#6B7280; font-size:14px;">Fetching leaderboard...</p>
@@ -670,7 +670,7 @@ onMounted(() => {
   gap: 16px;
 }
 
-.text-olive { color: #767676 !important; }
+.text-ash { color: var(--rk-ash) !important; }
 
 .loading-text {
   color: #6B7280;
