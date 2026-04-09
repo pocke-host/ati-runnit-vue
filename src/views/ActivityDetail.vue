@@ -117,7 +117,7 @@
               </div>
               <div class="stat-box">
                 <div class="stat-label">Avg HR</div>
-                <div class="stat-val">{{ activity.avgHeartRate ? activity.avgHeartRate + ' bpm' : '—' }}</div>
+                <div class="stat-val">{{ activity.averageHeartRate ? activity.averageHeartRate + ' bpm' : '—' }}</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label">Max HR</div>
