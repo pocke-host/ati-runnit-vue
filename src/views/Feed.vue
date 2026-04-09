@@ -74,7 +74,7 @@
                   </span>
                 </div>
               </div>
-              <div v-if="item.user?.id === user?.id" class="item-badge">
+              <div v-if="item.user.id === user?.id" class="item-badge">
                 <i class="bi bi-person-fill me-1"></i>You
               </div>
               <div class="type-badge moment-badge-type">
@@ -84,12 +84,12 @@
 
             <div class="card-info">
               <div class="card-user">
-                <router-link :to="`/profile/${item.user?.id}`" class="user-avatar-small avatar-link">{{ getUserInitial(item.user) }}</router-link>
+                <router-link :to="`/profile/${item.user.id}`" class="user-avatar-small avatar-link">{{ getUserInitial(item.user) }}</router-link>
                 <div class="user-details">
-                  <router-link :to="`/profile/${item.user?.id}`" class="user-name-link">
+                  <router-link :to="`/profile/${item.user.id}`" class="user-name-link">
                     <div class="user-name">
-                      {{ item.user?.displayName }}
-                      <span v-if="item.user?.id === user?.id" class="you-label">(You)</span>
+                      {{ item.user.displayName }}
+                      <span v-if="item.user.id === user?.id" class="you-label">(You)</span>
                     </div>
                   </router-link>
                   <div class="card-time">{{ formatTime(item.createdAt) }}</div>
@@ -114,10 +114,10 @@
               <!-- Top: user + time -->
               <div class="act-card-top">
                 <div class="act-card-user">
-                  <router-link :to="`/profile/${item.user?.id}`" class="act-avatar" @click.stop>{{ getUserInitial(item.user) }}</router-link>
+                  <router-link :to="`/profile/${item.user.id}`" class="act-avatar" @click.stop>{{ getUserInitial(item.user) }}</router-link>
                   <div>
-                    <router-link :to="`/profile/${item.user?.id}`" class="act-name" @click.stop>
-                      {{ item.user?.displayName }}<span v-if="item.user?.id === user?.id" class="act-you"> · YOU</span>
+                    <router-link :to="`/profile/${item.user.id}`" class="act-name" @click.stop>
+                      {{ item.user.displayName }}<span v-if="item.user.id === user?.id" class="act-you"> · YOU</span>
                     </router-link>
                     <div class="act-time">{{ formatTime(item.createdAt) }}</div>
                   </div>
@@ -449,12 +449,8 @@ const toggleActivityReaction = async (activityId, type) => {
 
 // Combine moments and activities into unified feed
 const feedItems = computed(() => {
-  const momentItems = moments.value
-    .filter(m => m && m.id)
-    .map(m => ({ ...m, type: 'moment' }))
-  const activityItems = activities.value
-    .filter(a => a && a.id)
-    .map(a => ({ ...a, type: 'activity' }))
+  const momentItems = moments.value.map(m => ({ ...m, type: 'moment' }))
+  const activityItems = activities.value.map(a => ({ ...a, type: 'activity' }))
   return [...momentItems, ...activityItems]
 })
 
@@ -476,7 +472,7 @@ const sortedFeedItems = computed(() => {
   } else if (activeTab.value === 'moments') {
     filtered = feedItems.value.filter(item => item.type === 'moment')
   } else if (activeTab.value === 'mine') {
-    filtered = feedItems.value.filter(item => item.user?.id === user.value?.id)
+    filtered = feedItems.value.filter(item => item.user.id === user.value?.id)
   } else if (activeTab.value === 'following') {
     filtered = feedItems.value.filter(item => followingIds.value.has(item.user?.id))
   }

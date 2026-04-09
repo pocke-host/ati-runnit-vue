@@ -156,33 +156,3 @@ a:hover { text-decoration: none; }
 @media (max-width: 768px) {
   body { padding-bottom: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px)); }
 }
-
-/* ── Mobile Typography Hierarchy ── */
-/* Addresses flat heading/body contrast on small screens.
-   Ensures clear visual rhythm: display > headline > subheading > body */
-@media (max-width: 480px) {
-  /* Body text — slightly larger for readability on small screens */
-  body { font-size: 15px; line-height: 1.65; }
-
-  /* Enforce minimum size contrast between heading levels */
-  h1 { font-size: 1.75rem !important; font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; }
-  h2 { font-size: 1.35rem !important; font-weight: 900; letter-spacing: -0.01em; line-height: 1.15; }
-  h3 { font-size: 1.1rem  !important; font-weight: 700; line-height: 1.25; }
-  h4 { font-size: 0.95rem !important; font-weight: 700; }
-  h5, h6 { font-size: 0.88rem !important; font-weight: 700; }
-
-  /* Utility scale overrides for rk- classes on mobile */
-  .rk-display  { font-size: clamp(2.2rem, 11vw, 3.5rem); }
-  .rk-headline { font-size: clamp(1.35rem, 5.5vw, 1.8rem); }
-  .rk-data     { font-size: clamp(1.6rem, 7vw, 2.4rem); }
-
-  /* Section titles used across all views */
-  .section-title { font-size: 1.25rem !important; }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  body { font-size: 15px; line-height: 1.65; }
-  h1 { font-size: 2rem !important; }
-  h2 { font-size: 1.5rem !important; }
-  h3 { font-size: 1.2rem !important; }
-}

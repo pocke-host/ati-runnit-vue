@@ -53,42 +53,6 @@
         </div>
       </section>
 
-      <!-- Coaching Rate -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">COACHING RATE</h2>
-        </div>
-        <div class="rate-card">
-          <div class="rate-current">
-            <span v-if="user?.monthlyRate" class="rate-value">${{ user.monthlyRate }}<span class="rate-unit">/mo</span></span>
-            <span v-else class="rate-unset">Not set — athletes can't hire you yet</span>
-          </div>
-          <div class="rate-form">
-            <div class="rate-input-wrap">
-              <span class="rate-prefix">$</span>
-              <input
-                v-model.number="rateInput"
-                type="number"
-                min="0"
-                class="rate-input"
-                placeholder="0"
-                :disabled="savingRate"
-              />
-              <span class="rate-suffix">/mo</span>
-            </div>
-            <button
-              class="btn-save-rate"
-              @click="saveRate"
-              :disabled="savingRate || rateInput === (user?.monthlyRate ?? null)"
-            >
-              <span v-if="savingRate" class="spinner-border spinner-border-sm"></span>
-              <span v-else>Save</span>
-            </button>
-          </div>
-          <div v-if="rateStatus" :class="['rate-status', rateStatusType]">{{ rateStatus }}</div>
-        </div>
-      </section>
-
       <!-- Athlete Roster -->
       <section class="section">
         <div class="section-header">
@@ -143,8 +107,6 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { useCoachStore } from '@/stores/coach'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-
 const authStore = useAuthStore()
 const coachStore = useCoachStore()
 const { user } = storeToRefs(authStore)
@@ -152,39 +114,6 @@ const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
 
 const actionLoading = ref(null)
 const actionError = ref('')
-
-// Coaching rate
-const rateInput = ref(user.value?.monthlyRate ?? null)
-const savingRate = ref(false)
-const rateStatus = ref('')
-const rateStatusType = ref('success')
-
-const saveRate = async () => {
-  savingRate.value = true
-  rateStatus.value = ''
-  try {
-    const token = localStorage.getItem('token')
-    const res = await fetch(`${API}/users/me`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ monthlyRate: rateInput.value }),
-    })
-    if (!res.ok) throw new Error('Failed to save rate')
-    const updated = await res.json()
-    // Sync back into auth store so reactivity picks it up
-    if (authStore.user) authStore.user.monthlyRate = updated.monthlyRate ?? rateInput.value
-    rateStatus.value = 'Rate saved!'
-    rateStatusType.value = 'success'
-  } catch {
-    rateStatus.value = 'Failed to save. Please try again.'
-    rateStatusType.value = 'error'
-  } finally {
-    savingRate.value = false
-  }
-}
 // keyed by athlete.id → compliance % (0–100), null if not yet loaded
 const athleteCompliance = ref({})
 
@@ -379,68 +308,6 @@ onMounted(async () => {
 .ath-progress-pct { font-size: 0.7rem; font-weight: 700; color: #767676; }
 .ath-link { font-size: 0.82rem; font-weight: 600; color: #000; text-decoration: none; flex-shrink: 0; }
 .ath-link:hover { text-decoration: underline; }
-
-/* Coaching Rate card */
-.rate-card {
-  border: 1px solid #E5E5E5;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.rate-current { display: flex; align-items: baseline; gap: 6px; }
-.rate-value { font-size: 1.6rem; font-weight: 800; color: #0052FF; line-height: 1; }
-.rate-unit { font-size: 0.85rem; font-weight: 600; color: #767676; }
-.rate-unset { font-size: 0.88rem; color: #767676; font-style: italic; }
-.rate-form { display: flex; align-items: center; gap: 10px; }
-.rate-input-wrap {
-  display: flex;
-  align-items: center;
-  border: 1px solid #E5E5E5;
-  overflow: hidden;
-}
-.rate-prefix, .rate-suffix {
-  padding: 0 10px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #767676;
-  background: #F5F5F5;
-  height: 38px;
-  display: flex;
-  align-items: center;
-}
-.rate-input {
-  border: none;
-  outline: none;
-  padding: 0 10px;
-  height: 38px;
-  width: 90px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  font-family: inherit;
-  background: #fff;
-  -moz-appearance: textfield;
-}
-.rate-input::-webkit-outer-spin-button,
-.rate-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.btn-save-rate {
-  padding: 0 20px;
-  height: 38px;
-  background: #0052FF;
-  color: #fff;
-  border: none;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.btn-save-rate:hover { background: #003ECC; }
-.btn-save-rate:disabled { opacity: 0.5; cursor: not-allowed; }
-.rate-status { font-size: 0.8rem; font-weight: 600; }
-.rate-status.success { color: #16a34a; }
-.rate-status.error { color: #dc2626; }
 
 /* Empty */
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 24px; color: #767676; text-align: center; }
