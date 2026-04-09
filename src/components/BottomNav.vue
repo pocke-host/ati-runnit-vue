@@ -42,10 +42,14 @@
         <i class="bi bi-calendar-week-fill tab-icon"></i>
         <span class="tab-label">Plans</span>
       </router-link>
-      <router-link :to="`/profile/${userId}`" class="tab-item" active-class="tab-active">
+      <router-link v-if="userId" :to="`/profile/${userId}`" class="tab-item" active-class="tab-active">
         <i class="bi bi-person-fill tab-icon"></i>
         <span class="tab-label">Profile</span>
       </router-link>
+      <button v-else class="tab-item" disabled style="opacity:0.4; background:none; border:none; cursor:default">
+        <i class="bi bi-person-fill tab-icon"></i>
+        <span class="tab-label">Profile</span>
+      </button>
     </template>
   </nav>
 </template>
