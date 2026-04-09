@@ -44,29 +44,34 @@
             <div class="coach-name">{{ coach.displayName }}</div>
             <div class="coach-meta">
               <span class="coach-ath-count">{{ coach.athleteCount || 0 }} athletes</span>
+              <span v-if="coach.monthlyRate" class="coach-rate">${{ coach.monthlyRate }}/mo</span>
             </div>
             <div class="sports-chips">
               <span v-for="sport in (coach.sportsCoached || [])" :key="sport" class="sport-chip">{{ sport }}</span>
             </div>
           </div>
           <div class="coach-action">
-            <template v-if="myCoach">
-              <!-- Already has a coach, hide request buttons -->
+            <span v-if="myCoach && myCoach.id === coach.id" class="badge-your-coach">Your Coach</span>
+            <template v-else-if="myCoach">
+              <!-- Has a different coach — show Hire button only -->
+              <button class="btn-hire" @click="hireCoach(coach.id)">Hire Coach</button>
             </template>
             <button
               v-else-if="requestSentToId === coach.id"
               class="btn-requested"
               disabled
             >Request Sent</button>
-            <button
-              v-else
-              class="btn-request"
-              @click="sendRequest(coach.id)"
-              :disabled="actionLoading === coach.id"
-            >
-              <span v-if="actionLoading === coach.id" class="spinner-border spinner-border-sm"></span>
-              <span v-else>Request to Join</span>
-            </button>
+            <template v-else>
+              <button
+                class="btn-request"
+                @click="sendRequest(coach.id)"
+                :disabled="actionLoading === coach.id"
+              >
+                <span v-if="actionLoading === coach.id" class="spinner-border spinner-border-sm"></span>
+                <span v-else>Request to Join</span>
+              </button>
+              <button class="btn-hire" @click="hireCoach(coach.id)">Hire Coach</button>
+            </template>
           </div>
         </div>
       </div>
@@ -76,9 +81,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAthleteStore } from '@/stores/athlete'
 import { useDMStore } from '@/stores/dm'
+
+const router = useRouter()
 
 const athleteStore = useAthleteStore()
 const dmStore = useDMStore()
@@ -86,6 +94,10 @@ const { coaches, myCoach, requestSentToId, loading } = storeToRefs(athleteStore)
 
 const actionLoading = ref(null)
 const requestError = ref('')
+
+const hireCoach = (coachId) => {
+  router.push(`/my-coach?hire=${coachId}`)
+}
 
 const sendRequest = async (coachId) => {
   actionLoading.value = coachId
@@ -145,10 +157,11 @@ onMounted(() => {
 .coach-avatar { width: 52px; height: 52px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; flex-shrink: 0; }
 .coach-info { flex: 1; min-width: 0; }
 .coach-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
-.coach-meta { font-size: 0.78rem; color: #767676; margin-bottom: 10px; }
+.coach-meta { font-size: 0.78rem; color: #767676; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.coach-rate { font-weight: 700; color: #0052FF; font-size: 0.78rem; }
 .sports-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .sport-chip { padding: 3px 10px; border: 1px solid #E5E5E5; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #000; }
-.coach-action { display: flex; align-items: center; padding-top: 4px; }
+.coach-action { display: flex; align-items: center; gap: 8px; padding-top: 4px; flex-shrink: 0; }
 .btn-request {
   padding: 10px 20px; background: #0052FF; color: #fff; border: none;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
@@ -159,6 +172,16 @@ onMounted(() => {
 .btn-requested {
   padding: 10px 20px; background: #fff; color: #767676;
   border: 1px solid #E5E5E5; font-size: 0.78rem; font-weight: 600; cursor: not-allowed;
+}
+.btn-hire {
+  padding: 10px 20px; background: #fff; color: #0052FF;
+  border: 2px solid #0052FF; font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+}
+.btn-hire:hover { background: #EBF0FF; }
+.badge-your-coach {
+  padding: 6px 12px; background: #EBF0FF; color: #0052FF;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
 }
 
 .request-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; }
@@ -175,7 +198,7 @@ onMounted(() => {
   .hero { padding: 36px 16px 28px; }
   .content-wrap { padding: 24px 16px; }
   .coach-card { flex-direction: column; gap: 12px; }
-  .coach-action { padding-top: 0; }
-  .btn-request, .btn-requested { width: 100%; justify-content: center; }
+  .coach-action { padding-top: 0; flex-wrap: wrap; }
+  .btn-request, .btn-requested, .btn-hire { flex: 1; text-align: center; justify-content: center; }
 }
 </style>

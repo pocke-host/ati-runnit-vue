@@ -126,6 +126,20 @@
                     </span>
                   </div>
 
+                  <!-- Progress bar for entered challenges -->
+                  <div v-if="isEntered(c.id) && getMyProgress(c)" class="challenge-progress">
+                    <div class="cp-row">
+                      <span class="cp-label">Your progress</span>
+                      <span class="cp-val">{{ getMyProgress(c).current }} / {{ getMyProgress(c).goal }} {{ getMyProgress(c).unit }}</span>
+                    </div>
+                    <div class="cp-bar">
+                      <div class="cp-fill" :style="{ width: Math.min(getMyProgress(c).pct, 100) + '%' }"></div>
+                    </div>
+                    <div v-if="getMyProgress(c).pct >= 100" class="cp-complete">
+                      <i class="bi bi-trophy-fill me-1"></i>Goal achieved!
+                    </div>
+                  </div>
+
                   <!-- Action buttons row -->
                   <div class="card-actions">
                     <button
@@ -428,6 +442,18 @@ function rankEmoji(rank) {
   if (rank === 2) return '🥈'
   if (rank === 3) return '🥉'
   return rank
+}
+
+function getMyProgress(challenge) {
+  const entry = myChallenges.value.find(mc => mc.id === challenge.id || mc.challengeId === challenge.id)
+  if (!entry) return null
+  // Support both flat fields and nested progressData
+  const current = entry.currentProgress ?? entry.progressData?.current ?? 0
+  const goal = entry.goalValue ?? challenge.goalValue ?? entry.progressData?.goal ?? 0
+  if (!goal) return null
+  const unit = entry.unit ?? challenge.unit ?? 'km'
+  const pct = Math.round((current / goal) * 100)
+  return { current: Math.round(current * 10) / 10, goal, unit, pct }
 }
 
 // ── Derived lists ─────────────────────────────────────────────
@@ -1144,6 +1170,15 @@ onMounted(() => {
 .lb-slide-leave-active { transition: transform 0.3s cubic-bezier(0.32,0,0.15,1); }
 .lb-slide-enter-from,
 .lb-slide-leave-to   { transform: translateX(100%); }
+
+/* Challenge progress */
+.challenge-progress { margin: 12px 0 0; }
+.cp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cp-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; color: #767676; }
+.cp-val { font-size: 0.78rem; font-weight: 700; color: #000; }
+.cp-bar { height: 4px; background: #E5E5E5; border-radius: 0; overflow: hidden; }
+.cp-fill { height: 100%; background: #0052FF; transition: width 0.5s; }
+.cp-complete { margin-top: 6px; font-size: 0.78rem; font-weight: 700; color: #0052FF; display: flex; align-items: center; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {

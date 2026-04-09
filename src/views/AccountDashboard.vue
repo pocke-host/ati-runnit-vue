@@ -308,6 +308,22 @@
                 <div class="coach-name">{{ myCoach.displayName }}</div>
               </div>
             </div>
+            <!-- Profile Completion Nudge -->
+            <div v-if="profileCompletion.pct < 100" class="profile-nudge">
+              <div class="nudge-header">
+                <span class="nudge-label">PROFILE</span>
+                <span class="nudge-pct">{{ profileCompletion.pct }}%</span>
+              </div>
+              <div class="nudge-bar">
+                <div class="nudge-fill" :style="{ width: profileCompletion.pct + '%' }"></div>
+              </div>
+              <ul class="nudge-list">
+                <li v-for="item in profileCompletion.missing.slice(0, 2)" :key="item.key" class="nudge-item">
+                  <i class="bi bi-circle me-2"></i>{{ item.label }}
+                </li>
+              </ul>
+              <router-link to="/profile/edit" class="nudge-cta">Complete Profile →</router-link>
+            </div>
             <!-- Subscription CTA -->
             <div v-if="subscriptionTier === 'free'" class="upgrade-banner">
               <div class="upgrade-label">UPGRADE TO PREMIUM</div>
@@ -805,6 +821,25 @@ const uploadStore = useUploadStore()
 const followStore = useFollowStore()
 
 const { user, subscriptionTier } = storeToRefs(authStore)
+
+const profileCompletion = computed(() => {
+  const u = user.value
+  if (!u) return { pct: 0, missing: [] }
+  const checks = [
+    { key: 'avatar', label: 'Add a profile photo', done: !!u.avatarUrl },
+    { key: 'bio', label: 'Write a bio', done: !!u.bio?.trim() },
+    { key: 'location', label: 'Add your location', done: !!u.location?.trim() },
+    { key: 'sport', label: 'Set your primary sport', done: !!u.primarySport },
+  ]
+  const done = checks.filter(c => c.done).length
+  return {
+    pct: Math.round((done / checks.length) * 100),
+    missing: checks.filter(c => !c.done),
+    total: checks.length,
+    done,
+  }
+})
+
 const { activities, loading } = storeToRefs(activityStore)
 const { uploading: momentLoading, progress: uploadProgress } = storeToRefs(uploadStore)
 
@@ -2165,4 +2200,16 @@ textarea.form-control{resize:vertical;min-height:72px}
   padding-bottom: 1px;
 }
 .tw-view-btn:hover { border-bottom-color: #fff; color: #fff; }
+
+/* Profile completion nudge */
+.profile-nudge { padding: 16px; border: 1px solid #E5E5E5; margin-bottom: 16px; }
+.nudge-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.nudge-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; color: #767676; }
+.nudge-pct { font-size: 0.78rem; font-weight: 900; color: #0052FF; }
+.nudge-bar { height: 3px; background: #E5E5E5; margin-bottom: 12px; }
+.nudge-fill { height: 100%; background: #0052FF; transition: width 0.4s; }
+.nudge-list { list-style: none; padding: 0; margin: 0 0 12px; }
+.nudge-item { font-size: 0.78rem; color: #767676; padding: 2px 0; display: flex; align-items: center; }
+.nudge-cta { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: #0052FF; text-decoration: none; }
+.nudge-cta:hover { text-decoration: underline; }
 </style>

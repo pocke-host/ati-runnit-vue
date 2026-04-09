@@ -331,6 +331,17 @@
             <textarea v-model.trim="newClub.description" class="create-input create-textarea" placeholder="What's your club about?" maxlength="300" rows="3"></textarea>
           </div>
 
+          <div class="create-field">
+            <label class="create-label">City / Location <span style="font-weight:400;color:#767676">(optional)</span></label>
+            <input
+              v-model.trim="newClub.location"
+              class="create-input"
+              placeholder="e.g. San Francisco, CA"
+              maxlength="100"
+            />
+            <div class="create-hint">Used to show your club on the map.</div>
+          </div>
+
           <div class="create-actions">
             <button type="button" class="btn-cancel" @click="createModalOpen = false">Cancel</button>
             <button type="submit" class="btn-create" :disabled="creating || !newClub.name">
@@ -469,7 +480,7 @@ const copiedId = ref(null)
 const createModalOpen = ref(false)
 const creating = ref(false)
 const createError = ref('')
-const newClub = ref({ name: '', sport: '', description: '' })
+const newClub = ref({ name: '', sport: '', description: '', location: '' })
 
 // Map tab
 const clubMapContainer = ref(null)
@@ -520,7 +531,8 @@ async function submitCreateClub() {
       body: JSON.stringify({
         name: newClub.value.name,
         sport: newClub.value.sport || 'General',
-        description: newClub.value.description
+        description: newClub.value.description,
+        ...(newClub.value.location ? { location: newClub.value.location } : {}),
       })
     })
     if (!res.ok) throw new Error('Failed to create club')
@@ -528,7 +540,7 @@ async function submitCreateClub() {
     // Add to all clubs + my clubs and open My Clubs tab
     allClubs.value.unshift(created)
     myClubs.value.unshift(created)
-    newClub.value = { name: '', sport: '', description: '' }
+    newClub.value = { name: '', sport: '', description: '', location: '' }
     createModalOpen.value = false
     activeTab.value = 'my'
   } catch (e) {
@@ -1688,4 +1700,5 @@ onMounted(() => {
 @media (max-width: 768px) {
   .clubs-map { height: 360px; }
 }
+.create-hint { font-size: 0.75rem; color: #767676; margin-top: 4px; }
 </style>
