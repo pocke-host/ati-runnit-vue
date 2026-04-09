@@ -22,7 +22,7 @@
       </router-link>
     </template>
 
-    <!-- Athlete tabs — 4 items max -->
+    <!-- Athlete tabs — 5 items, Track centered -->
     <template v-else>
       <router-link to="/dashboard" class="tab-item" active-class="tab-active">
         <i class="bi bi-grid-3x3-gap-fill tab-icon"></i>
@@ -30,7 +30,7 @@
       </router-link>
       <router-link to="/feed" class="tab-item" active-class="tab-active">
         <i class="bi bi-collection-fill tab-icon"></i>
-        <span class="tab-label">Social</span>
+        <span class="tab-label">Feed</span>
       </router-link>
       <router-link to="/track" class="tab-item tab-track">
         <div class="track-circle">
@@ -40,7 +40,11 @@
       </router-link>
       <router-link to="/plans" class="tab-item" active-class="tab-active">
         <i class="bi bi-calendar-week-fill tab-icon"></i>
-        <span class="tab-label">Train</span>
+        <span class="tab-label">Plans</span>
+      </router-link>
+      <router-link :to="`/profile/${userId}`" class="tab-item" active-class="tab-active">
+        <i class="bi bi-person-fill tab-icon"></i>
+        <span class="tab-label">Profile</span>
       </router-link>
     </template>
   </nav>
@@ -84,9 +88,9 @@ const userId = computed(() => user.value?.id)
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
-  padding: 8px 4px;
+  padding: 6px 2px;
   min-height: var(--tab-h, 64px);
   text-decoration: none;
   color: #A3A69F;
@@ -102,9 +106,9 @@ const userId = computed(() => user.value?.id)
 }
 
 .tab-label {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
 }
