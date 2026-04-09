@@ -545,7 +545,8 @@ const { classifyActivity } = useWorkoutClassifier()
 const activityStore = useActivityStore()
 const prStore = usePRStore()
 const { activities, loading } = storeToRefs(activityStore)
-const hasActivities = computed(() => loading.value || activities.value.length > 0)
+const initializing = ref(true)
+const hasActivities = computed(() => initializing.value || loading.value || activities.value.length > 0)
 
 const {
   isImperial,
@@ -1088,7 +1089,9 @@ function initPmcChart() {
 watch(pmcRange, () => nextTick(initPmcChart))
 
 onMounted(async () => {
-  if (!activities.value.length) await activityStore.fetchActivities()
+  initializing.value = true
+  await activityStore.fetchActivities()
+  initializing.value = false
   await prStore.fetchPRs(activities.value)
   await nextTick()
   initWeeklyChart()
