@@ -137,15 +137,18 @@
                 <span class="act-stat-chip" v-if="item.avgHeartRate"><i class="bi bi-heart me-1"></i>{{ item.avgHeartRate }} bpm</span>
                 <span class="act-stat-chip" v-if="item.elevationGain"><i class="bi bi-graph-up me-1"></i>{{ Math.round(item.elevationGain) }}m</span>
               </div>
-              <div class="act-reactions" @click.stop>
-                <button
-                  v-for="rxn in [{type:'LIKE',emoji:'👍'},{type:'FIRE',emoji:'🔥'},{type:'CLAP',emoji:'👏'}]"
-                  :key="rxn.type"
-                  :class="['act-rxn-btn', {active: getActivityReaction(item.id) === rxn.type}]"
-                  @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
-                >
-                  {{ rxn.emoji }} <span class="rxn-count">{{ getActivityReactionCount(item.id, rxn.type) }}</span>
-                </button>
+              <div class="act-card-footer">
+                <div class="act-reactions" @click.stop>
+                  <button
+                    v-for="rxn in [{type:'LIKE',emoji:'👍'},{type:'FIRE',emoji:'🔥'},{type:'CLAP',emoji:'👏'}]"
+                    :key="rxn.type"
+                    :class="['act-rxn-btn', {active: getActivityReaction(item.id) === rxn.type}]"
+                    @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
+                  >
+                    {{ rxn.emoji }} <span class="rxn-count">{{ getActivityReactionCount(item.id, rxn.type) }}</span>
+                  </button>
+                </div>
+                <span class="act-view-link">View Details <i class="bi bi-arrow-right"></i></span>
               </div>
             </router-link>
           </template>
@@ -949,8 +952,26 @@ onUnmounted(() => {
   padding: 20px;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
 }
 .act-card:hover { text-decoration: none; background: #fafafa; }
+.act-card:active { background: #f0f0f0; }
+.act-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+.act-view-link {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rk-signal);
+  white-space: nowrap;
+}
 .act-card-top {
   display: flex;
   align-items: center;
@@ -1735,8 +1756,6 @@ onUnmounted(() => {
 .act-reactions {
   display: flex;
   gap: 6px;
-  padding: 8px 12px 10px;
-  border-top: 1px solid #f0f0f0;
 }
 .act-rxn-btn {
   display: inline-flex;
