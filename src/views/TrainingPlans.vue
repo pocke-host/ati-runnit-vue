@@ -171,7 +171,7 @@
               <div class="step-label">Tell us about your current fitness</div>
 
               <div class="field-group">
-                <label class="field-label">Weekly {{ distanceUnit }} (current training)</label>
+                <label class="field-label">Weekly {{ distanceLabel }} (current training)</label>
                 <div class="field-input-row">
                   <input
                     type="number"
@@ -182,7 +182,7 @@
                     placeholder="e.g. 25"
                     style="max-width: 160px"
                   />
-                  <span class="field-unit">{{ distanceUnit }}/week</span>
+                  <span class="field-unit">{{ distanceLabel }}/week</span>
                 </div>
                 <div class="level-derived" v-if="weeklyMileageInput > 0">
                   <span class="level-chip" :class="derivedLevel">{{ derivedLevelLabel }}</span>
@@ -361,7 +361,7 @@ const router = useRouter()
 const planStore = usePlanStore()
 const authStore = useAuthStore()
 const { plans } = storeToRefs(planStore)
-const { formatDistance } = useUnits()
+const { formatDistance, distanceLabel, isImperial: isImperialUnits } = useUnits()
 const { unitSystem } = storeToRefs(authStore)
 const { showToast } = useToast()
 
@@ -476,8 +476,7 @@ watch(recentRaceTimeInput, (val) => {
 })
 
 // ── Units ───────────────────────────────────────────
-const distanceUnit = computed(() => unitSystem.value === 'imperial' ? 'mi' : 'km')
-const metersPerUnit = computed(() => unitSystem.value === 'imperial' ? 1609.344 : 1000)
+const metersPerUnit = computed(() => isImperialUnits.value ? 1609.344 : 1000)
 const currentWeeklyMeters = computed(() =>
   Math.round((weeklyMileageInput.value || 0) * metersPerUnit.value)
 )

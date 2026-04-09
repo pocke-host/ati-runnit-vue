@@ -245,10 +245,8 @@ import WorkoutStepBuilder from '@/components/WorkoutStepBuilder.vue'
 const libStore     = useWorkoutLibraryStore()
 const coachStore   = useCoachStore()
 const { showToast } = useToast()
-const { isImperial } = useUnits()
+const { isImperial, distanceLabel: distLabel } = useUnits()
 const { athletes } = storeToRefs(coachStore)
-
-const distLabel  = computed(() => isImperial.value ? 'mi' : 'km')
 const todayStr   = new Date().toISOString().slice(0, 10)
 const activeFilter  = ref('all')
 const expandedId    = ref(null)
