@@ -140,10 +140,14 @@ function formatDate(dateStr) {
 }
 
 onMounted(async () => {
-  if (!activities.value.length) {
-    await activityStore.fetchActivities()
+  try {
+    if (!activities.value.length) {
+      await activityStore.fetchActivities()
+    }
+    await achievementStore.fetchAchievements(activities.value)
+  } catch {
+    // achievements are computed client-side; silently degrade rather than crash the page
   }
-  await achievementStore.fetchAchievements(activities.value)
 })
 </script>
 

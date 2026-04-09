@@ -152,7 +152,7 @@
                   class="field-input"
                   @blur="saveWorkout(workout)"
                 />
-                <span class="unit-label">mi</span>
+                <span class="unit-label">{{ distLabel }}</span>
               </div>
             </div>
             <div class="field-group">
