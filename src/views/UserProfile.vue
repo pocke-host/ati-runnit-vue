@@ -560,7 +560,7 @@ const loadProfile = async () => {
   pageLoading.value = true
   notFound.value = false
   pageError.value = ''
-  if (!profileId.value) {
+  if (!profileId.value || profileId.value === 'undefined' || profileId.value === 'null') {
     notFound.value = true
     pageLoading.value = false
     return
