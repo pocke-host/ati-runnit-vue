@@ -1072,7 +1072,7 @@ watch([currentYear, currentMonth], fetchEvents)
 .cal-cell-other .cal-date-num { color: #ccc; }
 .cal-cell-today { border-color: #000; border-width: 2px; }
 .cal-cell-today .cal-date-num { background: #000; color: #fff; }
-.cal-cell-selected { border-color: #8b5cf6; border-width: 2px; background: #faf5ff; }
+.cal-cell-selected { border-color: #0052FF; border-width: 2px; background: #EBF0FF; }
 .cal-cell-past { opacity: 0.75; }
 
 .cal-date-num {
@@ -1226,7 +1226,7 @@ watch([currentYear, currentMonth], fetchEvents)
 .drawer-event-source {
   font-size: 0.62rem;
   font-weight: 700;
-  color: #8b5cf6;
+  color: #767676;
   margin-left: auto;
 }
 .drawer-event-actions { display: flex; gap: 4px; margin-left: auto; }
@@ -1330,8 +1330,8 @@ watch([currentYear, currentMonth], fetchEvents)
 
 /* AI CARD */
 .ai-card {
-  border: 2px solid #8b5cf6;
-  background: #faf5ff;
+  border: 2px solid #0052FF;
+  background: #EBF0FF;
   padding: 14px 14px 12px;
 }
 .ai-card-header {
@@ -1345,9 +1345,9 @@ watch([currentYear, currentMonth], fetchEvents)
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #7c3aed;
+  color: #0052FF;
 }
-.ai-close { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 0.9rem; }
+.ai-close { background: none; border: none; cursor: pointer; color: #767676; font-size: 0.9rem; }
 .ai-close:hover { color: #000; }
 .ai-type-chip {
   display: inline-block;
@@ -1364,8 +1364,8 @@ watch([currentYear, currentMonth], fetchEvents)
 .ai-desc { font-size: 0.78rem; color: rgba(15,18,16,0.70); line-height: 1.55; margin-bottom: 8px; }
 .ai-reasoning {
   font-size: 0.72rem;
-  color: #7c3aed;
-  background: #ede9fe;
+  color: #0052FF;
+  background: #EBF0FF;
   padding: 6px 10px;
   line-height: 1.45;
   margin-bottom: 10px;
@@ -1386,14 +1386,14 @@ watch([currentYear, currentMonth], fetchEvents)
 .ai-btn-accept:disabled { opacity: 0.5; cursor: not-allowed; }
 .ai-btn-regen {
   background: #fff;
-  border: 1px solid #8b5cf6;
-  color: #7c3aed;
+  border: 1px solid #0052FF;
+  color: #0052FF;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 9px 14px;
   cursor: pointer;
 }
-.ai-btn-regen:hover { background: #ede9fe; }
+.ai-btn-regen:hover { background: #EBF0FF; }
 
 /* CREATE FORM */
 .create-form { border: 1px solid #E5E5E5; padding: 16px; }
@@ -1517,7 +1517,7 @@ textarea.form-control { resize: vertical; min-height: 60px; }
   font-size: 1rem;
   color: #000;
 }
-.week-plan-selected .wpc-check { color: #22c55e; }
+.week-plan-selected .wpc-check { color: #0052FF; }
 
 /* RESPONSIVE */
 @media (max-width: 900px) {

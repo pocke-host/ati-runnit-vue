@@ -183,8 +183,8 @@ onUnmounted(() => {
   padding: 3px 10px;
   align-self: flex-start;
 }
-.badge-live { background: #22c55e; color: #fff; }
-.badge-ended { background: #9ca3af; color: #fff; }
+.badge-live { background: #0052FF; color: #fff; }
+.badge-ended { background: #767676; color: #fff; }
 
 .live-name { font-size: 18px; font-weight: 800; color: #000; letter-spacing: -0.01em; }
 
@@ -192,7 +192,7 @@ onUnmounted(() => {
 .live-stat { font-size: 13px; color: #444; display: flex; align-items: center; gap: 4px; }
 .live-stat-emoji { font-size: 15px; }
 
-.live-updated { font-size: 11px; color: #9ca3af; letter-spacing: 0.05em; }
+.live-updated { font-size: 11px; color: #767676; letter-spacing: 0.05em; }
 
 .live-not-found, .live-loading {
   position: absolute;

@@ -208,7 +208,7 @@
             </div>
 
             <div class="course-pr-banner" v-if="coursePR && String(coursePR.id) === String(activity?.id)">
-              <i class="bi bi-trophy-fill me-2" style="color:#f59e0b"></i>
+              <i class="bi bi-trophy-fill me-2" style="color:#0052FF"></i>
               <strong>Course PR!</strong>&nbsp;This is your fastest time on this route.
             </div>
 
@@ -461,7 +461,7 @@ const getSimilarTrendColor = (a) => {
   if (!cur?.distanceMeters || !cur?.durationSeconds || !a.distanceMeters || !a.durationSeconds) return '#767676'
   const curPace = cur.durationSeconds / (cur.distanceMeters / 1000)
   const aPace  = a.durationSeconds / (a.distanceMeters / 1000)
-  return aPace < curPace ? '#22c55e' : '#ef4444'
+  return aPace < curPace ? '#0052FF' : '#ef4444'
 }
 
 // ── Course History (route segment matching) ──────────────────────────────
@@ -515,7 +515,7 @@ function getCourseVsThisColor(a) {
   if (!activity.value?.durationSeconds || !a.durationSeconds) return '#767676'
   const diff = a.durationSeconds - activity.value.durationSeconds
   if (Math.abs(diff) < 10) return '#767676'
-  return diff < 0 ? '#22c55e' : '#ef4444'
+  return diff < 0 ? '#0052FF' : '#ef4444'
 }
 
 // Elevation profile chart
@@ -563,8 +563,8 @@ const autoClassification = computed(() => classifyActivity(activity.value))
 const displayClassification = computed(() => {
   if (activity.value?.workoutType) {
     const colorMap = {
-      EASY: '#22c55e', TEMPO: '#0052FF', INTERVAL: '#ef4444',
-      LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#9ca3af',
+      EASY: '#767676', TEMPO: '#0052FF', INTERVAL: '#000000',
+      LONG_RUN: '#0052FF', RECOVERY: '#767676', REST: '#E5E5E5',
     }
     return { label: activity.value.workoutType.replace('_', ' '), color: colorMap[activity.value.workoutType] || '#000' }
   }

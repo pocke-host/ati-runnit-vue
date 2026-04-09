@@ -1169,7 +1169,7 @@ onMounted(init)
 .ptier-pill-silver { background: rgba(168,169,173,0.18); color: #808285; }
 .ptier-pill-gold { background: rgba(255,215,0,0.16); color: #b8930a; }
 .ptier-pill-special { background: rgba(124,58,237,0.12); color: #7C3AED; }
-.pbadge-status-earned { font-size: 0.72rem; font-weight: 700; color: #16a34a; }
+.pbadge-status-earned { font-size: 0.72rem; font-weight: 700; color: #0052FF; }
 .pbadge-status-locked { font-size: 0.72rem; font-weight: 700; color: rgba(15,18,16,0.40); }
 
 @media (max-width: 900px) {

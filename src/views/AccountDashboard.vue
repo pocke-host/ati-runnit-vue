@@ -268,13 +268,13 @@
                 </div>
                 <div class="dash-insight-item">
                   <span class="dash-insight-key">Form</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#22c55e' : dashInsights.formScore > -5 ? '#0052FF' : '#ef4444' }">
+                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#0052FF' : dashInsights.formScore > -5 ? '#767676' : '#ef4444' }">
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
                 <div class="dash-insight-item" v-if="dashInsights.acwr !== null">
                   <span class="dash-insight-key">ACWR</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#22c55e' : dashInsights.acwr < 1.5 ? '#0052FF' : '#ef4444' }">
+                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#0052FF' : dashInsights.acwr < 1.5 ? '#767676' : '#ef4444' }">
                     {{ dashInsights.acwr }}
                   </span>
                 </div>
@@ -1181,11 +1181,11 @@ const sportBreakdown = computed(() => {
   const breakdown = {}
   const colors = {
     RUN:   '#0052FF',
-    BIKE:  '#3b82f6',
-    SWIM:  '#16a34a',
-    HIKE:  '#A0875A',
+    BIKE:  '#000000',
+    SWIM:  '#0052FF',
+    HIKE:  '#767676',
     WALK:  '#767676',
-    OTHER: '#E0D5C5',
+    OTHER: '#E5E5E5',
   }
 
   acts.forEach(a => {
@@ -2183,8 +2183,8 @@ textarea.form-control{resize:vertical;min-height:72px}
   flex-shrink: 0;
 }
 .tw-done-badge {
-  background: rgba(34,197,94,0.15);
-  color: #4ade80;
+  background: #EBF0FF;
+  color: #0052FF;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.10em;
