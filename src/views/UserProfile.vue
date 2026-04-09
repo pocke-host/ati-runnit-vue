@@ -172,6 +172,12 @@
             <SkeletonCard v-for="n in 5" :key="n" variant="activity-row" />
           </div>
 
+          <div v-else-if="activitiesError" class="tab-empty">
+            <i class="bi bi-wifi-off"></i>
+            <p>Couldn't load activities.</p>
+            <button class="btn btn-outline btn-sm mt-2" @click="loadActivities()">Retry</button>
+          </div>
+
           <div v-else-if="profileActivities.length === 0" class="tab-empty">
             <i class="bi bi-activity"></i>
             <p>No activities logged yet.</p>
@@ -454,6 +460,7 @@ const profile = ref({})
 const profileActivities = ref([])
 const moments = ref([])
 const activitiesLoading = ref(false)
+const activitiesError = ref(false)
 const momentsLoading = ref(false)
 const following = ref(false)
 const followLoading = ref(false)
@@ -584,6 +591,7 @@ const loadActivities = async (reset = true) => {
   if (reset) {
     activitiesPage.value = 0
     profileActivities.value = []
+    activitiesError.value = false
   }
   activitiesLoading.value = true
   try {
@@ -594,9 +602,9 @@ const loadActivities = async (reset = true) => {
     const items = data.content || data || []
     profileActivities.value = reset ? items : [...profileActivities.value, ...items]
     hasMoreActivities.value = data.totalPages ? activitiesPage.value < data.totalPages - 1 : items.length === 12
-  } catch (err) {
-    showToast(err.response?.data?.error || 'Failed to load activities.', 'error')
-    profileActivities.value = []
+    activitiesError.value = false
+  } catch {
+    activitiesError.value = true
   } finally {
     activitiesLoading.value = false
   }
