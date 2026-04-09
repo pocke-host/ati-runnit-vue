@@ -224,7 +224,7 @@ const pwdStrength = computed(() => {
   if (/[0-9]/.test(p)) score++
   if (/[^A-Za-z0-9]/.test(p)) score++
   if (score <= 1) return { score, label: 'Weak',      color: '#DC2626' }
-  if (score === 2) return { score, label: 'Fair',      color: '#C46A2A' }
+  if (score === 2) return { score, label: 'Fair',      color: '#f59e0b' }
   if (score === 3) return { score, label: 'Good',      color: '#0052FF' }
   return               { score, label: 'Strong',     color: '#16a34a' }
 })

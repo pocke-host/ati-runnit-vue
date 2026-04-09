@@ -141,13 +141,13 @@ export function useArchetype(activities) {
       key: 'explorer', label: 'THE EXPLORER',
       tagline: 'Every route is a new discovery.',
       traits: ['Sport Variety', 'Trail Runner', 'Route Diversity'],
-      color: '#C46A2A', icon: 'bi-compass-fill',
+      color: '#00B4D8', icon: 'bi-compass-fill',
     },
     hybrid: {
       key: 'hybrid', label: 'HYBRID ATHLETE',
       tagline: 'No single discipline can contain you.',
       traits: ['Multi-Sport', 'Versatile', 'Well-Rounded'],
-      color: '#5A6B4E', icon: 'bi-arrows-angle-expand',
+      color: '#6366f1', icon: 'bi-arrows-angle-expand',
     },
   }
 

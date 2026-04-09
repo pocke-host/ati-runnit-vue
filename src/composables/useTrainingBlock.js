@@ -13,7 +13,7 @@
 const PHASES = {
   PEAK:  { label: 'PEAK',  color: '#16a34a', description: 'Highest training load — race day is close' },
   BUILD: { label: 'BUILD', color: '#0052FF', description: 'Volume rising — fitness is accumulating' },
-  TAPER: { label: 'TAPER', color: '#C46A2A', description: 'Load dropping — recover and sharpen' },
+  TAPER: { label: 'TAPER', color: '#7c3aed', description: 'Load dropping — recover and sharpen' },
   BASE:  { label: 'BASE',  color: '#767676', description: 'Building your aerobic foundation' },
 }
 

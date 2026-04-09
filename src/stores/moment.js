@@ -69,22 +69,28 @@ export const useMomentStore = defineStore('moment', () => {
   
   async function addReaction(momentId, type) {
     await axios.post(`${API_URL}/moments/${momentId}/reaction`, { type })
-    // Update local state
-    const moment = feed.value.find(m => m.id === momentId)
-    if (moment) {
-      moment.currentUserReaction = type
-      moment.reactionCount++
-    }
+    // Update feed cache
+    const feedMoment = feed.value.find(m => m.id === momentId)
+    if (feedMoment) { feedMoment.currentUserReaction = type; feedMoment.reactionCount++ }
+    // Update userMoments cache
+    const userMoment = userMoments.value.find(m => m.id === momentId)
+    if (userMoment) { userMoment.currentUserReaction = type; userMoment.reactionCount++ }
+    // Persist both caches
+    if (feedMoment) saveCache(FEED_CACHE_KEY, feed.value)
+    if (userMoment) saveCache(USER_CACHE_KEY, userMoments.value)
   }
-  
+
   async function removeReaction(momentId) {
     await axios.delete(`${API_URL}/moments/${momentId}/reaction`)
-    // Update local state
-    const moment = feed.value.find(m => m.id === momentId)
-    if (moment) {
-      moment.currentUserReaction = null
-      moment.reactionCount--
-    }
+    // Update feed cache
+    const feedMoment = feed.value.find(m => m.id === momentId)
+    if (feedMoment) { feedMoment.currentUserReaction = null; feedMoment.reactionCount-- }
+    // Update userMoments cache
+    const userMoment = userMoments.value.find(m => m.id === momentId)
+    if (userMoment) { userMoment.currentUserReaction = null; userMoment.reactionCount-- }
+    // Persist both caches
+    if (feedMoment) saveCache(FEED_CACHE_KEY, feed.value)
+    if (userMoment) saveCache(USER_CACHE_KEY, userMoments.value)
   }
   
   return { 

@@ -155,20 +155,25 @@
       <EmptyState
         v-else-if="activeTab === 'following'"
         icon="bi-people"
-        title="Nothing here yet"
-        message="Follow some athletes to see their workouts."
+        title="No one followed yet"
+        message="Follow other athletes to see their workouts and moments here."
       />
 
-      <div v-else class="feed-empty">
-        <i class="bi bi-collection" style="font-size: 4rem; color: rgba(15,18,16,0.30);"></i>
-        <h3>Nothing here yet</h3>
-        <p v-if="activeTab === 'mine'">You haven't logged any activities or created moments yet.</p>
-        <p v-else-if="activeTab === 'following'">Follow some athletes to see their workouts.</p>
-        <p v-else>Be the first to log an activity or share a moment!</p>
-        <button class="btn btn-primary mt-3" @click="goToDashboard">
-          <i class="bi bi-plus-lg me-2"></i>Get Started
-        </button>
-      </div>
+      <EmptyState
+        v-else-if="activeTab === 'mine'"
+        icon="bi-collection"
+        title="Nothing logged yet"
+        message="Track a workout or share a moment to get started."
+        actionLabel="Log Activity"
+        actionTo="/track"
+      />
+
+      <EmptyState
+        v-else
+        icon="bi-globe2"
+        title="Nothing here yet"
+        message="Be the first to log an activity or share a moment!"
+      />
     </div>
 
     <!-- Create Event Modal -->
@@ -715,9 +720,6 @@ const followUser = async (userId) => {
   }
 }
 
-const goToDashboard = () => {
-  router.push('/dashboard')
-}
 
 const handleKeydown = (e) => {
   if (e.key === 'Escape' && selectedMoment.value) closeMoment()
@@ -869,18 +871,6 @@ onUnmounted(() => {
   color: rgba(15,18,16,0.60);
 }
 
-.feed-empty {
-  text-align: center;
-  padding: 80px 20px;
-  color: rgba(15,18,16,0.60);
-}
-
-.feed-empty h3 {
-  font-weight: 900;
-  font-size: 1.5rem;
-  margin: 16px 0 8px;
-  color: rgba(15,18,16,0.80);
-}
 
 .feed-grid {
   display: grid;

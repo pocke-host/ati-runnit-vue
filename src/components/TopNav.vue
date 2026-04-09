@@ -148,6 +148,13 @@
     </div>
   </nav>
 
+  <!-- Coach View banner — persistent indicator when in coach mode -->
+  <div v-if="isAuthenticated && role === 'coach'" class="coach-mode-bar">
+    <i class="bi bi-person-badge-fill me-2"></i>
+    COACH VIEW
+    <router-link to="/dashboard" class="coach-mode-switch">Switch to Athlete →</router-link>
+  </div>
+
   <!-- DM Drawer -->
   <DMDrawer />
 
@@ -970,4 +977,35 @@ onUnmounted(() => {
 
 .drawer-slide-enter-active, .drawer-slide-leave-active { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 .drawer-slide-enter-from, .drawer-slide-leave-to { transform: translateX(100%); }
+
+/* Coach mode banner */
+.coach-mode-bar {
+  position: fixed;
+  top: var(--nav-h, 64px);
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: #0052FF;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 16px;
+  gap: 0;
+}
+.coach-mode-switch {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  margin-left: auto;
+  border-bottom: 1px solid rgba(255,255,255,0.40);
+  padding-bottom: 1px;
+}
+.coach-mode-switch:hover { color: #fff; border-bottom-color: #fff; }
 </style>

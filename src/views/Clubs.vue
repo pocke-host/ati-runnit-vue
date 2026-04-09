@@ -210,7 +210,7 @@
           <button class="btn-join" @click="activeTab = 'discover'">Discover Clubs</button>
         </div>
         <div v-else>
-          <h5 class="fw-bold mb-4" style="color: var(--r-olive-deep)">Your Club Invite Links</h5>
+          <h5 class="fw-bold mb-4">Your Club Invite Links</h5>
           <div class="row g-3">
             <div class="col-12 col-md-6" v-for="club in myClubs" :key="'invite-' + club.id">
               <div class="invite-card">
@@ -1390,7 +1390,7 @@ onMounted(() => {
 .msg-name {
   font-size: 13px;
   font-weight: 700;
-  color: var(--r-olive-deep);
+  color: var(--rk-void);
   text-decoration: none;
 }
 
