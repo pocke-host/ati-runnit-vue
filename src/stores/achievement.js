@@ -117,8 +117,12 @@ export function computeEarnedBadges(activities) {
   return earned
 }
 
+const BADGE_CACHE_KEY = 'runnit_earned_badges_cache'
+const loadBadgeCache = () => { try { return JSON.parse(localStorage.getItem(BADGE_CACHE_KEY) || '[]') } catch { return [] } }
+const saveBadgeCache = (list) => { try { localStorage.setItem(BADGE_CACHE_KEY, JSON.stringify(list)) } catch {} }
+
 export const useAchievementStore = defineStore('achievement', () => {
-  const earnedBadges = ref([])   // [{ badgeId, earnedAt }]
+  const earnedBadges = ref(loadBadgeCache())   // [{ badgeId, earnedAt }]
   const loading = ref(false)
   // Keep a snapshot of activities for progress calculations
   const _activities = ref([])
@@ -155,13 +159,18 @@ export const useAchievementStore = defineStore('achievement', () => {
 
   async function fetchAchievements(activities = []) {
     _activities.value = activities
-    loading.value = true
+    if (!earnedBadges.value.length) loading.value = true
     try {
       const { data } = await axios.get(`${API_URL}/achievements`, { headers: getAuthHeaders() })
       earnedBadges.value = data
+      saveBadgeCache(data)
     } catch {
-      const ids = computeEarnedBadges(activities)
-      earnedBadges.value = [...ids].map(badgeId => ({ badgeId, earnedAt: null }))
+      // Fall back to client-side computation; only overwrite if cache is empty
+      if (!earnedBadges.value.length) {
+        const ids = computeEarnedBadges(activities)
+        earnedBadges.value = [...ids].map(badgeId => ({ badgeId, earnedAt: null }))
+        saveBadgeCache(earnedBadges.value)
+      }
     } finally {
       loading.value = false
     }

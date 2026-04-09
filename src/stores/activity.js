@@ -100,11 +100,25 @@ export const useActivityStore = defineStore('activity', () => {
 
   async function reactToActivity(id, type) {
     const { data } = await axios.post(`${API_URL}/activities/${id}/reactions`, { type })
+    // Patch local cache so reactions survive a refresh
+    const act = activities.value.find(a => String(a.id) === String(id))
+    if (act) {
+      act.currentUserReaction = type
+      if (!act.reactionCount) act.reactionCount = 0
+      act.reactionCount++
+      saveCache(activities.value)
+    }
     return data
   }
 
   async function removeReaction(id) {
     await axios.delete(`${API_URL}/activities/${id}/reactions`)
+    const act = activities.value.find(a => String(a.id) === String(id))
+    if (act) {
+      act.currentUserReaction = null
+      if (act.reactionCount > 0) act.reactionCount--
+      saveCache(activities.value)
+    }
   }
 
   async function fetchComments(id) {

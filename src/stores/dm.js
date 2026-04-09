@@ -8,10 +8,14 @@ const getHeaders = () => {
   return t ? { Authorization: `Bearer ${t}` } : {}
 }
 
+const CONV_CACHE_KEY = 'runnit_dm_conversations_cache'
+const loadConvCache = () => { try { return JSON.parse(localStorage.getItem(CONV_CACHE_KEY) || '[]') } catch { return [] } }
+const saveConvCache = (list) => { try { localStorage.setItem(CONV_CACHE_KEY, JSON.stringify(list)) } catch {} }
+
 export const useDMStore = defineStore('dm', () => {
   const isOpen = ref(false)
   const view = ref('list')           // 'list' | 'thread' | 'compose'
-  const conversations = ref([])
+  const conversations = ref(loadConvCache())
   const activeUserId = ref(null)
   const activeUserName = ref('')
   const messages = ref([])
@@ -25,14 +29,15 @@ export const useDMStore = defineStore('dm', () => {
   const close = () => { isOpen.value = false; view.value = 'list'; activeUserId.value = null }
 
   const fetchConversations = async () => {
-    loading.value = true
+    if (!conversations.value.length) loading.value = true
     error.value = null
     try {
       const { data } = await axios.get(`${API_URL}/dms/conversations`, { headers: getHeaders() })
       conversations.value = data
+      saveConvCache(data)
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to load conversations'
-      conversations.value = []
+      if (!conversations.value.length) conversations.value = []
     } finally {
       loading.value = false
     }
@@ -49,7 +54,7 @@ export const useDMStore = defineStore('dm', () => {
       messages.value = data
       await axios.patch(`${API_URL}/dms/${userId}/read`, {}, { headers: getHeaders() })
       const c = conversations.value.find(x => x.userId === userId)
-      if (c) c.unread = false
+      if (c) { c.unread = false; saveConvCache(conversations.value) }
     } finally {
       loading.value = false
     }
