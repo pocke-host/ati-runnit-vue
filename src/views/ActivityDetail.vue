@@ -700,6 +700,13 @@ const init = async () => {
     axios.get(`${API_URL}/multisport-events/by-activity/${activityId.value}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     }).then(r => { parentEvent.value = r.data }).catch(() => { /* not part of an event — expected */ })
+    // Normalize: raw Activity entity returns nested `user: {id, displayName, avatarUrl}`
+    // but the template uses flat `userId/userDisplayName`. Support both shapes.
+    if (actData.user && !actData.userId) {
+      actData.userId = actData.user.id
+      actData.userDisplayName = actData.user.displayName
+      actData.userAvatarUrl = actData.user.avatarUrl
+    }
     activity.value = actData
     comments.value = Array.isArray(commData) ? commData : []
     reactionCounts.value = actData.reactions || {}
