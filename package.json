@@ -42,7 +42,6 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
-    "@pinia/testing": "^1.0.3",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitest/ui": "^4.1.3",
     "@vue/test-utils": "^2.4.6",

@@ -31,6 +31,7 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(garminLastSync) }}
             </div>
+            <div v-if="syncCounts.garmin" class="sync-count">{{ syncCounts.garmin }} activities synced</div>
             <button class="btn btn-primary" @click="syncNow" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
               {{ syncing ? 'Syncing…' : 'Sync Now' }}
@@ -61,6 +62,7 @@
               CONNECTED
             </div>
             <div class="last-sync-label">Last synced: {{ relativeTime(stravaLastSync) }}</div>
+            <div v-if="syncCounts.strava" class="sync-count">{{ syncCounts.strava }} activities synced</div>
             <button class="btn btn-primary" @click="syncStrava" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
               {{ syncing ? 'Syncing…' : 'Sync Now' }}
@@ -94,12 +96,22 @@
         </template>
       </div>
 
-      <!-- Apple Watch -->
+      <!-- Apple Health -->
       <div class="device-card">
         <div class="device-icon">⌚</div>
-        <h3>Apple Watch</h3>
-        <p>Requires the RUNNIT iOS app. Apple Watch syncs automatically once you install and grant HealthKit access.</p>
-        <button class="btn btn-outline" @click="showToast('iOS app coming soon — join the waitlist at runnit.app', 'info')">Get iOS App →</button>
+        <h3>Apple Health</h3>
+        <p>On iPhone: install the RUNNIT app and grant HealthKit access for automatic sync. On web: import a GPX file.</p>
+        <div class="apple-actions">
+          <button class="btn btn-outline" @click="showToast('iOS app — install from the App Store once available', 'info')">
+            <i class="bi bi-apple me-2"></i>Get iOS App
+          </button>
+          <label class="btn btn-primary gpx-import-label" :class="{ disabled: gpxImporting }">
+            <span v-if="gpxImporting" class="spinner spinner-sm me-1"></span>
+            <i v-else class="bi bi-upload me-2"></i>
+            Import GPX
+            <input type="file" accept=".gpx,.fit,.tcx" class="gpx-file-input" @change="importGpx" :disabled="gpxImporting" />
+          </label>
+        </div>
       </div>
 
       <!-- COROS (Coming Soon) -->
@@ -110,12 +122,31 @@
         <div class="coming-soon-badge">COMING SOON</div>
       </div>
 
-      <!-- Wahoo (Coming Soon) -->
-      <div class="device-card device-coming-soon">
+      <!-- Wahoo -->
+      <div class="device-card">
         <div class="device-icon">🚲</div>
         <h3>Wahoo</h3>
-        <p>Sync rides and workouts from Wahoo</p>
-        <div class="coming-soon-badge">COMING SOON</div>
+        <p>Sync rides and workouts from Wahoo ELEMNT, KICKR, and SYSTM</p>
+        <template v-if="!wahooConnected">
+          <button class="btn btn-primary" @click="connectWahoo" :disabled="loading">
+            Connect Wahoo
+          </button>
+        </template>
+        <template v-else>
+          <div class="connected-state">
+            <div class="connected-chip">
+              <span class="green-dot"></span>
+              CONNECTED
+            </div>
+            <div class="last-sync-label">Last synced: {{ relativeTime(wahooLastSync) }}</div>
+            <div v-if="syncCounts.wahoo" class="sync-count">{{ syncCounts.wahoo }} activities synced</div>
+            <button class="btn btn-primary" @click="syncWahoo" :disabled="syncing">
+              <span v-if="syncing" class="spinner"></span>
+              {{ syncing ? 'Syncing…' : 'Sync Now' }}
+            </button>
+            <button class="btn-disconnect" @click="disconnectWahoo">Disconnect</button>
+          </div>
+        </template>
       </div>
 
       <!-- Fitbit (Coming Soon) -->
@@ -151,18 +182,22 @@ const garminLastSync = ref(null)
 const stravaConnected = ref(false)
 const stravaLastSync = ref(null)
 const zwiftConnected = ref(false)
+const wahooConnected = ref(false)
+const wahooLastSync = ref(null)
 const loading = ref(false)
 const syncing = ref(false)
+const gpxImporting = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
+const syncCounts = ref({ garmin: 0, strava: 0, wahoo: 0 })
 
 
 
 const { showToast } = useToast()
 const showDisconnectConfirm = ref(false)
-const pendingDisconnect = ref(null) // 'garmin' | 'strava' | 'zwift'
+const pendingDisconnect = ref(null) // 'garmin' | 'strava' | 'zwift' | 'wahoo'
 
-const disconnectLabels = { garmin: 'Garmin', strava: 'Strava', zwift: 'Zwift' }
+const disconnectLabels = { garmin: 'Garmin', strava: 'Strava', zwift: 'Zwift', wahoo: 'Wahoo' }
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -189,10 +224,12 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, stravaRes, zwiftRes] = await Promise.all([
+  const [garminRes, stravaRes, zwiftRes, wahooRes, countsRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
     safeFetch(`${API_URL}/integrations/strava/status`),
     safeFetch(`${API_URL}/integrations/zwift/status`),
+    safeFetch(`${API_URL}/integrations/wahoo/status`),
+    safeFetch(`${API_URL}/integrations/sync-counts`),
   ])
   if (garminRes) {
     garminConnected.value = garminRes.data.connected
@@ -205,6 +242,11 @@ const checkConnectionStatus = async () => {
   if (zwiftRes) {
     zwiftConnected.value = zwiftRes.data.connected
   }
+  if (wahooRes) {
+    wahooConnected.value = wahooRes.data.connected
+    wahooLastSync.value = wahooRes.data.lastSync || null
+  }
+  if (countsRes?.data) syncCounts.value = countsRes.data
 }
 
 const connectGarmin = async () => {
@@ -224,6 +266,7 @@ const connectGarmin = async () => {
 const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconnectConfirm.value = true }
 const disconnectStrava = () => { pendingDisconnect.value = 'strava'; showDisconnectConfirm.value = true }
 const disconnectZwift  = () => { pendingDisconnect.value = 'zwift';  showDisconnectConfirm.value = true }
+const disconnectWahoo  = () => { pendingDisconnect.value = 'wahoo';  showDisconnectConfirm.value = true }
 
 const doDisconnect = async () => {
   showDisconnectConfirm.value = false
@@ -233,6 +276,7 @@ const doDisconnect = async () => {
     if (service === 'garmin') { garminConnected.value = false; garminLastSync.value = null }
     if (service === 'strava') { stravaConnected.value = false; stravaLastSync.value = null }
     if (service === 'zwift')  { zwiftConnected.value  = false }
+    if (service === 'wahoo')  { wahooConnected.value  = false; wahooLastSync.value  = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
   } catch {
     showToast(`Failed to disconnect ${disconnectLabels[service]}. Try again.`, 'error')
@@ -289,6 +333,49 @@ const connectZwift = async () => {
   }
 }
 
+const connectWahoo = async () => {
+  loading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/wahoo/connect`, { headers: getAuthHeaders() })
+    window.location.href = data.authorizationUrl
+  } catch {
+    showStatus('Failed to connect Wahoo. Please try again.', 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+const syncWahoo = async () => {
+  syncing.value = true
+  try {
+    await axios.post(`${API_URL}/integrations/wahoo/sync`, {}, { headers: getAuthHeaders() })
+    showStatus('Wahoo sync triggered — activities will appear shortly.')
+    await checkConnectionStatus()
+  } catch {
+    showStatus('Sync failed. Please try again.', 'error')
+  } finally {
+    syncing.value = false
+  }
+}
+
+const importGpx = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  gpxImporting.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    await axios.post(`${API_URL}/activities/import/gpx`, form, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' }
+    })
+    showStatus(`${file.name} imported! Activity will appear shortly.`)
+  } catch {
+    showStatus('Import failed. Make sure the file is a valid GPX/FIT/TCX.', 'error')
+  } finally {
+    gpxImporting.value = false
+    e.target.value = ''
+  }
+}
 
 onMounted(() => {
   checkConnectionStatus()
@@ -303,11 +390,14 @@ onMounted(() => {
   } else if (params.get('zwift') === 'connected') {
     zwiftConnected.value = true
     showStatus('Zwift connected successfully!')
+  } else if (params.get('wahoo') === 'connected') {
+    wahooConnected.value = true
+    showStatus('Wahoo connected successfully!')
   } else if (params.get('error')) {
     showStatus('Connection failed. Please try again.', 'error')
   }
 
-  if (params.has('garmin') || params.has('strava') || params.has('zwift') || params.has('error')) {
+  if (params.has('garmin') || params.has('strava') || params.has('zwift') || params.has('wahoo') || params.has('error')) {
     history.replaceState({}, '', window.location.pathname)
   }
 })
@@ -542,4 +632,14 @@ onMounted(() => {
   text-transform: uppercase;
   color: rgba(15,18,16,0.40);
 }
+
+/* Sync count */
+.sync-count { font-size: 0.75rem; color: #767676; margin-bottom: 8px; }
+
+/* Apple Health GPX import */
+.apple-actions { display: flex; flex-direction: column; gap: 8px; }
+.gpx-import-label { cursor: pointer; position: relative; display: inline-flex; align-items: center; }
+.gpx-file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.gpx-import-label.disabled { opacity: 0.6; cursor: not-allowed; }
+.spinner-sm { width: 0.8rem; height: 0.8rem; border-width: 2px; }
 </style>

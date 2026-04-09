@@ -200,6 +200,61 @@
             </div>
           </div>
 
+          <!-- Course History -->
+          <div class="det-card course-history-section" v-if="isOwn && courseHistory.length > 1">
+            <div class="similar-header">
+              <h3 class="det-section-title">Course History</h3>
+              <span class="similar-sub">ROUTE SEGMENTS · fastest to slowest</span>
+            </div>
+
+            <div class="course-pr-banner" v-if="coursePR && String(coursePR.id) === String(activity?.id)">
+              <i class="bi bi-trophy-fill me-2" style="color:#f59e0b"></i>
+              <strong>Course PR!</strong>&nbsp;This is your fastest time on this route.
+            </div>
+
+            <div class="course-table-wrap">
+              <table class="course-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Pace</th>
+                    <th>vs This</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="a in courseHistory"
+                    :key="a.id"
+                    :class="{ 'course-row-this': String(a.id) === String(activity?.id) }"
+                  >
+                    <td class="course-rank">
+                      <span v-if="getCourseRank(a) === 1" class="rank-gold">🥇</span>
+                      <span v-else-if="getCourseRank(a) === 2" class="rank-silver">🥈</span>
+                      <span v-else-if="getCourseRank(a) === 3" class="rank-bronze">🥉</span>
+                      <span v-else class="rank-num">{{ getCourseRank(a) }}</span>
+                    </td>
+                    <td>{{ formatDateShort(a.createdAt) }}</td>
+                    <td class="course-time">{{ formatDuration(a.durationSeconds) }}</td>
+                    <td class="course-pace">{{ formatPace(a.durationSeconds / 60 / ((a.distanceMeters || 1) / 1000)) }}</td>
+                    <td>
+                      <span
+                        v-if="String(a.id) !== String(activity?.id)"
+                        class="course-vs"
+                        :style="{ color: getCourseVsThisColor(a) }"
+                      >
+                        {{ getCourseVsThisIcon(a) }}
+                        {{ Math.abs(a.durationSeconds - (activity?.durationSeconds || 0)) }}s
+                      </span>
+                      <span v-else class="course-this-badge">THIS</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- Reactions -->
           <div class="det-card">
             <h3 class="det-section-title">Reactions</h3>
@@ -407,6 +462,60 @@ const getSimilarTrendColor = (a) => {
   const curPace = cur.durationSeconds / (cur.distanceMeters / 1000)
   const aPace  = a.durationSeconds / (a.distanceMeters / 1000)
   return aPace < curPace ? '#22c55e' : '#ef4444'
+}
+
+// ── Course History (route segment matching) ──────────────────────────────
+// Finds activities that started within ~600m of this activity's start point
+// and are the same sport. Ranked fastest to slowest so we can show a PR banner.
+const COURSE_MATCH_METERS = 600 // activities starting within 600m are "same course"
+
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+const courseHistory = computed(() => {
+  const cur = activity.value
+  if (!cur?.startLat || !cur?.startLng || !cur?.durationSeconds) return []
+
+  const pool = (activityStore.activities || []).filter(a => {
+    if (!a.startLat || !a.startLng || !a.durationSeconds) return false
+    if (a.sportType !== cur.sportType) return false
+    const dist = haversineMeters(cur.startLat, cur.startLng, a.startLat, a.startLng)
+    return dist <= COURSE_MATCH_METERS
+  }).sort((a, b) => a.durationSeconds - b.durationSeconds) // fastest first
+
+  return pool.slice(0, 8)
+})
+
+// The fastest activity on this course — used for the PR banner
+const coursePR = computed(() => courseHistory.value[0] || null)
+
+// Returns 1-based rank of activity `a` in the course leaderboard (fastest = 1)
+function getCourseRank(a) {
+  const idx = courseHistory.value.findIndex(h => String(h.id) === String(a.id))
+  return idx >= 0 ? idx + 1 : null
+}
+
+// Returns an arrow icon: ↑ means that activity was faster than the current one (green), ↓ slower (red)
+function getCourseVsThisIcon(a) {
+  if (!activity.value?.durationSeconds || !a.durationSeconds) return ''
+  const diff = a.durationSeconds - activity.value.durationSeconds
+  if (Math.abs(diff) < 10) return ''
+  return diff < 0 ? '↑' : '↓' // faster = ↑ (green), slower = ↓ (red)
+}
+
+// Matching color for the vs-this indicator
+function getCourseVsThisColor(a) {
+  if (!activity.value?.durationSeconds || !a.durationSeconds) return '#767676'
+  const diff = a.durationSeconds - activity.value.durationSeconds
+  if (Math.abs(diff) < 10) return '#767676'
+  return diff < 0 ? '#22c55e' : '#ef4444'
 }
 
 // Elevation profile chart
@@ -1339,5 +1448,50 @@ onMounted(init)
   background: #0052FF;
   color: #fff;
   padding: 2px 5px;
+}
+
+/* ── Course History ── */
+.course-history-section { margin-top: 0; }
+.course-pr-banner {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+  color: #92400e;
+}
+.course-table-wrap { overflow-x: auto; }
+.course-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.course-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #767676;
+  padding: 8px 12px;
+  border-bottom: 2px solid #E5E5E5;
+}
+.course-table td { padding: 10px 12px; border-bottom: 1px solid #F5F5F5; }
+.course-table tbody tr:last-child td { border-bottom: none; }
+.course-row-this { background: #EBF0FF; }
+.course-rank { font-size: 1rem; }
+.rank-num { font-size: 0.82rem; font-weight: 700; color: #767676; }
+.course-time { font-weight: 700; font-variant-numeric: tabular-nums; }
+.course-pace { color: #767676; font-variant-numeric: tabular-nums; }
+.course-vs { font-weight: 700; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.course-this-badge {
+  background: #0052FF;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  padding: 2px 8px;
 }
 </style>
