@@ -164,6 +164,42 @@
             </div>
           </div>
 
+          <!-- Similar Efforts -->
+          <div class="det-card" v-if="isOwn && similarEfforts.length > 1">
+            <div class="similar-header">
+              <h3 class="det-section-title">Similar Efforts</h3>
+              <span class="similar-sub">{{ activity.sportType }} · ±30% distance</span>
+            </div>
+            <div class="similar-table">
+              <div class="similar-row similar-row-head">
+                <span class="sr-date">Date</span>
+                <span class="sr-dist">Distance</span>
+                <span class="sr-pace">Pace</span>
+                <span class="sr-dur">Time</span>
+                <span class="sr-trend"></span>
+              </div>
+              <router-link
+                v-for="e in similarEfforts"
+                :key="e.id"
+                :to="`/activities/${e.id}`"
+                :class="['similar-row', { 'similar-row-current': e.id === activity.id }]"
+              >
+                <span class="sr-date">{{ formatDateShort(e.createdAt) }}</span>
+                <span class="sr-dist">{{ formatDistance(e.distanceMeters) }}</span>
+                <span class="sr-pace">{{ getSimilarPace(e) }}</span>
+                <span class="sr-dur">{{ formatDuration(e.durationSeconds) }}</span>
+                <span class="sr-trend">
+                  <i
+                    v-if="e.id !== activity.id"
+                    :class="getSimilarTrendIcon(e)"
+                    :style="{ color: getSimilarTrendColor(e) }"
+                  ></i>
+                  <span v-else class="sr-this">THIS</span>
+                </span>
+              </router-link>
+            </div>
+          </div>
+
           <!-- Reactions -->
           <div class="det-card">
             <h3 class="det-section-title">Reactions</h3>
@@ -321,6 +357,57 @@ const showDeleteConfirm = ref(false)
 const activityId = computed(() => route.params.id)
 const parentEvent = ref(null)
 const activityPRs = ref([])
+
+// Similar Efforts — same sport type, distance within ±30%, sorted newest first
+const similarEfforts = computed(() => {
+  const cur = activity.value
+  if (!cur?.distanceMeters || !cur?.sportType) return []
+  const lo = cur.distanceMeters * 0.70
+  const hi = cur.distanceMeters * 1.30
+  const pool = (activityStore.activities || [])
+    .filter(a =>
+      a.sportType === cur.sportType &&
+      a.distanceMeters >= lo &&
+      a.distanceMeters <= hi &&
+      a.durationSeconds > 0
+    )
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 6)
+  // Make sure current activity is in the list
+  const hasCur = pool.some(a => String(a.id) === String(cur.id))
+  if (!hasCur) pool.push(cur)
+  return pool
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 6)
+})
+
+const getSimilarPace = (a) => {
+  if (!a.distanceMeters || !a.durationSeconds) return '—'
+  const minPerKm = (a.durationSeconds / 60) / (a.distanceMeters / 1000)
+  return formatPace(minPerKm)
+}
+
+const formatDateShort = (d) => {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+// Pace comparison vs this activity: faster = green, slower = red
+const getSimilarTrendIcon = (a) => {
+  const cur = activity.value
+  if (!cur?.distanceMeters || !cur?.durationSeconds || !a.distanceMeters || !a.durationSeconds) return ''
+  const curPace = cur.durationSeconds / (cur.distanceMeters / 1000)
+  const aPace  = a.durationSeconds / (a.distanceMeters / 1000)
+  return aPace < curPace ? 'bi bi-arrow-up-short' : 'bi bi-arrow-down-short'
+}
+
+const getSimilarTrendColor = (a) => {
+  const cur = activity.value
+  if (!cur?.distanceMeters || !cur?.durationSeconds || !a.distanceMeters || !a.durationSeconds) return '#767676'
+  const curPace = cur.durationSeconds / (cur.distanceMeters / 1000)
+  const aPace  = a.durationSeconds / (a.distanceMeters / 1000)
+  return aPace < curPace ? '#22c55e' : '#ef4444'
+}
 
 // Elevation profile chart
 const elevChart = ref(null)
@@ -1194,5 +1281,63 @@ onMounted(init)
   .user-row-wrap { padding: 0 16px; }
   .detail-layout { padding: 16px 12px 64px; }
   .reaction-btn { padding: 10px 14px; font-size: 0.78rem; }
+  .sr-date { font-size: 0.72rem; }
+}
+
+/* ── Similar Efforts ── */
+.similar-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.similar-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #767676;
+}
+.similar-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #E5E5E5;
+}
+.similar-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 32px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid #E5E5E5;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s;
+  gap: 8px;
+}
+.similar-row:last-child { border-bottom: none; }
+.similar-row:not(.similar-row-head):not(.similar-row-current):hover { background: #f9f9f9; }
+.similar-row-head {
+  background: #F5F5F5;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #767676;
+}
+.similar-row-current {
+  background: #EBF0FF;
+  font-weight: 700;
+}
+.sr-date { font-size: 0.80rem; color: #767676; }
+.sr-dist, .sr-pace, .sr-dur { font-size: 0.85rem; font-weight: 700; }
+.sr-trend { display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.sr-this {
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  background: #0052FF;
+  color: #fff;
+  padding: 2px 5px;
 }
 </style>
