@@ -134,7 +134,7 @@
               <!-- Secondary stats -->
               <div class="act-card-chips">
                 <span class="act-stat-chip" v-if="item.durationSeconds"><i class="bi bi-stopwatch me-1"></i>{{ formatDuration(item.durationSeconds) }}</span>
-                <span class="act-stat-chip" v-if="item.avgHeartRate"><i class="bi bi-heart me-1"></i>{{ item.avgHeartRate }} bpm</span>
+                <span class="act-stat-chip" v-if="item.averageHeartRate"><i class="bi bi-heart me-1"></i>{{ item.averageHeartRate }} bpm</span>
                 <span class="act-stat-chip" v-if="item.elevationGain"><i class="bi bi-graph-up me-1"></i>{{ Math.round(item.elevationGain) }}m</span>
               </div>
               <div class="act-card-footer">
