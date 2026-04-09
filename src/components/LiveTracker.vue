@@ -218,6 +218,9 @@ import axios from 'axios'
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
 
+// Emits elapsed seconds upward so parent (Track.vue) can feed WorkoutStepGuide
+const emit = defineEmits(['elapsed'])
+
 const isNative = Capacitor.isNativePlatform()
 
 const DRAFT_KEY   = 'runnit_tracking_draft'
@@ -642,6 +645,8 @@ const startTracking = async () => {
 
   timerInterval = setInterval(() => {
     elapsedTime.value = Math.floor((Date.now() - startEpoch) / 1000)
+    // Bubble elapsed time up to Track.vue so WorkoutStepGuide can sync
+    emit('elapsed', elapsedTime.value)
   }, 1000)
 
   // Autosave GPS draft every 30s — survives app crash or phone call

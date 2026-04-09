@@ -7,8 +7,15 @@
         </button>
         <h1>Live Tracking</h1>
       </div>
-  
-      <LiveTracker />
+
+      <!-- Workout step guide — only shown when launched from a plan workout -->
+      <WorkoutStepGuide
+        v-if="activeWorkout"
+        :workout="activeWorkout"
+        :elapsedSeconds="trackingSeconds"
+      />
+
+      <LiveTracker @elapsed="trackingSeconds = $event" />
 
       <ConfirmModal
         v-model="showStopConfirm"
@@ -20,15 +27,46 @@
       />
     </div>
   </template>
-  
+
   <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { ref, onMounted } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
   import LiveTracker from '@/components/LiveTracker.vue'
   import ConfirmModal from '@/components/ConfirmModal.vue'
+  import WorkoutStepGuide from '@/components/WorkoutStepGuide.vue'
+  import { usePlanStore } from '@/stores/plan'
 
   const router = useRouter()
+  const route = useRoute()
+  const planStore = usePlanStore()
+
   const showStopConfirm = ref(false)
+  // Elapsed seconds forwarded up from LiveTracker via the 'elapsed' emit
+  const trackingSeconds = ref(0)
+  // The workout object fetched from the plan store, null if not launched from a plan
+  const activeWorkout = ref(null)
+
+  // On mount, check for workoutId/planId query params and fetch the workout
+  onMounted(async () => {
+    const { workoutId, planId } = route.query
+    if (!workoutId || !planId) return
+
+    try {
+      const plan = await planStore.fetchPlan(planId)
+      if (!plan) return
+
+      // Walk the weeks → workouts tree to find the matching workout by id
+      for (const week of (plan.weeks || [])) {
+        const found = (week.workouts || []).find(w => String(w.id) === String(workoutId))
+        if (found) {
+          activeWorkout.value = found
+          break
+        }
+      }
+    } catch {
+      // If fetch fails we simply don't show the guide — tracking still works normally
+    }
+  })
 
   const handleBack = () => { showStopConfirm.value = true }
   const doGoBack = () => { showStopConfirm.value = false; router.push('/dashboard') }

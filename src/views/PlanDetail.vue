@@ -261,6 +261,13 @@
                 <button class="wba-btn" @click="toggleAdjust(workout.id)">
                   <i class="bi bi-sliders me-1"></i>{{ adjustOpen.has(workout.id) ? 'Close' : 'Adjust' }}
                 </button>
+                <button
+                  v-if="!workout.completed && workout.workoutType !== 'REST'"
+                  class="wba-btn wba-btn-start"
+                  @click="startWorkout(workout)"
+                >
+                  <i class="bi bi-play-fill me-1"></i>Start
+                </button>
               </div>
             </div>
           </div><!-- /.workout-card -->
@@ -635,6 +642,10 @@ const skipWorkout = async (workout) => {
   } finally {
     delete workoutLoading.value[workout.id]
   }
+}
+
+const startWorkout = (workout) => {
+  router.push(`/track?planId=${plan.value?.id}&workoutId=${workout.id}`)
 }
 
 const toggleAdjust = (workoutId) => {
@@ -1034,6 +1045,10 @@ onMounted(async () => {
   transition: all 0.15s;
 }
 .wba-btn:hover { border-color: #000; color: #000; }
+.wba-btn-start {
+  background: #0052FF; border-color: #0052FF; color: #fff;
+}
+.wba-btn-start:hover { background: #003ECC; border-color: #003ECC; color: #fff; }
 
 /* Post-completion panel */
 .completion-panel {
