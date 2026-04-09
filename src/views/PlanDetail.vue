@@ -439,11 +439,11 @@ const toggleSteps = (workoutId) => {
 }
 
 const STEP_COLORS = {
-  WARMUP:'#fb923c', EASY:'#22c55e', AEROBIC:'#4ade80', TEMPO:'#f59e0b',
-  THRESHOLD:'#ef4444', VO2MAX:'#8b5cf6', INTERVAL:'#3b82f6',
-  SPRINT:'#dc2626', RECOVERY:'#60a5fa', COOLDOWN:'#94a3b8'
+  WARMUP:'#767676', EASY:'#767676', AEROBIC:'#0052FF', TEMPO:'#0052FF',
+  THRESHOLD:'#000000', VO2MAX:'#000000', INTERVAL:'#000000',
+  SPRINT:'#000000', RECOVERY:'#767676', COOLDOWN:'#767676'
 }
-const stepColor = (t) => STEP_COLORS[t] || '#9ca3af'
+const stepColor = (t) => STEP_COLORS[t] || '#767676'
 const authStore = useAuthStore()
 const { unitSystem } = storeToRefs(authStore)
 
@@ -486,8 +486,8 @@ const formatDateShort = (str) => {
 
 function typeChipColor(wType) {
   return {
-    EASY: '#22c55e', TEMPO: '#0052FF', INTERVAL: '#ef4444',
-    LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#9ca3af',
+    EASY: '#767676', TEMPO: '#0052FF', INTERVAL: '#000000',
+    LONG_RUN: '#0052FF', RECOVERY: '#767676', REST: '#767676',
   }[wType] || '#767676'
 }
 
@@ -505,7 +505,7 @@ function formatPace(sPerKm) {
 // ── Phase ─────────────────────────────────────────
 
 const phaseColors = {
-  BASE: '#22c55e', BUILD: '#0052FF', PEAK: '#ef4444', TAPER: '#3b82f6',
+  BASE: '#767676', BUILD: '#0052FF', PEAK: '#000000', TAPER: '#767676',
 }
 
 const phaseDescriptions = {

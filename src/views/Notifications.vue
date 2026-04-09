@@ -343,14 +343,14 @@ onMounted(() => {
 }
 .notif-icon--new_follower  { background: #f0f0f0; color: #000; }
 .notif-icon--reaction      { background: #fff0f0; color: #ef4444; }
-.notif-icon--comment       { background: #eff4ff; color: #3b82f6; }
+.notif-icon--comment       { background: #EBF0FF; color: #0052FF; }
 .notif-icon--club_invite   { background: #f0f0f0; color: #000; }
-.notif-icon--challenge     { background: #ebf0ff; color: #0052FF; }
-.notif-icon--plan_assigned { background: #f0fff4; color: #16a34a; }
-.notif-icon--workout_reminder { background: #fffbeb; color: #d97706; }
-.notif-icon--personal_record  { background: #fff7ed; color: #ea580c; }
-.notif-icon--achievement       { background: #fefce8; color: #ca8a04; }
-.notif-icon--coach_note        { background: #f0f9ff; color: #0284c7; }
+.notif-icon--challenge     { background: #EBF0FF; color: #0052FF; }
+.notif-icon--plan_assigned { background: #EBF0FF; color: #0052FF; }
+.notif-icon--workout_reminder { background: #EBF0FF; color: #0052FF; }
+.notif-icon--personal_record  { background: #EBF0FF; color: #0052FF; }
+.notif-icon--achievement       { background: #EBF0FF; color: #0052FF; }
+.notif-icon--coach_note        { background: #EBF0FF; color: #0052FF; }
 .notif-icon--activity_upload   { background: #f0f0f0; color: #000; }
 
 .notif-content { flex: 1; min-width: 0; }

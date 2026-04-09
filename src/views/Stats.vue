@@ -1049,7 +1049,7 @@ function initPmcChart() {
         {
           label: 'TSB (Form)',
           data: pts.map(p => p.tsb),
-          borderColor: '#22c55e',
+          borderColor: '#000000',
           backgroundColor: 'transparent',
           tension: 0.3,
           borderWidth: 2,
@@ -1277,7 +1277,7 @@ onUnmounted(() => {
   line-height: 1.5;
 }
 .block-trend { margin-top: 4px; }
-.trend-up { font-size: 0.78rem; font-weight: 700; color: #16a34a; }
+.trend-up { font-size: 0.78rem; font-weight: 700; color: #0052FF; }
 .trend-down { font-size: 0.78rem; font-weight: 700; color: #dc2626; }
 .block-card-right {
   display: flex;
@@ -1585,7 +1585,7 @@ onUnmounted(() => {
 .heatmap-l0  { background: #F0F0F0; }
 .heatmap-l1  { background: #bbf7d0; }
 .heatmap-l2  { background: #4ade80; }
-.heatmap-l3  { background: #16a34a; }
+.heatmap-l3  { background: #0052FF; }
 .heatmap-l4  { background: #064e3b; }
 .heatmap-lx  { background: transparent; }
 .heatmap-legend {

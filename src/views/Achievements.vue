@@ -152,7 +152,7 @@ onMounted(async () => {
   --bronze: #CD7F32;
   --silver: #A8A9AD;
   --gold: #FFD700;
-  --special: #7C3AED;
+  --special: #0052FF;
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
   background: #fff;
@@ -333,11 +333,11 @@ onMounted(async () => {
 .tier-pill-bronze { background: rgba(205,127,50,0.15); color: var(--bronze); }
 .tier-pill-silver { background: rgba(168,169,173,0.18); color: #808285; }
 .tier-pill-gold { background: rgba(255,215,0,0.18); color: #b8930a; }
-.tier-pill-special { background: rgba(124,58,237,0.13); color: var(--special); }
+.tier-pill-special { background: #EBF0FF; color: var(--special); }
 
 /* Status labels */
 .badge-status { font-size: 0.78rem; font-weight: 700; }
-.earned-label { color: #16a34a; }
+.earned-label { color: #0052FF; }
 .locked-label { color: rgba(15,18,16,0.45); }
 .badge-date { font-size: 0.72rem; color: rgba(15,18,16,0.50); }
 

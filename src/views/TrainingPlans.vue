@@ -271,7 +271,7 @@
 
                 <!-- Phase breakdown -->
                 <div class="phase-breakdown">
-                  <div class="phase-strip" title="Base phase" style="background:#22c55e">
+                  <div class="phase-strip" title="Base phase" style="background:#767676">
                     <span class="phase-strip-label">Base</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.base }}w</span>
                   </div>
@@ -279,11 +279,11 @@
                     <span class="phase-strip-label">Build</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.build }}w</span>
                   </div>
-                  <div class="phase-strip" title="Peak phase" style="background:#ef4444">
+                  <div class="phase-strip" title="Peak phase" style="background:#000000">
                     <span class="phase-strip-label">Peak</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.peak }}w</span>
                   </div>
-                  <div v-if="preview.phaseBreakdown.taper > 0" class="phase-strip" title="Taper" style="background:#3b82f6">
+                  <div v-if="preview.phaseBreakdown.taper > 0" class="phase-strip" title="Taper" style="background:#767676">
                     <span class="phase-strip-label">Taper</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.taper }}w</span>
                   </div>
@@ -845,8 +845,8 @@ function planProgressPct(plan) {
 
 function typeChipColor(wType) {
   return {
-    EASY: '#22c55e', TEMPO: '#0052FF', INTERVAL: '#ef4444',
-    LONG_RUN: '#8b5cf6', RECOVERY: '#06b6d4', REST: '#e5e7eb',
+    EASY: '#767676', TEMPO: '#0052FF', INTERVAL: '#000000',
+    LONG_RUN: '#0052FF', RECOVERY: '#767676', REST: '#767676',
   }[wType] || '#767676'
 }
 
@@ -957,7 +957,7 @@ onBeforeRouteLeave((to, from, next) => {
 .wsb-step.active { color: #000; }
 .wsb-step.active .wsb-dot { border-color: #000; background: #000; color: white; }
 .wsb-step.done { color: rgba(15,18,16,0.55); }
-.wsb-step.done .wsb-dot { border-color: #22c55e; background: #22c55e; color: white; }
+.wsb-step.done .wsb-dot { border-color: #0052FF; background: #0052FF; color: white; }
 .wsb-label { display: none; }
 @media (min-width: 580px) { .wsb-label { display: inline; } }
 
@@ -1039,8 +1039,8 @@ onBeforeRouteLeave((to, from, next) => {
 .preview-name { font-weight: 900; font-size: 1.3rem; color: rgba(15,18,16,0.92); margin: 0; }
 .engine-badge {
   display: inline-flex; align-items: center;
-  background: #f0fdf4; border: 1px solid #86efac;
-  color: #166534; padding: 4px 12px; border-radius: 0;
+  background: #EBF0FF; border: 1px solid #0052FF;
+  color: #0052FF; padding: 4px 12px; border-radius: 0;
   font-size: 0.78rem; font-weight: 700;
 }
 .preview-meta-row { display: flex; gap: 20px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; flex-wrap: wrap; }

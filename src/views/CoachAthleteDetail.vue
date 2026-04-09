@@ -577,7 +577,7 @@
                 <div class="cw-bar-bg">
                   <div
                     class="cw-bar-fill"
-                    :style="{ width: week.pct + '%', background: week.pct >= 75 ? '#16a34a' : week.pct >= 50 ? '#f59e0b' : '#ef4444' }"
+                    :style="{ width: week.pct + '%', background: week.pct >= 75 ? '#0052FF' : week.pct >= 50 ? '#767676' : '#ef4444' }"
                   ></div>
                 </div>
                 <span class="cw-fraction">{{ week.completed }}/{{ week.planned }}</span>
@@ -621,9 +621,9 @@
             </div>
           </div>
           <div class="pmc-legend">
-            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#3b82f6"></span>Fitness (CTL)</span>
+            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#0052FF"></span>Fitness (CTL)</span>
             <span class="pmc-legend-item"><span class="pmc-dot" style="background:#ef4444"></span>Fatigue (ATL)</span>
-            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#22c55e"></span>Form (TSB)</span>
+            <span class="pmc-legend-item"><span class="pmc-dot" style="background:#000000"></span>Form (TSB)</span>
           </div>
         </div>
         <div class="pmc-chart-wrap">
@@ -783,8 +783,8 @@ const getAuthHeaders = () => {
 const WORKOUT_TYPES = ['EASY', 'TEMPO', 'INTERVAL', 'LONG_RUN', 'RECOVERY', 'REST']
 const SPORTS = ['RUN', 'RIDE', 'SWIM', 'HIKE', 'WALK']
 const TYPE_COLORS = {
-  EASY: '#22c55e', TEMPO: '#f59e0b', INTERVAL: '#ef4444',
-  LONG_RUN: '#0052FF', RECOVERY: '#8b5cf6', REST: '#9ca3af',
+  EASY: '#767676', TEMPO: '#0052FF', INTERVAL: '#000000',
+  LONG_RUN: '#0052FF', RECOVERY: '#767676', REST: '#767676',
 }
 const typeColor = (t) => TYPE_COLORS[t] || '#767676'
 const todayStr = new Date().toISOString().slice(0, 10)
@@ -855,7 +855,7 @@ let pmcChart = null
 const savingZones    = ref(false)
 const zonesSaveError = ref('')
 const zonesSaved     = ref(false)
-const ZONE_COLORS_MAP = { 1: '#60a5fa', 2: '#22c55e', 3: '#f59e0b', 4: '#ef4444', 5: '#8b5cf6' }
+const ZONE_COLORS_MAP = { 1: '#E5E5E5', 2: '#EBF0FF', 3: '#0052FF', 4: '#000000', 5: '#000000' }
 const zoneColor = (z) => ZONE_COLORS_MAP[z] || '#767676'
 const zonesForm = ref({
   maxHr: null,
@@ -1394,8 +1394,8 @@ const renderPmcChart = () => {
         {
           label: 'Fitness (CTL)',
           data: pts.map(p => p.ctl),
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59,130,246,0.08)',
+          borderColor: '#0052FF',
+          backgroundColor: 'rgba(0,82,255,0.08)',
           fill: true,
           tension: 0.3,
           pointRadius: 0,
@@ -1413,7 +1413,7 @@ const renderPmcChart = () => {
         {
           label: 'Form (TSB)',
           data: pts.map(p => p.tsb),
-          borderColor: '#22c55e',
+          borderColor: '#000000',
           backgroundColor: 'transparent',
           tension: 0.3,
           pointRadius: 0,
@@ -1525,9 +1525,9 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .stats-row { display: flex; gap: 32px; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.10); flex-wrap: wrap; }
 .stat-item { text-align: left; }
 .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; line-height: 1; }
-.val-green  { color: #4ade80 !important; }
-.val-yellow { color: #fbbf24 !important; }
-.val-red    { color: #f87171 !important; }
+.val-green  { color: #0052FF !important; }
+.val-yellow { color: #767676 !important; }
+.val-red    { color: #ef4444 !important; }
 .stat-lbl { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-top: 3px; }
 
 .tab-bar { display: flex; gap: 0; margin-top: 16px; overflow-x: auto; }
@@ -1567,9 +1567,9 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .compliance-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
 .compliance-fraction { font-size: 0.82rem; font-weight: 600; color: #000; }
 .compliance-chip { font-size: 0.72rem; font-weight: 700; padding: 2px 8px; letter-spacing: 0.05em; }
-.chip-green  { background: #dcfce7; color: #16a34a; }
-.chip-yellow { background: #fef9c3; color: #ca8a04; }
-.chip-red    { background: #fee2e2; color: #dc2626; }
+.chip-green  { background: #EBF0FF; color: #0052FF; }
+.chip-yellow { background: #F5F5F5; color: #767676; }
+.chip-red    { background: rgba(239,68,68,0.10); color: #dc2626; }
 
 .activity-list { display: flex; flex-direction: column; }
 .act-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #E5E5E5; text-decoration: none; color: inherit; }
@@ -1604,7 +1604,7 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 
 .cal-event { padding: 4px 6px; margin-bottom: 3px; border-left: 3px solid; }
 .cal-event--planned { background: #f9f9f9; }
-.cal-event--done { background: #f0fdf4; border-left-color: #16a34a; }
+.cal-event--done { background: #EBF0FF; border-left-color: #0052FF; }
 .cal-event-type { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #000; }
 .cal-event-detail { font-size: 0.65rem; color: #767676; margin-top: 1px; }
 .cal-event-title { font-size: 0.65rem; color: #444; margin-top: 1px; }
@@ -1712,7 +1712,7 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .cw-pct { font-size: 0.82rem; font-weight: 700; min-width: 36px; text-align: right; }
 .cw-days { display: flex; gap: 4px; flex-wrap: wrap; }
 .cw-dot { width: 10px; height: 10px; }
-.dot-done   { background: #16a34a; }
+.dot-done   { background: #0052FF; }
 .dot-missed { background: #ef4444; }
 .dot-rest   { background: #E5E5E5; }
 
@@ -1810,14 +1810,14 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 }
 .priority-a { background: rgba(239,68,68,0.12); color: #dc2626; }
 .priority-b { background: rgba(245,158,11,0.12); color: #b45309; }
-.priority-c { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+.priority-c { background: #EBF0FF; color: #0052FF; }
 
 /* ── ANNOTATIONS ─────────────────────────────────────────── */
 .act-row-wrap { border-bottom: 1px solid #F5F5F5; }
 .act-row-wrap:last-child { border-bottom: none; }
 .annotation-wrap { padding: 0 12px 10px 44px; }
-.annotation-saved { display: flex; align-items: flex-start; gap: 8px; padding: 6px 10px; background: rgba(59,130,246,0.06); border-left: 2px solid #3b82f6; }
-.annotation-icon { color: #3b82f6; font-size: 0.82rem; flex-shrink: 0; margin-top: 1px; }
+.annotation-saved { display: flex; align-items: flex-start; gap: 8px; padding: 6px 10px; background: #EBF0FF; border-left: 2px solid #0052FF; }
+.annotation-icon { color: #0052FF; font-size: 0.82rem; flex-shrink: 0; margin-top: 1px; }
 .annotation-text { font-size: 0.78rem; color: #555; font-style: italic; flex: 1; }
 .annotation-edit-btn { background: none; border: none; color: #767676; cursor: pointer; font-size: 0.75rem; padding: 0 4px; flex-shrink: 0; }
 .annotation-edit-btn:hover { color: #000; }
@@ -1860,9 +1860,9 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .pmc-stat-lbl { font-size: 0.7rem; color: #767676; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
 .pmc-stat--explain { border-left: 1px solid #E5E5E5; padding-left: 24px; }
 .pmc-form-label { font-size: 1.1rem; font-weight: 700; padding: 4px 10px; }
-.form-fresh   { background: rgba(34,197,94,0.12);  color: #16a34a; }
+.form-fresh   { background: #EBF0FF; color: #0052FF; }
 .form-optimal { background: rgba(0,82,255,0.10);   color: #0052FF; }
-.form-tired   { background: rgba(245,158,11,0.12); color: #b45309; }
+.form-tired   { background: #F5F5F5; color: #767676; }
 .form-over    { background: rgba(239,68,68,0.12);  color: #dc2626; }
 .pmc-legend { display: flex; gap: 16px; flex-wrap: wrap; }
 .pmc-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; color: #555; }
@@ -1874,9 +1874,9 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .pmc-ex-item strong { color: #000; }
 .pmc-ex-phases { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .phase-chip { padding: 4px 10px; font-size: 0.7rem; font-weight: 700; }
-.phase-fresh    { background: rgba(34,197,94,0.10);  color: #16a34a; }
+.phase-fresh    { background: #EBF0FF; color: #0052FF; }
 .phase-optimal  { background: rgba(0,82,255,0.08);   color: #0052FF; }
-.phase-tired    { background: rgba(245,158,11,0.10); color: #b45309; }
+.phase-tired    { background: #F5F5F5; color: #767676; }
 .phase-overtrain { background: rgba(239,68,68,0.10); color: #dc2626; }
 
 /* ── ZONES ───────────────────────────────────────────────── */
@@ -1897,7 +1897,7 @@ onUnmounted(() => { if (pmcChart) { pmcChart.destroy(); pmcChart = null } })
 .z-pace { width: 52px; }
 .z-pct { font-size: 0.72rem; color: #767676; font-weight: 600; }
 .zones-actions { display: flex; align-items: center; gap: 16px; }
-.zones-saved-msg { font-size: 0.78rem; font-weight: 700; color: #16a34a; }
+.zones-saved-msg { font-size: 0.78rem; font-weight: 700; color: #0052FF; }
 .form-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; font-size: 0.82rem; font-weight: 600; padding: 10px 12px; }
 
 /* ── SHARED STATES ───────────────────────────────────────── */

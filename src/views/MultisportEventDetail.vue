@@ -155,11 +155,11 @@ const eventTypeLabel = computed(() => {
 
 function segColor(label) {
   const l = (label || '').toUpperCase()
-  if (l.includes('SWIM') || l === 'SWIM') return '#3b82f6'
-  if (l === 'T1' || l === 'T2')           return '#a3a3a3'
-  if (l.includes('BIKE') || l === 'BIKE' || l === 'RIDE') return '#0052FF'
-  if (l.includes('RUN')  || l === 'RUN')  return '#22c55e'
-  if (l.includes('HIKE') || l === 'HIKE') return '#8b5cf6'
+  if (l.includes('SWIM') || l === 'SWIM') return '#0052FF'
+  if (l === 'T1' || l === 'T2')           return '#767676'
+  if (l.includes('BIKE') || l === 'BIKE' || l === 'RIDE') return '#000000'
+  if (l.includes('RUN')  || l === 'RUN')  return '#0052FF'
+  if (l.includes('HIKE') || l === 'HIKE') return '#767676'
   return '#767676'
 }
 

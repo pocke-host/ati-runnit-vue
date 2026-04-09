@@ -280,8 +280,10 @@ import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import { useToast } from '@/composables/useToast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const { showToast } = useToast()
 
 /* ─── Bookmarks ───────────────────────────────────────────── */
 const bookmarkedIds = ref(new Set())
@@ -312,19 +314,24 @@ const toggleBookmark = async (event) => {
       await axios.delete(`${API_URL}/race-bookmarks/${bmId}`)
     } catch {
       bookmarkedIds.value.add(extId)
+      showToast('Failed to remove bookmark. Try again.', 'error')
     }
   } else {
     bookmarkedIds.value = new Set([...bookmarkedIds.value, extId])
     try {
-      const dateStr = event.date
-        ? (event.date.includes('/')
-            ? (() => { const [m, d, y] = event.date.split('/'); return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}` })()
-            : event.date)
-        : null
+      const normalizeDate = (d) => {
+        if (!d) return null
+        if (/^\d{4}-\d{2}-\d{2}/.test(d)) return d.slice(0, 10)
+        if (d.includes('/')) {
+          const [m, day, y] = d.split('/')
+          return `${y}-${m.padStart(2,'0')}-${day.padStart(2,'0')}`
+        }
+        return d
+      }
       const { data } = await axios.post(`${API_URL}/race-bookmarks`, {
         externalRaceId: extId,
         raceName:       event.name,
-        raceDate:       dateStr,
+        raceDate:       normalizeDate(event.date),
         raceType:       event.sport,
         city:           event.city,
         state:          event.state,
@@ -333,6 +340,7 @@ const toggleBookmark = async (event) => {
       bookmarkIdMap.value = { ...bookmarkIdMap.value, [extId]: data.id }
     } catch {
       bookmarkedIds.value = new Set([...bookmarkedIds.value].filter(x => x !== extId))
+      showToast('Failed to bookmark race. Try again.', 'error')
     }
   }
 }
@@ -1317,9 +1325,9 @@ watch(zipcode, () => {
   font-weight: 900;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: #16a34a;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  color: #0052FF;
+  background: #EBF0FF;
+  border: 1px solid #0052FF;
   padding: 2px 7px;
 }
 .sample-badge {
