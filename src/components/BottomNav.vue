@@ -1,6 +1,6 @@
 <template>
   <nav class="bottom-nav" v-if="isAuthenticated">
-    <!-- Coach tabs -->
+    <!-- Coach tabs — 4 items max -->
     <template v-if="role === 'coach'">
       <router-link to="/coach/dashboard" class="tab-item" active-class="tab-active">
         <i class="bi bi-grid-3x3-gap-fill tab-icon"></i>
@@ -20,13 +20,9 @@
         <i class="bi bi-calendar3 tab-icon"></i>
         <span class="tab-label">Calendar</span>
       </router-link>
-      <router-link to="/my-coach" class="tab-item" active-class="tab-active">
-        <i class="bi bi-person-fill tab-icon"></i>
-        <span class="tab-label">Me</span>
-      </router-link>
     </template>
 
-    <!-- Athlete tabs -->
+    <!-- Athlete tabs — 4 items max -->
     <template v-else>
       <router-link to="/dashboard" class="tab-item" active-class="tab-active">
         <i class="bi bi-grid-3x3-gap-fill tab-icon"></i>
@@ -34,7 +30,7 @@
       </router-link>
       <router-link to="/feed" class="tab-item" active-class="tab-active">
         <i class="bi bi-collection-fill tab-icon"></i>
-        <span class="tab-label">Feed</span>
+        <span class="tab-label">Social</span>
       </router-link>
       <router-link to="/track" class="tab-item tab-track">
         <div class="track-circle">
@@ -45,10 +41,6 @@
       <router-link to="/plans" class="tab-item" active-class="tab-active">
         <i class="bi bi-calendar-week-fill tab-icon"></i>
         <span class="tab-label">Train</span>
-      </router-link>
-      <router-link :to="userId ? `/profile/${userId}` : '/dashboard'" class="tab-item" active-class="tab-active">
-        <i class="bi bi-person-fill tab-icon"></i>
-        <span class="tab-label">Me</span>
       </router-link>
     </template>
   </nav>

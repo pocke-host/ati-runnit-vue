@@ -54,11 +54,34 @@
         </div>
       </section>
 
+      <!-- ── PLAN TEMPLATES ────────────────────────── -->
+      <section class="templates-section">
+        <div class="section-header">
+          <h2 class="section-title">Start from a Template</h2>
+          <p class="section-sub">Pick a goal — we'll pre-fill the plan builder for you.</p>
+        </div>
+        <div class="templates-grid">
+          <button
+            v-for="t in PLAN_TEMPLATES"
+            :key="t.key"
+            :class="['template-card', { 'template-selected': selectedTemplate === t.key }]"
+            @click="applyTemplate(t)"
+          >
+            <span class="template-emoji">{{ t.emoji }}</span>
+            <div class="template-info">
+              <div class="template-name">{{ t.name }}</div>
+              <div class="template-meta">{{ t.weeks }} weeks · {{ t.daysPerWeek }}x/week · {{ t.level }}</div>
+            </div>
+            <i v-if="selectedTemplate === t.key" class="bi bi-check-circle-fill template-check"></i>
+          </button>
+        </div>
+      </section>
+
       <!-- ── START A NEW PLAN ───────────────────────── -->
       <section class="new-plan-section">
         <div class="section-header">
-          <h2 class="section-title">{{ plans.length ? 'Start Another Plan' : 'Start Your First Plan' }}</h2>
-          <p class="section-sub">Five steps to a fully personalized, periodized training plan.</p>
+          <h2 class="section-title">{{ plans.length ? 'Customize & Build' : 'Build Your Plan' }}</h2>
+          <p class="section-sub">Personalize every detail — or use a template above to get started fast.</p>
         </div>
 
         <!-- ── WIZARD ── -->
@@ -344,6 +367,47 @@ const { showToast } = useToast()
 
 // ── Status (toast-backed) ────────────────────────────
 const showStatus = (msg, type = 'success') => showToast(msg, type)
+
+// ── Plan Templates ────────────────────────────────────
+const PLAN_TEMPLATES = [
+  { key: '5k-beginner',    name: '5K Starter',       emoji: '🏃', weeks: 8,  daysPerWeek: 3, level: 'Beginner',     goal: '5k',      mileage: 10, raceWeeks: 8  },
+  { key: '10k-inter',      name: '10K Build',         emoji: '🔥', weeks: 10, daysPerWeek: 4, level: 'Intermediate', goal: '10k',     mileage: 20, raceWeeks: 10 },
+  { key: 'half-inter',     name: 'Half Marathon',     emoji: '🏅', weeks: 14, daysPerWeek: 5, level: 'Intermediate', goal: 'half',    mileage: 25, raceWeeks: 14 },
+  { key: 'marathon-adv',   name: 'Marathon',          emoji: '🎽', weeks: 18, daysPerWeek: 5, level: 'Advanced',     goal: 'marathon',mileage: 35, raceWeeks: 18 },
+  { key: 'base-fitness',   name: 'Base Fitness',      emoji: '💪', weeks: 12, daysPerWeek: 4, level: 'Beginner',     goal: '5k',      mileage: 15, raceWeeks: 12 },
+  { key: 'cycling-base',   name: 'Cycling Endurance', emoji: '🚴', weeks: 10, daysPerWeek: 4, level: 'Intermediate', goal: 'cycling', mileage: 80, raceWeeks: 10 },
+]
+
+const selectedTemplate = ref(null)
+
+function applyTemplate(t) {
+  selectedTemplate.value = t.key
+  selectedGoal.value = t.goal
+
+  // Set race date based on weeks from now
+  const raceDate = new Date()
+  raceDate.setDate(raceDate.getDate() + t.raceWeeks * 7)
+  targetRaceDate.value = raceDate.toISOString().slice(0, 10)
+
+  // Pre-fill fitness fields
+  justBuildingFitness.value = t.goal === '5k' && t.key === 'base-fitness'
+  weeklyMileageInput.value = t.mileage
+
+  // Default days based on daysPerWeek
+  const defaultDaySets = {
+    3: new Set(['Monday', 'Wednesday', 'Saturday']),
+    4: new Set(['Monday', 'Wednesday', 'Thursday', 'Saturday']),
+    5: new Set(['Monday', 'Tuesday', 'Wednesday', 'Friday', 'Saturday']),
+  }
+  availableDays.value = defaultDaySets[t.daysPerWeek] || new Set(['Monday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday'])
+
+  // Jump to step 2 so user can confirm race date
+  wizardStep.value = 2
+
+  // Scroll to wizard
+  const el = document.querySelector('.new-plan-section')
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 // ── Wizard draft persistence ─────────────────────────
 const WIZARD_DRAFT_KEY = 'runnit_wizard_draft'
@@ -1058,5 +1122,38 @@ onBeforeRouteLeave((to, from, next) => {
   .preview-start { flex-direction: column; align-items: flex-start; gap: 8px; }
   .preview-actions { justify-content: stretch; }
   .preview-actions .btn { flex: 1; justify-content: center; }
+}
+
+/* ── Plan Templates ── */
+.templates-section { max-width: 860px; }
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.template-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: #fff;
+  border: 2px solid #E5E5E5;
+  border-radius: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.template-card:hover { border-color: #767676; }
+.template-selected { border-color: #0052FF !important; background: #EBF0FF; }
+.template-emoji { font-size: 1.6rem; flex-shrink: 0; }
+.template-info { flex: 1; min-width: 0; }
+.template-name { font-weight: 900; font-size: 0.95rem; color: #000; }
+.template-meta { font-size: 0.78rem; color: #767676; font-weight: 600; margin-top: 2px; }
+.template-check { font-size: 1.1rem; color: #0052FF; flex-shrink: 0; margin-left: auto; }
+
+@media (max-width: 640px) {
+  .templates-grid { grid-template-columns: 1fr; }
 }
 </style>

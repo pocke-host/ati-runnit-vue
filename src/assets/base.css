@@ -13,6 +13,7 @@
   /* ── Layout ── */
   /* Include safe-area-inset-top so pages padding-top: var(--nav-h) clears the notch */
   --nav-h: calc(64px + env(safe-area-inset-top, 0px));
+  --coach-bar-h: 28px; /* height of the COACH VIEW banner shown when role=coach */
   --tab-h: 64px;
 
   /* ── RUNNIT Electric Palette ── */

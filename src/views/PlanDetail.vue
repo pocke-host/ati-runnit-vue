@@ -1,10 +1,23 @@
 <!-- src/views/PlanDetail.vue -->
 <template>
   <div class="plan-detail-page">
-    <!-- Loading -->
-    <div v-if="loading" class="page-loading">
-      <div class="spinner-border"></div>
-      <p>Loading plan…</p>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="plan-skeleton">
+      <div class="sk-header">
+        <div class="sk-bar sk-bar-sm"></div>
+        <div class="sk-bar sk-bar-lg"></div>
+        <div class="sk-bar sk-bar-md"></div>
+      </div>
+      <div class="sk-tabs">
+        <div v-for="n in 5" :key="n" class="sk-tab"></div>
+      </div>
+      <div class="sk-workouts">
+        <div v-for="n in 4" :key="n" class="sk-workout-card">
+          <div class="sk-bar sk-bar-xs"></div>
+          <div class="sk-bar sk-bar-md"></div>
+          <div class="sk-bar sk-bar-sm"></div>
+        </div>
+      </div>
     </div>
 
     <template v-else-if="plan">
@@ -187,8 +200,11 @@
               </div>
 
               <div class="workout-detail-row" v-if="workout.type !== 'Rest'">
-                <span class="workout-dist">{{ formatDistance(workout.distanceMeters) }}</span>
-                <span class="workout-dur">{{ workout.durationMinutes }} min</span>
+                <span class="workout-dist" v-if="workout.distanceMeters">{{ formatDistance(workout.distanceMeters) }}</span>
+                <span class="workout-dur" v-if="workout.durationMinutes">
+                  <span class="dur-sep" v-if="workout.distanceMeters">·</span>
+                  {{ workout.durationMinutes }} min
+                </span>
               </div>
 
               <!-- Pace target -->
@@ -249,8 +265,10 @@
             </div>
           </div><!-- /.workout-card -->
 
-          <!-- Post-completion panel -->
-          <div v-if="postCompletion?.id === workout.id" class="completion-panel">
+          <!-- Post-completion panel moved to bottom sheet below -->
+
+          <!-- Post-completion panel (bottom-sheet stub — keeps workout loop clean) -->
+          <div v-if="false && postCompletion?.id === workout.id" class="completion-panel">
             <div class="cp-header">
               <span class="cp-title">How'd it go?</span>
               <button class="cp-close" @click="closePostCompletion"><i class="bi bi-x"></i></button>
@@ -350,6 +368,44 @@
       <button class="btn btn-primary mt-3" @click="router.push('/plans')">Back to Plans</button>
     </div>
   </div>
+
+  <!-- RPE Bottom Sheet (global, outside workout loop) -->
+  <Teleport to="body">
+    <Transition name="rpe-sheet">
+      <div v-if="postCompletion" class="rpe-sheet-overlay" @click.self="closePostCompletion">
+        <div class="rpe-sheet">
+          <div class="rpe-sheet-handle"></div>
+          <div class="rpe-sheet-header">
+            <span class="rpe-sheet-title">How'd it go?</span>
+            <button class="rpe-sheet-close" @click="closePostCompletion"><i class="bi bi-x-lg"></i></button>
+          </div>
+          <div class="rpe-sheet-body">
+            <div class="rpe-row">
+              <span class="rpe-label">Effort (RPE)</span>
+              <div class="rpe-btns">
+                <button
+                  v-for="n in 10"
+                  :key="n"
+                  :class="['rpe-btn', { active: postCompletion.rpe === n }]"
+                  @click="postCompletion.rpe = n"
+                >{{ n }}</button>
+              </div>
+            </div>
+            <textarea
+              v-model="postCompletion.notes"
+              class="cp-notes"
+              placeholder="How did the workout feel? Any notes…"
+              rows="3"
+            ></textarea>
+            <div class="rpe-sheet-actions">
+              <button class="cp-skip-btn" @click="closePostCompletion">Skip</button>
+              <button class="cp-save-btn" @click="savePostCompletionFromSheet">Save Note</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
@@ -551,6 +607,14 @@ const savePostCompletion = async (workout) => {
 
 const closePostCompletion = () => { postCompletion.value = null }
 
+// Bottom-sheet save: look up the workout by id from the active week data
+const savePostCompletionFromSheet = async () => {
+  if (!postCompletion.value || !activeWeekData.value) return
+  const workout = activeWeekData.value.workouts?.find(w => w.id === postCompletion.value.id)
+  if (workout) await savePostCompletion(workout)
+  else postCompletion.value = null
+}
+
 const openEditNote = (workout) => {
   postCompletion.value = { id: workout.id, rpe: workout.rpe || null, notes: workout.athleteNotes || '' }
 }
@@ -675,6 +739,59 @@ onMounted(async () => {
 
 /* Page loading */
 .page-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; color: rgba(15,18,16,0.55); }
+
+/* Plan detail skeleton */
+@keyframes sk-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.sk-bar {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: sk-shimmer 1.4s infinite linear;
+  border-radius: 0;
+  height: 16px;
+}
+.sk-bar-xs  { width: 60px;  height: 12px; }
+.sk-bar-sm  { width: 120px; }
+.sk-bar-md  { width: 220px; height: 20px; }
+.sk-bar-lg  { width: 320px; height: 32px; }
+.plan-skeleton { padding-top: var(--nav-h, 64px); }
+.sk-header {
+  background: #000;
+  padding: 40px 24px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sk-header .sk-bar { filter: brightness(0.4); }
+.sk-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 24px;
+  border-bottom: 1px solid #E5E5E5;
+  background: #fff;
+}
+.sk-tab {
+  width: 80px;
+  height: 44px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: sk-shimmer 1.4s infinite linear;
+}
+.sk-workouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 24px;
+}
+.sk-workout-card {
+  border: 1px solid #E5E5E5;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 /* ── Plan Header ── */
 .plan-header { background: #000; color: white; padding: 24px 0 28px; }
@@ -827,7 +944,10 @@ onMounted(async () => {
 .tag-today  { background: rgba(196,106,42,0.12); color: #000; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 .tag-missed { background: rgba(239,68,68,0.10); color: #dc2626; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 
-.workout-detail-row { display: flex; gap: 12px; font-size: 0.88rem; font-weight: 700; color: rgba(15,18,16,0.70); margin-bottom: 6px; }
+.workout-detail-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.workout-dist { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; color: rgba(15,18,16,0.90); line-height: 1; }
+.workout-dur { font-size: 0.85rem; font-weight: 600; color: rgba(15,18,16,0.50); }
+.dur-sep { color: rgba(15,18,16,0.25); margin-right: 4px; }
 
 /* Pace target */
 .pace-target {
@@ -1021,4 +1141,38 @@ onMounted(async () => {
   .week-stats { flex-direction: column; gap: 6px; }
   .phase-banner-sub { display: none; }
 }
+
+/* ── RPE Bottom Sheet ── */
+.rpe-sheet-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.50);
+  display: flex; align-items: flex-end;
+}
+.rpe-sheet {
+  width: 100%; background: #000; color: #fff;
+  border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.rpe-sheet-handle {
+  width: 36px; height: 4px; background: rgba(255,255,255,0.25);
+  margin: 12px auto 0; border-radius: 2px;
+}
+.rpe-sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px 8px;
+}
+.rpe-sheet-title {
+  font-size: 0.72rem; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.6);
+}
+.rpe-sheet-close {
+  background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1rem; cursor: pointer; padding: 0;
+}
+.rpe-sheet-close:hover { color: #fff; }
+.rpe-sheet-body { padding: 8px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+.rpe-sheet-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Bottom sheet slide-up transition */
+.rpe-sheet-enter-active, .rpe-sheet-leave-active { transition: all 0.28s cubic-bezier(0.32, 0.72, 0, 1); }
+.rpe-sheet-enter-from, .rpe-sheet-leave-to { opacity: 0; }
+.rpe-sheet-enter-from .rpe-sheet, .rpe-sheet-leave-to .rpe-sheet { transform: translateY(100%); }
+.rpe-sheet-enter-active .rpe-sheet, .rpe-sheet-leave-active .rpe-sheet { transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1); }
 </style>
