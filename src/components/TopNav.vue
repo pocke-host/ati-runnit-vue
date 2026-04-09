@@ -165,7 +165,7 @@
     </Transition>
 
     <Transition name="drawer-slide">
-      <div v-if="mobileMenuOpen" class="mobile-drawer">
+      <div v-if="mobileMenuOpen" class="mobile-drawer" @touchstart.passive="onDrawerTouchStart" @touchend.passive="onDrawerTouchEnd">
         <!-- Drawer Header -->
         <div class="drawer-header">
           <span class="drawer-brand">RUNNIT</span>
@@ -315,6 +315,16 @@ const mobileMenuOpen = ref(false)
 const scrolled = ref(false)
 
 const handleScroll = () => { scrolled.value = window.scrollY > 32 }
+
+// Swipe-to-close drawer (swipe right ≥ 60px)
+let swipeStartX = null
+const onDrawerTouchStart = (e) => { swipeStartX = e.touches[0].clientX }
+const onDrawerTouchEnd = (e) => {
+  if (swipeStartX === null) return
+  const delta = e.changedTouches[0].clientX - swipeStartX
+  if (delta > 60) mobileMenuOpen.value = false
+  swipeStartX = null
+}
 const notifOpen = ref(false)
 const notifRef = ref(null)
 const avatarOpen = ref(false)
