@@ -139,8 +139,10 @@ export const usePRStore = defineStore('pr', () => {
         most_elevation:data.most_elevation!= null ? { elevationMeters: data.most_elevation } : null,
         fastest_pace:  data.fastest_pace  != null ? { pace: data.fastest_pace }      : null,
       }
-      prs.value = normalized
-      saveCache(normalized)
+      // If API returned all nulls, fall back to client-side computation
+      const hasAny = Object.values(normalized).some(v => v !== null)
+      prs.value = hasAny ? normalized : computePRs(activities)
+      saveCache(prs.value)
     } catch {
       // Fall back to client-side computation if API fails
       prs.value = computePRs(activities)

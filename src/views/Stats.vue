@@ -84,7 +84,7 @@
             <div class="perf-val">{{ performanceMetrics.fitnessScore }}</div>
             <div class="perf-sub">Chronic Training Load</div>
             <div class="perf-bar-bg">
-              <div class="perf-bar" :style="{ width: performanceMetrics.fitnessScore + '%', background: '#22c55e' }"></div>
+              <div class="perf-bar" :style="{ width: performanceMetrics.fitnessScore + '%', background: '#0052FF' }"></div>
             </div>
           </div>
           <div class="perf-card">
@@ -92,7 +92,7 @@
             <div class="perf-val">{{ performanceMetrics.fatigueScore }}</div>
             <div class="perf-sub">Acute Training Load</div>
             <div class="perf-bar-bg">
-              <div class="perf-bar" :style="{ width: performanceMetrics.fatigueScore + '%', background: '#ef4444' }"></div>
+              <div class="perf-bar" :style="{ width: performanceMetrics.fatigueScore + '%', background: '#000000' }"></div>
             </div>
           </div>
           <div class="perf-card">
@@ -108,10 +108,10 @@
           </div>
           <div class="perf-card">
             <div class="perf-label">VO2max</div>
-            <div class="perf-val" style="color:#3b82f6">{{ performanceMetrics.vo2max ?? '—' }}</div>
+            <div class="perf-val" style="color:#0052FF">{{ performanceMetrics.vo2max ?? '—' }}</div>
             <div class="perf-sub">ml/kg/min estimate</div>
             <div class="perf-bar-bg" v-if="performanceMetrics.vo2max">
-              <div class="perf-bar" :style="{ width: ((performanceMetrics.vo2max - 25) / 60 * 100) + '%', background: '#3b82f6' }"></div>
+              <div class="perf-bar" :style="{ width: ((performanceMetrics.vo2max - 25) / 60 * 100) + '%', background: '#0052FF' }"></div>
             </div>
           </div>
         </div>
@@ -164,12 +164,12 @@
             </div>
             <div class="pmc-stat">
               <div class="pmc-stat-label">ATL (Fatigue)</div>
-              <div class="pmc-stat-val" style="color:#ef4444">{{ pmcTimeSeries[pmcTimeSeries.length - 1]?.atl ?? '—' }}</div>
+              <div class="pmc-stat-val" style="color:#000000">{{ pmcTimeSeries[pmcTimeSeries.length - 1]?.atl ?? '—' }}</div>
               <div class="pmc-stat-sub">7-day load</div>
             </div>
             <div class="pmc-stat">
               <div class="pmc-stat-label">TSB (Form)</div>
-              <div class="pmc-stat-val" :style="{ color: (pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? 0) >= 0 ? '#22c55e' : '#ef4444' }">
+              <div class="pmc-stat-val" :style="{ color: (pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? 0) >= 0 ? '#0052FF' : '#ef4444' }">
                 {{ (pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? 0) > 0 ? '+' : '' }}{{ pmcTimeSeries[pmcTimeSeries.length - 1]?.tsb ?? '—' }}
               </div>
               <div class="pmc-stat-sub">CTL − ATL</div>
@@ -180,8 +180,8 @@
           </div>
           <div class="pmc-legend-row">
             <span class="pmc-legend-dot" style="background:#0052FF"></span>CTL = chronic training load (fitness, 42-day)
-            <span class="pmc-legend-dot" style="background:#ef4444; margin-left:16px"></span>ATL = acute training load (fatigue, 7-day)
-            <span class="pmc-legend-dot" style="background:#22c55e; margin-left:16px"></span>TSB = training stress balance (form)
+            <span class="pmc-legend-dot" style="background:#000000; margin-left:16px"></span>ATL = acute training load (fatigue, 7-day)
+            <span class="pmc-legend-dot" style="background:#0052FF; margin-left:16px"></span>TSB = training stress balance (form)
           </div>
         </div>
       </section>
@@ -363,10 +363,10 @@
             <div class="insight-sub">{{ acwrInfo.desc }}</div>
             <!-- Visual gauge bar -->
             <div class="acwr-gauge">
-              <div class="acwr-zone" style="width:40%; background:#3b82f6"></div>
-              <div class="acwr-zone" style="width:10%; background:#86efac"></div>
-              <div class="acwr-zone" style="width:15%; background:#22c55e"></div>
-              <div class="acwr-zone" style="width:10%; background:#0052FF"></div>
+              <div class="acwr-zone" style="width:40%; background:#E5E5E5"></div>
+              <div class="acwr-zone" style="width:10%; background:#EBF0FF"></div>
+              <div class="acwr-zone" style="width:15%; background:#0052FF"></div>
+              <div class="acwr-zone" style="width:10%; background:#111111"></div>
               <div class="acwr-zone" style="width:25%; background:#ef4444"></div>
               <div class="acwr-needle" :style="{ left: Math.min(98, (acwrScore / 2) * 100) + '%' }"></div>
             </div>
@@ -394,12 +394,12 @@
               <span class="insight-label">Last Activity</span>
               <span
                 class="insight-badge"
-                :style="{ background: daysSinceLastActivity === 0 ? '#22c55e' : daysSinceLastActivity <= 2 ? '#0052FF' : '#ef4444' }"
+                :style="{ background: daysSinceLastActivity === 0 ? '#0052FF' : daysSinceLastActivity <= 2 ? '#767676' : '#ef4444' }"
               >
                 {{ daysSinceLastActivity === 0 ? 'Today' : daysSinceLastActivity === 1 ? 'Yesterday' : `${daysSinceLastActivity}d ago` }}
               </span>
             </div>
-            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#22c55e' : daysSinceLastActivity <= 3 ? '#0052FF' : '#ef4444' }">
+            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#0052FF' : daysSinceLastActivity <= 3 ? '#767676' : '#ef4444' }">
               {{ daysSinceLastActivity }}
               <span class="insight-unit">{{ daysSinceLastActivity === 1 ? 'day' : 'days' }}</span>
             </div>
@@ -682,8 +682,8 @@ const performanceMetrics = computed(() => {
 
 const formColor = computed(() => {
   const f = performanceMetrics.value?.formScore ?? 0
-  if (f > 10)  return '#22c55e'
-  if (f > -5)  return '#0052FF'
+  if (f > 10)  return '#0052FF'
+  if (f > -5)  return '#767676'
   return '#ef4444'
 })
 
@@ -773,10 +773,10 @@ const acwrScore = computed(() => {
 const acwrInfo = computed(() => {
   const a = acwrScore.value
   if (a === null) return null
-  if (a < 0.8)  return { label: 'Undertraining', color: '#3b82f6', desc: 'Gradually increase volume to build fitness' }
-  if (a < 1.0)  return { label: 'Optimal Base', color: '#22c55e', desc: 'Solid aerobic foundation, safe to add load' }
-  if (a < 1.3)  return { label: 'Productive Load', color: '#22c55e', desc: 'Good training stimulus, manage recovery' }
-  if (a < 1.5)  return { label: 'Caution Zone', color: '#0052FF', desc: 'Monitor fatigue — consider an easy day' }
+  if (a < 0.8)  return { label: 'Undertraining', color: '#767676', desc: 'Gradually increase volume to build fitness' }
+  if (a < 1.0)  return { label: 'Optimal Base', color: '#0052FF', desc: 'Solid aerobic foundation, safe to add load' }
+  if (a < 1.3)  return { label: 'Productive Load', color: '#0052FF', desc: 'Good training stimulus, manage recovery' }
+  if (a < 1.5)  return { label: 'Caution Zone', color: '#000000', desc: 'Monitor fatigue — consider an easy day' }
   return           { label: 'High Injury Risk', color: '#ef4444', desc: 'Reduce load or take a rest day now' }
 })
 
