@@ -26,8 +26,8 @@ axios.interceptors.response.use(
       localStorage.removeItem('runnit_activities_cache')
       delete axios.defaults.headers.common['Authorization']
       // Hard redirect to login — simple and reliable across all pages
-      if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
-        window.location.href = '/login'
+      if (!window.location.pathname.startsWith('/join-us') && !window.location.pathname.startsWith('/signup')) {
+        window.location.href = '/join-us'
       }
     }
     return Promise.reject(err)
