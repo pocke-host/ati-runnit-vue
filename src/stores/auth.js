@@ -14,6 +14,26 @@ if (_storedToken) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${_storedToken}`
 }
 
+// Global 401 interceptor — stale/invalid token means the user needs to re-login.
+// Without this, every API call silently fails and the app shows all zeros while
+// appearing "logged in" (user object still in localStorage from a previous session).
+axios.interceptors.response.use(
+  res => res,
+  err => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('runnit_activities_cache')
+      delete axios.defaults.headers.common['Authorization']
+      // Hard redirect to login — simple and reliable across all pages
+      if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+        window.location.href = '/login'
+      }
+    }
+    return Promise.reject(err)
+  }
+)
+
 const clearLocalState = () => {
   localStorage.removeItem('user')
   localStorage.removeItem('token')
