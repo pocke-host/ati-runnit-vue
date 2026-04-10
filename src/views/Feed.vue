@@ -1691,12 +1691,10 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .feed-header { top: 64px; padding: 10px 0; }
-  .feed-tabs-wrapper { top: 112px; padding: 8px 0; }
+  .feed-header-inner { padding: 0 12px; }
   .feed-container { padding-top: 168px; padding-left: 12px; padding-right: 12px; }
-  .feed-tabs { gap: 6px; padding: 0 12px; }
+  .feed-tabs { gap: 6px; }
   .feed-tab { padding: 9px 14px; font-size: 0.82rem; }
-  .feed-header-content { padding: 0 12px; }
 
   .moment-modal-content {
     grid-template-columns: 1fr;
@@ -1717,9 +1715,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 375px) {
+  .feed-header-inner { padding: 0 8px; }
   .feed-container { padding: 8px; padding-top: 168px; }
-  .feed-header { padding: 12px 0; }
-  .feed-header-content { padding: 0 8px; }
 }
 
 .create-event-btn {

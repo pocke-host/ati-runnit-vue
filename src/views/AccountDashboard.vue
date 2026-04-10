@@ -2007,7 +2007,7 @@ textarea.form-control{resize:vertical;min-height:72px}
 .streak-at-risk .perf-num { color: #f97316; }
 @media(max-width:480px){.form-row-2,.form-row-3{grid-template-columns:1fr}.perf-strip{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1200px){.dashboard-grid{grid-template-columns:1fr}.sidebar-section{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));display:grid}}
-@media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.dash-greeting{flex-direction:column;align-items:flex-start;gap:16px}.greeting-right{flex-direction:row;align-items:center;width:100%;justify-content:space-between}.greeting-headline{font-size:1.8rem}.top-actions{width:auto}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}}
+@media (max-width:768px){.perf-strip{grid-template-columns:repeat(2,1fr)}.dash-greeting{flex-direction:column;align-items:flex-start;gap:16px}.greeting-right{flex-direction:row;align-items:center;width:100%;justify-content:space-between}.greeting-headline{font-size:1.8rem}.top-actions{width:auto}.top-actions .btn{flex:1}.chart-body-split{grid-template-columns:1fr;gap:20px}.chart-doughnut{height:180px;margin:0 auto}.wrap{padding:20px 16px 48px}.today-workout-strip{padding:16px}.week-strip-inner{padding:14px 16px 12px}}
 @media(max-width:375px){.perf-strip{grid-template-columns:repeat(2,1fr)}.profile-stats-mini{grid-template-columns:repeat(2,1fr)}.top-actions .btn{font-size:0.72rem;padding:10px 12px}}
 
 /* ── Week Calendar Strip ─────────────────────────────────────────── */
