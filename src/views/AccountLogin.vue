@@ -102,7 +102,7 @@
 
         <p class="text-center text-muted small mt-4 mb-0">
           Don't have an account?
-          <router-link to="/join-us" class="link">Sign up</router-link>
+          <router-link to="/signup" class="link">Sign up</router-link>
         </p>
       </div>
     </section>
