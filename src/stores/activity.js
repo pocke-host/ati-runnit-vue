@@ -100,12 +100,14 @@ export const useActivityStore = defineStore('activity', () => {
 
   async function reactToActivity(id, type) {
     const { data } = await axios.post(`${API_URL}/activities/${id}/reactions`, { type })
-    // Patch local cache so reactions survive a refresh
+    // Patch local cache — use DTO field names: userReaction + reactionCounts map
     const act = activities.value.find(a => String(a.id) === String(id))
     if (act) {
-      act.currentUserReaction = type
-      if (!act.reactionCount) act.reactionCount = 0
-      act.reactionCount++
+      const prev = act.userReaction
+      if (!act.reactionCounts) act.reactionCounts = {}
+      if (prev && prev !== type) act.reactionCounts[prev] = Math.max(0, (act.reactionCounts[prev] || 0) - 1)
+      act.reactionCounts[type] = (act.reactionCounts[type] || 0) + 1
+      act.userReaction = type
       saveCache(activities.value)
     }
     return data
@@ -115,8 +117,11 @@ export const useActivityStore = defineStore('activity', () => {
     await axios.delete(`${API_URL}/activities/${id}/reactions`)
     const act = activities.value.find(a => String(a.id) === String(id))
     if (act) {
-      act.currentUserReaction = null
-      if (act.reactionCount > 0) act.reactionCount--
+      const prev = act.userReaction
+      if (prev && act.reactionCounts) {
+        act.reactionCounts[prev] = Math.max(0, (act.reactionCounts[prev] || 0) - 1)
+      }
+      act.userReaction = null
       saveCache(activities.value)
     }
   }
