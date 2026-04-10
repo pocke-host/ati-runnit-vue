@@ -1909,6 +1909,7 @@ onUnmounted(() => {
   .hero-chip { font-size: 0.8rem; padding: 8px 14px; }
   .chart-card canvas { max-height: 200px; }
   .stats-content { padding: 28px 16px 64px; }
+  .jumpnav-inner { padding: 0 16px; }
 }
 @media (max-width: 600px) {
   .hero-title { font-size: 2rem; }
@@ -1926,6 +1927,7 @@ onUnmounted(() => {
   .perf-grid { grid-template-columns: 1fr; }
   .hero { padding: 32px 16px 28px; }
   .stats-content { padding: 20px 12px 80px; }
+  .jumpnav-inner { padding: 0 12px; }
 }
 
 /* ── Athlete Archetype ── */
