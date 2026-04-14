@@ -14,20 +14,22 @@
 
         <!-- Social Buttons -->
         <div class="social-buttons mb-4">
-          <button type="button" class="btn btn-social" @click="handleGoogleSignIn">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <button type="button" class="btn btn-social" @click="handleGoogleSignIn" :disabled="googleLoading">
+            <span v-if="googleLoading" class="spinner-border spinner-border-sm"></span>
+            <svg v-else width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
               <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
               <path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
               <path d="M9 3.582c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 7.29C4.672 5.163 6.656 3.582 9 3.582z" fill="#EA4335"/>
             </svg>
-            Continue with Google
+            {{ googleLoading ? 'Signing in...' : 'Continue with Google' }}
           </button>
-          <button type="button" class="btn btn-social" @click="handleAppleSignIn">
+          <button type="button" class="btn btn-social" @click="handleAppleSignIn" disabled style="opacity:0.45;cursor:not-allowed">
             <i class="bi bi-apple"></i>
             Continue with Apple
           </button>
         </div>
+        <div v-if="googleError" class="alert alert-danger py-2 mb-3">{{ googleError }}</div>
 
         <div class="divider">
           <span>or</span>
@@ -158,10 +160,53 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { role, isAuthenticated } = storeToRefs(authStore)
 
+// ── Google Sign-In (GIS) ──────────────────────────────────────────────────────
+const googleLoading = ref(false)
+const googleError = ref('')
+
+const initGoogleSignIn = () => {
+  if (!window.google?.accounts?.id) { setTimeout(initGoogleSignIn, 300); return }
+  window.google.accounts.id.initialize({
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    callback: async ({ credential }) => {
+      googleLoading.value = true
+      googleError.value = ''
+      try {
+        await authStore.loginWithGoogle(credential)
+        router.push(authStore.onboardingComplete ? (role.value === 'coach' ? '/coach/dashboard' : '/dashboard') : '/onboard')
+      } catch {
+        googleError.value = 'Google sign-in failed. Please try again.'
+      } finally {
+        googleLoading.value = false
+      }
+    },
+    ux_mode: 'popup',
+    cancel_on_tap_outside: false
+  })
+}
+
+const handleGoogleSignIn = () => {
+  if (!window.google?.accounts?.id) {
+    googleError.value = 'Google Sign-In is loading, please try again.'
+    return
+  }
+  googleLoading.value = true
+  window.google.accounts.id.prompt((notification) => {
+    if (notification.isNotDisplayed()) {
+      googleLoading.value = false
+      googleError.value = 'Google Sign-In unavailable. Please use email or try again.'
+    }
+    if (notification.isDismissedMoment() && notification.getDismissedReason() !== 'credential_returned') {
+      googleLoading.value = false
+    }
+  })
+}
+
 onMounted(() => {
   if (isAuthenticated.value) {
     router.replace(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
   }
+  initGoogleSignIn()
 })
 
 const email = ref('')
@@ -249,15 +294,8 @@ const onSubmit = async (e) => {
 
 onUnmounted(() => clearInterval(lockTimer))
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-
-const handleGoogleSignIn = () => {
-  window.location.href = `${API_URL}/auth/oauth/google`
-}
-
-const handleAppleSignIn = () => {
-  window.location.href = `${API_URL}/auth/oauth/apple`
-}
+// Apple Sign-In — placeholder until Apple Developer credentials are configured
+const handleAppleSignIn = () => {}
 </script>
 
 <style scoped>
