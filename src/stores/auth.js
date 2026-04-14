@@ -130,6 +130,16 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('user', JSON.stringify(user.value))
   }
 
+  async function loginWithGoogle(idToken) {
+    const { data } = await axios.post(`${API_URL}/auth/google`, { idToken })
+    if (data.token) {
+      localStorage.setItem('token', data.token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+    }
+    setAuth(data.user)
+    try { await fetchCurrentUser() } catch { /* silent */ }
+  }
+
   async function logout() {
     try { await axios.post(`${API_URL}/auth/logout`) } catch { /* cookie cleared best-effort */ }
     user.value = null
@@ -143,6 +153,6 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user, isAuthenticated, unitSystem, onboardingComplete,
     subscriptionTier, subscriptionStatus, role,
-    login, register, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding, updateAvatar
+    login, register, loginWithGoogle, fetchCurrentUser, logout, setAuth, setUnitSystem, completeOnboarding, updateAvatar
   }
 })
