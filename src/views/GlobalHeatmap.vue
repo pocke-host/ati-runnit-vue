@@ -27,6 +27,9 @@ const mapContainer = ref(null)
 const loading = ref(true)
 const pointCount = ref(0)
 
+// Module-level cache — avoids re-fetching 500 activities on every mount within a session
+let _cachedFeatures = null
+
 let map
 const SOURCE_ID = 'runnit-activities'
 
@@ -93,23 +96,30 @@ function emptyFC() { return { type: 'FeatureCollection', features: [] } }
 async function loadActivities() {
   loading.value = true
   try {
-    const token = localStorage.getItem('token')
-    const { data } = await axios.get(`${API_URL}/activities?page=0&size=500`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    })
+    let features
 
-    const activities = Array.isArray(data) ? data : (data.content ?? data.activities ?? [])
-    const features = []
+    if (_cachedFeatures) {
+      features = _cachedFeatures
+    } else {
+      const token = localStorage.getItem('token')
+      const { data } = await axios.get(`${API_URL}/activities?page=0&size=500`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      })
 
-    for (const act of activities) {
-      // Use start coordinates if available
-      if (act.startLat && act.startLng) {
-        features.push({
-          type: 'Feature',
-          properties: { sport: act.sport || act.activityType || 'running' },
-          geometry: { type: 'Point', coordinates: [act.startLng, act.startLat] }
-        })
+      const activities = Array.isArray(data) ? data : (data.content ?? data.activities ?? [])
+      features = []
+
+      for (const act of activities) {
+        if (act.startLat && act.startLng) {
+          features.push({
+            type: 'Feature',
+            properties: { sport: act.sport || act.activityType || 'running' },
+            geometry: { type: 'Point', coordinates: [act.startLng, act.startLat] }
+          })
+        }
       }
+
+      _cachedFeatures = features
     }
 
     pointCount.value = features.length
