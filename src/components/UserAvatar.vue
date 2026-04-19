@@ -2,7 +2,7 @@
 <!-- Reusable avatar: shows photo if available, falls back to initials -->
 <template>
   <div class="ua-wrap" :style="wrapStyle">
-    <img v-if="src" :src="src" :alt="name" class="ua-img" @error="imgError = true" />
+    <img v-if="src" :src="src" :alt="name" class="ua-img" loading="lazy" @error="imgError = true" />
     <span v-else class="ua-initials" :style="{ fontSize: fontSize + 'px' }">{{ initials }}</span>
   </div>
 </template>

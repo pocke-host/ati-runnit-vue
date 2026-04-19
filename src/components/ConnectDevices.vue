@@ -44,7 +44,7 @@
       <!-- Strava -->
       <div class="device-card">
         <div class="device-icon">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg" alt="Strava" class="brand-logo" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg" alt="Strava" class="brand-logo" loading="lazy" />
         </div>
         <h3>Strava</h3>
         <p>Automatically import every run, ride, and swim you log on Strava</p>

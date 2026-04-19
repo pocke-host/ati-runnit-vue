@@ -787,7 +787,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useActivityStore } from '@/stores/activity'
@@ -1620,6 +1620,12 @@ onMounted(async () => {
     achievementStore.fetchAchievements(activities.value),
     prStore.fetchPRs(activities.value)
   ])
+})
+
+onUnmounted(() => {
+  if (weeklyChartInstance)   { weeklyChartInstance.destroy();   weeklyChartInstance   = null }
+  if (pieChartInstance)      { pieChartInstance.destroy();      pieChartInstance      = null }
+  if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null }
 })
 </script>
 

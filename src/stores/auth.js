@@ -78,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
     }
     setAuth(data.user)
-    try { await fetchCurrentUser() } catch { /* silent */ }
+    try { await fetchCurrentUser() } catch (e) { console.error('[auth] fetchCurrentUser after login failed:', e) }
   }
 
   async function register(email, password, displayName, userRole = 'athlete') {
@@ -137,11 +137,11 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
     }
     setAuth(data.user)
-    try { await fetchCurrentUser() } catch { /* silent */ }
+    try { await fetchCurrentUser() } catch (e) { console.error('[auth] fetchCurrentUser after Google login failed:', e) }
   }
 
   async function logout() {
-    try { await axios.post(`${API_URL}/auth/logout`) } catch { /* cookie cleared best-effort */ }
+    try { await axios.post(`${API_URL}/auth/logout`) } catch (e) { console.error('[auth] logout endpoint failed:', e) }
     user.value = null
     role.value = 'athlete'
     onboardingComplete.value = false
