@@ -1200,6 +1200,16 @@ onUnmounted(() => {
   z-index: 50;
   background: #fff;
   border-bottom: 1px solid #E5E5E5;
+  /* Fade-out gradient on right edge signals horizontal scrollability */
+  -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+          mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+}
+@media (min-width: 900px) {
+  /* Wide screens: all buttons visible, no need for scroll hint */
+  .stats-jumpnav {
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
 }
 .jumpnav-inner {
   max-width: 1100px;
@@ -1209,6 +1219,8 @@ onUnmounted(() => {
   gap: 0;
   overflow-x: auto;
   scrollbar-width: none;
+  /* Ensure last button isn't cut off by the gradient */
+  padding-right: 48px;
 }
 .jumpnav-inner::-webkit-scrollbar { display: none; }
 .jumpnav-btn {

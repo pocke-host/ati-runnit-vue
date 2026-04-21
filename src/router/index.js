@@ -64,6 +64,13 @@ const routes = [
   { path: '/coaches',         name: 'FindCoaches',    component: () => import('@/views/FindCoaches.vue'),    meta: { requiresAuth: true } },
   { path: '/my-coach',        name: 'MyCoach',        component: () => import('@/views/MyCoach.vue'),        meta: { requiresAuth: true } },
 
+  // Password reset (public — no auth required)
+  { path: '/forgot-password', name: 'ForgotPassword', component: () => import('@/views/ForgotPassword.vue') },
+  { path: '/reset-password',  name: 'ResetPassword',  component: () => import('@/views/ResetPassword.vue') },
+
+  // Admin (auth required — role check happens in the view/API)
+  { path: '/admin', name: 'AdminDashboard', component: () => import('@/views/AdminDashboard.vue'), meta: { requiresAuth: true, requiresAdmin: true } },
+
   // OAuth callback — public, no auth required
   { path: '/oauth-callback', name: 'OAuthCallback', component: () => import('@/views/OAuthCallback.vue') },
 
@@ -101,8 +108,11 @@ router.beforeEach((to, from, next) => {
     return next('/onboard')
   }
 
-  // Coach-only routes — redirect athletes to their dashboard
+  // Coach-only routes — redirect non-coaches to their dashboard
   if (to.meta.requiresCoach && userRole !== 'coach') return next('/dashboard')
+
+  // Admin-only routes — redirect non-admins to their dashboard
+  if (to.meta.requiresAdmin && userRole !== 'admin') return next(homeDash)
 
   next()
 })

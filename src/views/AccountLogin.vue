@@ -76,7 +76,7 @@
               <input type="checkbox" v-model="remember" />
               <span>Remember me</span>
             </label>
-            <a href="/support" class="forgot-link">Forgot password?</a>
+            <router-link to="/forgot-password" class="forgot-link">Forgot password?</router-link>
           </div>
 
           <div v-if="error" class="alert alert-danger py-2 mb-3" role="alert">
