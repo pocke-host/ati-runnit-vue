@@ -1393,10 +1393,12 @@ onMounted(init)
 }
 
 @media (max-width: 480px) {
-  .top-bar { padding: 12px 16px; }
+  .top-bar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+  .top-bar-meta { flex: 1 1 100%; } /* push meta to its own row on tiny screens */
   .user-row-wrap { padding: 0 16px; }
   .detail-layout { padding: 16px 12px 64px; }
-  .reaction-btn { padding: 10px 14px; font-size: 0.78rem; }
+  /* Ensure 44px minimum touch target on reaction buttons */
+  .reaction-btn { padding: 10px 14px; font-size: 0.78rem; min-height: 44px; }
   .sr-date { font-size: 0.72rem; }
 }
 

@@ -609,7 +609,7 @@ onMounted(() => {
   border: 1px solid #E5E5E5;
   border-radius: 0;
   padding: 0 14px;
-  font-size: 0.9rem;
+  font-size: 1rem; /* 16px — prevents iOS auto-zoom on focus */
   color: #000;
   background: #fff;
   outline: none;
@@ -625,7 +625,7 @@ onMounted(() => {
   border: 1px solid #E5E5E5;
   border-radius: 0;
   padding: 0 14px;
-  font-size: 0.9rem;
+  font-size: 1rem; /* match input, prevents zoom */
   color: #767676;
   background: #fafafa;
   cursor: default;
@@ -651,8 +651,8 @@ onMounted(() => {
 }
 
 .pe-char-count {
-  font-size: 11px;
-  color: #767676;
+  font-size: 12px;
+  color: rgba(15,18,16,0.55); /* better contrast than #767676 on white */
   text-align: right;
   margin-top: 4px;
 }
@@ -777,7 +777,7 @@ onMounted(() => {
 .btn-danger:hover { background: #fef2f2; border-color: #dc2626; }
 
 /* Responsive */
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .pe-grid {
     grid-template-columns: 1fr;
   }
@@ -791,7 +791,12 @@ onMounted(() => {
     align-items: flex-start;
   }
   .pe-wrap {
-    padding: 32px 16px 80px;
+    /* extra bottom padding so iOS keyboard doesn't cover the save button */
+    padding: 32px 16px 120px;
+  }
+  /* Toggle buttons need clear text at smaller widths */
+  .pe-toggle-btn {
+    font-size: 0.85rem;
   }
 }
 </style>

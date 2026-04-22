@@ -388,7 +388,7 @@ const handleAppleSignIn = () => {
   border: 1px solid #E5E7EB;
   border-radius: 0;
   padding: 0 16px;
-  font-size: 15px;
+  font-size: 16px; /* 16px minimum — prevents iOS from auto-zooming on focus */
   transition: all 0.2s ease;
 }
 
@@ -406,19 +406,27 @@ const handleAppleSignIn = () => {
 .password-input {
   position: relative;
 }
+/* Ensure typed text doesn't slide under the toggle button */
+.password-input .form-control {
+  padding-right: 52px;
+}
 
 .password-toggle {
   position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
   background: none;
   border: none;
   color: #9CA3AF;
   font-size: 18px;
   cursor: pointer;
-  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.2s ease;
+  /* 48px touch target — safe on all iPhones including SE */
 }
 
 .password-toggle:hover {

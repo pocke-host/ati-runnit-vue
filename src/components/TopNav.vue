@@ -811,7 +811,8 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .navbar-content {
-    padding: 0 16px;
+    /* horizontal safe-area for notch/island (landscape or side-notch) */
+    padding: 0 max(16px, env(safe-area-inset-right, 16px)) 0 max(16px, env(safe-area-inset-left, 16px));
   }
   /* Center brand on mobile via absolute */
   .navbar-brand {
@@ -863,6 +864,10 @@ onUnmounted(() => {
   overflow-y: auto;
   box-shadow: none;
   font-family: Futura, 'Avenir Next', system-ui, sans-serif;
+  /* safe-area insets so content isn't behind notch or home bar */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 .drawer-header {
@@ -880,8 +885,8 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 .drawer-close {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 0;
   border: none;
   background: transparent;
@@ -892,6 +897,7 @@ onUnmounted(() => {
   justify-content: center;
   cursor: pointer;
   transition: color 0.15s;
+  flex-shrink: 0;
 }
 .drawer-close:hover { color: white; }
 

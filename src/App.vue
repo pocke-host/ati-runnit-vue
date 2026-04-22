@@ -184,6 +184,12 @@ const toastIcon = (type) => ({
 .toast-enter-from   { opacity: 0; transform: translateY(10px); }
 .toast-leave-to     { opacity: 0; transform: translateY(-6px); }
 
+/* ── Global mobile safe-area / bottom-nav clearance ── */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px));
+  }
+}
 /* ── Scroll Reveal ── */
 [data-reveal] {
   opacity: 0;
