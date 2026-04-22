@@ -1933,13 +1933,19 @@ onUnmounted(() => {
   .pr-grid { grid-template-columns: 1fr; }
   .milestone-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-title { font-size: 1.8rem; }
-  .section-title { font-size: 1.1rem; }
+  .section-title { font-size: 1.2rem; }
   .pr-card { padding: 16px; }
   .pr-value { font-size: 1.3rem; }
   .perf-grid { grid-template-columns: 1fr; }
   .hero { padding: 32px 16px 28px; }
   .stats-content { padding: 20px 12px 80px; }
   .jumpnav-inner { padding: 0 12px; }
+
+  /* Heatmap: shrink cells so the grid fits on small screens */
+  .heatmap-cell { width: 8px; height: 8px; }
+  .heatmap-months { grid-auto-columns: 10px; }
+  .heatmap-grid { gap: 1px; }
+  .heatmap-week { gap: 1px; }
 }
 
 /* ── Athlete Archetype ── */

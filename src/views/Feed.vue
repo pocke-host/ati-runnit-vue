@@ -1693,24 +1693,58 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .feed-header-inner { padding: 0 12px; }
   .feed-container { padding-top: 168px; padding-left: 12px; padding-right: 12px; }
-  .feed-tabs { gap: 6px; }
-  .feed-tab { padding: 9px 14px; font-size: 0.82rem; }
+  .feed-tabs { gap: 6px; padding: 0 12px; }
 
-  .moment-modal-content {
-    grid-template-columns: 1fr;
-  }
+  /* 44px minimum touch target for tabs */
+  .feed-tab { min-height: 44px; padding: 12px 16px; font-size: 0.82rem; }
 
-  .moment-modal-image {
-    display: none;
-  }
+  .feed-header-content { padding: 0 12px; }
 
-  .feed-grid {
-    grid-template-columns: 1fr;
-  }
-
+  /* Sort buttons — keep inline with tabs, right-aligned */
   .feed-sort {
     position: static;
-    margin-top: 12px;
+    margin-top: 8px;
+    justify-content: flex-end;
+    padding: 0 12px;
+  }
+  .sort-btn { width: 44px; height: 44px; }
+
+  /* Feed grid: single column */
+  .feed-grid { grid-template-columns: 1fr; }
+
+  /* Song metadata font-size bump */
+  .song-title { font-size: 1rem; }
+  .song-artist { font-size: 0.88rem; }
+
+  /* Comment text readability */
+  .comment-author { font-size: 0.95rem; }
+  .comment-time { font-size: 0.8rem; }
+
+  /* Moment modal — stack image on top, sidebar below (scrollable) */
+  .moment-modal {
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .moment-modal-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: min(45vw, 300px) 1fr;
+    height: auto;
+    flex: 1;
+  }
+  /* Show the image — previously hidden */
+  .moment-modal-image {
+    display: flex;
+    max-height: min(45vw, 300px);
+    min-height: 200px;
+  }
+  .moment-modal-sidebar {
+    border-left: none;
+    border-top: 1px solid rgba(15,18,16,0.10);
+    overflow-y: auto;
   }
 }
 
