@@ -280,6 +280,24 @@ import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Races — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/races' }],
+  meta: [
+    { name: 'description', content: 'Discover upcoming running, cycling, and triathlon races near you. Filter by sport, distance, and date. Track your race history on Runnit.' },
+    { property: 'og:title', content: 'Races — Runnit' },
+    { property: 'og:description', content: 'Discover upcoming running, cycling, and triathlon races. Filter by sport, distance, and date.' },
+    { property: 'og:url', content: 'https://runnit.live/races' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Races — Runnit' },
+    { name: 'twitter:description', content: 'Discover upcoming running, cycling, and triathlon races near you.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
 import { useToast } from '@/composables/useToast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'

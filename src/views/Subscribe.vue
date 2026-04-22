@@ -158,6 +158,24 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useStripe } from '@/composables/useStripe'
 import { storeToRefs } from 'pinia'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Subscribe — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/subscribe' }],
+  meta: [
+    { name: 'description', content: 'Unlock Runnit Pro — advanced training plans, unlimited GPS tracking, coach tools, and priority support. Start free, upgrade anytime.' },
+    { property: 'og:title', content: 'Subscribe — Runnit' },
+    { property: 'og:description', content: 'Unlock Runnit Pro — advanced training plans, unlimited GPS tracking, coach tools, and priority support.' },
+    { property: 'og:url', content: 'https://runnit.live/subscribe' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Subscribe — Runnit' },
+    { name: 'twitter:description', content: 'Advanced training plans, unlimited GPS tracking, and coach tools.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
 
 const authStore = useAuthStore()
 const { isAuthenticated } = storeToRefs(authStore)

@@ -94,6 +94,7 @@ useHead({
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Cycling — Runnit' },
+    { name: 'twitter:description', content: 'Log road, gravel, and MTB rides. Track power, segments, and PRs with Garmin and Wahoo sync.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
