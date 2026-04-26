@@ -45,7 +45,7 @@
       <div class="user-row-wrap">
         <div class="user-row">
           <router-link :to="`/profile/${activity.userId}`" class="avatar-link">
-            <div class="det-avatar">{{ getInitial(activity.userDisplayName) }}</div>
+            <UserAvatar :src="activity.userAvatarUrl" :name="activity.userDisplayName || ''" :size="40" />
           </router-link>
           <div class="user-info">
             <router-link :to="`/profile/${activity.userId}`" class="user-name-link">
@@ -130,6 +130,26 @@
               <div class="stat-box">
                 <div class="stat-label">Calories</div>
                 <div class="stat-val">{{ activity.calories ? activity.calories + ' kcal' : '—' }}</div>
+              </div>
+            </div>
+
+            <!-- HR Zone Bar -->
+            <div v-if="activity.averageHeartRate" class="hr-zone-block">
+              <div class="hr-zone-label">HEART RATE ZONE</div>
+              <div class="hr-zone-bar">
+                <div
+                  v-for="z in hrZones"
+                  :key="z.zone"
+                  :class="['hr-zone-seg', { active: z.zone === hrAvgZone }]"
+                  :style="{ background: z.color }"
+                  :title="`Z${z.zone}: ${z.label}`"
+                >
+                  <span v-if="z.zone === hrAvgZone" class="hr-zone-marker">Z{{ z.zone }}</span>
+                </div>
+              </div>
+              <div class="hr-zone-meta">
+                <span>{{ activity.averageHeartRate }} bpm avg</span>
+                <span class="hr-zone-name">{{ hrZones.find(z => z.zone === hrAvgZone)?.label || '' }}</span>
               </div>
             </div>
 
@@ -369,6 +389,7 @@ import RouteViewer from '@/components/RouteViewer.vue'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
 import { useNotificationStore } from '@/stores/notification'
@@ -596,6 +617,27 @@ const getInitial = (val) => {
   if (typeof val === 'string') return val.charAt(0).toUpperCase()
   return ((val.displayName || val.name || '?').charAt(0).toUpperCase())
 }
+
+// HR Zone visualization
+const hrZones = [
+  { zone: 1, label: 'Recovery',  color: '#93C5FD', pct: [0,   60] },
+  { zone: 2, label: 'Aerobic',   color: '#6EE7B7', pct: [60,  70] },
+  { zone: 3, label: 'Tempo',     color: '#FCD34D', pct: [70,  80] },
+  { zone: 4, label: 'Threshold', color: '#FB923C', pct: [80,  90] },
+  { zone: 5, label: 'Max',       color: '#F87171', pct: [90, 100] },
+]
+
+const hrAvgZone = computed(() => {
+  const hr = activity.value?.averageHeartRate
+  const maxHr = activity.value?.maxHeartRate || user.value?.maxHeartRate || 190
+  if (!hr) return null
+  const pct = (hr / maxHr) * 100
+  if (pct < 60) return 1
+  if (pct < 70) return 2
+  if (pct < 80) return 3
+  if (pct < 90) return 4
+  return 5
+})
 
 const formatDate = (d) => {
   if (!d) return ''
@@ -1078,6 +1120,57 @@ onMounted(init)
   color: #fff;
   padding: 4px 10px;
 }
+/* HR Zone block */
+.hr-zone-block {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E5E5;
+}
+.hr-zone-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(15,18,16,0.45);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.hr-zone-bar {
+  display: flex;
+  height: 10px;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.hr-zone-seg {
+  flex: 1;
+  position: relative;
+  transition: transform 0.15s;
+}
+.hr-zone-seg.active {
+  transform: scaleY(1.5);
+  transform-origin: bottom;
+}
+.hr-zone-marker {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.hr-zone-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: rgba(15,18,16,0.55);
+}
+.hr-zone-name {
+  font-weight: 700;
+  color: rgba(15,18,16,0.80);
+}
+
 .gear-row {
   display: flex;
   align-items: center;

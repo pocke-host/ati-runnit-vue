@@ -91,7 +91,9 @@
 
             <div class="card-info">
               <div class="card-user">
-                <router-link :to="`/profile/${item.user?.id}`" class="user-avatar-small avatar-link">{{ getUserInitial(item.user) }}</router-link>
+                <router-link :to="`/profile/${item.user?.id}`" class="avatar-link">
+                  <UserAvatar :src="item.user?.avatarUrl" :name="item.user?.displayName || ''" :size="32" />
+                </router-link>
                 <div class="user-details">
                   <router-link :to="`/profile/${item.user?.id}`" class="user-name-link">
                     <div class="user-name">
@@ -118,10 +120,21 @@
           <!-- ACTIVITY CARD -->
           <template v-else-if="item.type === 'activity'">
             <router-link :to="`/activities/${item.id}`" class="act-card">
+              <!-- Sport thumbnail -->
+              <div class="act-map-thumb" :style="{ background: getSportGradient(item.sportType) }">
+                <svg viewBox="0 0 200 60" class="route-art" preserveAspectRatio="none">
+                  <polyline points="0,45 30,20 60,35 90,15 120,30 150,10 180,25 200,20"
+                            stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+                <span class="act-thumb-icon">{{ getSportIcon(item.sportType) }}</span>
+              </div>
+
               <!-- Top: user + time -->
               <div class="act-card-top">
                 <div class="act-card-user">
-                  <router-link :to="`/profile/${item.user?.id}`" class="act-avatar" @click.stop>{{ getUserInitial(item.user) }}</router-link>
+                  <router-link :to="`/profile/${item.user?.id}`" class="avatar-link" @click.stop>
+                    <UserAvatar :src="item.user?.avatarUrl" :name="item.user?.displayName || ''" :size="32" />
+                  </router-link>
                   <div>
                     <router-link :to="`/profile/${item.user?.id}`" class="act-name" @click.stop>
                       {{ item.user?.displayName }}<span v-if="item.user?.id === user?.id" class="act-you"> · YOU</span>
@@ -222,7 +235,7 @@
           <div class="moment-modal-sidebar">
             <div class="moment-modal-header">
               <div class="moment-user">
-                <div class="user-avatar">{{ getUserInitial(selectedMoment.user) }}</div>
+                <UserAvatar :src="selectedMoment.user?.avatarUrl" :name="selectedMoment.user?.displayName || ''" :size="40" />
                 <div class="user-details">
                   <div class="user-name">
                     {{ selectedMoment.user.displayName }}
@@ -372,6 +385,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 import CreateEventForm from '@/components/CreateEventForm.vue'
@@ -526,6 +540,17 @@ const getSportIcon = (sportType) => {
     OTHER: '🏋️'
   }
   return icons[sportType] || '🏋️'
+}
+
+const getSportGradient = (sportType) => {
+  const gradients = {
+    RUN:  'linear-gradient(135deg, #0052FF 0%, #003ECC 100%)',
+    BIKE: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+    SWIM: 'linear-gradient(135deg, #0077B6 0%, #023E8A 100%)',
+    HIKE: 'linear-gradient(135deg, #2D6A4F 0%, #1B4332 100%)',
+    WALK: 'linear-gradient(135deg, #5A6B4E 0%, #2C3726 100%)',
+  }
+  return gradients[sportType] || 'linear-gradient(135deg, #333 0%, #111 100%)'
 }
 
 const formatTime = (dateString) => {
@@ -979,6 +1004,30 @@ onUnmounted(() => {
 }
 .act-card:hover { text-decoration: none; background: #fafafa; }
 .act-card:active { background: #f0f0f0; }
+
+/* Sport thumbnail */
+.act-map-thumb {
+  height: 96px;
+  margin: -20px -20px 16px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.route-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.act-thumb-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-size: 1.6rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+
 .act-card-footer {
   display: flex;
   align-items: center;
