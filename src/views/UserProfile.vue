@@ -28,7 +28,7 @@
       <section class="profile-hero">
         <div class="hero-inner">
           <div class="avatar-wrap">
-            <div class="avatar-xl">{{ userInitial }}</div>
+            <UserAvatar :src="profile.avatarUrl" :name="profile.displayName || ''" :size="96" />
             <div v-if="isOwnProfile" class="avatar-badge" title="Your profile">
               <i class="bi bi-star-fill"></i>
             </div>
@@ -397,7 +397,7 @@
           </div>
           <div class="moment-modal-side">
             <div class="moment-modal-user">
-              <div class="m-avatar">{{ userInitial }}</div>
+              <UserAvatar :src="profile.avatarUrl" :name="profile.displayName || ''" :size="36" />
               <div>
                 <div class="m-name">{{ profile.displayName }}</div>
                 <div class="m-time">{{ formatTimeFull(selectedMoment.createdAt) }}</div>
@@ -434,6 +434,7 @@ import { useGrowthTimeline } from '@/composables/useGrowthTimeline'
 import { useAchievementStore, BADGE_CATALOG, computeEarnedBadges } from '@/stores/achievement'
 import { useNotificationStore } from '@/stores/notification'
 import SkeletonCard from '@/components/SkeletonCard.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
