@@ -94,6 +94,7 @@ useHead({
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Swimming — Runnit' },
+    { name: 'twitter:description', content: 'Track pool and open-water swims with auto-splits, lap pace, and GPS mapping.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })

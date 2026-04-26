@@ -46,6 +46,25 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Careers — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/careers' }],
+  meta: [
+    { name: 'description', content: 'Join the team building the future of endurance training. Open roles in engineering, design, and growth at Runnit.' },
+    { property: 'og:title', content: 'Careers — Runnit' },
+    { property: 'og:description', content: 'Join the team building the future of endurance training. Open roles in engineering, design, and growth.' },
+    { property: 'og:url', content: 'https://runnit.live/careers' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Careers — Runnit' },
+    { name: 'twitter:description', content: 'Join the team building the future of endurance training.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
+
 const roles = [
   // {
   //   title: 'UI/UX Designer',

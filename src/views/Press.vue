@@ -40,6 +40,25 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Press — Runnit',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/press' }],
+  meta: [
+    { name: 'description', content: 'Runnit in the news — press coverage, media resources, and brand assets for journalists and creators.' },
+    { property: 'og:title', content: 'Press — Runnit' },
+    { property: 'og:description', content: 'Press coverage, media resources, and brand assets for journalists and creators.' },
+    { property: 'og:url', content: 'https://runnit.live/press' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Press — Runnit' },
+    { name: 'twitter:description', content: 'Press coverage, media resources, and brand assets.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+  ]
+})
+
 const coverage = [
   { pub: 'Runner\'s World', headline: '"The Strava Challenger That\'s Actually Different"', date: 'February 2026' },
   { pub: 'TechCrunch', headline: '"Runnit Raises Seed Round to Build the Athlete OS"', date: 'January 2026' },

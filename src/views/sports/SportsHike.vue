@@ -96,6 +96,7 @@ useHead({
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Hiking — Runnit' },
+    { name: 'twitter:description', content: 'Track hikes with trail maps, elevation profiles, and offline route support.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
