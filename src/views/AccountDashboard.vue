@@ -4,15 +4,14 @@
     <!-- Loading State -->
     <AppSpinner v-if="!user" label="Loading dashboard…" />
 
-    <!-- Pull-to-refresh indicator (mobile only) -->
-    <div class="ptr-indicator" :style="{ height: pullY + 'px', opacity: pullY > 0 ? 1 : 0 }" aria-hidden="true">
-      <div :class="['ptr-spinner', { spinning: refreshing }]">
-        <i class="bi bi-arrow-clockwise"></i>
-      </div>
-    </div>
-
     <!-- Dashboard Content -->
     <div v-else class="wrap">
+      <!-- Pull-to-refresh indicator (mobile only) -->
+      <div class="ptr-indicator" :style="{ height: pullY + 'px', opacity: pullY > 0 ? 1 : 0 }" aria-hidden="true">
+        <div :class="['ptr-spinner', { spinning: refreshing }]">
+          <i class="bi bi-arrow-clockwise"></i>
+        </div>
+      </div>
 
       <!-- Streak urgency banner -->
       <div v-if="totalStats.streak > 0 && !activityToday" class="streak-banner" role="alert">
