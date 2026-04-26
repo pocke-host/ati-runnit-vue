@@ -28,8 +28,8 @@
     <!-- Body -->
     <div class="notif-body">
 
-      <div v-if="loading" class="notif-loading">
-        <div class="spinner-border me-2"></div> Loading…
+      <div v-if="loading" class="notif-skeleton">
+        <SkeletonCard v-for="n in 6" :key="n" variant="activity-row" />
       </div>
 
       <div v-else-if="filtered.length === 0" class="notif-empty">
@@ -80,6 +80,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/stores/notification'
 import { storeToRefs } from 'pinia'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 
 const router = useRouter()
 const notifStore = useNotificationStore()
@@ -280,12 +281,11 @@ onMounted(() => {
   padding: 32px 24px 80px;
 }
 
-.notif-loading {
+.notif-skeleton {
   display: flex;
-  align-items: center;
-  padding: 48px 0;
-  color: #767676;
-  font-size: 0.88rem;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
 }
 
 .notif-empty {

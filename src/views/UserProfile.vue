@@ -1196,11 +1196,31 @@ onMounted(init)
   .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
+@media (max-width: 768px) {
+  /* Horizontally scrollable tabs — no squishing or wrapping */
+  .content-tabs {
+    padding: 0 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+  .content-tabs::-webkit-scrollbar { display: none; }
+  .ctab {
+    flex-shrink: 0;
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    gap: 6px;
+  }
+  /* Hide icons inside tabs — keep text + count only */
+  .ctab i { display: none; }
+}
+
 @media (max-width: 480px) {
   .avatar-xl { width: 72px; height: 72px; font-size: 1.8rem; }
   .hero-name { font-size: 1.5rem; }
   .hero-actions { flex-direction: column; gap: 8px; width: 100%; }
-  .ctab { width: 100%; justify-content: center; }
   .activities-grid { grid-template-columns: 1fr; }
   .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }

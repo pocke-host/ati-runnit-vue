@@ -1,5 +1,12 @@
 <template>
   <div class="feed-page">
+    <!-- Pull-to-refresh indicator -->
+    <div class="ptr-indicator" :style="{ height: feedPullY + 'px', opacity: feedPullY > 0 ? 1 : 0 }" aria-hidden="true">
+      <div :class="['ptr-spinner', { spinning: feedRefreshing }]">
+        <i class="bi bi-arrow-clockwise"></i>
+      </div>
+    </div>
+
     <!-- Editorial Header + Tabs -->
     <div class="feed-header-bar">
       <div class="feed-header-inner">
@@ -368,6 +375,7 @@ import ConfirmModal from '@/components/ConfirmModal.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 import CreateEventForm from '@/components/CreateEventForm.vue'
+import { usePullToRefresh } from '@/composables/usePullToRefresh'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -737,6 +745,8 @@ function onEventCreated(event) {
   router.push(`/multisport-events/${event.id}`)
 }
 
+const { refreshing: feedRefreshing, pullY: feedPullY } = usePullToRefresh(fetchFeed)
+
 onMounted(() => {
   fetchFeed()
   loadFollowStatus()
@@ -755,6 +765,19 @@ onUnmounted(() => {
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
+
+/* Pull-to-refresh */
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.2s ease, opacity 0.15s ease;
+  pointer-events: none;
+}
+.ptr-spinner { font-size: 1.4rem; color: #0052FF; }
+.ptr-spinner.spinning i { animation: ptr-spin 0.7s linear infinite; }
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
 
 /* ── HEADER BAR ── */
 .feed-header-bar {
