@@ -4,8 +4,25 @@
     <!-- Loading State -->
     <AppSpinner v-if="!user" label="Loading dashboard…" />
 
+    <!-- Pull-to-refresh indicator (mobile only) -->
+    <div class="ptr-indicator" :style="{ height: pullY + 'px', opacity: pullY > 0 ? 1 : 0 }" aria-hidden="true">
+      <div :class="['ptr-spinner', { spinning: refreshing }]">
+        <i class="bi bi-arrow-clockwise"></i>
+      </div>
+    </div>
+
     <!-- Dashboard Content -->
     <div v-else class="wrap">
+
+      <!-- Streak urgency banner -->
+      <div v-if="totalStats.streak > 0 && !activityToday" class="streak-banner" role="alert">
+        <span class="streak-banner-icon">🔥</span>
+        <span class="streak-banner-text">
+          Your <strong>{{ totalStats.streak }}-day streak</strong> is at risk — log an activity today to keep it alive.
+        </span>
+        <router-link to="/track" class="streak-banner-cta">Track Now</router-link>
+      </div>
+
       <!-- EDITORIAL GREETING -->
       <header class="dash-greeting">
         <div class="greeting-left">
@@ -353,20 +370,19 @@
               </div>
             </div>
 
-            <div v-if="loading" class="activities-loading">
-              <div class="spinner-border spinner-border-sm"></div>
-              <span>Loading...</span>
+            <div v-if="loading" class="sk-activity-list">
+              <SkeletonCard v-for="n in 4" :key="n" variant="activity-row" />
             </div>
 
             <div v-else-if="filteredActivities.length" class="activities-list">
-              <div 
+              <div
                 v-for="activity in filteredActivities.slice(0, 5)"
                 :key="activity.id"
                 class="activity-item"
               >
                 <div class="activity-icon">{{ getSportIcon(activity.sportType) }}</div>
                 <div class="activity-details">
-                  <div class="activity-name">{{ activity.sportType }} Activity</div>
+                  <div class="activity-name">{{ getActivityName(activity) }}</div>
                   <div class="activity-meta">
                     {{ formatDuration(activity.durationSeconds) }} • {{ formatDistance(activity.distanceMeters) }}
                   </div>
@@ -807,7 +823,9 @@ import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
 import { useAthleteStore } from '@/stores/athlete'
 import AppSpinner from '@/components/AppSpinner.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
 import StoriesViewer from '@/components/StoriesViewer.vue'
+import { usePullToRefresh } from '@/composables/usePullToRefresh'
 
 Chart.register(...registerables)
 
@@ -1220,6 +1238,15 @@ const getSportIcon = (sportType) => {
   return icons[sportType] || '🏋️'
 }
 
+// Returns a contextual name like "Morning Run", "Evening Ride", etc.
+const getActivityName = (activity) => {
+  if (activity.title) return activity.title
+  const hour = new Date(activity.createdAt).getHours()
+  const time = hour < 5 ? 'Night' : hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : hour < 20 ? 'Evening' : 'Night'
+  const sport = { RUN: 'Run', BIKE: 'Ride', SWIM: 'Swim', HIKE: 'Hike', WALK: 'Walk' }[activity.sportType] || activity.sportType
+  return `${time} ${sport}`
+}
+
 const formatDateShort = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
@@ -1598,33 +1625,89 @@ watch(activities, () => {
   updateCharts()
 }, { deep: true })
 
-onMounted(async () => {
-  // Render empty charts immediately so the canvas elements appear at once
-  await nextTick()
-  updateCharts()
-
-  // Kick off all independent data fetches in parallel
+const loadData = async () => {
   await Promise.all([
     activityStore.fetchActivities(),
     loadFollowData(),
     planStore.fetchPlans(),
     athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
   ])
-
   if (activePlan.value?.id) {
     planStore.fetchPlan(activePlan.value.id).then(data => { fullActivePlan.value = data }).catch(() => {})
   }
-
-  // Achievements and PRs depend on activities being loaded
   await Promise.all([
     achievementStore.fetchAchievements(activities.value),
     prStore.fetchPRs(activities.value)
   ])
+}
+
+const { refreshing, pullY } = usePullToRefresh(loadData)
+
+onMounted(async () => {
+  // Render empty charts immediately so the canvas elements appear at once
+  await nextTick()
+  updateCharts()
+  await loadData()
 })
 </script>
 
 <style scoped>
 /* ... keeping all existing styles ... */
+
+/* ── Pull-to-refresh indicator ── */
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+.ptr-spinner {
+  font-size: 1.4rem;
+  color: #0052FF;
+  transition: transform 0.2s ease;
+}
+.ptr-spinner.spinning i {
+  animation: ptr-spin 0.7s linear infinite;
+}
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
+
+/* ── Streak urgency banner ── */
+.streak-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #fff8e1;
+  border-bottom: 2px solid #ffc107;
+  font-size: 0.85rem;
+  color: #5a4000;
+  flex-wrap: wrap;
+}
+.streak-banner-icon { font-size: 1.2rem; flex-shrink: 0; }
+.streak-banner-text { flex: 1; min-width: 180px; line-height: 1.4; }
+.streak-banner-cta {
+  padding: 6px 14px;
+  background: #0052FF;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.streak-banner-cta:hover { background: #003ECC; color: #fff; }
+
+/* ── Activity skeleton list ── */
+.sk-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
 
 /* Add new Friends Modal styles */
 .friends-search {

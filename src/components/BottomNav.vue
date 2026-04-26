@@ -32,7 +32,7 @@
         <i class="bi bi-collection-fill tab-icon"></i>
         <span class="tab-label">Feed</span>
       </router-link>
-      <router-link to="/track" class="tab-item tab-track">
+      <router-link to="/track" class="tab-item tab-track" @click="hapticTrack">
         <div class="track-circle">
           <i class="bi bi-play-fill"></i>
         </div>
@@ -58,10 +58,19 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import { Capacitor } from '@capacitor/core'
 
 const authStore = useAuthStore()
 const { isAuthenticated, user, role } = storeToRefs(authStore)
 const userId = computed(() => user.value?.id)
+
+const hapticTrack = async () => {
+  if (!Capacitor.isNativePlatform()) return
+  try {
+    const { Haptics, ImpactStyle } = await import('@capacitor/haptics')
+    await Haptics.impact({ style: ImpactStyle.Medium })
+  } catch { /* non-fatal */ }
+}
 </script>
 
 <style scoped>
@@ -146,6 +155,10 @@ const userId = computed(() => user.value?.id)
 .tab-track:hover .track-circle,
 .tab-track.router-link-active .track-circle {
   transform: scale(1.06);
+}
+.tab-track:active .track-circle {
+  transform: scale(0.92);
+  transition: transform 0.08s ease;
 }
 
 .tab-track .tab-label {
