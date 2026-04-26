@@ -58,19 +58,12 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
-import { Capacitor } from '@capacitor/core'
-
 const authStore = useAuthStore()
 const { isAuthenticated, user, role } = storeToRefs(authStore)
 const userId = computed(() => user.value?.id)
 
-const hapticTrack = async () => {
-  if (!Capacitor.isNativePlatform()) return
-  try {
-    const { Haptics, ImpactStyle } = await import('@capacitor/haptics')
-    await Haptics.impact({ style: ImpactStyle.Medium })
-  } catch { /* non-fatal */ }
-}
+// Web Vibration API — works on Android Chrome/Capacitor, no-ops silently on iOS
+const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not supported */ } }
 </script>
 
 <style scoped>
