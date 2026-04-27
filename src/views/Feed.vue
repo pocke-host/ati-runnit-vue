@@ -47,6 +47,13 @@
       </div>
     </div>
 
+    <!-- Backend error banner -->
+    <div v-if="fetchError" class="feed-error-banner">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      Couldn't load feed — the server may be waking up.
+      <button class="feed-error-retry" @click="fetchFeed">Retry</button>
+    </div>
+
     <!-- Feed Content -->
     <div class="feed-container">
       <div v-if="loading" class="feed-grid">
@@ -408,6 +415,7 @@ const activeTab = ref('all')
 const timePeriod = ref('all')
 const sortOrder = ref('newest')
 const loading = ref(false)
+const fetchError = ref(false)
 const showCreateEvent = ref(false)
 const moments = ref([])
 const activities = ref([])
@@ -577,16 +585,23 @@ const formatTimeFull = (dateString) => {
 }
 
 const safeFetch = (url) =>
-  axios.get(url, { headers: getAuthHeaders() }).catch(() => ({ data: [] }))
+  axios.get(url, { headers: getAuthHeaders(), timeout: 15000 })
+    .catch(() => ({ data: [], _failed: true }))
 
 const fetchFeed = async () => {
   loading.value = true
+  fetchError.value = false
   try {
     const [momentsRes, activitiesRes, ownActivitiesRes] = await Promise.all([
       safeFetch(`${API_URL}/moments/feed?page=0&size=100`),
       safeFetch(`${API_URL}/activities/feed`),
       safeFetch(`${API_URL}/activities?page=0&size=200`),
     ])
+
+    // If the two critical endpoints both failed, surface an error
+    if (ownActivitiesRes._failed && momentsRes._failed) {
+      fetchError.value = true
+    }
 
     moments.value = momentsRes.data.content || momentsRes.data || []
 
@@ -686,9 +701,9 @@ const toggleReaction = async (type) => {
   reactionLoading.value = true
   try {
     if (prevReaction === type) {
-      await axios.delete(`${API_URL}/reactions/${selectedMoment.value.id}`, { headers: getAuthHeaders() })
+      await axios.delete(`${API_URL}/moments/${selectedMoment.value.id}/reaction`, { headers: getAuthHeaders() })
     } else {
-      await axios.post(`${API_URL}/reactions/${selectedMoment.value.id}`, { reactionType: type }, { headers: getAuthHeaders() })
+      await axios.post(`${API_URL}/moments/${selectedMoment.value.id}/reaction`, { type }, { headers: getAuthHeaders() })
     }
   } catch (err) {
     // Rollback
@@ -790,6 +805,32 @@ onUnmounted(() => {
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
+
+/* Error banner */
+.feed-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff3cd;
+  border-bottom: 1px solid #ffc107;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #856404;
+}
+.feed-error-retry {
+  margin-left: auto;
+  padding: 4px 12px;
+  border: 1px solid #856404;
+  background: transparent;
+  color: #856404;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.feed-error-retry:hover { background: rgba(133,100,4,0.1); }
 
 /* Pull-to-refresh */
 .ptr-indicator {
