@@ -78,7 +78,7 @@
               </div>
               <div v-else class="notif-list">
                 <div
-                  v-for="n in notifications.slice(0, 12)"
+                  v-for="n in notifications"
                   :key="n.id"
                   :class="['notif-item', { unread: !n.read }]"
                   @click="handleNotifClick(n)"
@@ -93,9 +93,6 @@
                   <div v-if="!n.read" class="notif-dot"></div>
                 </div>
               </div>
-              <button v-if="notifications.length > 12" class="notif-footer" @click="notifStore.markAllRead(); notifOpen = false">
-                {{ notifications.length - 12 }} more &mdash; mark all read
-              </button>
             </div>
           </div>
 
