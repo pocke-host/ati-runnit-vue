@@ -8,7 +8,7 @@
     <!-- Header row (steps 2–6, athlete only) -->
     <div class="onboard-header" v-if="!isCoach && step >= 2 && step <= 6">
       <button class="btn-back" @click="back">← Back</button>
-      <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 05</span>
+      <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 06</span>
     </div>
     <!-- Header row for coach steps -->
     <div class="onboard-header" v-if="isCoach && step >= 2 && step <= 3">
@@ -185,11 +185,30 @@
           <span class="tile-sub">km, m, min/km</span>
         </button>
       </div>
+      <button class="btn-cta mt-auto" @click="step = 7">Continue</button>
+    </div>
+
+    <!-- ── Step 7: City ── -->
+    <div v-else-if="step === 7" class="step-container">
+      <button class="btn-back standalone" @click="back">← Back</button>
+      <h2 class="step-question">Where do<br>you run?</h2>
+      <p style="color:#767676;font-size:0.9rem;margin:-24px 0 28px;font-weight:300;">
+        We'll use this to connect you with local run crews and events.
+      </p>
+      <div class="tile-grid" style="grid-template-columns:1fr;gap:0;">
+        <input
+          v-model="selections.city"
+          class="city-input"
+          placeholder="City (e.g. Austin, TX)"
+          @keyup.enter="finish"
+          autofocus
+        />
+      </div>
       <button class="btn-cta mt-auto" @click="finish">Continue</button>
     </div>
 
-    <!-- ── Step 7: Done ── -->
-    <div v-else-if="step === 7" class="step-container step-done">
+    <!-- ── Step 8: Done ── -->
+    <div v-else-if="step === 8" class="step-container step-done">
       <div class="done-sport-emoji">{{ selectedSportEmoji }}</div>
       <h2 class="done-headline">You're all set.</h2>
       <div class="done-summary">
@@ -239,13 +258,14 @@ const { user, role } = storeToRefs(authStore)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const step = ref(1)
-const ATHLETE_STEPS = 5  // steps 2–6 are the 5 choice screens
+const ATHLETE_STEPS = 6  // steps 2–7 are the 6 choice screens (city added)
 const COACH_STEPS = 2    // steps 2–3 are the 2 coach choice screens
 const saving = ref(false)
 
 const isCoach = computed(() => role.value === 'coach')
 
 const selections = reactive({
+  city: '',
   sport: '',
   goal: '',
   level: '',
@@ -342,7 +362,7 @@ function back() {
 }
 
 function finish() {
-  step.value = 7
+  step.value = 8
 }
 
 function finishCoach() {
@@ -372,6 +392,12 @@ async function goToDashboard() {
   saveError.value = ''
   authStore.setUnitSystem(selections.units)
   try {
+    // Set city + sport + compute archetype via new onboarding endpoint
+    await axios.post(`${API_URL}/auth/onboarding`, {
+      city: selections.city || '',
+      sport: selections.sport,
+    })
+    // Save training preferences separately
     await axios.patch(`${API_URL}/users/me/preferences`, {
       sport: selections.sport,
       goal: selections.goal,
@@ -690,6 +716,27 @@ async function goToDashboard() {
   color: #000;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* ── City input ── */
+.city-input {
+  width: 100%;
+  padding: 18px 20px;
+  border: 1px solid #E5E5E5;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #000;
+  background: #fff;
+  outline: none;
+  margin-bottom: 32px;
+  transition: border-color 0.15s;
+}
+.city-input:focus {
+  border-color: #000;
+}
+.city-input::placeholder {
+  color: #C5C5C5;
 }
 
 /* ── Save error ── */
