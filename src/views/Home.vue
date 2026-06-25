@@ -1,206 +1,147 @@
 <template>
   <main class="home-page">
 
-    <!-- ── HERO ── -->
+    <!-- ── HERO (Direction B) ── -->
     <section class="hero">
-      <div class="hero-inner container-xxl">
-        <p class="hero-overline">Your run crew, in an app.</p>
-        <h1 class="hero-headline">
-          Run together.<br>
-          Even when<br>
-          you're alone.
-        </h1>
+      <div class="hero-inner">
+        <p class="kicker">Runnit — Moments</p>
+        <h1 class="hero-h1">EVERY RUN GOES<br>ON THE RECORD.</h1>
         <div class="hero-actions">
-          <router-link to="/signup" class="btn-cta">Join for free</router-link>
-          <router-link to="/join-us" class="btn-cta-ghost">Sign in</router-link>
-        </div>
-        <p class="hero-fine">Free forever · No credit card · Cancel anytime</p>
-      </div>
-    </section>
-
-    <!-- ── SOCIAL PROOF STATS ── -->
-    <section class="stats-bar">
-      <div class="container-xxl">
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-num">{{ dispAthletes }}</div>
-            <div class="stat-label">Athletes training</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-num">{{ dispMiles }}</div>
-            <div class="stat-label">Miles logged</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-num">{{ dispPRs }}</div>
-            <div class="stat-label">PRs broken</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-num">{{ dispRating }}</div>
-            <div class="stat-label">Average rating</div>
-          </div>
+          <router-link to="/waitlist" class="btn-primary">Get early access</router-link>
+          <a href="#moment-detail" class="btn-ghost-dark" @click.prevent="scrollTo('moment-detail')">Watch a moment</a>
         </div>
       </div>
-    </section>
-
-    <!-- ── MANIFESTO STRIP ── -->
-    <section class="manifesto" :ref="el => reveal(el)" data-reveal>
-      <div class="container-xxl">
-        <p class="manifesto-text">
-          Strava tracks your run.<br>
-          RUNNIT is where your run lives.
-        </p>
+      <!-- 4-up MomentTile grid -->
+      <div class="moment-grid">
+        <MomentTile
+          v-for="m in heroMoments"
+          :key="m.handle"
+          :handle="m.handle"
+          :photo="m.photo"
+          :distance-meters="m.distanceMeters"
+          :pace-sec-per-km="m.paceSecPerKm"
+        />
       </div>
     </section>
 
-    <!-- ── PILLARS ── -->
-    <section class="pillars">
-      <div class="container-xxl">
-        <div class="pillars-grid" :ref="el => reveal(el)" data-stagger>
-          <div class="pillar">
-            <div class="pillar-num">01</div>
-            <div class="pillar-body">
-              <h3 class="pillar-title">Crew</h3>
-              <p class="pillar-desc">Find run crews near you. Join clubs, attend group runs, share your route. Runnit connects you to athletes in your city who move the way you do.</p>
-            </div>
+    <!-- ── HOW IT WORKS (Direction B) ── -->
+    <section class="hiw-section">
+      <div class="home-inner">
+        <p class="kicker kicker-light">How it works</p>
+        <h2 class="section-h2">Stop. Snap. It's posted.</h2>
+        <div class="newsprint-grid-3">
+          <div class="np-card">
+            <div class="np-num">01</div>
+            <div class="np-title">Finish your run</div>
+            <p class="np-body">Hit stop on the watch or the app. Your splits, route and time are already captured.</p>
           </div>
-          <div class="pillar-divider"></div>
-          <div class="pillar">
-            <div class="pillar-num">02</div>
-            <div class="pillar-body">
-              <h3 class="pillar-title">Share</h3>
-              <p class="pillar-desc">Post a daily Moment — one photo, one song. Share 24hr Stories. React to your crew's runs. This is what social training actually looks like.</p>
-            </div>
+          <div class="np-card">
+            <div class="np-num">02</div>
+            <div class="np-title">One photo</div>
+            <p class="np-body">The sweat, the view, the finish line. One shot — no editing, no second takes.</p>
           </div>
-          <div class="pillar-divider"></div>
-          <div class="pillar">
-            <div class="pillar-num">03</div>
-            <div class="pillar-body">
-              <h3 class="pillar-title">Train</h3>
-              <p class="pillar-desc">GPS tracking, Garmin sync, AI-built plans, built-in coaching. The data is all there — but it's the crew that keeps you showing up.</p>
-            </div>
+          <div class="np-card">
+            <div class="np-num">03</div>
+            <div class="np-title">Auto-stamped</div>
+            <p class="np-body">Distance and pace print onto the moment like a timing-mat receipt. Posted to your crew.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── HOW IT WORKS ── -->
-    <section class="how-it-works">
-      <div class="container-xxl">
-        <div class="hiw-header" :ref="el => reveal(el)" data-reveal>
-          <p class="section-overline">Getting started</p>
-          <h2 class="hiw-title">Up and running<br>in 3 minutes.</h2>
-        </div>
-        <div class="hiw-steps" :ref="el => reveal(el)" data-stagger>
-          <div class="hiw-step">
-            <div class="hiw-step-num">01</div>
-            <div class="hiw-step-body">
-              <h3 class="hiw-step-title">Create your free account</h3>
-              <p class="hiw-step-desc">Sign up in under a minute. Tell us your city, your sport, your vibe. No credit card, no commitment.</p>
-            </div>
-          </div>
-          <div class="hiw-connector"><i class="bi bi-arrow-right"></i></div>
-          <div class="hiw-step">
-            <div class="hiw-step-num">02</div>
-            <div class="hiw-step-body">
-              <h3 class="hiw-step-title">Find your crew</h3>
-              <p class="hiw-step-desc">Search local run clubs and crews near you. Join one and their runs start showing up in your feed instantly.</p>
-            </div>
-          </div>
-          <div class="hiw-connector"><i class="bi bi-arrow-right"></i></div>
-          <div class="hiw-step">
-            <div class="hiw-step-num">03</div>
-            <div class="hiw-step-body">
-              <h3 class="hiw-step-title">Log, share, grow</h3>
-              <p class="hiw-step-desc">Track every session, post a daily Moment, react to your crew's runs. Connect Garmin or Apple Watch to sync automatically.</p>
-            </div>
-          </div>
-        </div>
-        <div class="hiw-cta">
-          <router-link to="/signup" class="btn-cta">Create free account</router-link>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── STATEMENT ── -->
-    <section class="statement">
-      <div class="container-xxl">
-        <div class="statement-inner" :ref="el => reveal(el)" data-reveal>
-          <blockquote class="statement-quote">
-            "Your pace is just<br>
-            a number. Your crew<br>
-            is everything."
-          </blockquote>
-          <router-link to="/signup" class="btn-cta">Start your story</router-link>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── CAPABILITIES ── -->
-    <section class="capabilities">
-      <div class="container-xxl">
-        <div class="cap-header" :ref="el => reveal(el)" data-reveal>
-          <p class="section-overline">What's inside</p>
-          <h2 class="cap-title">Built different</h2>
-        </div>
-        <div class="cap-list" :ref="el => reveal(el)" data-stagger>
-          <div class="cap-item">
-            <span class="cap-icon"><i class="bi bi-robot"></i></span>
-            <div class="cap-content">
-              <div class="cap-name">AI and Coach Training Plans</div>
-              <div class="cap-desc">Adapts to your fitness, schedule, and fatigue — not a generic template.</div>
-            </div>
-          </div>
-          <div class="cap-item">
-            <span class="cap-icon"><i class="bi bi-activity"></i></span>
-            <div class="cap-content">
-              <div class="cap-name">Live Activity Tracker</div>
-              <div class="cap-desc">GPS tracking with real-time pace, heart rate, route mapping and personal safety.</div>
-            </div>
-          </div>
-          <div class="cap-item">
-            <span class="cap-icon"><i class="bi bi-camera-reels-fill"></i></span>
-            <div class="cap-content">
-              <div class="cap-name">Daily Moments</div>
-              <div class="cap-desc">One photo, one song. Share your workout or thoughts.</div>
-            </div>
-          </div>
-          <div class="cap-item">
-            <span class="cap-icon"><i class="bi bi-people-fill"></i></span>
-            <div class="cap-content">
-              <div class="cap-name">Clubs & Challenges</div>
-              <div class="cap-desc">Find your crew. Weekly meet-ups, group goals, and group chat.</div>
-            </div>
-          </div>
-          <div class="cap-item">
-            <span class="cap-icon"><i class="bi bi-trophy-fill"></i></span>
-            <div class="cap-content">
-              <div class="cap-name">Personal Records</div>
-              <div class="cap-desc">PRs automatically detected across all distances.</div>
-            </div>
-          </div>
-          <div class="cap-item">
-            <span class="cap-icon"><i class="bi bi-smartwatch"></i></span>
-            <div class="cap-content">
-              <div class="cap-name">Device Compability</div>
-              <div class="cap-desc">Connects with Garmin, Apple Watch, and COROS seamlessly.</div>
-            </div>
+    <!-- ── FEATURE INDEX (Direction A) ── -->
+    <section class="feature-section">
+      <div class="home-inner">
+        <p class="kicker kicker-light">What you get</p>
+        <h2 class="section-h2" style="max-width:620px">Built for the work,<br>not the trophy case.</h2>
+        <div class="feature-list">
+          <div v-for="f in features" :key="f.num" class="feature-row">
+            <div class="f-num">{{ f.num }}</div>
+            <div class="f-name">{{ f.name }}</div>
+            <div class="f-desc">{{ f.desc }}</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── FINAL CTA ── -->
+    <!-- ── MOMENT DETAIL (Direction B) ── -->
+    <section id="moment-detail" class="detail-section">
+      <div class="detail-photo-panel">
+        <div class="detail-placeholder"></div>
+        <div class="detail-overlay" aria-hidden="true"></div>
+        <!-- Avatar chip -->
+        <div class="detail-chip">
+          <div class="detail-avatar">WO</div>
+          <div class="detail-chip-info">
+            <div class="detail-chip-name">Wren Okafor</div>
+            <div class="detail-chip-handle">@wren · 5:58 AM</div>
+          </div>
+        </div>
+        <!-- DIST / PACE / TIME stamp -->
+        <div class="data-stamp">
+          <div class="stamp-cell">
+            <div class="stamp-label">DIST</div>
+            <div class="stamp-value">{{ formatDistance(detailActivity.distanceMeters, 2) }}</div>
+          </div>
+          <div class="stamp-cell">
+            <div class="stamp-label">PACE</div>
+            <div class="stamp-value">{{ detailPace }}</div>
+          </div>
+          <div class="stamp-cell">
+            <div class="stamp-label">TIME</div>
+            <div class="stamp-value">{{ formatDurationClock(detailActivity.timeSec) }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-info-panel">
+        <p class="kicker kicker-light">A moment, in full</p>
+        <h2 class="detail-h2">The data lives<br>under the photo.</h2>
+        <!-- 2×2 stat grid -->
+        <div class="stat-grid">
+          <div class="stat-cell">
+            <div class="stat-label">Distance</div>
+            <div class="stat-value">{{ formatDistance(detailActivity.distanceMeters, 2) }}</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-label">Avg pace</div>
+            <div class="stat-value">{{ detailPace }} {{ paceLabel }}</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-label">Moving time</div>
+            <div class="stat-value">{{ formatDurationClock(detailActivity.timeSec) }}</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-label">Elevation</div>
+            <div class="stat-value">{{ formatElevation(detailActivity.elevationMeters) }}</div>
+          </div>
+        </div>
+        <!-- Reaction bar -->
+        <div class="reaction-bar">
+          <button
+            v-for="r in reactions"
+            :key="r.type"
+            class="reaction-btn"
+            :class="{ 'reaction-selected': r.selected }"
+          >{{ r.label }} {{ r.count }}</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ACTIVITY BOARD (Direction A) ── -->
+    <section class="board-section">
+      <div class="home-inner">
+        <p class="kicker kicker-light">On the board today</p>
+        <h2 class="section-h2">The board doesn't lie.</h2>
+        <ActivityBoard :rows="boardRows" />
+      </div>
+    </section>
+
+    <!-- ── CTA (Direction B) ── -->
     <section class="final-cta">
-      <div class="container-xxl text-center" :ref="el => reveal(el)" data-reveal>
-        <p class="section-overline" style="color:rgba(255,255,255,0.45)">Get started</p>
-        <h2 class="cta-title">Your crew is<br>waiting.</h2>
-        <router-link to="/signup" class="btn-cta btn-cta-light">
-          Join RUNNIT — Free
-        </router-link>
-        <p class="cta-fine">Free to use. No credit card needed.</p>
+      <div class="cta-inner">
+        <h2 class="cta-h2">YOUR MILES.<br>ON RECORD.</h2>
+        <p class="cta-body">Get early access to Moments and claim your handle before someone else does.</p>
+        <router-link to="/waitlist" class="btn-primary">Get early access</router-link>
       </div>
     </section>
 
@@ -208,525 +149,456 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { useScrollReveal } from '@/composables/useScrollReveal'
-import { useCountUp } from '@/composables/useCountUp'
+import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
+import MomentTile from '@/components/MomentTile.vue'
+import ActivityBoard from '@/components/ActivityBoard.vue'
+import { useUnits } from '@/composables/useUnits'
 
 useHead({
-  title: 'Runnit — Your Run Crew, In An App',
+  title: 'Runnit — Every Run Goes on the Record',
   link: [{ rel: 'canonical', href: 'https://runnit.live' }],
   meta: [
-    { name: 'description', content: 'Runnit is the social training app for community runners. Find local run crews, track every session, share daily Moments, and belong to something. Free forever.' },
-    { property: 'og:title', content: 'Runnit — Your Run Crew, In An App' },
-    { property: 'og:description', content: 'Find local run crews, track every session, share daily Moments, and belong to something.' },
+    { name: 'description', content: 'Runnit is the social fitness app for athletes who put every mile on the record. GPS tracking, clubs, AI training plans, and Moments — one photo, auto-stamped with your data.' },
+    { property: 'og:title', content: 'Runnit — Every Run Goes on the Record' },
+    { property: 'og:description', content: 'GPS tracking, clubs, AI training plans, and Moments — one photo, auto-stamped with your data.' },
     { property: 'og:url', content: 'https://runnit.live' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Runnit — Your Run Crew, In An App' },
-    { name: 'twitter:description', content: 'Find local run crews, track every session, share daily Moments, and belong to something.' },
+    { name: 'twitter:title', content: 'Runnit — Every Run Goes on the Record' },
+    { name: 'twitter:description', content: 'Social fitness for athletes who put every mile on the record.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const { formatDistance, formatDurationClock, formatElevation, paceLabel } = useUnits()
 
-const { reveal } = useScrollReveal()
-const { animate } = useCountUp()
+// ── Demo data ──────────────────────────────────────────────
 
-const stats = ref({ athleteCount: 0, totalMilesLogged: 0, totalPRs: 0, avgRating: 0 })
+const heroMoments = [
+  { handle: '@theo',   photo: null, distanceMeters: 5020,  paceSecPerKm: 261 },
+  { handle: '@maya.k', photo: null, distanceMeters: 21100, paceSecPerKm: 278 },
+  { handle: '@wren',   photo: null, distanceMeters: 8000,  paceSecPerKm: 238 },
+  { handle: '@marcus', photo: null, distanceMeters: 30200, paceSecPerKm: 310 },
+]
 
-// Animated display refs
-const dispAthletes = ref('—')
-const dispMiles    = ref('—')
-const dispPRs      = ref('—')
-const dispRating   = ref('—')
+const features = [
+  { num: '01', name: 'AI training plans',    desc: '12-week periodized blocks that adapt to the runs you actually log — not a static PDF you ignore by week three.' },
+  { num: '02', name: 'Live GPS tracking',    desc: 'Record on your wrist or your phone. Friends see the dot move in real time, mile by mile.' },
+  { num: '03', name: 'Clubs that move',      desc: 'Find the people who run your pace and your hours. Weekly boards, shared routes, real meetups.' },
+  { num: '04', name: 'Strava & Garmin sync', desc: 'Bring your history with you. Two-way sync means nothing you\'ve already done gets left behind.' },
+]
 
-const fmtMiles = (n) => {
-  if (!n) return '0'
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
-  if (n >= 1_000)     return Math.round(n / 1_000) + 'K'
-  return n.toLocaleString('en-US')
-}
+const detailActivity = { distanceMeters: 8000, paceSecPerKm: 238, timeSec: 1904, elevationMeters: 82 }
 
-const startCountUp = () => {
-  const s = stats.value
-  animate(dispAthletes, s.athleteCount || 14235, n => Math.round(n).toLocaleString('en-US') + '+')
-  animate(dispMiles,    s.totalMilesLogged || 892000, n => fmtMiles(Math.round(n)))
-  animate(dispPRs,      s.totalPRs || 3210, n => Math.round(n).toLocaleString('en-US') + '+')
-  if ((s.avgRating || 4.8) > 0) animate(dispRating, s.avgRating || 4.8, n => n.toFixed(1) + ' / 5')
-}
-
-onMounted(async () => {
-  try {
-    const { data } = await axios.get(`${API_URL}/stats`)
-    stats.value = data
-  } catch { /* use fallback values in startCountUp */ } finally {
-    startCountUp()
-  }
+const detailPace = computed(() => {
+  const minPerKm = detailActivity.paceSecPerKm / 60
+  const mins = Math.floor(minPerKm)
+  const secs = Math.round((minPerKm - mins) * 60)
+  return `${mins}:${secs.toString().padStart(2, '0')}`
 })
+
+const reactions = [
+  { type: 'LIKE', label: 'Like',  count: 41, selected: true },
+  { type: 'FIRE', label: 'Fire',  count: 53, selected: false },
+  { type: 'CLAP', label: 'Clap',  count: 12, selected: false },
+]
+
+const boardRows = [
+  { name: 'Maya Kessler', club: 'East Side Run Club', distanceMeters: 21100, paceSecPerKm: 278, fire: 128 },
+  { name: 'Theo Albright', club: 'Dawn Patrol',       distanceMeters: 16000, paceSecPerKm: 245, fire: 96  },
+  { name: 'Priya Nair',    club: 'Bridgerunners',     distanceMeters: 12400, paceSecPerKm: 292, fire: 74  },
+  { name: 'Marcus Lee',    club: 'Trackhouse',         distanceMeters: 30200, paceSecPerKm: 310, fire: 61  },
+]
+
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <style scoped>
+/* ── Base ── */
 .home-page {
-  background: var(--rk-paper, #ffffff);
-  color: var(--rk-void, #000000);
+  min-height: 100vh;
+  background: #fff;
   padding-top: var(--nav-h, 64px);
+  font-family: Futura, 'Futura PT', 'Avenir Next', Avenir, system-ui, sans-serif;
+  color: #000;
 }
+
+.home-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Shared type ── */
+.kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+}
+.kicker-light { color: #767676; }
+
+.section-h2 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  margin: 14px 0 38px;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 24px;
+  background: #0052FF;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid #0052FF;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.btn-primary:hover { background: #003ECC; border-color: #003ECC; color: #fff; text-decoration: none; }
+
+.btn-ghost-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 24px;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+.btn-ghost-dark:hover { border-color: #fff; color: #fff; text-decoration: none; }
 
 /* ── HERO ── */
 .hero {
-  padding: 140px 0 120px;
-  background: var(--rk-paper, #ffffff);
-  border-bottom: 1px solid #E5E5E5;
+  background: #000;
+  color: #fff;
+  padding: 80px 24px 0;
 }
-
-.hero-inner { }
-
-.hero-overline {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  color: #767676;
-  margin-bottom: 28px;
+.hero-inner {
+  max-width: 1000px;
+  margin: 0 auto;
 }
-
-.hero-headline {
-  font-size: clamp(4.5rem, 11vw, 8rem);
+.hero-h1 {
+  font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.95;
-  color: #000;
-  margin-bottom: 52px;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  margin: 16px 0 26px;
+  max-width: 780px;
 }
-
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 48px;
   flex-wrap: wrap;
 }
-
-.hero-fine {
-  font-size: 0.72rem;
-  font-weight: 400;
-  color: #767676;
-  letter-spacing: 0.04em;
-  margin-bottom: 0;
-}
-
-/* CTAs */
-.btn-cta {
-  display: inline-flex;
-  align-items: center;
-  padding: 16px 48px;
-  border-radius: 0;
-  background: var(--rk-signal, #0052FF);
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.15s;
-  border: 2px solid var(--rk-signal, #0052FF);
-  cursor: pointer;
-}
-.btn-cta:hover {
-  background: #003ECC;
-  border-color: #003ECC;
-  color: #fff;
-  text-decoration: none;
-}
-
-.btn-cta-ghost {
-  display: inline-flex;
-  align-items: center;
-  padding: 16px 48px;
-  border-radius: 0;
-  background: transparent;
-  color: var(--rk-signal, #0052FF);
-  font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.15s;
-  border: 2px solid var(--rk-signal, #0052FF);
-  cursor: pointer;
-}
-.btn-cta-ghost:hover {
-  background: var(--rk-signal, #0052FF);
-  color: #fff;
-  text-decoration: none;
-}
-
-.btn-cta-light {
-  background: var(--rk-signal, #0052FF);
-  color: #fff;
-  border: 2px solid var(--rk-signal, #0052FF);
-}
-.btn-cta-light:hover {
-  background: #003ECC;
-  border-color: #003ECC;
-  color: #fff;
-}
-
-/* ── STATS BAR ── */
-.stats-bar {
-  background: var(--rk-paper, #ffffff);
-  border-bottom: 1px solid #E5E5E5;
-  padding: 56px 0;
-}
-
-.stats-grid {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-}
-
-.stat-item {
-  flex: 1;
-  text-align: center;
-  padding: 0 32px;
-}
-
-.stat-num {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: #000;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.stat-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #767676;
-}
-
-.stat-divider {
-  width: 1px;
-  height: 48px;
-  background: #E5E5E5;
-  flex-shrink: 0;
-}
-
-/* ── MANIFESTO STRIP ── */
-.manifesto {
-  background: #000;
-  padding: 80px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.manifesto-text {
-  font-size: clamp(1.4rem, 3.5vw, 2.4rem);
-  font-weight: 300;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.45;
-  margin: 0;
-  max-width: 700px;
-}
-
-/* ── PILLARS ── */
-.pillars {
-  padding: 0;
-  background: var(--rk-paper, #ffffff);
-  border-bottom: 1px solid #E5E5E5;
-}
-
-.pillars-grid {
-  display: flex;
-  align-items: stretch;
-}
-
-.pillar {
-  flex: 1;
-  padding: 72px 48px;
-  display: flex;
-  gap: 24px;
-}
-
-.pillar-divider {
-  width: 1px;
-  background: #E5E5E5;
-  flex-shrink: 0;
-}
-
-.pillar-num {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--rk-signal, #0052FF);
-  margin-top: 4px;
-  flex-shrink: 0;
-}
-
-.pillar-body { flex: 1; }
-
-.pillar-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #000;
-  margin-bottom: 12px;
-}
-
-.pillar-desc {
-  font-size: 0.88rem;
-  font-weight: 300;
-  color: #767676;
-  line-height: 1.7;
-  margin: 0;
+.moment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #1d1d1d;
+  border: 1px solid #1d1d1d;
+  margin-top: 0;
 }
 
 /* ── HOW IT WORKS ── */
-.how-it-works {
-  padding: 100px 0;
+.hiw-section {
+  padding: 72px 0;
+  background: #fff;
+  border-top: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+}
+.newsprint-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+}
+.np-card {
+  background: #fff;
+  padding: 34px;
+}
+.np-num {
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+}
+.np-title {
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.np-body {
+  color: #767676;
+  line-height: 1.6;
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+/* ── FEATURE INDEX ── */
+.feature-section {
+  padding: 72px 0;
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+}
+.feature-list { margin-top: 0; }
+.feature-row {
+  display: grid;
+  grid-template-columns: 60px 1.1fr 1.3fr;
+  gap: 24px;
+  align-items: start;
+  padding: 26px 0;
+  border-top: 1px solid #E5E5E5;
+}
+.feature-row:last-child { border-bottom: 1px solid #E5E5E5; }
+.f-num {
+  font-weight: 900;
+  font-size: 1.05rem;
+  padding-top: 2px;
+}
+.f-name {
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.f-desc {
+  color: #767676;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── MOMENT DETAIL ── */
+.detail-section {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  border-top: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+}
+.detail-photo-panel {
+  position: relative;
+  background: #111;
+  min-height: 560px;
+}
+.detail-placeholder {
+  position: absolute;
+  inset: 0;
+  background: #1a1a1a;
+}
+.detail-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0) 48%);
+  pointer-events: none;
+}
+.detail-chip {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-avatar {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+.detail-chip-name {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+.detail-chip-handle {
+  font-size: 0.64rem;
+  color: rgba(255,255,255,0.7);
+}
+.data-stamp {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  display: flex;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.stamp-cell {
+  padding: 9px 16px;
+  border-right: 1px solid rgba(255,255,255,0.3);
+}
+.stamp-cell:last-child { border-right: none; }
+.stamp-label {
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.stamp-value {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.detail-info-panel {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #fff;
+}
+.detail-h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  margin: 12px 0 24px;
+}
+
+/* 2×2 stat grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #E5E5E5;
+  border: 1px solid #E5E5E5;
+  margin-bottom: 28px;
+}
+.stat-cell {
+  background: #fff;
+  padding: 18px 20px;
+}
+.stat-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Reaction bar */
+.reaction-bar {
+  display: flex;
+  border: 1px solid #E5E5E5;
+}
+.reaction-btn {
+  flex: 1;
+  text-align: center;
+  padding: 13px 0;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: none;
+  border-right: 1px solid #E5E5E5;
+  background: #fff;
+  color: #767676;
+  cursor: pointer;
+  transition: color 0.12s;
+}
+.reaction-btn:last-child { border-right: none; }
+.reaction-btn:hover { color: #000; }
+.reaction-selected {
+  color: #000;
+  border-bottom: 2px solid #000;
+}
+
+/* ── ACTIVITY BOARD ── */
+.board-section {
+  padding: 72px 0;
   background: #F5F5F5;
   border-bottom: 1px solid #E5E5E5;
 }
 
-.hiw-header {
-  margin-bottom: 64px;
-}
-
-.hiw-title {
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: #000;
-  margin: 0;
-}
-
-.hiw-steps {
-  display: flex;
-  align-items: flex-start;
-  gap: 0;
-  margin-bottom: 56px;
-}
-
-.hiw-step {
-  flex: 1;
-  padding-right: 40px;
-}
-
-.hiw-connector {
-  font-size: 1.2rem;
-  color: #C5C5C5;
-  padding: 0 16px;
-  margin-top: 8px;
-  flex-shrink: 0;
-}
-
-.hiw-step-num {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--rk-signal, #0052FF);
-  margin-bottom: 16px;
-}
-
-.hiw-step-title {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #000;
-  margin-bottom: 12px;
-}
-
-.hiw-step-desc {
-  font-size: 0.88rem;
-  font-weight: 300;
-  color: #767676;
-  line-height: 1.7;
-  margin: 0;
-}
-
-.hiw-cta {
-  display: flex;
-  justify-content: flex-start;
-}
-
-/* ── STATEMENT ── */
-.statement {
-  background: var(--rk-paper, #ffffff);
-  border-bottom: 1px solid #E5E5E5;
-  padding: 100px 0;
-}
-
-.statement-inner {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 48px;
-}
-
-.statement-quote {
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  color: #000;
-  margin: 0;
-  border: none;
-  padding: 0;
-  font-style: normal;
-  max-width: 700px;
-}
-
-/* ── CAPABILITIES ── */
-.capabilities {
-  padding: 100px 0;
-  background: var(--rk-paper, #ffffff);
-  border-bottom: 1px solid #E5E5E5;
-}
-
-.cap-header {
-  margin-bottom: 56px;
-}
-
-.section-overline {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  color: #767676;
-  margin-bottom: 12px;
-}
-
-.cap-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: #000;
-  margin: 0;
-}
-
-.cap-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid #E5E5E5;
-}
-
-.cap-item {
-  display: flex;
-  gap: 20px;
-  padding: 36px 32px;
-  border-bottom: 1px solid #E5E5E5;
-  border-right: 1px solid #E5E5E5;
-}
-.cap-item:nth-child(3n) { border-right: none; }
-
-.cap-icon {
-  font-size: 1.1rem;
-  color: #000;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.cap-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #000;
-  margin-bottom: 8px;
-}
-
-.cap-desc {
-  font-size: 0.83rem;
-  font-weight: 300;
-  color: #767676;
-  line-height: 1.65;
-  margin: 0;
-}
-
 /* ── FINAL CTA ── */
 .final-cta {
-  padding: 140px 0;
   background: #000;
-  color: white;
+  color: #fff;
+  padding: 84px 24px;
+  text-align: center;
 }
-
-.cta-title {
-  font-size: clamp(3rem, 7vw, 5.5rem);
+.cta-inner { max-width: 600px; margin: 0 auto; }
+.cta-h2 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.95;
-  color: white;
-  margin-bottom: 48px;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  margin: 0 0 18px;
+}
+.cta-body {
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  font-size: 0.98rem;
+  max-width: 440px;
+  margin: 0 auto 30px;
 }
 
-.cta-fine {
-  font-size: 0.72rem;
-  font-weight: 400;
-  color: rgba(255,255,255,0.35);
-  margin-top: 20px;
-  margin-bottom: 0;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .moment-grid { grid-template-columns: repeat(2, 1fr); }
+  .detail-section { grid-template-columns: 1fr; }
+  .detail-photo-panel { min-height: 420px; }
+  .detail-info-panel { padding: 36px 24px; }
+  .newsprint-grid-3 { grid-template-columns: 1fr; }
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 991px) {
-  .hero { padding: 100px 0 80px; }
-  .pillars-grid { flex-direction: column; }
-  .pillar { padding: 48px 32px; }
-  .pillar-divider { width: 100%; height: 1px; }
-  .statement-inner { flex-direction: column; align-items: flex-start; }
-  .cap-list { grid-template-columns: repeat(2, 1fr); }
-  .cap-item:nth-child(3n) { border-right: 1px solid #E5E5E5; }
-  .cap-item:nth-child(2n) { border-right: none; }
-  .hiw-steps { flex-direction: column; gap: 32px; }
-  .hiw-connector { display: none; }
-  .hiw-step { padding-right: 0; }
+@media (max-width: 720px) {
+  .feature-row {
+    grid-template-columns: 48px 1fr;
+    grid-template-rows: auto auto;
+  }
+  .f-num { grid-row: 1; }
+  .f-name { grid-row: 1; }
+  .f-desc { grid-column: 2; grid-row: 2; }
 }
 
-@media (max-width: 768px) {
-  .hero { padding: 72px 0 56px; }
-  .hero-headline { font-size: 3.5rem; margin-bottom: 36px; }
-  .manifesto { padding: 56px 0; }
-  .pillar { padding: 36px 24px; flex-direction: column; gap: 12px; }
-  .statement { padding: 72px 0; }
-  .statement-quote { font-size: 2rem; }
-  .capabilities { padding: 64px 0; }
-  .cap-list { grid-template-columns: 1fr; }
-  .cap-item { border-right: none !important; }
-  .final-cta { padding: 80px 0; }
-  .cta-title { font-size: 3rem; }
-  .stats-grid { flex-wrap: wrap; gap: 32px; }
-  .stat-divider { display: none; }
-  .stat-item { flex: 0 0 calc(50% - 16px); }
-  .how-it-works { padding: 64px 0; }
-  .testimonials { padding: 64px 0; }
-  .pricing { padding: 64px 0; }
-}
-
-@media (max-width: 480px) {
-  .hero { padding: 56px 0 40px; }
-  .hero-headline { font-size: 2.6rem; }
+@media (max-width: 560px) {
+  .hero { padding: 64px 24px 0; }
   .hero-actions { flex-direction: column; align-items: flex-start; }
-  .btn-cta, .btn-cta-ghost { padding: 14px 32px; width: 100%; justify-content: center; }
-  .manifesto-text { font-size: 1.2rem; }
-  .final-cta { padding: 64px 0; }
-  .cta-title { font-size: 2.4rem; }
-  .stat-item { flex: 0 0 100%; }
-  .stat-num { font-size: 2.2rem; }
-  .pricing-card { padding: 32px 24px; }
-  .testi-card { padding: 28px 24px; }
+  .btn-primary, .btn-ghost-dark { width: 100%; }
+  .feature-row { grid-template-columns: 1fr; }
+  .f-num { font-size: 0.85rem; }
+  .detail-info-panel { padding: 28px 20px; }
+  .stat-value { font-size: 1.15rem; }
 }
 </style>
