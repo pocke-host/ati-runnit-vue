@@ -23,6 +23,7 @@ const routes = [
   { path: '/careers',        name: 'Careers',       component: () => import('@/views/Careers.vue') },
   { path: '/press',          name: 'Press',         component: () => import('@/views/Press.vue') },
   { path: '/blog',           name: 'Blog',          component: () => import('@/views/Blog.vue') },
+  { path: '/waitlist',        name: 'Waitlist',      component: () => import('@/views/Waitlist.vue') },
   { path: '/sports/running', name: 'SportsRunning', component: () => import('@/views/sports/SportsRunning.vue') },
   { path: '/sports/ride',    name: 'SportsRide',    component: () => import('@/views/sports/SportsRide.vue') },
   { path: '/sports/swim',    name: 'SportsSwim',    component: () => import('@/views/sports/SportsSwim.vue') },
