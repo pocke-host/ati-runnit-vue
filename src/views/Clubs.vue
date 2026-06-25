@@ -500,17 +500,11 @@ try { currentUserId.value = JSON.parse(atob((localStorage.getItem('token') || ''
 
 // ── Computed ───────────────────────────────────────────────────────────────
 const filtered = computed(() => {
+  // Use server search results when a query or sport filter is active
+  if (q.value || sport.value !== 'All') {
+    return searchResults.value
+  }
   let list = allClubs.value.slice()
-  if (sport.value !== 'All') {
-    list = list.filter(c => (c.sport || '').toLowerCase() === sport.value.toLowerCase())
-  }
-  if (q.value) {
-    const t = q.value.toLowerCase()
-    list = list.filter(c =>
-      (c.name || '').toLowerCase().includes(t) ||
-      (c.description || '').toLowerCase().includes(t)
-    )
-  }
   if (sortBy.value === 'popular') {
     list.sort((a, b) => (b.memberCount ?? b.members ?? 0) - (a.memberCount ?? a.members ?? 0))
   } else if (sortBy.value === 'new') {
@@ -718,8 +712,30 @@ function isOwner(club) {
 async function loadMapClubs() {
   mapClubsLoading.value = true
   try {
-    const res = await fetch(`${API_URL}/clubs/with-location`, { headers: getAuthHeaders() })
-    const clubs = res.ok ? await res.json() : []
+    let clubs = []
+
+    // Try geolocation + nearby endpoint first
+    const coords = await new Promise((resolve) => {
+      if (!navigator.geolocation) return resolve(null)
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => resolve(null),
+        { timeout: 5000 }
+      )
+    })
+
+    if (coords) {
+      const nearbyRes = await fetch(
+        `${API_URL}/clubs/nearby?lat=${coords.lat}&lng=${coords.lng}&radiusKm=25`,
+        { headers: getAuthHeaders() }
+      )
+      if (nearbyRes.ok) clubs = await nearbyRes.json()
+    } else {
+      // Fallback: clubs that have any location set
+      const res = await fetch(`${API_URL}/clubs/with-location`, { headers: getAuthHeaders() })
+      if (res.ok) clubs = await res.json()
+    }
+
     const allRes = await fetch(`${API_URL}/clubs`, { headers: getAuthHeaders() })
     const all = allRes.ok ? await allRes.json() : []
     mapClubsNoLocation.value = all.filter(c => !c.latitude).length
@@ -790,6 +806,31 @@ watch(activeTab, (newTab, oldTab) => {
     clubMap.value.remove()
     clubMap.value = null
   }
+})
+
+// Debounced server-side search — fires when q or sport filter changes
+const searchResults = ref([])
+const isSearching = ref(false)
+let searchTimer = null
+
+watch([q, sport], () => {
+  clearTimeout(searchTimer)
+  if (!q.value && sport.value === 'All') {
+    searchResults.value = []
+    return
+  }
+  searchTimer = setTimeout(async () => {
+    isSearching.value = true
+    try {
+      const params = new URLSearchParams()
+      if (q.value) params.set('q', q.value)
+      if (sport.value !== 'All') params.set('sport', sport.value)
+      const res = await fetch(`${API_URL}/clubs/search?${params}`, { headers: getAuthHeaders() })
+      if (res.ok) searchResults.value = await res.json()
+    } catch { /* fall back to local filter */ } finally {
+      isSearching.value = false
+    }
+  }, 350)
 })
 
 // ── Set Location ─────────────────────────────────────────────────────────────

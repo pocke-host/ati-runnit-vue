@@ -4,11 +4,11 @@
     <!-- ── HERO ── -->
     <section class="hero">
       <div class="hero-inner container-xxl">
-        <p class="hero-overline">Movement, redefined</p>
+        <p class="hero-overline">Your run crew, in an app.</p>
         <h1 class="hero-headline">
-          Move further.<br>
-          Train smarter.<br>
-          Go together.
+          Run together.<br>
+          Even when<br>
+          you're alone.
         </h1>
         <div class="hero-actions">
           <router-link to="/signup" class="btn-cta">Join for free</router-link>
@@ -49,8 +49,8 @@
     <section class="manifesto" :ref="el => reveal(el)" data-reveal>
       <div class="container-xxl">
         <p class="manifesto-text">
-          Most apps track what you did.<br>
-          RUNNIT helps you figure out what's next.
+          Strava tracks your run.<br>
+          RUNNIT is where your run lives.
         </p>
       </div>
     </section>
@@ -62,24 +62,24 @@
           <div class="pillar">
             <div class="pillar-num">01</div>
             <div class="pillar-body">
-              <h3 class="pillar-title">Track</h3>
-              <p class="pillar-desc">Log every run, ride, swim, or hike. GPS routes, splits, heart rate — all in one place. Syncs with Garmin, Apple Watch and Coros.</p>
+              <h3 class="pillar-title">Crew</h3>
+              <p class="pillar-desc">Find run crews near you. Join clubs, attend group runs, share your route. Runnit connects you to athletes in your city who move the way you do.</p>
             </div>
           </div>
           <div class="pillar-divider"></div>
           <div class="pillar">
             <div class="pillar-num">02</div>
             <div class="pillar-body">
-              <h3 class="pillar-title">Train</h3>
-              <p class="pillar-desc">AI-powered plans built around your goals and schedule — not the other way around. 5K to ultra. Beginner to elite. Every plan adapts as you do.</p>
+              <h3 class="pillar-title">Share</h3>
+              <p class="pillar-desc">Post a daily Moment — one photo, one song. Share 24hr Stories. React to your crew's runs. This is what social training actually looks like.</p>
             </div>
           </div>
           <div class="pillar-divider"></div>
           <div class="pillar">
             <div class="pillar-num">03</div>
             <div class="pillar-body">
-              <h3 class="pillar-title">Connect</h3>
-              <p class="pillar-desc">Join clubs, enter challenges, follow athletes you admire. Share a daily moment — one photo, one song. Community without the noise.</p>
+              <h3 class="pillar-title">Train</h3>
+              <p class="pillar-desc">GPS tracking, Garmin sync, AI-built plans, built-in coaching. The data is all there — but it's the crew that keeps you showing up.</p>
             </div>
           </div>
         </div>
@@ -98,23 +98,23 @@
             <div class="hiw-step-num">01</div>
             <div class="hiw-step-body">
               <h3 class="hiw-step-title">Create your free account</h3>
-              <p class="hiw-step-desc">Sign up in under a minute. No credit card, no commitment. Pick your sport, set your goal, and you're in.</p>
+              <p class="hiw-step-desc">Sign up in under a minute. Tell us your city, your sport, your vibe. No credit card, no commitment.</p>
             </div>
           </div>
           <div class="hiw-connector"><i class="bi bi-arrow-right"></i></div>
           <div class="hiw-step">
             <div class="hiw-step-num">02</div>
             <div class="hiw-step-body">
-              <h3 class="hiw-step-title">Connect your device</h3>
-              <p class="hiw-step-desc">Sync Garmin, Apple Watch, or COROS. Your workouts appear automatically — no manual logging.</p>
+              <h3 class="hiw-step-title">Find your crew</h3>
+              <p class="hiw-step-desc">Search local run clubs and crews near you. Join one and their runs start showing up in your feed instantly.</p>
             </div>
           </div>
           <div class="hiw-connector"><i class="bi bi-arrow-right"></i></div>
           <div class="hiw-step">
             <div class="hiw-step-num">03</div>
             <div class="hiw-step-body">
-              <h3 class="hiw-step-title">Train with a plan</h3>
-              <p class="hiw-step-desc">Get an AI-built training plan or connect with a real coach. Every session adapts to your progress.</p>
+              <h3 class="hiw-step-title">Log, share, grow</h3>
+              <p class="hiw-step-desc">Track every session, post a daily Moment, react to your crew's runs. Connect Garmin or Apple Watch to sync automatically.</p>
             </div>
           </div>
         </div>
@@ -129,8 +129,9 @@
       <div class="container-xxl">
         <div class="statement-inner" :ref="el => reveal(el)" data-reveal>
           <blockquote class="statement-quote">
-            "Every distance has a story.<br>
-            Yours deserves to be told."
+            "Your pace is just<br>
+            a number. Your crew<br>
+            is everything."
           </blockquote>
           <router-link to="/signup" class="btn-cta">Start your story</router-link>
         </div>
@@ -195,7 +196,7 @@
     <section class="final-cta">
       <div class="container-xxl text-center" :ref="el => reveal(el)" data-reveal>
         <p class="section-overline" style="color:rgba(255,255,255,0.45)">Get started</p>
-        <h2 class="cta-title">Your next session<br>starts here.</h2>
+        <h2 class="cta-title">Your crew is<br>waiting.</h2>
         <router-link to="/signup" class="btn-cta btn-cta-light">
           Join RUNNIT — Free
         </router-link>
@@ -214,18 +215,18 @@ import { useCountUp } from '@/composables/useCountUp'
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Runnit — Train Smarter. Race Faster.',
+  title: 'Runnit — Your Run Crew, In An App',
   link: [{ rel: 'canonical', href: 'https://runnit.live' }],
   meta: [
-    { name: 'description', content: 'Runnit is a modern training platform for runners and triathletes. Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
-    { property: 'og:title', content: 'Runnit — Train Smarter. Race Faster.' },
-    { property: 'og:description', content: 'Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
+    { name: 'description', content: 'Runnit is the social training app for community runners. Find local run crews, track every session, share daily Moments, and belong to something. Free forever.' },
+    { property: 'og:title', content: 'Runnit — Your Run Crew, In An App' },
+    { property: 'og:description', content: 'Find local run crews, track every session, share daily Moments, and belong to something.' },
     { property: 'og:url', content: 'https://runnit.live' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Runnit — Train Smarter. Race Faster.' },
-    { name: 'twitter:description', content: 'Periodized training plans, GPS tracking, Garmin sync, and a community built around movement.' },
+    { name: 'twitter:title', content: 'Runnit — Your Run Crew, In An App' },
+    { name: 'twitter:description', content: 'Find local run crews, track every session, share daily Moments, and belong to something.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })

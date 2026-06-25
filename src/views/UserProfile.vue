@@ -50,6 +50,11 @@
 
             <div v-if="profile.bio" class="hero-bio">{{ profile.bio }}</div>
 
+            <div v-if="serverArchetype" class="hero-archetype">
+              <span class="hero-archetype-badge">{{ serverArchetype.label }}</span>
+              <span class="hero-archetype-tagline">{{ serverArchetype.tagline }}</span>
+            </div>
+
             <div class="hero-stats">
               <div class="hstat">
                 <div class="hstat-val">{{ activitiesCount }}</div>
@@ -487,6 +492,7 @@ const activitiesCount = computed(() => profile.value.activityCount ?? profileAct
 const totalDistanceMeters = computed(() => profileActivities.value.reduce((s, a) => s + (a.distanceMeters || 0), 0))
 const disciplineData  = computed(() => useDisciplineScore(profileActivities.value))
 const archetypeData   = computed(() => useArchetype(profileActivities.value))
+const serverArchetype = ref(null)
 const growthTimeline  = computed(() => useGrowthTimeline(profileActivities.value))
 
 // Streak
@@ -737,6 +743,12 @@ const init = async () => {
   await loadProfile()
   if (!notFound.value && !pageError.value) {
     await Promise.all([loadActivities(), loadFollowStatus()])
+    if (isOwnProfile.value) {
+      try {
+        const { data } = await axios.get(`${API_URL}/users/me/archetype`, { headers: getAuthHeaders() })
+        serverArchetype.value = data
+      } catch { /* non-critical */ }
+    }
   }
 }
 
@@ -1354,6 +1366,28 @@ onMounted(init)
   margin: 8px 0 4px;
   max-width: 480px;
   line-height: 1.5;
+}
+.hero-archetype {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+  flex-wrap: wrap;
+}
+.hero-archetype-badge {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+.hero-archetype-tagline {
+  font-size: 0.78rem;
+  color: #767676;
+  font-weight: 300;
 }
 .records-grid {
   display: grid;
