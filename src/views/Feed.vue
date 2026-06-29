@@ -167,12 +167,12 @@
               <div class="act-card-footer">
                 <div class="act-reactions" @click.stop>
                   <button
-                    v-for="rxn in [{type:'LIKE',emoji:'👍'},{type:'FIRE',emoji:'🔥'},{type:'CLAP',emoji:'👏'}]"
+                    v-for="rxn in [{type:'LIKE',label:'LIKE'},{type:'FIRE',label:'FIRE'},{type:'CLAP',label:'CLAP'}]"
                     :key="rxn.type"
                     :class="['act-rxn-btn', {active: getActivityReaction(item.id) === rxn.type}]"
                     @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
                   >
-                    {{ rxn.emoji }} <span class="rxn-count">{{ getActivityReactionCount(item.id, rxn.type) }}</span>
+                    {{ rxn.label }}<span class="rxn-count">{{ getActivityReactionCount(item.id, rxn.type) || '' }}</span>
                   </button>
                 </div>
                 <span class="act-view-link">View Details <i class="bi bi-arrow-right"></i></span>
@@ -856,7 +856,7 @@ onUnmounted(() => {
   border-bottom: 1px solid #E5E5E5;
 }
 .feed-header-inner {
-  max-width: 1400px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -868,16 +868,19 @@ onUnmounted(() => {
   border-bottom: 1px solid #E5E5E5;
 }
 .feed-brand {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.22em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   color: #000;
+  text-transform: uppercase;
 }
 .feed-date-text {
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
   letter-spacing: 0.10em;
-  color: rgba(15,18,16,0.35);
+  color: #767676;
   text-transform: uppercase;
 }
 .feed-controls {
@@ -896,14 +899,14 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #767676;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
-  font-family: inherit;
 }
 .feed-tab:hover { color: #000; }
 .feed-tab.active { color: #000; border-bottom-color: #000; }
@@ -939,20 +942,20 @@ onUnmounted(() => {
   padding: 4px 14px;
   border: 1px solid #E5E5E5;
   background: #fff;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   color: #767676;
   cursor: pointer;
-  font-family: inherit;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .period-pill:hover { color: #000; border-color: #000; }
 .period-pill.active { background: #000; color: #fff; border-color: #000; }
 
 .feed-container {
-  max-width: 1400px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 182px 24px 60px;
 }
@@ -1075,14 +1078,15 @@ onUnmounted(() => {
   justify-content: space-between;
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #E5E5E5;
 }
 .act-view-link {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--rk-signal);
+  color: #000;
   white-space: nowrap;
 }
 .act-card-top {
@@ -1101,7 +1105,7 @@ onUnmounted(() => {
   height: 32px;
   background: #000;
   color: #fff;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1111,24 +1115,29 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 .act-name {
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 800;
   color: #000;
   text-decoration: none;
   display: block;
   line-height: 1.3;
+  letter-spacing: -0.01em;
 }
-.act-name:hover { color: #000; text-decoration: underline; }
+.act-name:hover { color: #000; text-decoration: none; }
 .act-you {
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
   letter-spacing: 0.08em;
   color: #767676;
 }
 .act-time {
-  font-size: 0.72rem;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   color: #767676;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 .act-sport-icon {
   font-size: 1.4rem;
@@ -1142,10 +1151,12 @@ onUnmounted(() => {
   margin-bottom: 12px;
 }
 .act-dist {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 600;
   color: #000;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 .act-chip {
@@ -1162,10 +1173,13 @@ onUnmounted(() => {
   gap: 6px;
 }
 .act-stat-chip {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   color: #767676;
-  background: #f5f5f5;
+  background: #fff;
   padding: 4px 10px;
   border: 1px solid #E5E5E5;
 }
@@ -1195,7 +1209,7 @@ onUnmounted(() => {
 .user-avatar-small {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0;
   background: #000;
   display: flex;
   align-items: center;
@@ -1470,7 +1484,7 @@ onUnmounted(() => {
 .user-avatar {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 0;
   background: #000;
   display: flex;
   align-items: center;
@@ -1643,7 +1657,7 @@ onUnmounted(() => {
 .comment-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 0;
   background: #000;
   display: flex;
   align-items: center;
@@ -1899,21 +1913,35 @@ onUnmounted(() => {
 
 .act-reactions {
   display: flex;
-  gap: 6px;
+  gap: 0;
+  border: 1px solid #E5E5E5;
 }
 .act-rxn-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  border: 1px solid #E5E5E5;
+  padding: 6px 12px;
+  border: none;
+  border-right: 1px solid #E5E5E5;
+  border-bottom: 2px solid transparent;
   background: none;
-  font-size: 0.78rem;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #767676;
   cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
+  transition: color 0.15s, border-bottom-color 0.15s;
 }
-.act-rxn-btn:hover { border-color: #0052FF; color: #0052FF; }
-.act-rxn-btn.active { background: #0052FF; border-color: #0052FF; color: #fff; }
-.rxn-count { font-size: 0.72rem; font-weight: 600; }
+.act-rxn-btn:last-child { border-right: none; }
+.act-rxn-btn:hover { color: #000; }
+.act-rxn-btn.active { color: #000; border-bottom-color: #000; }
+.rxn-count {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #767676;
+}
 </style>
