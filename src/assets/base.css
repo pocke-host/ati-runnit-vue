@@ -11,9 +11,9 @@
 
 :root {
   /* ── Layout ── */
-  /* Include safe-area-inset-top so pages padding-top: var(--nav-h) clears the notch */
   --nav-h: calc(64px + env(safe-area-inset-top, 0px));
-  --coach-bar-h: 28px; /* height of the COACH VIEW banner shown when role=coach */
+  --spec-h: 35px; /* SpecBar height — shown only on marketing/unauthenticated pages */
+  --coach-bar-h: 28px;
   --tab-h: 64px;
 
   /* ── RUNNIT Electric Palette ── */
@@ -145,6 +145,38 @@ a:hover { text-decoration: none; }
 .form-control:focus, .form-select:focus {
   border-color: var(--rk-signal);
   box-shadow: 0 0 0 2px rgba(0,82,255,0.15);
+}
+
+/* ── Mono type helper ── */
+.rk-mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* ── Global keyframes (brand motion system) ── */
+/* Transform-only — never opacity fade (export-safe) */
+@keyframes rkRise {
+  from { transform: translateY(18px); }
+  to   { transform: translateY(0); }
+}
+@keyframes rkWipe {
+  from { transform: translateY(26px); }
+  to   { transform: translateY(0); }
+}
+@keyframes rkDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes rkPing {
+  0%   { r: 4; opacity: 0.8; }
+  70%  { r: 18; opacity: 0; }
+  100% { r: 18; opacity: 0; }
+}
+@keyframes rkBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
 }
 
 /* ── Utility ── */

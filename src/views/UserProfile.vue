@@ -784,7 +784,7 @@ onMounted(init)
   padding: 48px 0 40px;
 }
 .hero-inner {
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -795,32 +795,32 @@ onMounted(init)
 /* Avatar */
 .avatar-wrap { position: relative; flex-shrink: 0; }
 .avatar-xl {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+  border-radius: 0;
   background: rgba(255,255,255,0.18);
-  border: 4px solid rgba(255,255,255,0.60);
+  border: 2px solid rgba(255,255,255,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  font-size: 3rem;
+  font-size: 2.4rem;
   color: white;
   box-shadow: none;
 }
 .avatar-badge {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #000;
-  border: 2px solid white;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 0;
+  background: #0052FF;
+  border: 2px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: white;
 }
 
@@ -828,43 +828,60 @@ onMounted(init)
 .hero-info { flex: 1; }
 .hero-name {
   font-weight: 900;
-  font-size: 2.4rem;
-  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
   color: white;
-  line-height: 1.1;
+  line-height: 1.0;
 }
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 .meta-chip {
-  padding: 5px 14px;
+  padding: 4px 12px;
   border-radius: 0;
-  background: rgba(255,255,255,0.15);
-  font-size: 0.82rem;
-  font-weight: 700;
+  background: rgba(255,255,255,0.12);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
 }
-.meta-chip-sport { background: #333; }
-.meta-chip-date { background: rgba(255,255,255,0.10); }
+.meta-chip-sport { background: rgba(255,255,255,0.18); }
+.meta-chip-date { background: rgba(255,255,255,0.08); }
 
 .hero-stats {
   display: flex;
   align-items: center;
   gap: 0;
   margin-bottom: 24px;
-  background: rgba(255,255,255,0.10);
-  border-radius: 0;
-  padding: 16px 24px;
+  border: 1px solid rgba(255,255,255,0.2);
   width: fit-content;
 }
-.hstat { text-align: center; padding: 0 20px; }
-.hstat-val { font-weight: 900; font-size: 1.6rem; color: white; line-height: 1; }
-.hstat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.70); margin-top: 4px; }
-.hstat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.20); }
+.hstat { text-align: center; padding: 14px 20px; }
+.hstat-val {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: white;
+  line-height: 1;
+}
+.hstat-label {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.55);
+  margin-top: 4px;
+}
+.hstat-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,0.15); }
 
 .hero-actions { display: flex; gap: 12px; }
 
@@ -914,39 +931,45 @@ onMounted(init)
   z-index: 50;
 }
 .content-tabs {
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
 }
 .ctab {
-  padding: 16px 24px;
+  padding: 14px 20px;
   border: none;
   background: transparent;
-  font-weight: 900;
-  font-size: 0.9rem;
-  color: rgba(15,18,16,0.55);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #767676;
   cursor: pointer;
-  transition: all 0.2s;
-  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.ctab:hover { color: rgba(15,18,16,0.80); }
+.ctab:hover { color: #000; }
 .ctab.active { color: #000; border-bottom-color: #000; }
 .ctab-count {
-  background: rgba(15,18,16,0.08);
+  background: #F5F5F5;
+  border: 1px solid #E5E5E5;
   border-radius: 0;
-  padding: 2px 8px;
-  font-size: 0.75rem;
+  padding: 1px 7px;
+  font-size: 0.6rem;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }
-.ctab.active .ctab-count { background: rgba(0,0,0,0.08); color: #000; }
+.ctab.active .ctab-count { background: #000; color: #fff; border-color: #000; }
 
 /* Content area */
 .content-area {
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 32px 24px 64px;
 }
@@ -1003,8 +1026,14 @@ onMounted(init)
   border-bottom: 1px solid rgba(15,18,16,0.07);
 }
 .act-sport-icon { font-size: 1.8rem; line-height: 1; }
-.act-type-label { font-weight: 900; font-size: 0.9rem; color: rgba(15,18,16,0.80); flex: 1; }
-.act-time { font-size: 0.75rem; color: rgba(15,18,16,0.50); }
+.act-type-label { font-weight: 900; font-size: 0.88rem; color: #000; flex: 1; letter-spacing: -0.01em; }
+.act-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #767676;
+}
 .act-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1016,8 +1045,22 @@ onMounted(init)
   text-align: center;
   padding: 14px 8px;
 }
-.act-stat-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(15,18,16,0.50); margin-bottom: 4px; }
-.act-stat-val { font-weight: 900; font-size: 1rem; color: rgba(15,18,16,0.90); }
+.act-stat-label {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #767676;
+  margin-bottom: 4px;
+}
+.act-stat-val {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #000;
+}
 
 .load-more-row {
   display: flex;
@@ -1113,13 +1156,18 @@ onMounted(init)
 }
 .moment-modal-user { display: flex; align-items: center; gap: 12px; }
 .m-avatar {
-  width: 44px; height: 44px; border-radius: 50%;
+  width: 40px; height: 40px; border-radius: 0;
   background: #000;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; color: white; font-size: 1.1rem; flex-shrink: 0;
+  font-weight: 900; color: white; font-size: 1rem; flex-shrink: 0;
 }
-.m-name { font-weight: 900; font-size: 0.95rem; }
-.m-time { font-size: 0.78rem; color: rgba(15,18,16,0.55); }
+.m-name { font-weight: 800; font-size: 0.92rem; letter-spacing: -0.01em; }
+.m-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #767676;
+}
 .moment-song {
   display: flex;
   gap: 12px;

@@ -897,14 +897,18 @@ onMounted(() => {
 
 .hero h1 {
   color: white;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
 }
 
 .hero .lead {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
   font-weight: 400;
-  max-width: 700px;
+  max-width: 500px;
+  line-height: 1.6;
 }
 
 /* ===== CONTROLS ===== */
@@ -929,22 +933,22 @@ onMounted(() => {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  padding: 12px 20px;
   border: none;
   background: transparent;
-  font-family: inherit;
-  font-size: 14px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
   font-weight: 600;
-  color: #6B7280;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #767676;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.15s, border-color 0.15s;
 }
 
-.tab-btn:hover {
-  color: #000;
-}
+.tab-btn:hover { color: #000; }
 
 .tab-btn.active {
   color: #000;
@@ -955,13 +959,15 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  height: 16px;
+  min-width: 16px;
+  padding: 0 4px;
   background: #000;
   color: white;
   border-radius: 0;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 0.55rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   margin-left: 6px;
 }
 
@@ -979,27 +985,26 @@ onMounted(() => {
 }
 
 .sport-pill {
-  padding: 8px 20px;
-  border: 1px solid #E5E5E5;
+  padding: 6px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
   border-radius: 0;
-  background: white;
-  color: #374151;
-  font-family: inherit;
+  background: transparent;
+  color: #767676;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.15s, border-color 0.15s;
 }
 
-.sport-pill:hover {
-  background: #F9FAFB;
-  border-color: #D1D5DB;
-}
+.sport-pill:hover { color: #000; }
 
 .sport-pill.active {
-  background: var(--r-black, #0F1210);
-  border-color: var(--r-black, #0F1210);
-  color: white;
+  color: #000;
+  border-bottom-color: #000;
 }
 
 /* Search & Sort */
@@ -1086,15 +1091,15 @@ onMounted(() => {
   position: absolute;
   bottom: 12px;
   left: 12px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.75);
   color: white;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 4px 10px;
   border-radius: 0;
-  backdrop-filter: blur(4px);
 }
 
 .club-card .body {
@@ -1105,60 +1110,49 @@ onMounted(() => {
 }
 
 .club-card .title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #111827;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #000;
 }
 
 /* Buttons */
 .btn-join {
-  padding: 8px 18px;
-  border: none;
+  padding: 10px 18px;
+  border: 2px solid #0052FF;
   border-radius: 0;
   background: #0052FF;
   color: white;
-  font-family: inherit;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.btn-join:hover:not(:disabled) {
-  background: #003ECC;
-  transform: translateY(-1px);
-  box-shadow: none;
-}
-
-.btn-join:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.btn-join:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
+.btn-join:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-leave {
-  padding: 8px 14px;
-  border: 1px solid #D1D5DB;
+  padding: 10px 14px;
+  border: 1px solid #E5E5E5;
   border-radius: 0;
   background: white;
-  color: #6B7280;
-  font-family: inherit;
+  color: #767676;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
-.btn-leave:hover:not(:disabled) {
-  border-color: #EF4444;
-  color: #EF4444;
-  background: #FEF2F2;
-}
-
-.btn-leave:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.btn-leave:hover:not(:disabled) { border-color: #dc2626; color: #dc2626; }
+.btn-leave:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Chat button on cards */
 .chat-btn {

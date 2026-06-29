@@ -1,143 +1,107 @@
 <template>
   <main class="waitlist-page">
 
-    <!-- HERO -->
+    <!-- 001 HERO ─ black -->
     <section class="hero">
       <div class="hero-inner">
-        <p class="hero-kicker">BETA — COMING SOON</p>
-        <h1 class="hero-headline">Train together.<br>Race further.</h1>
-        <p class="hero-sub">
-          Runnit is a social fitness app built for athletes who want more than a leaderboard.
-          GPS tracking, club runs, training plans, and a community that actually shows up.
-        </p>
-        <p class="hero-fine">Join the waitlist — early access drops this summer.</p>
+        <SectionIndex :num="1" label="Waitlist" :on-dark="true" />
+        <h1 class="hero-h1">CLAIM YOUR HANDLE.</h1>
+        <p class="hero-sub">Be first in when we open your city. No spam — just the green light and your @name held.</p>
       </div>
     </section>
 
-    <!-- FORM -->
+    <!-- FORM SECTION ─ white -->
     <section class="form-section">
       <div class="form-inner">
 
-        <div v-if="!submitted" class="form-card">
-          <p class="form-eyebrow">GET EARLY ACCESS</p>
-          <h2 class="form-title">You're in the right place.</h2>
-          <p class="form-desc">
-            Tell us a little about yourself and we'll let you know the moment the app is live.
-          </p>
+        <!-- syncs row -->
+        <div class="syncs-row">
+          <span class="syncs-label">Syncs With</span>
+          <span class="syncs-app">STRAVA</span>
+          <span class="syncs-slash">/</span>
+          <span class="syncs-app">GARMIN</span>
+          <span class="syncs-slash">/</span>
+          <span class="syncs-app">APPLE HEALTH</span>
+        </div>
 
+        <!-- form card -->
+        <div v-if="!submitted" class="form-card">
           <form @submit.prevent="submit" class="waitlist-form" novalidate>
 
             <div class="field-group">
-              <label class="field-label" for="wl-email">EMAIL *</label>
+              <label class="field-label" for="wl-email">Email</label>
               <input
                 id="wl-email"
                 v-model.trim="form.email"
                 type="email"
                 class="field-input"
                 :class="{ 'field-error': errors.email }"
-                placeholder="you@example.com"
+                placeholder="you@email.com"
                 autocomplete="email"
               />
               <p v-if="errors.email" class="field-err-msg">{{ errors.email }}</p>
             </div>
 
             <div class="field-group">
-              <label class="field-label" for="wl-name">NAME</label>
+              <label class="field-label" for="wl-handle">Desired Handle</label>
               <input
-                id="wl-name"
-                v-model.trim="form.name"
+                id="wl-handle"
+                v-model.trim="form.handle"
                 type="text"
                 class="field-input"
-                placeholder="First name (optional)"
-                autocomplete="given-name"
+                placeholder="@yourname"
+                autocomplete="username"
               />
             </div>
 
             <div class="field-group">
-              <label class="field-label" for="wl-training">WHAT ARE YOU TRAINING FOR?</label>
-              <select id="wl-training" v-model="form.trainingFor" class="field-input field-select">
-                <option value="">Pick one (optional)</option>
-                <option value="5K">5K</option>
-                <option value="10K">10K</option>
-                <option value="Half Marathon">Half Marathon</option>
-                <option value="Marathon">Marathon</option>
-                <option value="Triathlon">Triathlon</option>
-                <option value="Ironman">Ironman</option>
-                <option value="Ultra">Ultra / Trail</option>
-                <option value="Cycling">Cycling</option>
-                <option value="Swimming">Swimming</option>
-                <option value="General Fitness">General Fitness</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">DO YOU TRAIN SOLO OR WITH OTHERS?</label>
-              <div class="radio-group">
-                <label class="radio-opt" :class="{ active: form.trainsWith === 'solo' }">
-                  <input type="radio" v-model="form.trainsWith" value="solo" />
-                  Solo
-                </label>
-                <label class="radio-opt" :class="{ active: form.trainsWith === 'group' }">
-                  <input type="radio" v-model="form.trainsWith" value="group" />
-                  With a group
-                </label>
-                <label class="radio-opt" :class="{ active: form.trainsWith === 'both' }">
-                  <input type="radio" v-model="form.trainsWith" value="both" />
-                  Both
-                </label>
-              </div>
+              <label class="field-label" for="wl-city">City</label>
+              <input
+                id="wl-city"
+                v-model.trim="form.city"
+                type="text"
+                class="field-input"
+                placeholder="Where you run"
+                autocomplete="address-level2"
+              />
             </div>
 
             <p v-if="serverError" class="server-error">{{ serverError }}</p>
 
-            <button type="submit" class="submit-btn" :disabled="loading">
+            <button type="submit" class="btn-submit" :disabled="loading">
               <span v-if="loading" class="btn-spinner"></span>
-              <span v-else>Reserve my spot</span>
+              <span v-else>Join the Waitlist</span>
             </button>
 
-            <p class="form-fine">No spam. No credit card. Just early access.</p>
           </form>
         </div>
 
-        <!-- SUCCESS STATE -->
+        <!-- SUCCESS -->
         <div v-else class="success-card">
-          <div class="success-icon">✓</div>
-          <h2 class="success-title">You're on the list.</h2>
-          <p class="success-desc">
-            We'll reach out as soon as beta access opens up.
-            In the meantime, follow the build on
-            <a href="https://instagram.com/runnitapp" target="_blank" rel="noopener">Instagram</a>
-            and
-            <a href="https://x.com/runnitapp" target="_blank" rel="noopener">X</a>.
-          </p>
-          <router-link to="/" class="back-link">Back to home</router-link>
+          <div class="success-label">You're on the list.</div>
+          <p class="success-body">We'll reach out as soon as beta access opens in your city.</p>
+          <router-link to="/" class="btn-ghost">Back to home</router-link>
         </div>
 
       </div>
     </section>
 
-    <!-- SOCIAL PROOF STRIP -->
-    <section class="proof-strip">
-      <div class="proof-inner">
-        <div class="proof-item">
-          <span class="proof-stat">GPS</span>
-          <span class="proof-label">Activity tracking</span>
-        </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-          <span class="proof-stat">Clubs</span>
-          <span class="proof-label">Train with friends</span>
-        </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-          <span class="proof-stat">AI</span>
-          <span class="proof-label">Personalized plans</span>
-        </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-          <span class="proof-stat">Strava</span>
-          <span class="proof-label">Sync your data</span>
+    <!-- PROOF STRIP -->
+    <section class="proof-section">
+      <div class="form-inner">
+        <div class="proof-strip">
+          <div class="proof-cell">
+            <div class="proof-label">On The List</div>
+            <div class="proof-val">12,400</div>
+          </div>
+          <div class="proof-cell">
+            <div class="proof-label">Cities</div>
+            <div class="proof-val">38</div>
+          </div>
+          <div class="proof-cell proof-cell--last">
+            <div class="proof-label">Launching</div>
+            <div class="proof-val">SUMMER '26</div>
+          </div>
         </div>
       </div>
     </section>
@@ -148,27 +112,22 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useHead } from '@unhead/vue'
+import SectionIndex from '@/components/SectionIndex.vue'
 
 useHead({
   title: 'Join the Waitlist — Runnit',
   link: [{ rel: 'canonical', href: 'https://runnit.live/waitlist' }],
   meta: [
-    { name: 'description', content: 'Runnit is a social fitness app for athletes. GPS tracking, club runs, AI training plans — built for people who actually move. Join the beta waitlist.' },
-    { property: 'og:title', content: 'Join the Waitlist — Runnit' },
-    { property: 'og:description', content: 'GPS tracking, club runs, AI training plans. Built for athletes who show up. Get early access.' },
+    { name: 'description', content: 'Claim your handle before someone else does. Join the Runnit waitlist and get early access when we open your city.' },
+    { property: 'og:title', content: 'Claim Your Handle — Runnit Waitlist' },
     { property: 'og:url', content: 'https://runnit.live/waitlist' },
-    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
-    { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Join the Waitlist — Runnit' },
-    { name: 'twitter:description', content: 'Social fitness app for athletes. GPS, clubs, AI plans. Beta dropping soon.' },
-    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
-const form = reactive({ email: '', name: '', trainingFor: '', trainsWith: '' })
+const form = reactive({ email: '', handle: '', city: '' })
 const errors = reactive({ email: '' })
 const loading = ref(false)
 const submitted = ref(false)
@@ -191,9 +150,8 @@ async function submit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: form.email,
-        name: form.name || undefined,
-        trainingFor: form.trainingFor || undefined,
-        trainsWith: form.trainsWith || undefined,
+        name: form.handle || undefined,
+        city: form.city || undefined,
       }),
     })
     if (!res.ok) {
@@ -214,283 +172,233 @@ async function submit() {
 .waitlist-page {
   min-height: 100vh;
   background: #fff;
-  padding-top: var(--nav-h, 64px);
-  font-family: Futura, 'Futura PT', 'Avenir Next', system-ui, sans-serif;
+  font-family: Futura, 'Futura PT', 'Avenir Next', Avenir, 'Jost', system-ui, sans-serif;
   color: #000;
 }
 
-/* HERO */
+/* ── HERO ── */
 .hero {
   background: #000;
   color: #fff;
-  padding: 100px 24px 80px;
+  padding: 92px 0 80px;
+  text-align: center;
 }
-.hero-inner { max-width: 680px; margin: 0 auto; }
-.hero-kicker {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: rgba(255,255,255,0.40);
-  margin-bottom: 24px;
+.hero-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.hero-headline {
-  font-size: clamp(3rem, 8vw, 5.5rem);
+.hero-h1 {
+  font-size: clamp(2.6rem, 6vw, 4.125rem);
   font-weight: 900;
   letter-spacing: -0.04em;
-  line-height: 0.95;
-  margin: 0 0 24px;
+  line-height: 0.96;
+  margin: 18px 0 0;
+  animation: rkWipe 0.85s cubic-bezier(0.65,0,0.35,1) 0.08s both;
 }
 .hero-sub {
-  font-size: 1rem;
-  color: rgba(255,255,255,0.60);
+  max-width: 460px;
+  color: rgba(255,255,255,0.6);
   line-height: 1.6;
-  max-width: 520px;
-  margin: 0 0 20px;
-}
-.hero-fine {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #0052FF;
-  text-transform: uppercase;
-  margin: 0;
+  font-size: 1rem;
+  margin: 22px auto 0;
+  animation: rkRise 0.6s ease-out 0.3s both;
 }
 
-/* FORM */
+/* ── FORM SECTION ── */
 .form-section {
   padding: 64px 24px 80px;
-  background: #F5F5F5;
-  border-top: 1px solid #E5E5E5;
-  border-bottom: 1px solid #E5E5E5;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .form-inner {
-  max-width: 560px;
-  margin: 0 auto;
-}
-.form-card {
-  background: #fff;
-  border: 1px solid #E5E5E5;
-  padding: 48px;
-}
-.form-eyebrow {
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.20em;
-  color: #767676;
-  margin-bottom: 12px;
-}
-.form-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin: 0 0 12px;
-}
-.form-desc {
-  font-size: 0.88rem;
-  color: #767676;
-  line-height: 1.6;
-  margin: 0 0 36px;
+  width: 100%;
+  max-width: 440px;
 }
 
-/* Fields */
-.waitlist-form { display: flex; flex-direction: column; gap: 24px; }
-.field-group { display: flex; flex-direction: column; gap: 6px; }
-.field-label {
-  font-size: 0.60rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  color: #767676;
+.syncs-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  flex-wrap: wrap;
 }
-.field-input {
-  padding: 12px 14px;
-  font-family: inherit;
-  font-size: 0.9rem;
+.syncs-label {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.5);
+}
+.syncs-app {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(0,0,0,0.55);
+}
+.syncs-slash { color: rgba(0,0,0,0.25); }
+
+.form-card {
   border: 1px solid #E5E5E5;
-  background: #fff;
+  padding: 32px;
+  animation: rkRise 0.6s ease-out 0.15s both;
+}
+
+.waitlist-form { display: flex; flex-direction: column; gap: 0; }
+
+.field-group { margin-bottom: 18px; }
+.field-group:last-of-type { margin-bottom: 24px; }
+
+.field-label {
+  display: block;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #767676;
+  margin-bottom: 8px;
+}
+
+.field-input {
+  display: block;
+  width: 100%;
+  border: 1px solid #E5E5E5;
+  padding: 13px 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
   color: #000;
+  background: #fff;
   outline: none;
   transition: border-color 0.15s;
-  appearance: none;
-  border-radius: 0;
 }
 .field-input:focus { border-color: #000; }
 .field-input.field-error { border-color: #dc2626; }
-.field-select {
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23000' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 36px;
-}
+.field-input::placeholder { color: #767676; }
 .field-err-msg {
   font-size: 0.75rem;
   color: #dc2626;
-  margin: 0;
+  margin: 6px 0 0;
 }
-
-/* Radio */
-.radio-group { display: flex; gap: 0; border: 1px solid #E5E5E5; }
-.radio-opt {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 11px 8px;
-  font-size: 0.80rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #767676;
-  cursor: pointer;
-  border-right: 1px solid #E5E5E5;
-  transition: background 0.12s, color 0.12s;
-  user-select: none;
-}
-.radio-opt:last-child { border-right: none; }
-.radio-opt.active { background: #000; color: #fff; }
-.radio-opt input { display: none; }
-
-/* Submit */
-.submit-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 16px 24px;
-  background: #0052FF;
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  border: 2px solid #0052FF;
-  cursor: pointer;
-  transition: background 0.15s;
-  margin-top: 8px;
-}
-.submit-btn:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .server-error {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #dc2626;
-  margin: 0;
+  margin-bottom: 16px;
 }
 
-.form-fine {
-  font-size: 0.68rem;
-  color: #767676;
-  letter-spacing: 0.05em;
+.btn-submit {
+  display: block;
+  width: 100%;
   text-align: center;
-  margin: 0;
+  background: #0052FF;
+  color: #fff;
+  border: 2px solid #0052FF;
+  padding: 14px 0;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
 }
+.btn-submit:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
+.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 
 .btn-spinner {
   display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.30);
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Success */
+/* SUCCESS */
 .success-card {
-  background: #fff;
   border: 1px solid #E5E5E5;
-  padding: 64px 48px;
+  padding: 40px 32px;
   text-align: center;
 }
-.success-icon {
-  width: 56px; height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  color: #fff;
-  font-size: 1.6rem;
-  font-weight: 900;
-  margin: 0 auto 28px;
-}
-.success-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  margin: 0 0 16px;
-}
-.success-desc {
-  font-size: 0.9rem;
-  color: #767676;
-  line-height: 1.65;
-  max-width: 360px;
-  margin: 0 auto 32px;
-}
-.success-desc a { color: #0052FF; text-decoration: none; }
-.success-desc a:hover { text-decoration: underline; }
-.back-link {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #767676;
-  text-decoration: none;
-  border-bottom: 1px solid #E5E5E5;
-  padding-bottom: 2px;
-}
-.back-link:hover { color: #000; border-color: #000; }
-
-/* PROOF STRIP */
-.proof-strip {
-  padding: 48px 24px;
-  background: #fff;
-  border-top: 1px solid #E5E5E5;
-}
-.proof-inner {
-  max-width: 720px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-}
-.proof-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-}
-.proof-stat {
-  font-size: 1rem;
+.success-label {
+  font-size: 1.2rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  color: #000;
+  margin-bottom: 12px;
 }
-.proof-label {
+.success-body {
+  color: #767676;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 20px;
+  background: transparent;
+  color: #000;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid #E5E5E5;
+  transition: border-color 0.15s;
+}
+.btn-ghost:hover { border-color: #000; text-decoration: none; }
+
+/* ── PROOF STRIP ── */
+.proof-section {
+  padding: 0 24px 80px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+}
+.proof-strip {
+  width: 100%;
+  max-width: 440px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid #E5E5E5;
+  animation: rkRise 0.6s ease-out 0.25s both;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.proof-cell {
+  padding: 28px 24px;
+  border-right: 1px solid #E5E5E5;
+  text-align: center;
+}
+.proof-cell--last { border-right: none; }
+.proof-label {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #767676;
+  margin-bottom: 8px;
 }
-.proof-divider {
-  width: 1px;
-  height: 40px;
-  background: #E5E5E5;
-  flex-shrink: 0;
+.proof-val {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .form-card, .success-card { padding: 32px 24px; }
-  .hero { padding: 64px 24px 56px; }
-  .proof-inner { flex-wrap: wrap; gap: 24px; }
-  .proof-divider { display: none; }
-  .radio-group { flex-direction: column; }
-  .radio-opt { border-right: none; border-bottom: 1px solid #E5E5E5; }
-  .radio-opt:last-child { border-bottom: none; }
+@media (max-width: 480px) {
+  .form-section { padding: 48px 16px 56px; }
+  .proof-section { padding-bottom: 48px; }
+  .syncs-row { justify-content: center; }
 }
 </style>

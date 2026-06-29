@@ -1,11 +1,15 @@
 <!-- src/components/TopNav.vue -->
 <template>
-  <nav :class="['navbar', { 'navbar--scrolled': scrolled }]">
+  <header :class="['site-header', { 'site-header--auth': isAuthenticated }]">
+    <!-- Spec bar — marketing pages only (unauthenticated) -->
+    <SpecBar v-if="!isAuthenticated" />
+
+    <nav class="navbar">
     <div class="navbar-content">
 
       <!-- LEFT: brand -->
       <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
-        <span class="brand-text">RUNNIT</span>
+        <span class="brand-text">RUNNIT<span class="brand-reg">&reg;</span></span>
       </router-link>
 
       <!-- CENTER: desktop nav links (authenticated athletes get centered; coach + public stay in flow) -->
@@ -34,11 +38,10 @@
 
         <!-- Public nav links -->
         <div class="navbar-links navbar-links--public" v-if="!isAuthenticated">
-          <router-link to="/features" class="nav-link">Features</router-link>
-          <router-link to="/about" class="nav-link">About</router-link>
-          <router-link to="/blog" class="nav-link">Blog</router-link>
-          <router-link to="/join-us" class="nav-link">Login</router-link>
-          <router-link to="/signup" class="nav-link nav-link-primary">Join Us</router-link>
+          <router-link to="/features" class="nav-link nav-link-mono">Features</router-link>
+          <router-link to="/about" class="nav-link nav-link-mono">About</router-link>
+          <router-link to="/subscribe" class="nav-link nav-link-mono">Pricing</router-link>
+          <router-link to="/waitlist" class="nav-link nav-link-primary">Join Waitlist</router-link>
         </div>
 
         <!-- Auth icons -->
@@ -267,27 +270,28 @@
         <template v-else>
           <nav class="drawer-nav">
             <router-link to="/features" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-star"></i> Features
+              Features
             </router-link>
             <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-info-circle"></i> About
+              About
             </router-link>
-            <router-link to="/blog" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-pencil-square"></i> Blog
+            <router-link to="/subscribe" class="drawer-link" @click="mobileMenuOpen = false">
+              Pricing
             </router-link>
           </nav>
           <div class="drawer-footer">
             <router-link to="/join-us" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-box-arrow-in-right"></i> Login
+              Login
             </router-link>
-            <router-link to="/signup" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
-              <i class="bi bi-person-plus"></i> Join Us
+            <router-link to="/waitlist" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
+              Join Waitlist
             </router-link>
           </div>
         </template>
       </div>
     </Transition>
   </Teleport>
+  </header>
 </template>
 
 <script setup>
@@ -299,6 +303,7 @@ import { useDMStore } from '@/stores/dm'
 import { storeToRefs } from 'pinia'
 import DMDrawer from '@/components/DMDrawer.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import SpecBar from '@/components/SpecBar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -434,32 +439,26 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.navbar {
+.site-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--rk-void, #000000);
-  border-bottom: 1px solid rgba(139,43,226,0.20);
-  box-shadow: none;
-  transition: background 0.3s ease, border-color 0.3s ease;
-  /* Push content below the status bar / Dynamic Island on iOS */
   padding-top: env(safe-area-inset-top, 0px);
 }
-.navbar--scrolled {
-  background: rgba(13, 5, 18, 0.82);
-  border-bottom-color: rgba(139,43,226,0.12);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.navbar {
+  background: #fff;
+  border-bottom: 1px solid #E5E5E5;
+  box-shadow: none;
 }
 
 .navbar-content {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px; /* fixed content height — safe area is handled by .navbar padding-top */
+  height: 64px;
   display: flex;
   align-items: center;
 }
@@ -502,42 +501,82 @@ onUnmounted(() => {
 }
 
 .brand-text {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 0.20em;
-  color: white;
+  font-family: Futura, "Futura PT", "Avenir Next", Avenir, "Jost", system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: -0.04em;
+  color: #000;
   text-transform: uppercase;
+}
+.brand-reg {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  vertical-align: super;
+  margin-left: 1px;
 }
 
 .nav-link {
-  padding: 8px 14px;
+  padding: 5px 0;
   border-radius: 0;
   border: none;
+  border-bottom: 2px solid transparent;
   background: transparent;
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 400;
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
+  color: #767676;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   cursor: pointer;
   transition: color 0.15s;
 }
-.nav-link:hover { background: transparent; color: white; }
-.nav-link.router-link-active { color: white; }
+.nav-link:hover { background: transparent; color: #000; }
+.nav-link.router-link-active {
+  color: #000;
+  border-bottom: 2px solid #000;
+  padding-bottom: 5px;
+}
+/* non-mono links keep old styling (e.g. Track) */
+.nav-link:not(.nav-link-mono) {
+  font-family: Futura, "Futura PT", "Avenir Next", Avenir, "Jost", system-ui, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: #767676;
+  font-weight: 500;
+}
+.nav-link:not(.nav-link-mono):hover { color: #000; }
+.nav-link:not(.nav-link-mono).router-link-active { color: #000; border-bottom: 2px solid #000; }
+
+.nav-link-mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  color: #767676;
+}
+.nav-link-mono:hover { color: #000; }
+.nav-link-mono.router-link-active {
+  color: #000;
+  font-weight: 600;
+  border-bottom: 2px solid #000;
+}
 
 .nav-link-track {
   background: #000;
   color: #fff !important;
-  font-weight: 700;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  font-size: 0.72rem;
-  padding: 8px 18px;
-  margin-left: 6px;
+  font-size: 0.68rem;
+  padding: 8px 16px;
+  margin-left: 4px;
   gap: 7px;
-  border: 1px solid rgba(255,255,255,0.25);
+  border-bottom: none !important;
 }
 .nav-link-track:hover { background: #222 !important; color: #fff !important; }
 
@@ -552,7 +591,7 @@ onUnmounted(() => {
   border-radius: 0;
   border: none;
   background: transparent;
-  color: rgba(255,255,255,0.75);
+  color: #767676;
   font-size: 1rem;
   display: flex;
   align-items: center;
@@ -561,7 +600,7 @@ onUnmounted(() => {
   transition: color 0.15s;
   position: relative;
 }
-.nav-icon-btn:hover { color: white; }
+.nav-icon-btn:hover { color: #000; }
 .notif-badge {
   position: absolute;
   top: -2px;
@@ -705,8 +744,8 @@ onUnmounted(() => {
 .avatar-wrap { position: relative; }
 
 .nav-avatar {
-  border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.40);
+  border-radius: 0;
+  border: none;
   padding: 0;
   background: transparent;
   display: flex;
@@ -784,6 +823,29 @@ onUnmounted(() => {
 .avd-link-danger i { color: #dc2626; }
 .avd-link-danger:hover { background: #fef2f2; }
 
+/* Primary nav CTA — blue mono button */
+.nav-link-primary {
+  background: #0052FF;
+  color: #fff !important;
+  border: 2px solid #0052FF;
+  padding: 9px 16px !important;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 2px solid #0052FF !important;
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-link-primary:hover {
+  background: #003ECC !important;
+  border-color: #003ECC !important;
+  color: #fff !important;
+}
+.nav-link-primary.router-link-active {
+  border-bottom: 2px solid #0052FF !important;
+}
+
 /* Mobile toggle */
 .mobile-menu-toggle {
   display: none;
@@ -792,7 +854,7 @@ onUnmounted(() => {
   border: none;
   background: transparent;
   border-radius: 0;
-  color: white;
+  color: #000;
   font-size: 1.2rem;
   cursor: pointer;
   align-items: center;
@@ -832,7 +894,7 @@ onUnmounted(() => {
   /* Hide text nav links and DM/bell on mobile — use drawer instead */
   .navbar-links { display: none !important; }
   .desktop-only { display: none !important; }
-  .mobile-menu-toggle { display: flex; }
+  .mobile-menu-toggle { display: flex; color: #000; }
   .brand-text { font-size: 1rem; }
 }
 </style>

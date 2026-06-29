@@ -1,123 +1,62 @@
 <template>
   <main class="about-page">
 
-    <!-- HERO -->
-    <section class="ep-hero">
-      <div class="ep-hero-inner">
-        <div class="ep-kicker">RUNNIT // ABOUT</div>
-        <h1 class="ep-headline">Movement<br>with purpose.</h1>
-        <p class="ep-sub">
-          RUNNIT is built for the people who show up — even when motivation isn't loud.
-          We turn daily training into a moment you can feel, track, and share.
-        </p>
-        <div class="ep-actions">
-          <router-link to="/signup" class="ep-btn">Join RUNNIT</router-link>
-          <router-link to="/features" class="ep-btn-ghost">Explore Features →</router-link>
-        </div>
+    <!-- 001 HERO ─ black -->
+    <section class="hero">
+      <div class="page-inner">
+        <SectionIndex :num="1" label="Our Story" :on-dark="true" />
+        <h1 class="hero-h1">WE BUILT THE APP<br>WE WANTED TO USE.</h1>
       </div>
     </section>
 
-    <!-- MISSION -->
-    <section class="ep-section">
-      <div class="ep-content">
-        <div class="about-split">
-          <div class="about-split-text">
-            <div class="section-label">Our Mission</div>
-            <h2 class="about-h2">Make consistency easier than motivation.</h2>
-            <p class="about-p">
-              RUNNIT blends community, structure, and reflection so training becomes a habit
-              you can sustain — and a story you're proud of.
-            </p>
-          </div>
-          <div class="mission-list">
-            <div class="mission-item" v-for="(point, i) in missionPoints" :key="i">
-              <i class="bi bi-check2"></i>
-              <span>{{ point }}</span>
-            </div>
+    <!-- MANIFESTO ─ white -->
+    <section class="manifesto-section">
+      <div class="manifesto-inner">
+        <p class="manifesto-lead">Most apps track your run. Runnit is where your run lives.</p>
+        <p class="manifesto-body">Runnit started as one runner's frustration: the apps that tracked everything somehow felt like nothing. Numbers without a story. A feed full of strangers' splits and sponsored shoes.</p>
+        <p class="manifesto-body">So it got built — solo, in the hours around training — into the place a run actually lives. The photo. The route. The people who were there when your legs gave out at mile twenty.</p>
+      </div>
+    </section>
+
+    <!-- 002 WHAT WE BELIEVE ─ smoke -->
+    <section class="beliefs-section">
+      <div class="page-inner">
+        <SectionIndex :num="2" label="What We Believe" />
+        <h2 class="section-h2">Three things, held hard.</h2>
+        <div class="beliefs-grid">
+          <div v-for="b in beliefs" :key="b.num" class="belief-card">
+            <div class="belief-num">{{ b.num }}</div>
+            <div class="belief-title">{{ b.title }}</div>
+            <p class="belief-body">{{ b.body }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- STATS -->
-    <section class="stats-band">
-      <div class="ep-content">
-        <div class="stats-grid">
-          <div class="stat-item" v-for="s in stats" :key="s.label">
-            <div class="stat-value">{{ s.value }}</div>
-            <div class="stat-label">{{ s.label }}</div>
+    <!-- 003 HOW IT'S BUILT ─ white 2-col -->
+    <section class="build-section">
+      <div class="build-stack-col">
+        <SectionIndex :num="3" label="How It's Built" />
+        <div class="stack-list">
+          <div v-for="(item, i) in stackItems" :key="item.name" class="stack-row">
+            <span class="stack-num">{{ String(i + 1).padStart(2, '0') }}</span>
+            <span class="stack-name">{{ item.name }}</span>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- STORY + VALUES -->
-    <section class="ep-section ep-section--gray">
-      <div class="ep-content">
-        <div class="about-split">
-          <div>
-            <div class="section-label">Our Story</div>
-            <h2 class="about-h2">Progress built in quiet reps.</h2>
-            <p class="about-p">
-              RUNNIT started from one belief: progress is built in quiet reps — not highlight reels.
-              We wanted a place where training feels meaningful, not noisy.
-            </p>
-            <p class="about-p">
-              Whether you're chasing your first finish line or a new PR, RUNNIT is designed to help you
-              keep the loop alive: show up, log the moment, and build momentum.
-            </p>
-          </div>
-          <div>
-            <div class="section-label">Our Values</div>
-            <div class="values-list">
-              <div class="value-row" v-for="(v, i) in values" :key="i">
-                <div class="value-title">{{ v.title }}</div>
-                <div class="value-body">{{ v.body }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="build-copy-col">
+        <p class="build-body">Runnit is built and maintained by one person, in the hours around marathon and Ironman training. Every feature earns its place because there's no room for the ones that don't.</p>
+        <p class="build-bold">Beta opens summer 2026 — built in public, shaped by the people on the list.</p>
       </div>
     </section>
 
-    <!-- TEAM -->
-    <section class="ep-section">
-      <div class="ep-content">
-        <div class="section-label">Team</div>
-        <h2 class="about-h2">Meet the people behind it.</h2>
-        <div class="team-grid">
-          <div class="team-card">
-            <div class="team-avatar">Q</div>
-            <div class="team-name">Quinn</div>
-            <div class="team-role">Founder & CEO</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA BAND -->
-    <section class="cta-band">
-      <div class="ep-content">
-        <div class="cta-grid">
-          <div class="cta-card">
-            <div class="cta-label">Press</div>
-            <div class="cta-title">Media & press</div>
-            <p class="cta-body">Media kit, logos, and story inquiries.</p>
-            <router-link to="/press" class="cta-link">Press resources →</router-link>
-          </div>
-          <div class="cta-card">
-            <div class="cta-label">Contact</div>
-            <div class="cta-title">Get in touch</div>
-            <p class="cta-body">We'd love to hear from you. Say hello.</p>
-            <router-link to="/support" class="cta-link">Contact us →</router-link>
-          </div>
-          <div class="cta-card cta-card--dark">
-            <div class="cta-label" style="color:rgba(255,255,255,0.40)">Careers</div>
-            <div class="cta-title" style="color:#fff">Join the team</div>
-            <p class="cta-body" style="color:rgba(255,255,255,0.60)">Small team. Big energy. Meaningful work.</p>
-            <router-link to="/careers" class="cta-link" style="color:#fff">See open roles →</router-link>
-          </div>
-        </div>
+    <!-- CTA ─ black -->
+    <section class="final-cta">
+      <div class="finish-tick"></div>
+      <div class="cta-inner">
+        <h2 class="cta-h2">COME BUILD WITH US.</h2>
+        <p class="cta-body">Get on the list and help shape what Runnit becomes.</p>
+        <router-link to="/waitlist" class="btn-cta">Join the Waitlist</router-link>
       </div>
     </section>
 
@@ -126,336 +65,226 @@
 
 <script setup>
 import { useHead } from '@unhead/vue'
+import SectionIndex from '@/components/SectionIndex.vue'
+
 useHead({
   title: 'About — Runnit',
-  link: [{ rel: 'canonical', href: 'https://runnit.live/about' }],
   meta: [
-    { name: 'description', content: 'Runnit is built for athletes who show up. Our mission: make consistency easier than motivation through community, structure, and data you own.' },
-    { property: 'og:title', content: 'About — Runnit' },
-    { property: 'og:description', content: 'Built for the people who show up — even when motivation isn\'t loud. Runnit turns daily training into a moment you can feel, track, and share.' },
-    { property: 'og:url', content: 'https://runnit.live/about' },
-    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
-    { property: 'og:type', content: 'website' },
-    { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'About — Runnit' },
-    { name: 'twitter:description', content: 'Built for the people who show up. Runnit turns daily training into a moment you can feel, track, and share.' },
-    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
+    { name: 'description', content: 'Most apps track your run. Runnit is where your run lives. Built solo, in the hours around marathon and Ironman training.' },
   ]
 })
 
-const missionPoints = [
-  'Community-first motivation that makes training stick.',
-  'Systems that help you build consistency without burnout.',
-  'Privacy you control — your data, your rules.',
-  'Device-friendly: bring Garmin, Apple Watch, COROS, and more.',
+const beliefs = [
+  { num: '01', title: 'Community over metrics',    body: 'The people you run with matter more than the numbers you post. We design for the crew first.' },
+  { num: '02', title: 'Real athletes, not influencers', body: 'No sponsored feeds, no perfect lighting. Just people who showed up and did the work.' },
+  { num: '03', title: 'Data that means something', body: "Every stat we show has to earn the pixels. If it doesn't change how you train, it's gone." },
 ]
 
-const stats = [
-  { value: '100M+', label: 'Moments captured' },
-  { value: '30B+',  label: 'Miles tracked' },
-  { value: '190+',  label: 'Countries moving' },
-  { value: '∞',     label: 'Reasons to show up' },
-]
-
-const values = [
-  { title: 'Build the habit',     body: "Consistency beats intensity you can't repeat." },
-  { title: 'Earned confidence',   body: 'Progress is proof — stack the days.' },
-  { title: 'Better together',     body: 'Community makes hard things easier.' },
-  { title: 'Trust always',        body: 'Clear controls and no surprises with your data.' },
+const stackItems = [
+  { name: 'iOS — native Swift' },
+  { name: 'Backend — Spring Boot' },
+  { name: 'Data — MySQL' },
+  { name: 'Infra — Render + PlanetScale' },
 ]
 </script>
 
 <style scoped>
 .about-page {
-  background: var(--rk-paper, #ffffff);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  padding-top: var(--nav-h, 64px);
+  min-height: 100vh;
+  background: #fff;
+  font-family: Futura, 'Futura PT', 'Avenir Next', Avenir, 'Jost', system-ui, sans-serif;
+  color: #000;
 }
 
-/* HERO */
-.ep-hero {
+.page-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── HERO ── */
+.hero {
   background: #000;
   color: #fff;
-  padding: 88px 24px 80px;
+  padding: 92px 0 84px;
 }
-.ep-hero-inner {
-  max-width: 900px;
-  margin: 0 auto;
-}
-.ep-kicker {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.40);
-  margin-bottom: 28px;
-}
-.ep-headline {
-  font-size: clamp(2.8rem, 8vw, 5.5rem);
+.hero-h1 {
+  font-size: clamp(2.4rem, 6vw, 4.125rem);
   font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
-  margin: 0 0 28px;
-}
-.ep-sub {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.65);
-  line-height: 1.65;
-  max-width: 520px;
-  margin: 0 0 36px;
-}
-.ep-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.ep-btn {
-  background: #fff;
-  color: #000;
-  text-decoration: none;
-  padding: 14px 28px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: opacity 0.15s;
-}
-.ep-btn:hover { opacity: 0.85; }
-.ep-btn-ghost {
-  color: rgba(255,255,255,0.72);
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  transition: color 0.15s;
-}
-.ep-btn-ghost:hover { color: #fff; }
-
-/* SECTIONS */
-.ep-section {
-  padding: 72px 24px;
-  background: #fff;
-}
-.ep-section--gray {
-  background: #F7F7F7;
-}
-.ep-content {
-  max-width: 900px;
-  margin: 0 auto;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+  margin: 18px 0 0;
+  max-width: 840px;
+  animation: rkWipe 0.85s cubic-bezier(0.65,0,0.35,1) 0.08s both;
 }
 
-.section-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  color: rgba(15,18,16,0.35);
-  margin-bottom: 16px;
+/* ── MANIFESTO ── */
+.manifesto-section {
+  padding: 84px 48px;
+  max-width: 880px;
 }
-.about-h2 {
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
-  font-weight: 900;
+.manifesto-lead {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  margin: 0 0 20px;
+  margin: 0 0 40px;
+  animation: rkRise 0.7s ease-out both;
 }
-.about-p {
-  font-size: 0.97rem;
-  color: rgba(15,18,16,0.62);
-  line-height: 1.7;
-  margin: 0 0 16px;
-}
-.about-p:last-child { margin-bottom: 0; }
-
-/* SPLIT LAYOUT */
-.about-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px;
-  align-items: start;
-}
-
-/* MISSION CHECKLIST */
-.mission-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-top: 4px;
-}
-.mission-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 0.92rem;
-  color: rgba(15,18,16,0.75);
-  line-height: 1.5;
-}
-.mission-item .bi {
+.manifesto-body {
+  color: #767676;
+  line-height: 1.6;
   font-size: 1rem;
-  color: #000;
-  flex-shrink: 0;
-  margin-top: 1px;
+  margin: 0 0 20px;
+  max-width: 640px;
 }
+.manifesto-body:last-child { margin-bottom: 0; }
 
-/* STATS */
-.stats-band {
-  padding: 40px 24px;
+/* ── BELIEFS ── */
+.beliefs-section {
+  background: #F5F5F5;
   border-top: 1px solid #E5E5E5;
   border-bottom: 1px solid #E5E5E5;
-  background: #fff;
 }
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-}
-.stat-item {
-  text-align: center;
-  padding: 24px 16px;
-  border-right: 1px solid #E5E5E5;
-}
-.stat-item:last-child { border-right: none; }
-.stat-value {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+.beliefs-section .page-inner { padding-top: 72px; padding-bottom: 72px; }
+.section-h2 {
+  font-size: clamp(2.2rem, 4vw, 2.5rem);
   font-weight: 900;
-  letter-spacing: -0.02em;
-  color: #000;
-  margin-bottom: 4px;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  margin: 14px 0 36px;
+  max-width: 620px;
 }
-.stat-label {
-  font-size: 0.78rem;
-  color: rgba(15,18,16,0.45);
-  letter-spacing: 0.04em;
-}
-
-/* VALUES */
-.values-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.value-row {
-  padding: 16px 0;
-  border-bottom: 1px solid #E5E5E5;
-}
-.value-row:last-child { border-bottom: none; }
-.value-title {
-  font-size: 0.92rem;
-  font-weight: 900;
-  color: #000;
-  margin-bottom: 4px;
-}
-.value-body {
-  font-size: 0.83rem;
-  color: rgba(15,18,16,0.55);
-  line-height: 1.5;
-}
-
-/* TEAM */
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: #E5E5E5;
-  border: 1px solid #E5E5E5;
-  margin-top: 32px;
-}
-.team-card {
-  background: #fff;
-  padding: 24px 20px;
-}
-.team-avatar {
-  width: 56px;
-  height: 56px;
-  background: #000;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  font-weight: 900;
-  margin-bottom: 14px;
-}
-.team-name {
-  font-size: 0.92rem;
-  font-weight: 900;
-  color: #000;
-  margin-bottom: 2px;
-}
-.team-role {
-  font-size: 0.78rem;
-  color: rgba(15,18,16,0.45);
-  letter-spacing: 0.04em;
-}
-
-/* CTA BAND */
-.cta-band {
-  padding: 72px 24px;
-  background: #fff;
-  border-top: 1px solid #E5E5E5;
-}
-.cta-grid {
+.beliefs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: #E5E5E5;
   border: 1px solid #E5E5E5;
 }
-.cta-card {
+.belief-card {
   background: #fff;
-  padding: 32px 28px;
-  display: flex;
-  flex-direction: column;
+  padding: 36px;
 }
-.cta-card--dark {
-  background: #000;
+.belief-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
 }
-.cta-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(15,18,16,0.35);
+.belief-title {
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
   margin-bottom: 10px;
 }
-.cta-title {
-  font-size: 1.1rem;
-  font-weight: 900;
+.belief-body {
+  color: #767676;
+  line-height: 1.6;
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+/* ── BUILD ── */
+.build-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #fff;
+}
+.build-stack-col {
+  padding: 64px 48px;
+  border-right: 1px solid #E5E5E5;
+}
+.stack-list { margin-top: 24px; }
+.stack-row {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  font-weight: 800;
+  font-size: 1.15rem;
+  border-top: 1px solid #E5E5E5;
+  padding: 16px 0;
+}
+.stack-row:last-child { border-bottom: 1px solid #E5E5E5; }
+.stack-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #767676;
+}
+
+.build-copy-col {
+  padding: 64px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.build-body {
+  color: #767676;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin: 0 0 18px;
+}
+.build-bold {
   color: #000;
-  margin-bottom: 8px;
+  line-height: 1.6;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* ── FINAL CTA ── */
+.final-cta { background: #000; color: #fff; }
+.finish-tick {
+  height: 9px;
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0 2px, transparent 2px 9px);
+}
+.cta-inner {
+  padding: 80px 48px 84px;
+  text-align: center;
+}
+.cta-h2 {
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  margin: 0;
+  animation: rkWipe 0.85s cubic-bezier(0.65,0,0.35,1) both;
 }
 .cta-body {
-  font-size: 0.85rem;
-  color: rgba(15,18,16,0.55);
+  color: rgba(255,255,255,0.6);
   line-height: 1.6;
-  margin: 0 0 20px;
-  flex: 1;
+  margin: 18px auto 30px;
+  max-width: 420px;
 }
-.cta-link {
-  font-size: 0.80rem;
-  font-weight: 700;
-  color: #000;
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 28px;
+  background: #0052FF;
+  color: #fff;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   text-decoration: none;
-  letter-spacing: 0.04em;
-  transition: opacity 0.15s;
+  border: 2px solid #0052FF;
+  transition: background 0.15s, border-color 0.15s;
 }
-.cta-link:hover { opacity: 0.65; }
+.btn-cta:hover { background: #003ECC; border-color: #003ECC; color: #fff; text-decoration: none; }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .about-split { grid-template-columns: 1fr; gap: 40px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .stat-item:nth-child(2) { border-right: none; }
-  .stat-item:nth-child(3) { border-right: 1px solid #E5E5E5; }
-  .stat-item:nth-child(4) { border-right: none; }
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
-  .cta-grid { grid-template-columns: 1fr; }
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .manifesto-section { padding: 56px 24px; }
+  .beliefs-grid { grid-template-columns: 1fr; }
+  .build-section { grid-template-columns: 1fr; }
+  .build-stack-col { border-right: none; border-bottom: 1px solid #E5E5E5; padding: 40px 32px; }
+  .build-copy-col  { padding: 40px 32px; }
+  .cta-inner { padding: 60px 24px; }
 }
-
-@media (max-width: 480px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 560px) {
+  .hero { padding: 64px 0 56px; }
 }
 </style>
