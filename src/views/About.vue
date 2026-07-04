@@ -284,7 +284,30 @@ const stackItems = [
   .build-copy-col  { padding: 40px 32px; }
   .cta-inner { padding: 60px 24px; }
 }
-@media (max-width: 560px) {
-  .hero { padding: 64px 0 56px; }
+
+@media (max-width: 640px) {
+  .page-inner { padding-left: 22px; padding-right: 22px; }
+
+  /* Hero */
+  .hero { padding: 56px 0 52px; }
+  .hero-h1 { font-size: 38px !important; line-height: 0.96; }
+
+  /* Manifesto */
+  .manifesto-section { padding: 48px 22px; }
+  .manifesto-lead { font-size: 1.6rem !important; font-weight: 300; }
+
+  /* Beliefs */
+  .beliefs-section .page-inner { padding-top: 44px; padding-bottom: 44px; }
+  .section-h2 { font-size: 32px !important; }
+  .belief-card { padding: 26px 22px; }
+
+  /* Build */
+  .build-stack-col { padding: 44px 22px; }
+  .build-copy-col  { padding: 26px 22px 44px; }
+
+  /* CTA */
+  .cta-inner { padding: 56px 22px 60px; }
+  .cta-h2 { font-size: 36px !important; }
+  .cta-inner .btn-cta { display: block; width: 100%; text-align: center; padding: 15px 0; }
 }
 </style>

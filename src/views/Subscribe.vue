@@ -427,7 +427,31 @@ function handleUpgrade() {
   .why-grid { grid-template-columns: repeat(2, 1fr); }
   .cta-inner { padding: 60px 24px; }
 }
-@media (max-width: 560px) {
-  .why-grid { grid-template-columns: 1fr; }
+
+@media (max-width: 640px) {
+  .page-inner { padding-left: 22px; padding-right: 22px; }
+
+  /* Hero */
+  .hero { padding: 56px 0 44px; }
+  .hero-h1 { font-size: 40px !important; line-height: 0.96; }
+  .billing-toggle { display: flex; width: 100%; }
+  .toggle-opt { flex: 1; justify-content: center; }
+
+  /* Plans */
+  .pricing-section { padding: 44px 22px 56px; }
+  .plan-card { padding: 30px 24px; }
+  .plan-price { font-size: 2.6rem; }
+  .btn-cta, .btn-outline { padding: 15px 0; }
+
+  /* Why Pro */
+  .why-pro-section .page-inner { padding-top: 44px; padding-bottom: 44px; }
+  .section-h2 { font-size: 32px !important; }
+  .why-grid { grid-template-columns: repeat(2, 1fr); }
+  .why-card { padding: 22px; }
+
+  /* CTA */
+  .cta-inner { padding: 56px 22px 60px; }
+  .cta-h2 { font-size: 36px !important; }
+  .btn-cta-white { display: block; width: 100%; text-align: center; padding: 15px 0; }
 }
 </style>

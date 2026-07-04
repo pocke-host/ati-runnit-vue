@@ -91,6 +91,10 @@ const router = createRouter({
   }
 })
 
+router.afterEach(() => {
+  window.scrollTo(0, 0)
+})
+
 router.beforeEach((to, from, next) => {
   const storedUser = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null } })()
   const isAuthenticated = !!storedUser

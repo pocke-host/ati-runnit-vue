@@ -32,7 +32,12 @@
   font-weight: 600;
 }
 
-@media (max-width: 480px) {
-  .rk-footer-tagline { display: none; }
+@media (max-width: 640px) {
+  .rk-footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 22px 18px;
+  }
 }
 </style>
