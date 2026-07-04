@@ -133,6 +133,9 @@
           </div><!-- /icon-group -->
         </template>
 
+        <!-- Mobile Join button (unauthenticated only, mobile only) -->
+        <router-link v-if="!isAuthenticated" to="/waitlist" class="mobile-join-btn">Join</router-link>
+
         <!-- Hamburger (mobile only, all users) -->
         <button
           class="mobile-menu-toggle"
@@ -846,6 +849,25 @@ onUnmounted(() => {
   border-bottom: 2px solid #0052FF !important;
 }
 
+/* Mobile Join button */
+.mobile-join-btn {
+  display: none;
+  background: #0052FF;
+  color: #fff !important;
+  border: none;
+  padding: 8px 14px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.mobile-join-btn:hover { background: #003ECC; text-decoration: none; }
+
 /* Mobile toggle */
 .mobile-menu-toggle {
   display: none;
@@ -867,6 +889,11 @@ onUnmounted(() => {
 .spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(0,0,0,0.10); border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
 .spinner-border-sm { width: 1rem; height: 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .navbar-content { height: 56px; }
+  .mobile-join-btn { display: inline-flex; align-items: center; }
+}
 
 @media (max-width: 768px) {
   .navbar-content {

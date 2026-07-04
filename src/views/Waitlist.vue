@@ -396,9 +396,34 @@ async function submit() {
   letter-spacing: -0.01em;
 }
 
-@media (max-width: 480px) {
-  .form-section { padding: 48px 16px 56px; }
-  .proof-section { padding-bottom: 48px; }
-  .syncs-row { justify-content: center; }
+@media (max-width: 640px) {
+  /* Hero */
+  .hero { padding: 56px 0 52px; }
+  .hero-inner { padding-left: 22px; padding-right: 22px; }
+  .hero-h1 { font-size: 40px !important; line-height: 0.96; }
+  .hero-sub { font-size: 0.95rem; }
+
+  /* Form section */
+  .form-section { padding: 44px 22px 56px; }
+  .form-inner { max-width: 100%; }
+
+  /* Syncs row — label on own line, apps wrap below */
+  .syncs-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 12px;
+  }
+  .syncs-label { width: 100%; text-align: center; }
+
+  /* Form card */
+  .form-card { padding: 26px 22px; }
+  .field-input { min-height: 44px; }
+  .btn-submit { min-height: 44px; padding: 15px 0; }
+
+  /* Proof strip */
+  .proof-section { padding: 0 22px 44px; }
+  .proof-cell { padding: 22px 10px; }
+  .proof-label { font-size: 0.54rem; }
+  .proof-val { font-size: 1.1rem; }
 }
 </style>

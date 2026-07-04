@@ -459,8 +459,45 @@ const kitItems = [
   .kit-grid { grid-template-columns: repeat(2, 1fr); }
   .restraint-grid { grid-template-columns: 1fr; }
 }
-@media (max-width: 560px) {
-  .kit-grid { grid-template-columns: 1fr; }
-  .cta-inner { padding: 60px 24px; }
+
+@media (max-width: 640px) {
+  .page-inner { padding-left: 22px; padding-right: 22px; }
+
+  /* Hero */
+  .hero { padding: 52px 0 48px; }
+  .hero-h1 { font-size: 38px !important; line-height: 0.96; }
+  .hero-sub { font-size: 0.95rem; }
+
+  /* Moments */
+  .moments-photo-col { min-height: 300px; }
+  .moments-text-col { padding: 40px 22px; }
+  .photo-chip { padding: 7px 12px; }
+  .stamp-cell { padding: 7px 12px; }
+  .stamp-value { font-size: 0.9rem; }
+
+  /* GPS */
+  .gps-text-col { padding: 44px 22px 36px; }
+  .gps-map-col { height: 240px; min-height: unset; }
+
+  /* Kit */
+  .kit-section .page-inner { padding-top: 44px; padding-bottom: 44px; }
+  .kit-grid { grid-template-columns: repeat(2, 1fr); }
+  .kit-card { padding: 20px; }
+  .kit-name { font-size: 0.72rem; }
+  .kit-desc { font-size: 0.8rem; }
+
+  /* Restraint */
+  .restraint-section .page-inner { padding-top: 44px; padding-bottom: 44px; }
+  .restraint-grid { flex-direction: column; }
+  .restraint-card { padding: 26px 22px; }
+
+  /* Section h2 */
+  .section-h2 { font-size: 32px !important; }
+  .feature-h2, .feature-h2-light { font-size: 32px !important; }
+
+  /* CTA */
+  .cta-inner { padding: 56px 22px 60px; }
+  .cta-h2 { font-size: 36px !important; }
+  .cta-inner .btn-cta { display: block; width: 100%; text-align: center; padding: 15px 0; }
 }
 </style>

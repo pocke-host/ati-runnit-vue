@@ -615,10 +615,31 @@ function scrollTo(id) {
   .newsprint-grid-3 { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 560px) {
-  .hero-actions { flex-direction: column; }
+@media (max-width: 640px) {
+  .home-inner { padding-left: 22px; padding-right: 22px; }
+
+  /* Hero */
+  .hero-h1 { font-size: 38px !important; line-height: 0.96; margin-top: 14px; }
+  .hero-sub { font-size: 0.95rem; margin-top: 18px; }
+  .hero-actions { flex-direction: column; gap: 10px; margin-bottom: 32px; }
   .btn-cta, .btn-ghost { width: 100%; justify-content: center; }
-  .detail-info-panel { padding: 28px 20px; }
-  .syncs-row { flex-wrap: wrap; gap: 12px; padding-bottom: 48px; }
+
+  /* Syncs */
+  .syncs-row { flex-wrap: wrap; justify-content: center; gap: 10px; padding-bottom: 44px; }
+
+  /* Protocol */
+  .section-white .home-inner { padding-top: 44px; padding-bottom: 44px; }
+  .section-h2 { font-size: 32px !important; }
+
+  /* Moment detail */
+  .detail-info-panel { padding: 26px 22px; }
+  .detail-photo-panel { min-height: 300px; }
+
+  /* Board */
+  .board-section .home-inner { padding-top: 44px; padding-bottom: 44px; }
+
+  /* Final CTA */
+  .cta-inner { padding: 56px 22px 60px; }
+  .cta-h2 { font-size: 36px !important; }
 }
 </style>
