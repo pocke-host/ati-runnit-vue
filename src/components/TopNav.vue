@@ -9,7 +9,8 @@
 
       <!-- LEFT: brand -->
       <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
-        <span class="brand-text">RUNNIT<span class="brand-reg">&reg;</span></span>
+        <span v-if="!isAuthenticated" class="brand-text brand-text--gr">RUNNIT<span class="brand-dot">.</span></span>
+        <span v-else class="brand-text">RUNNIT<span class="brand-reg">&reg;</span></span>
       </router-link>
 
       <!-- CENTER: desktop nav links (authenticated athletes get centered; coach + public stay in flow) -->
@@ -38,10 +39,10 @@
 
         <!-- Public nav links -->
         <div class="navbar-links navbar-links--public" v-if="!isAuthenticated">
-          <router-link to="/features" class="nav-link nav-link-mono">Features</router-link>
-          <router-link to="/about" class="nav-link nav-link-mono">About</router-link>
-          <router-link to="/subscribe" class="nav-link nav-link-mono">Pricing</router-link>
-          <router-link to="/waitlist" class="nav-link nav-link-primary">Join Waitlist</router-link>
+          <router-link to="/features" class="nav-link nav-link-gr">Features</router-link>
+          <router-link to="/about" class="nav-link nav-link-gr">About</router-link>
+          <router-link to="/subscribe" class="nav-link nav-link-gr">Pricing</router-link>
+          <router-link to="/waitlist" class="nav-link nav-link-gr-cta">Get Early Access</router-link>
         </div>
 
         <!-- Auth icons -->
@@ -134,7 +135,7 @@
         </template>
 
         <!-- Mobile Join button (unauthenticated only, mobile only) -->
-        <router-link v-if="!isAuthenticated" to="/waitlist" class="mobile-join-btn">Join</router-link>
+        <router-link v-if="!isAuthenticated" to="/waitlist" class="mobile-join-btn mobile-join-btn--gr">Join</router-link>
 
         <!-- Hamburger (mobile only, all users) -->
         <button
@@ -168,7 +169,7 @@
     </Transition>
 
     <Transition name="drawer-slide">
-      <div v-if="mobileMenuOpen" class="mobile-drawer" @touchstart.passive="onDrawerTouchStart" @touchend.passive="onDrawerTouchEnd">
+      <div v-if="mobileMenuOpen" :class="['mobile-drawer', { 'mobile-drawer--public': !isAuthenticated }]" @touchstart.passive="onDrawerTouchStart" @touchend.passive="onDrawerTouchEnd">
         <!-- Drawer Header -->
         <div class="drawer-header">
           <span class="drawer-brand">RUNNIT</span>
@@ -455,6 +456,11 @@ onUnmounted(() => {
   border-bottom: 1px solid #E5E5E5;
   box-shadow: none;
 }
+/* Public nav: Good Record design */
+.site-header:not(.site-header--auth) .navbar {
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
+}
 
 .navbar-content {
   width: 100%;
@@ -517,6 +523,66 @@ onUnmounted(() => {
   font-weight: 500;
   vertical-align: super;
   margin-left: 1px;
+}
+/* Good Record logo */
+.brand-text--gr {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.7rem;
+  letter-spacing: 0.01em;
+  color: #16130F;
+}
+.brand-dot {
+  color: #2A55F5;
+  font-style: normal;
+}
+/* Good Record nav links */
+.nav-link-gr {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #16130F !important;
+  border-bottom: none !important;
+  padding: 5px 0 !important;
+}
+.nav-link-gr:hover { color: #2A55F5 !important; }
+.nav-link-gr.router-link-active {
+  color: #16130F !important;
+  border-bottom: 2px solid #2A55F5 !important;
+}
+/* Good Record CTA pill */
+.nav-link-gr-cta {
+  background: #2A55F5 !important;
+  color: #fff !important;
+  border: 2px solid #16130F !important;
+  border-radius: 999px !important;
+  padding: 9px 15px !important;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  box-shadow: 3px 3px 0 #16130F !important;
+  transition: background 0.15s !important;
+}
+.nav-link-gr-cta:hover {
+  background: #1E42D6 !important;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+.nav-link-gr-cta.router-link-active {
+  border-bottom: 2px solid #16130F !important;
+}
+/* Good Record mobile join pill */
+.mobile-join-btn--gr {
+  background: #2A55F5 !important;
+  border: 2px solid #16130F !important;
+  border-radius: 999px !important;
+  box-shadow: 2px 2px 0 #16130F !important;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace !important;
 }
 
 .nav-link {
@@ -936,7 +1002,7 @@ onUnmounted(() => {
   z-index: 9998;
 }
 
-/* Drawer panel — flat black */
+/* Drawer panel — authenticated: flat black; public: paper */
 .mobile-drawer {
   position: fixed;
   top: 0;
@@ -950,11 +1016,57 @@ onUnmounted(() => {
   overflow-y: auto;
   box-shadow: none;
   font-family: Futura, 'Avenir Next', system-ui, sans-serif;
-  /* safe-area insets so content isn't behind notch or home bar */
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
+/* Public drawer: Good Record cream */
+.mobile-drawer--public {
+  background: #FBF6EC;
+  border-left: 2px solid #16130F;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+}
+.mobile-drawer--public .drawer-header {
+  border-bottom: 2px solid #16130F;
+}
+.mobile-drawer--public .drawer-brand {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  color: #16130F;
+}
+.mobile-drawer--public .drawer-brand::after {
+  content: '.';
+  color: #2A55F5;
+}
+.mobile-drawer--public .drawer-close {
+  color: #16130F;
+}
+.mobile-drawer--public .drawer-close:hover { color: #2A55F5; }
+.mobile-drawer--public .drawer-link {
+  color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.mobile-drawer--public .drawer-link:hover { color: #2A55F5; }
+.mobile-drawer--public .drawer-footer {
+  border-top: 2px solid #16130F;
+}
+.mobile-drawer--public .drawer-link-primary {
+  background: #2A55F5;
+  color: #fff !important;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  margin: 12px 20px;
+  padding: 13px 20px;
+  text-align: center;
+  justify-content: center;
+  box-shadow: 3px 3px 0 #16130F;
+}
+.mobile-drawer--public .drawer-link-primary:hover { background: #1E42D6; }
 
 .drawer-header {
   display: flex;

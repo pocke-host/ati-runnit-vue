@@ -1,108 +1,103 @@
 <template>
   <main class="waitlist-page">
 
-    <!-- 001 HERO ─ black -->
+    <!-- HERO — ink, centered -->
     <section class="hero">
-      <div class="hero-inner">
-        <SectionIndex :num="1" label="Waitlist" :on-dark="true" />
-        <h1 class="hero-h1">CLAIM YOUR HANDLE.</h1>
+      <div class="page-inner hero-inner">
+        <span class="gr-eyebrow-badge">Waitlist</span>
+        <h1 class="hero-h1">Claim your handle.</h1>
         <p class="hero-sub">Be first in when we open your city. No spam — just the green light and your @name held.</p>
       </div>
     </section>
 
-    <!-- FORM SECTION ─ white -->
+    <!-- FORM + SYNCS -->
     <section class="form-section">
-      <div class="form-inner">
+      <div class="page-inner form-grid">
 
-        <!-- syncs row -->
-        <div class="syncs-row">
-          <span class="syncs-label">Syncs With</span>
-          <span class="syncs-app">STRAVA</span>
-          <span class="syncs-slash">/</span>
-          <span class="syncs-app">GARMIN</span>
-          <span class="syncs-slash">/</span>
-          <span class="syncs-app">APPLE HEALTH</span>
-        </div>
+        <!-- Form card -->
+        <div class="form-card">
+          <div v-if="!submitted">
+            <form @submit.prevent="submit" novalidate>
 
-        <!-- form card -->
-        <div v-if="!submitted" class="form-card">
-          <form @submit.prevent="submit" class="waitlist-form" novalidate>
+              <div class="field-group">
+                <label class="field-label" for="wl-email">Email</label>
+                <input
+                  id="wl-email"
+                  v-model.trim="form.email"
+                  type="email"
+                  class="field-input"
+                  :class="{ 'field-input--error': errors.email }"
+                  placeholder="you@email.com"
+                  autocomplete="email"
+                />
+                <p v-if="errors.email" class="field-err">{{ errors.email }}</p>
+              </div>
 
-            <div class="field-group">
-              <label class="field-label" for="wl-email">Email</label>
-              <input
-                id="wl-email"
-                v-model.trim="form.email"
-                type="email"
-                class="field-input"
-                :class="{ 'field-error': errors.email }"
-                placeholder="you@email.com"
-                autocomplete="email"
-              />
-              <p v-if="errors.email" class="field-err-msg">{{ errors.email }}</p>
-            </div>
+              <div class="field-group">
+                <label class="field-label" for="wl-handle">Desired Handle</label>
+                <input
+                  id="wl-handle"
+                  v-model.trim="form.handle"
+                  type="text"
+                  class="field-input"
+                  placeholder="@yourname"
+                  autocomplete="username"
+                />
+              </div>
 
-            <div class="field-group">
-              <label class="field-label" for="wl-handle">Desired Handle</label>
-              <input
-                id="wl-handle"
-                v-model.trim="form.handle"
-                type="text"
-                class="field-input"
-                placeholder="@yourname"
-                autocomplete="username"
-              />
-            </div>
+              <div class="field-group">
+                <label class="field-label" for="wl-city">City</label>
+                <input
+                  id="wl-city"
+                  v-model.trim="form.city"
+                  type="text"
+                  class="field-input"
+                  placeholder="Where you run"
+                  autocomplete="address-level2"
+                />
+              </div>
 
-            <div class="field-group">
-              <label class="field-label" for="wl-city">City</label>
-              <input
-                id="wl-city"
-                v-model.trim="form.city"
-                type="text"
-                class="field-input"
-                placeholder="Where you run"
-                autocomplete="address-level2"
-              />
-            </div>
+              <p v-if="serverError" class="server-error">{{ serverError }}</p>
 
-            <p v-if="serverError" class="server-error">{{ serverError }}</p>
+              <button type="submit" class="btn-submit" :disabled="loading">
+                <span v-if="loading" class="btn-spinner"></span>
+                <span v-else>Join the Waitlist</span>
+              </button>
 
-            <button type="submit" class="btn-submit" :disabled="loading">
-              <span v-if="loading" class="btn-spinner"></span>
-              <span v-else>Join the Waitlist</span>
-            </button>
-
-          </form>
-        </div>
-
-        <!-- SUCCESS -->
-        <div v-else class="success-card">
-          <div class="success-label">You're on the list.</div>
-          <p class="success-body">We'll reach out as soon as beta access opens in your city.</p>
-          <router-link to="/" class="btn-ghost">Back to home</router-link>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- PROOF STRIP -->
-    <section class="proof-section">
-      <div class="form-inner">
-        <div class="proof-strip">
-          <div class="proof-cell">
-            <div class="proof-label">On The List</div>
-            <div class="proof-val">12,400</div>
+            </form>
           </div>
-          <div class="proof-cell">
-            <div class="proof-label">Cities</div>
-            <div class="proof-val">38</div>
-          </div>
-          <div class="proof-cell proof-cell--last">
-            <div class="proof-label">Launching</div>
-            <div class="proof-val">SUMMER '26</div>
+
+          <div v-else class="success-block">
+            <div class="success-label">You're on the list.</div>
+            <p class="success-body">We'll reach out as soon as beta opens in your city.</p>
+            <router-link to="/" class="btn-ghost">Back to home</router-link>
           </div>
         </div>
+
+        <!-- Right: syncs + stats -->
+        <div class="syncs-col">
+          <div class="syncs-label">Syncs with</div>
+          <div class="sync-list">
+            <div class="sync-item">Strava</div>
+            <div class="sync-item">Garmin</div>
+            <div class="sync-item">Apple Health</div>
+          </div>
+          <div class="proof-strip">
+            <div class="proof-cell">
+              <div class="proof-lbl">On List</div>
+              <div class="proof-val">12,400</div>
+            </div>
+            <div class="proof-cell">
+              <div class="proof-lbl">Cities</div>
+              <div class="proof-val">38</div>
+            </div>
+            <div class="proof-cell proof-cell--last">
+              <div class="proof-lbl">Launch</div>
+              <div class="proof-val">S'26</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -112,7 +107,6 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useHead } from '@unhead/vue'
-import SectionIndex from '@/components/SectionIndex.vue'
 
 useHead({
   title: 'Join the Waitlist — Runnit',
@@ -171,259 +165,215 @@ async function submit() {
 <style scoped>
 .waitlist-page {
   min-height: 100vh;
-  background: #fff;
-  font-family: Futura, 'Futura PT', 'Avenir Next', Avenir, 'Jost', system-ui, sans-serif;
-  color: #000;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
+}
+.page-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 32px;
 }
 
 /* ── HERO ── */
 .hero {
-  background: #000;
-  color: #fff;
-  padding: 92px 0 80px;
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 56px 0;
   text-align: center;
+  border-bottom: 2px solid #16130F;
 }
 .hero-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.hero-h1 {
-  font-size: clamp(2.6rem, 6vw, 4.125rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 0.96;
-  margin: 18px 0 0;
-  animation: rkWipe 0.85s cubic-bezier(0.65,0,0.35,1) 0.08s both;
-}
-.hero-sub {
-  max-width: 460px;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.6;
-  font-size: 1rem;
-  margin: 22px auto 0;
-  animation: rkRise 0.6s ease-out 0.3s both;
-}
-
-/* ── FORM SECTION ── */
-.form-section {
-  padding: 64px 24px 80px;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.form-inner {
-  width: 100%;
-  max-width: 440px;
-}
-
-.syncs-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 32px;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  flex-wrap: wrap;
-}
-.syncs-label {
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(0,0,0,0.5);
-}
-.syncs-app {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgba(0,0,0,0.55);
-}
-.syncs-slash { color: rgba(0,0,0,0.25); }
-
-.form-card {
-  border: 1px solid #E5E5E5;
-  padding: 32px;
-  animation: rkRise 0.6s ease-out 0.15s both;
-}
-
-.waitlist-form { display: flex; flex-direction: column; gap: 0; }
-
-.field-group { margin-bottom: 18px; }
-.field-group:last-of-type { margin-bottom: 24px; }
-
-.field-label {
-  display: block;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.58rem;
-  font-weight: 500;
+.gr-eyebrow-badge {
+  display: inline-block;
+  background: #2A55F5;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #767676;
-  margin-bottom: 8px;
+  padding: 6px 12px;
+  transform: rotate(-2deg);
+}
+.hero-h1 {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(60px, 9vw, 100px);
+  line-height: 0.82;
+  text-transform: uppercase;
+  margin: 18px 0 0;
+  animation: rkRise 0.6s ease-out both;
+}
+.hero-sub {
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: rgba(251,246,236,0.68);
+  max-width: 480px;
+  margin: 20px auto 0;
 }
 
+/* ── FORM ── */
+.form-section {
+  padding: 48px 0;
+  border-bottom: 2px solid #16130F;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 36px;
+  align-items: start;
+}
+.form-card {
+  border: 2px solid #16130F;
+  padding: 30px;
+  background: #fff;
+}
+
+.field-group { margin-bottom: 16px; }
+.field-label {
+  display: block;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5A5348;
+  margin-bottom: 8px;
+}
 .field-input {
   display: block;
   width: 100%;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   padding: 13px 14px;
-  font-family: inherit;
   font-size: 0.95rem;
-  color: #000;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
   background: #fff;
   outline: none;
+  border-radius: 0;
   transition: border-color 0.15s;
 }
-.field-input:focus { border-color: #000; }
-.field-input.field-error { border-color: #dc2626; }
-.field-input::placeholder { color: #767676; }
-.field-err-msg {
-  font-size: 0.75rem;
-  color: #dc2626;
+.field-input:focus { border-color: #2A55F5; }
+.field-input--error { border-color: #dc2626; }
+.field-input::placeholder { color: #8a8a8a; }
+.field-err {
   margin: 6px 0 0;
-}
-
-.server-error {
   font-size: 0.8rem;
   color: #dc2626;
-  margin-bottom: 16px;
 }
-
+.server-error {
+  font-size: 0.85rem;
+  color: #dc2626;
+  margin: 0 0 12px;
+}
 .btn-submit {
   display: block;
   width: 100%;
   text-align: center;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
-  border: 2px solid #0052FF;
-  padding: 14px 0;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 15px 0;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  position: relative;
+  box-shadow: 4px 4px 0 #16130F;
+  transition: background 0.15s;
+  margin-top: 22px;
 }
-.btn-submit:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
-.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
-
+.btn-submit:hover:not(:disabled) { background: #1E42D6; }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-spinner {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255,255,255,0.4);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
   border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.75s linear infinite;
+  vertical-align: middle;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* SUCCESS */
-.success-card {
-  border: 1px solid #E5E5E5;
-  padding: 40px 32px;
-  text-align: center;
-}
+/* success */
+.success-block { text-align: center; padding: 20px 0; }
 .success-label {
-  font-size: 1.2rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  text-transform: uppercase;
   margin-bottom: 12px;
 }
-.success-body {
-  color: #767676;
-  line-height: 1.6;
-  font-size: 0.95rem;
-  margin-bottom: 24px;
-}
+.success-body { color: #5A5348; line-height: 1.6; margin-bottom: 20px; }
 .btn-ghost {
   display: inline-flex;
   align-items: center;
+  border: 2px solid #16130F;
+  border-radius: 999px;
   padding: 11px 20px;
-  background: transparent;
-  color: #000;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #16130F;
   text-decoration: none;
-  border: 1px solid #E5E5E5;
-  transition: border-color 0.15s;
+  transition: background 0.15s;
 }
-.btn-ghost:hover { border-color: #000; text-decoration: none; }
+.btn-ghost:hover { background: rgba(22,19,15,0.06); text-decoration: none; }
 
-/* ── PROOF STRIP ── */
-.proof-section {
-  padding: 0 24px 80px;
+/* ── SYNCS COL ── */
+.syncs-col { display: flex; flex-direction: column; gap: 0; }
+.syncs-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5A5348;
+  margin-bottom: 14px;
+}
+.sync-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.sync-item {
+  border: 2px solid #16130F;
+  padding: 14px 16px;
+  font-weight: 800;
   background: #fff;
-  display: flex;
-  justify-content: center;
 }
 .proof-strip {
-  width: 100%;
-  max-width: 440px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border: 1px solid #E5E5E5;
-  animation: rkRise 0.6s ease-out 0.25s both;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  border: 2px solid #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
+  background: #fff;
 }
 .proof-cell {
-  padding: 28px 24px;
-  border-right: 1px solid #E5E5E5;
+  padding: 18px 12px;
+  border-right: 2px solid #16130F;
   text-align: center;
 }
 .proof-cell--last { border-right: none; }
-.proof-label {
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+.proof-lbl {
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #767676;
-  margin-bottom: 8px;
+  color: #5A5348;
+  margin-bottom: 6px;
 }
-.proof-val {
-  font-size: 1.3rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
+.proof-val { font-size: 1.05rem; font-weight: 600; }
 
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 640px) {
-  /* Hero */
-  .hero { padding: 56px 0 52px; }
-  .hero-inner { padding-left: 22px; padding-right: 22px; }
-  .hero-h1 { font-size: 40px !important; line-height: 0.96; }
-  .hero-sub { font-size: 0.95rem; }
-
-  /* Form section */
-  .form-section { padding: 44px 22px 56px; }
-  .form-inner { max-width: 100%; }
-
-  /* Syncs row — label on own line, apps wrap below */
-  .syncs-row {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px 12px;
-  }
-  .syncs-label { width: 100%; text-align: center; }
-
-  /* Form card */
-  .form-card { padding: 26px 22px; }
-  .field-input { min-height: 44px; }
-  .btn-submit { min-height: 44px; padding: 15px 0; }
-
-  /* Proof strip */
-  .proof-section { padding: 0 22px 44px; }
-  .proof-cell { padding: 22px 10px; }
-  .proof-label { font-size: 0.54rem; }
-  .proof-val { font-size: 1.1rem; }
+  .page-inner { padding: 0 22px; }
+  .hero { padding: 40px 0; }
+  .form-section { padding: 36px 0; }
 }
 </style>

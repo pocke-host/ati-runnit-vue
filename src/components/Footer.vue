@@ -1,8 +1,8 @@
 <template>
   <footer class="rk-footer">
     <div class="rk-footer-inner">
-      <span class="rk-footer-brand">RUNNIT&reg;</span>
-      <span class="rk-footer-tagline">Built For The Long Run</span>
+      <span class="rk-footer-brand">RUNNIT<span class="rk-footer-dot">.</span></span>
+      <span class="rk-footer-tagline">Made by runners, for runners</span>
       <span class="rk-footer-copy">&copy; MMXXVI</span>
     </div>
   </footer>
@@ -10,26 +10,28 @@
 
 <style scoped>
 .rk-footer {
-  background: #fff;
-  border-top: 1px solid #E5E5E5;
+  background: #16130F;
 }
 .rk-footer-inner {
-  max-width: 1000px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 28px 24px;
+  padding: 22px 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #767676;
+  color: rgba(251, 246, 236, 0.6);
 }
 .rk-footer-brand {
-  color: #000;
-  font-weight: 600;
+  color: #FBF6EC;
+  font-weight: 700;
+}
+.rk-footer-dot {
+  color: #2A55F5;
 }
 
 @media (max-width: 640px) {
@@ -37,7 +39,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
-    padding: 22px 18px;
+    padding: 20px 22px;
   }
 }
 </style>

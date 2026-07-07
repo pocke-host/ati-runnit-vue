@@ -1,46 +1,32 @@
 <template>
-  <div class="spec-bar">
-    <div class="spec-bar-inner">
-      <span class="spec-left spec-left--desktop">RUNNIT&reg; &mdash; Distance Division</span>
-      <span class="spec-left spec-left--mobile">RUNNIT&reg; &mdash; Distance Div.</span>
-      <span class="spec-center">Social Training System</span>
-      <span class="spec-right">Est. MMXXVI</span>
+  <div class="rk-ticker">
+    <div class="rk-ticker-track">
+      <span class="rk-ticker-text">&nbsp;★&nbsp; NO OFF-SEASON &nbsp;★&nbsp; MILES ARE BETTER SHARED &nbsp;★&nbsp; DRAG YOUR CREW OUT AT 6AM &nbsp;★&nbsp; BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
+      <span class="rk-ticker-text">&nbsp;★&nbsp; NO OFF-SEASON &nbsp;★&nbsp; MILES ARE BETTER SHARED &nbsp;★&nbsp; DRAG YOUR CREW OUT AT 6AM &nbsp;★&nbsp; BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
     </div>
   </div>
 </template>
 
 <style scoped>
-.spec-bar {
-  background: #000;
-  color: #fff;
-  width: 100%;
+.rk-ticker {
+  background: #16130F;
+  border-bottom: 3px solid #2A55F5;
+  overflow: hidden;
 }
-.spec-bar-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 9px 24px;
+.rk-ticker-track {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  white-space: nowrap;
+  animation: rkMarq 26s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
+  color: #FBF6EC;
+  padding: 9px 0;
 }
-.spec-left  { color: #fff; }
-.spec-left--mobile { display: none; }
-.spec-center { color: rgba(255,255,255,0.5); }
-.spec-right  { color: rgba(255,255,255,0.5); }
-
-@media (max-width: 640px) {
-  .spec-bar-inner {
-    padding: 7px 18px;
-    font-size: 0.56rem;
-    letter-spacing: 0.14em;
-  }
-  .spec-left--desktop { display: none; }
-  .spec-left--mobile  { display: inline; }
-  .spec-center { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rk-ticker-track { animation: none; }
 }
 </style>

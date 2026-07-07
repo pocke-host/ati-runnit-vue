@@ -16,6 +16,18 @@
   --coach-bar-h: 28px;
   --tab-h: 64px;
 
+  /* ── Good Record design system (marketing pages) ── */
+  --rk-paper:   #FBF6EC;
+  --rk-ink:     #16130F;
+  --rk-cobalt:  #2A55F5;
+  --rk-cobalt-hover: #1E42D6;
+  --rk-yellow:  #FFC53D;
+  --rk-muted:   #5A5348;
+  --rk-hairline: #E7DFCE;
+  --rk-font-display: 'Big Shoulders Display', system-ui, sans-serif;
+  --rk-font-body:    'Hanken Grotesk', system-ui, sans-serif;
+  --rk-font-mono-gr: 'Spline Sans Mono', ui-monospace, monospace;
+
   /* ── RUNNIT Electric Palette ── */
   --rk-void:    #000000;   /* pure black — nav, hero */
   --rk-paper:   #ffffff;   /* pure white — page bg */
@@ -173,6 +185,14 @@ a:hover { text-decoration: none; }
 @keyframes rkBlink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.3; }
+}
+@keyframes rkMarq {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes rkFloat {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50%       { transform: translateY(-7px) rotate(var(--r, 0deg)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
