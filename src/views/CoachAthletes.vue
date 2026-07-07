@@ -248,7 +248,7 @@ onMounted(() => {
 .coach-athletes {
   min-height: 100vh;
   background: #fff;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   font-family: "Futura PT", Futura, "Century Gothic", system-ui, sans-serif;
 }
 

@@ -22,7 +22,7 @@ import ConnectDevices from '@/components/ConnectDevices.vue'
 .devices-page {
   min-height: 100vh;
   background: #FBF6EC;
-  padding-top: var(--nav-h, 66px);
+  padding-top: var(--page-top);
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
 }

@@ -135,7 +135,7 @@ const onSubmit = () => {
 .request-page{
   --footer-h: 40px;
 
-  padding-top: var(--nav-h);
+  padding-top: var(--page-top);
   min-height: calc(100vh - var(--nav-h) - var(--footer-h));
   background: var(--r-offwhite);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,

@@ -975,7 +975,7 @@ onUnmounted(() => {
 <style scoped>
 .stats-page {
   min-height: 100vh;
-  padding-top: var(--nav-h, 66px);
+  padding-top: var(--page-top);
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;

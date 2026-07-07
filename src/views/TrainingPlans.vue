@@ -875,7 +875,7 @@ onBeforeRouteLeave((to, from, next) => {
 
 <style scoped>
 .plans-page {
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   min-height: calc(100vh - var(--nav-h, 64px));
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
