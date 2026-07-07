@@ -112,7 +112,7 @@ const faqs = [
 .support-page {
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  padding-top: var(--nav-h, 66px);
+  padding-top: calc(var(--nav-h, 66px) + 20px);
   min-height: 100vh;
   color: #16130F;
 }
