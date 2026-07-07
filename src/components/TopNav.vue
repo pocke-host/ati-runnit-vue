@@ -172,124 +172,121 @@
       <div v-if="mobileMenuOpen" :class="['mobile-drawer', { 'mobile-drawer--public': !isAuthenticated }]" @touchstart.passive="onDrawerTouchStart" @touchend.passive="onDrawerTouchEnd">
         <!-- Drawer Header -->
         <div class="drawer-header">
-          <span class="drawer-brand">RUNNIT</span>
-          <button class="drawer-close" @click="mobileMenuOpen = false" aria-label="Close navigation menu">
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
-          </button>
+          <span class="drawer-brand">RUNNIT<span class="drawer-brand-dot">.</span></span>
+          <button class="drawer-close" @click="mobileMenuOpen = false" aria-label="Close navigation menu">✕</button>
         </div>
 
         <!-- Authenticated links -->
         <template v-if="isAuthenticated">
           <div class="drawer-user" v-if="user">
-            <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="40" />
+            <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="44" />
             <div class="drawer-user-info">
               <div class="drawer-user-name">{{ user.displayName }}</div>
               <div class="drawer-user-email">{{ user.email }}</div>
             </div>
           </div>
 
-          <nav class="drawer-nav">
-            <!-- Messages + Notifications (mobile-only, hidden from top bar) -->
+          <!-- Quick: messages + notifications -->
+          <div class="drawer-quick">
             <button class="drawer-link" @click="dmStore.open(); mobileMenuOpen = false">
-              <i class="bi bi-chat-dots-fill"></i> Messages
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 9 9 0 0 1-4-1L3 20l1.5-4.5a8.5 8.5 0 1 1 16.5-4Z"/></svg>
+              Messages
               <span v-if="dmStore.unreadCount > 0" class="drawer-badge">{{ dmStore.unreadCount }}</span>
             </button>
             <router-link to="/notifications" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-bell-fill"></i> Notifications
+              <span class="drawer-bell-wrap">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.5 21a1.7 1.7 0 0 1-3 0"/></svg>
+                <span v-if="unreadCount > 0" class="drawer-bell-dot"></span>
+              </span>
+              Notifications
               <span v-if="unreadCount > 0" class="drawer-badge">{{ unreadCount }}</span>
             </router-link>
-            <div class="drawer-divider"></div>
+          </div>
+          <div class="drawer-divider"></div>
 
+          <nav class="drawer-nav">
             <!-- Coach drawer links -->
             <template v-if="role === 'coach'">
               <router-link to="/coach/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-grid-3x3-gap"></i> Dashboard
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
               </router-link>
               <router-link to="/coach/athletes" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-people"></i> Athletes
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
+                Athletes
               </router-link>
             </template>
             <!-- Athlete drawer links -->
             <template v-else>
               <router-link to="/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-grid-3x3-gap"></i> Dashboard
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
               </router-link>
               <router-link to="/feed" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-collection"></i> Feed
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18"/></svg>
+                Feed
               </router-link>
-              <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
-                <i class="bi bi-play-circle-fill"></i> Track Activity
-              </router-link>
+              <div class="drawer-track-wrap">
+                <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
+                  <span class="drawer-track-icon">▶</span>
+                  Track Activity
+                </router-link>
+              </div>
               <router-link to="/stats" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-bar-chart-line-fill"></i> Stats
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+                Stats
               </router-link>
               <router-link to="/achievements" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-trophy"></i> Achievements
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9a6 6 0 0 0 12 0V3H6Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 21h6M12 15v6"/></svg>
+                Achievements
               </router-link>
               <router-link to="/clubs" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-people"></i> Clubs
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
+                Clubs
               </router-link>
               <router-link to="/challenges" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-flag"></i> Challenges
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>
+                Challenges
               </router-link>
               <router-link to="/plans" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-calendar3"></i> Training Plans
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="1"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+                Training Plans
               </router-link>
               <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
-                <i class="bi bi-smartwatch"></i> Devices
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="7" y="4" width="10" height="16" rx="2.5"/><path d="M11 4h2"/></svg>
+                Devices
               </router-link>
             </template>
           </nav>
 
           <div class="drawer-footer">
-            <router-link to="/profile/edit" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-person-circle"></i> Edit Profile
-            </router-link>
-            <router-link to="/settings" class="drawer-link" @click="mobileMenuOpen = false">
-              <i class="bi bi-gear"></i> Settings
-            </router-link>
+            <router-link to="/settings" class="drawer-link drawer-link-settings" @click="mobileMenuOpen = false">Settings</router-link>
             <router-link
               v-if="subscriptionTier !== 'free'"
               to="/billing"
-              class="drawer-link"
+              class="drawer-link drawer-link-settings"
               @click="mobileMenuOpen = false"
-            >
-              <i class="bi bi-credit-card"></i> Manage Billing
-            </router-link>
+            >Billing</router-link>
             <router-link
               v-else
               to="/subscribe"
-              class="drawer-link drawer-link-primary"
+              class="drawer-link drawer-link-settings"
               @click="mobileMenuOpen = false"
-            >
-              <i class="bi bi-star"></i> Upgrade to Premium
-            </router-link>
-            <button class="drawer-link drawer-link-danger" @click="handleLogout">
-              <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+            >Upgrade</router-link>
+            <button class="drawer-link drawer-link-signout" @click="handleLogout">Sign Out</button>
           </div>
         </template>
 
         <!-- Unauthenticated links -->
         <template v-else>
           <nav class="drawer-nav">
-            <router-link to="/features" class="drawer-link" @click="mobileMenuOpen = false">
-              Features
-            </router-link>
-            <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">
-              About
-            </router-link>
-            <router-link to="/subscribe" class="drawer-link" @click="mobileMenuOpen = false">
-              Pricing
-            </router-link>
+            <router-link to="/features" class="drawer-link" @click="mobileMenuOpen = false">Features</router-link>
+            <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">About</router-link>
+            <router-link to="/subscribe" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
           </nav>
           <div class="drawer-footer">
-            <router-link to="/join-us" class="drawer-link" @click="mobileMenuOpen = false">
-              Login
-            </router-link>
-            <router-link to="/waitlist" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
-              Join Waitlist
-            </router-link>
+            <router-link to="/join-us" class="drawer-link" @click="mobileMenuOpen = false">Login</router-link>
+            <router-link to="/waitlist" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">Join Waitlist</router-link>
           </div>
         </template>
       </div>
@@ -1078,63 +1075,44 @@ onUnmounted(() => {
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.60);
+  background: rgba(22, 19, 15, 0.55);
   z-index: 9998;
 }
 
-/* Drawer panel — authenticated: flat black; public: paper */
+/* Drawer panel */
 .mobile-drawer {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   width: min(320px, 85vw);
-  background: #000;
+  background: #16130F;
+  border-left: 3px solid #2A55F5;
   z-index: 9999;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  box-shadow: none;
-  font-family: Futura, 'Avenir Next', system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #FBF6EC;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
-/* Public drawer: Good Record cream */
+
+/* Public drawer: Good Record cream (unauthenticated) */
 .mobile-drawer--public {
   background: #FBF6EC;
   border-left: 2px solid #16130F;
-  font-family: 'Hanken Grotesk', system-ui, sans-serif;
-}
-.mobile-drawer--public .drawer-header {
-  border-bottom: 2px solid #16130F;
-}
-.mobile-drawer--public .drawer-brand {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-style: italic;
-  font-size: 1.4rem;
   color: #16130F;
 }
-.mobile-drawer--public .drawer-brand::after {
-  content: '.';
-  color: #2A55F5;
-}
-.mobile-drawer--public .drawer-close {
-  color: #16130F;
-}
+.mobile-drawer--public .drawer-header { border-bottom: 2px solid #16130F; }
+.mobile-drawer--public .drawer-brand { color: #16130F; }
+.mobile-drawer--public .drawer-brand-dot { color: #2A55F5; }
+.mobile-drawer--public .drawer-close { color: #16130F; border-color: rgba(22,19,15,0.3); }
 .mobile-drawer--public .drawer-close:hover { color: #2A55F5; }
-.mobile-drawer--public .drawer-link {
-  color: #16130F;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
+.mobile-drawer--public .drawer-link { color: #16130F; }
 .mobile-drawer--public .drawer-link:hover { color: #2A55F5; }
-.mobile-drawer--public .drawer-footer {
-  border-top: 2px solid #16130F;
-}
+.mobile-drawer--public .drawer-footer { border-top: 2px solid #16130F; }
 .mobile-drawer--public .drawer-link-primary {
   background: #2A55F5;
   color: #fff !important;
@@ -1152,32 +1130,35 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 18px 20px;
+  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
+  flex-shrink: 0;
 }
 .drawer-brand {
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.20em;
-  color: white;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
+  color: #FBF6EC;
 }
+.drawer-brand-dot { color: #2A55F5; }
 .drawer-close {
-  width: 44px;
-  height: 44px;
-  border-radius: 0;
-  border: none;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(251, 246, 236, 0.35);
   background: transparent;
-  color: rgba(255, 255, 255, 0.70);
-  font-size: 1rem;
+  color: rgba(251, 246, 236, 0.85);
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: border-color 0.15s, color 0.15s;
   flex-shrink: 0;
 }
-.drawer-close:hover { color: white; }
+.drawer-close:hover { border-color: #FBF6EC; color: #FBF6EC; }
 
 /* User block */
 .drawer-user {
@@ -1185,17 +1166,33 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
+  flex-shrink: 0;
 }
 .drawer-user-name {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: white;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: #FBF6EC;
 }
 .drawer-user-email {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.45);
-  margin-top: 2px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  color: rgba(251, 246, 236, 0.55);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Quick actions (messages / notifications) */
+.drawer-quick {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
 }
 
 /* Nav links */
@@ -1206,49 +1203,126 @@ onUnmounted(() => {
   flex-direction: column;
 }
 .drawer-footer {
-  padding: 8px 0 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
-  display: flex;
-  flex-direction: column;
-}
-.drawer-link {
+  padding: 14px 20px;
+  border-top: 2px solid rgba(251, 246, 236, 0.15);
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 20px;
-  border-radius: 0;
-  color: rgba(255, 255, 255, 0.65);
-  font-weight: 400;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.drawer-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 20px;
+  color: rgba(251, 246, 236, 0.85);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-decoration: none;
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color 0.15s, background 0.15s;
   width: 100%;
   text-align: left;
   box-sizing: border-box;
 }
-.drawer-link i { font-size: 1rem; width: 20px; text-align: center; }
-.drawer-link:hover { color: white; background: transparent; }
-.drawer-link.router-link-active { color: white; }
+.drawer-link svg { flex-shrink: 0; }
+.drawer-link:hover { color: #FBF6EC; background: rgba(251,246,236,0.05); }
+.drawer-link.router-link-active {
+  color: #2A55F5;
+  background: rgba(42, 85, 245, 0.14);
+}
+.drawer-link.router-link-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #2A55F5;
+}
+.drawer-link.router-link-active svg { stroke: #2A55F5; }
+
+/* Track Activity CTA */
+.drawer-track-wrap { padding: 6px 20px; }
 .drawer-link-primary {
-  color: white;
-  font-weight: 600;
+  background: #2A55F5;
+  color: #fff !important;
+  border: 2px solid #FBF6EC !important;
+  border-radius: 999px;
+  padding: 12px 16px;
+  justify-content: center;
+  box-shadow: 3px 3px 0 rgba(251, 246, 236, 0.25);
+  width: 100%;
+  letter-spacing: 0.1em;
+}
+.drawer-link-primary:hover { background: #1E42D6 !important; }
+.drawer-track-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  color: #2A55F5;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  flex-shrink: 0;
+}
+
+/* Footer links */
+.drawer-link-settings {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 0.78rem;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  margin-top: 4px;
-  padding-top: 16px;
+  color: rgba(251, 246, 236, 0.85);
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
 }
-.drawer-link-primary:hover { color: rgba(255,255,255,0.85); }
-.drawer-link-danger { color: rgba(248, 113, 113, 0.75); }
-.drawer-link-danger:hover { color: #f87171; }
+.drawer-link-settings:hover { color: #FBF6EC; }
+.drawer-link-signout {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2A55F5;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+}
+.drawer-link-signout:hover { color: #FBF6EC; }
+
+/* Bell unread dot */
+.drawer-bell-wrap { position: relative; display: inline-flex; }
+.drawer-bell-dot {
+  position: absolute;
+  top: -2px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #2A55F5;
+  border: 1.5px solid #16130F;
+}
+
 .drawer-divider {
-  height: 1px;
-  background: rgba(255,255,255,0.10);
+  height: 2px;
+  background: rgba(251, 246, 236, 0.15);
   margin: 4px 20px;
 }
 .drawer-badge {
@@ -1263,6 +1337,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 0 4px;
+  border-radius: 999px;
 }
 
 /* Transitions */

@@ -180,15 +180,15 @@
             <div class="col-12" v-if="displayedChallenges.length === 0">
               <div class="empty-state">
                 <div class="empty-icon">
-                  <i class="bi bi-trophy"></i>
+                  <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#16130F" stroke-width="2"><path d="M6 4h12v3a6 6 0 0 1-12 0V4Z"/><path d="M6 6H3v2a3 3 0 0 0 3 3M18 6h3v2a3 3 0 0 1-3 3"/><path d="M9 18h6M12 14v4M8 22h8"/></svg>
                 </div>
                 <h3 class="empty-title">
-                  {{ activeTab === 'my' ? 'No challenges entered yet' : 'No challenges found' }}
+                  {{ activeTab === 'my' ? 'No challenges yet.' : 'No challenges found.' }}
                 </h3>
                 <p class="empty-text">
                   {{
                     activeTab === 'my'
-                      ? 'Browse All Challenges and join one to get started.'
+                      ? 'Nothing live right now — check back soon, or start one and drag your crew in.'
                       : 'Try adjusting your filters or check back later for new challenges.'
                   }}
                 </p>
@@ -499,10 +499,10 @@ onMounted(() => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .challenges-page {
-  font-family: Futura, 'Avenir Next', 'Avenir', system-ui, -apple-system, sans-serif;
-  background: #fff;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  background: #FBF6EC;
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--nav-h, 66px);
 }
 
 /* ===== HERO ===== */
@@ -530,7 +530,7 @@ onMounted(() => {
   background: white;
   border-bottom: 1px solid #E5E7EB;
   position: sticky;
-  top: var(--nav-h, 64px);
+  top: var(--nav-h, 66px);
   z-index: 90;
 }
 
@@ -589,7 +589,7 @@ onMounted(() => {
   padding: 20px 0;
   border-bottom: 1px solid #E5E7EB;
   position: sticky;
-  top: calc(var(--nav-h, 64px) + 49px);
+  top: calc(var(--nav-h, 66px) + 49px);
   z-index: 80;
 }
 
@@ -863,7 +863,7 @@ onMounted(() => {
   height: 42px;
   border: none;
   border-radius: 0;
-  background: #0052FF;
+  background: #2A55F5;
   color: white;
   font-weight: 600;
   font-size: 14px;
@@ -873,7 +873,7 @@ onMounted(() => {
 }
 
 .btn-join:hover:not(:disabled) {
-  background: #003ECC;
+  background: #1E42D6;
   transform: translateY(-1px);
   box-shadow: none;
 }
@@ -939,22 +939,31 @@ onMounted(() => {
 }
 
 .empty-icon {
-  font-size: 64px;
-  color: #D1D5DB;
-  margin-bottom: 20px;
-  line-height: 1;
+  width: 64px;
+  height: 64px;
+  border: 2px solid #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
 }
 
 .empty-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 8px;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.85;
+  color: #16130F;
+  margin-bottom: 12px;
 }
 
 .empty-text {
-  font-size: 15px;
-  color: #6B7280;
+  font-size: 0.95rem;
+  color: #5a5348;
+  max-width: 360px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 /* Pagination */
@@ -1177,8 +1186,8 @@ onMounted(() => {
 .cp-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; color: #767676; }
 .cp-val { font-size: 0.78rem; font-weight: 700; color: #000; }
 .cp-bar { height: 4px; background: #E5E5E5; border-radius: 0; overflow: hidden; }
-.cp-fill { height: 100%; background: #0052FF; transition: width 0.5s; }
-.cp-complete { margin-top: 6px; font-size: 0.78rem; font-weight: 700; color: #0052FF; display: flex; align-items: center; }
+.cp-fill { height: 100%; background: #2A55F5; transition: width 0.5s; }
+.cp-complete { margin-top: 6px; font-size: 0.78rem; font-weight: 700; color: #2A55F5; display: flex; align-items: center; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {

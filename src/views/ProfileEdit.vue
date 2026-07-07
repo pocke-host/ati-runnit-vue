@@ -409,9 +409,9 @@ onMounted(() => {
 <style scoped>
 .profile-edit-page {
   min-height: 100vh;
-  background: var(--rk-paper, #ffffff);
-  padding-top: var(--nav-h, 64px);
-  font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  background: #FBF6EC;
+  padding-top: var(--nav-h, 66px);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .pe-wrap {
@@ -429,36 +429,42 @@ onMounted(() => {
 }
 
 .btn-back {
-  width: 44px;
-  height: 44px;
-  border: 1px solid #E5E5E5;
-  background: #fff;
+  width: 38px;
+  height: 38px;
+  border: 2px solid #16130F;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.1rem;
-  color: #000;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #16130F;
   border-radius: 0;
   transition: background 0.15s;
   flex-shrink: 0;
 }
-.btn-back:hover { background: #f5f5f5; }
+.btn-back:hover { background: rgba(22,19,15,0.06); }
 
 .pe-kicker {
-  font-size: 11px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: var(--rk-signal, #0052FF);
+  text-transform: uppercase;
+  color: #2A55F5;
   margin-bottom: 4px;
 }
 
 .pe-title {
-  font-size: 1.8rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(2rem, 7vw, 2.8rem);
   font-weight: 900;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 0.85;
   margin: 0;
-  color: #000;
+  color: #16130F;
 }
 
 /* Status banners */
@@ -605,29 +611,29 @@ onMounted(() => {
 
 .pe-input {
   width: 100%;
-  height: 44px;
-  border: 1px solid #E5E5E5;
+  height: 48px;
+  border: 2px solid #16130F;
   border-radius: 0;
   padding: 0 14px;
   font-size: 1rem; /* 16px — prevents iOS auto-zoom on focus */
-  color: #000;
+  color: #16130F;
   background: #fff;
   outline: none;
   transition: border-color 0.15s;
   box-sizing: border-box;
   font-family: inherit;
 }
-.pe-input:focus { border-color: var(--rk-signal, #0052FF); }
+.pe-input:focus { border-color: #2A55F5; }
 
 .pe-input-static {
   width: 100%;
-  height: 44px;
-  border: 1px solid #E5E5E5;
+  height: 48px;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 0 14px;
-  font-size: 1rem; /* match input, prevents zoom */
-  color: #767676;
-  background: #fafafa;
+  font-size: 1rem;
+  color: #5a5348;
+  background: #F1EADC;
   cursor: default;
   display: flex;
   align-items: center;
@@ -702,12 +708,13 @@ onMounted(() => {
 
 .btn-save {
   height: 48px;
-  padding: 0 40px;
-  background: var(--rk-signal, #0052FF);
+  padding: 0 36px;
+  background: #2A55F5;
   color: #fff;
-  border: none;
-  border-radius: 0;
-  font-size: 0.8rem;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.10em;
@@ -715,11 +722,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+  box-shadow: 4px 4px 0 #16130F;
   transition: background 0.15s;
-  font-family: inherit;
 }
-.btn-save:hover:not(:disabled) { background: #003ECC; }
-.btn-save:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-save:hover:not(:disabled) { background: #1E42D6; }
+.btn-save:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 
 .btn-spinner {
   width: 14px;
