@@ -10,18 +10,15 @@
       <!-- LEFT: brand -->
       <router-link :to="isAuthenticated ? (role === 'coach' ? '/coach/dashboard' : '/dashboard') : '/'" class="navbar-brand">
         <span v-if="!isAuthenticated" class="brand-text brand-text--gr">RUNNIT<span class="brand-dot">.</span></span>
-        <span v-else class="brand-text">RUNNIT<span class="brand-reg">&reg;</span></span>
+        <span v-else class="brand-text brand-text--gr">RUNNIT<span class="brand-dot">.</span></span>
       </router-link>
 
-      <!-- CENTER: desktop nav links (authenticated athletes get centered; coach + public stay in flow) -->
+      <!-- LEFT: desktop nav links (authenticated athletes, left-aligned after brand) -->
       <div class="navbar-links" v-if="isAuthenticated && role !== 'coach'">
-        <router-link to="/feed" class="nav-link">Feed</router-link>
-        <router-link to="/explore" class="nav-link">Explore</router-link>
-        <router-link to="/track" class="nav-link nav-link-track">
-          <i class="bi bi-play-circle-fill"></i> Track
-        </router-link>
-        <router-link to="/stats" class="nav-link">Stats</router-link>
-        <router-link to="/my-coach" class="nav-link">My Coach</router-link>
+        <router-link to="/feed" class="nav-link-auth">Feed</router-link>
+        <router-link to="/explore" class="nav-link-auth">Explore</router-link>
+        <router-link to="/stats" class="nav-link-auth">Stats</router-link>
+        <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
       </div>
 
       <!-- RIGHT: icons + coach links + public links + hamburger -->
@@ -47,12 +44,15 @@
 
         <!-- Auth icons -->
         <template v-if="isAuthenticated">
+          <router-link to="/track" class="nav-track-pill desktop-only" aria-label="Track activity">
+            <span class="track-pill-play">▶</span>Track
+          </router-link>
           <div class="icon-group">
           <!-- DM (hidden on mobile — accessible via drawer) -->
           <div class="notif-wrap desktop-only">
             <button class="nav-icon-btn" @click="dmStore.open()" aria-label="Messages">
-              <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
-              <span v-if="dmStore.unreadCount > 0" class="notif-badge" :aria-label="`${dmStore.unreadCount} unread messages`">{{ dmStore.unreadCount > 9 ? '9+' : dmStore.unreadCount }}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 9 9 0 0 1-4-1L3 20l1.5-4.5a8.5 8.5 0 1 1 16.5-4Z"/></svg>
+              <span v-if="dmStore.unreadCount > 0" class="notif-unread-dot" :aria-label="`${dmStore.unreadCount} unread messages`"></span>
             </button>
           </div>
 
@@ -65,8 +65,8 @@
               :aria-expanded="notifOpen"
               aria-haspopup="true"
             >
-              <i class="bi bi-bell-fill" aria-hidden="true"></i>
-              <span v-if="unreadCount > 0" class="notif-badge" :aria-label="`${unreadCount} unread notifications`">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.5 21a1.7 1.7 0 0 1-3 0"/></svg>
+              <span v-if="unreadCount > 0" class="notif-unread-dot" :aria-label="`${unreadCount} unread notifications`"></span>
             </button>
             <div v-if="notifOpen" class="notif-dropdown">
               <div class="notif-header">
@@ -109,7 +109,7 @@
               :aria-expanded="avatarOpen"
               aria-haspopup="true"
             >
-              <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="34" />
+              <div class="nav-avatar-mono">{{ userInitial }}</div>
             </button>
             <div v-if="avatarOpen" class="avatar-dropdown">
               <div class="avd-header">
@@ -452,12 +452,6 @@ onUnmounted(() => {
   padding-top: env(safe-area-inset-top, 0px);
 }
 .navbar {
-  background: #fff;
-  border-bottom: 1px solid #E5E5E5;
-  box-shadow: none;
-}
-/* Public nav: Good Record design */
-.site-header:not(.site-header--auth) .navbar {
   background: #FBF6EC;
   border-bottom: 2px solid #16130F;
 }
@@ -467,7 +461,7 @@ onUnmounted(() => {
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: 66px;
   display: flex;
   align-items: center;
 }
@@ -482,16 +476,15 @@ onUnmounted(() => {
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 8px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  gap: 28px;
+  margin-left: 20px;
 }
-/* Coach + public links: sit inside nav-right, not centered */
+/* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
 .navbar-links--public {
   position: static;
   transform: none;
+  margin-left: 0;
 }
 
 .nav-right {
@@ -503,10 +496,9 @@ onUnmounted(() => {
 .nav-right .icon-group {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-  padding-left: 12px;
-  border-left: 1px solid rgba(255,255,255,0.15);
+  gap: 16px;
+  padding-left: 20px;
+  border-left: 2px solid #E7DFCE;
 }
 
 .brand-text {
@@ -649,27 +641,105 @@ onUnmounted(() => {
 }
 .nav-link-track:hover { background: #222 !important; color: #fff !important; }
 
+/* GR authenticated nav links */
+.nav-link-auth {
+  position: relative;
+  padding: 22px 0;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5a5348;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.nav-link-auth:hover { color: #16130F; }
+.nav-link-auth.router-link-active { color: #16130F; }
+.nav-link-auth.router-link-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: #2A55F5;
+}
+
+/* GR Track CTA pill */
+.nav-track-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2A55F5;
+  color: #fff !important;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 #16130F;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.nav-track-pill:hover { background: #1E42D6 !important; text-decoration: none; }
+.track-pill-play {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #fff;
+  color: #2A55F5;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  flex-shrink: 0;
+}
+
+/* GR cobalt avatar monogram */
+.nav-avatar-mono {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: #2A55F5;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.74rem;
+  border: 2px solid #16130F;
+  flex-shrink: 0;
+}
+
 /* Hide on mobile, show on desktop */
 .desktop-only { display: flex; }
 
 /* Notification bell */
 .notif-wrap { position: relative; }
 .nav-icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 0;
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
-  color: #767676;
-  font-size: 1rem;
+  color: #5a5348;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: color 0.15s;
   position: relative;
+  flex-shrink: 0;
+  padding: 0;
 }
-.nav-icon-btn:hover { color: #000; }
+.nav-icon-btn:hover { color: #16130F; }
 .notif-badge {
   position: absolute;
   top: -2px;
@@ -686,6 +756,16 @@ onUnmounted(() => {
   justify-content: center;
   padding: 0 3px;
   line-height: 1;
+}
+.notif-unread-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #2A55F5;
+  border: 1.5px solid #FBF6EC;
 }
 
 /* Notification dropdown */
@@ -1195,11 +1275,11 @@ onUnmounted(() => {
 /* Coach mode banner */
 .coach-mode-bar {
   position: fixed;
-  top: var(--nav-h, 64px);
+  top: var(--nav-h, 66px);
   left: 0;
   right: 0;
   z-index: 999;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
   font-size: 0.65rem;
   font-weight: 900;
