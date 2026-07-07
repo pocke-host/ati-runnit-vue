@@ -673,13 +673,21 @@ const pauseTracking = () => {
   lastPosition.value = null   // don't connect dots across a pause
 }
 
-const resumeTracking = () => {
-  startTracking()
+const resumeTracking = async () => {
+  try {
+    await startTracking()
+  } catch {
+    // GPS failed to restart (native permission revoked, etc.)
+    isTracking.value = false
+    gpsError.value = 'GPS failed to restart. Check permissions and try again.'
+    setTimeout(() => { gpsError.value = '' }, 5000)
+  }
 }
 
 const stopTracking = async () => {
   showFinishConfirm.value = false
-  await stopSharing()
+  // Fire-and-forget — don't await; waiting inflates elapsedTime by API latency
+  stopSharing().catch(() => {})
   pauseTracking()
   saving.value = true
   saveError.value = ''
@@ -694,12 +702,18 @@ const stopTracking = async () => {
     })
     savedActivityId.value = activity?.id ?? null
     saving.value = false
-    clearDraft()   // run saved — kill the crash recovery draft
+    clearDraft()
     showNotesStep.value = true
-  } catch {
-    saveError.value = 'Failed to save. Tap Finish again to retry.'
+  } catch (err) {
+    const status = err?.response?.status
+    saveError.value = (status === 401 || status === 403)
+      ? 'Session expired — log back in and tap Finish to retry.'
+      : status === 413
+        ? 'Route data too large to upload. Tap Finish to retry.'
+        : 'Failed to save. Tap Finish again to retry.'
     saving.value = false
-    startTracking()
+    // Draft preserved in localStorage — no data loss on failure.
+    // Tracking stays paused so retries use the same frozen snapshot.
   }
 }
 

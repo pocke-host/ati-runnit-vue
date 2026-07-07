@@ -27,7 +27,11 @@ export const useActivityStore = defineStore('activity', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.post(`${API_URL}/activities`, data, { timeout: 30000 })
+      const token = localStorage.getItem('token')
+      const response = await axios.post(`${API_URL}/activities`, data, {
+        timeout: 30000,
+        headers: { Authorization: `Bearer ${token}` },
+      })
       activities.value.unshift(response.data)
       saveCache(activities.value)
       return response.data
