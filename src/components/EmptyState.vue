@@ -32,53 +32,55 @@ defineEmits(['action'])
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 72px 24px;
+  padding: 64px 24px;
   text-align: center;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .empty-state-icon {
-  font-size: 3rem;
-  color: var(--rk-ash, #B0A8C0);
-  margin-bottom: 16px;
+  font-size: 2.6rem;
+  color: #5A5348;
+  margin-bottom: 18px;
 }
 
 .empty-state-title {
-  font-size: 1.1rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2rem);
   font-weight: 900;
-  letter-spacing: -0.01em;
-  color: #1a1a1a;
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  line-height: 0.88;
+  color: #16130F;
+  margin-bottom: 10px;
 }
 
 .empty-state-message {
-  font-size: 0.88rem;
-  color: #767676;
+  font-size: 0.9rem;
+  color: #5A5348;
   line-height: 1.6;
-  max-width: 320px;
-  margin: 0 0 24px;
+  max-width: 300px;
+  margin: 0 0 28px;
 }
 
 .empty-state-btn {
   display: inline-flex;
   align-items: center;
-  height: 40px;
-  padding: 0 24px;
-  border: 2px solid var(--rk-signal, #0052FF);
-  background: transparent;
-  color: var(--rk-signal, #0052FF);
-  font-size: 0.78rem;
-  font-weight: 600;
+  justify-content: center;
+  padding: 13px 28px;
+  border: 2px solid #16130F;
+  background: #2A55F5;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   cursor: pointer;
   text-decoration: none;
-  border-radius: 0;
-  transition: background 0.15s, color 0.15s;
-  font-family: inherit;
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 #16130F;
+  transition: background 0.15s, box-shadow 0.15s;
 }
-
 .empty-state-btn:hover {
-  background: var(--rk-signal, #0052FF);
-  color: #fff;
+  background: #1E42D6;
 }
 </style>
