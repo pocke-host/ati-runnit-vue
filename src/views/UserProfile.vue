@@ -24,100 +24,53 @@
     </div>
 
     <template v-else>
-      <!-- HERO -->
+      <!-- HERO — Good Record ink section -->
       <section class="profile-hero">
         <div class="hero-inner">
-          <div class="avatar-wrap">
-            <UserAvatar :src="profile.avatarUrl" :name="profile.displayName || ''" :size="96" />
-            <div v-if="isOwnProfile" class="avatar-badge" title="Your profile">
-              <i class="bi bi-star-fill"></i>
-            </div>
+          <!-- Avatar slot -->
+          <div class="gr-avatar-wrap">
+            <UserAvatar :src="profile.avatarUrl" :name="profile.displayName || ''" :size="88" class="gr-avatar-img" />
           </div>
 
           <div class="hero-info">
-            <h1 class="hero-name">{{ profile.displayName || 'Athlete' }}</h1>
-            <div class="hero-meta">
-              <span v-if="profile.location" class="meta-chip">
-                <i class="bi bi-geo-alt me-1"></i>{{ profile.location }}
-              </span>
-              <span v-if="profile.sport" class="meta-chip meta-chip-sport">
-                {{ sportEmoji(profile.sport) }} {{ profile.sport }}
-              </span>
-              <span class="meta-chip meta-chip-date">
-                <i class="bi bi-calendar3 me-1"></i>Joined {{ joinedDate }}
-              </span>
-            </div>
-
-            <div v-if="profile.bio" class="hero-bio">{{ profile.bio }}</div>
-
-            <div v-if="serverArchetype" class="hero-archetype">
-              <span class="hero-archetype-badge">{{ serverArchetype.label }}</span>
-              <span class="hero-archetype-tagline">{{ serverArchetype.tagline }}</span>
-            </div>
-
-            <div class="hero-stats">
-              <div class="hstat">
-                <div class="hstat-val">{{ activitiesCount }}</div>
-                <div class="hstat-label">Activities</div>
+            <div class="hero-top-row">
+              <div>
+                <h1 class="gr-hero-name">{{ profile.displayName || 'Athlete' }}</h1>
+                <div class="gr-hero-handle">@{{ profile.handle || (profile.displayName||'').toLowerCase().replace(/\s+/g,'') }} · No. {{ String(profile.id || 0).padStart(4, '0') }}</div>
               </div>
-              <div class="hstat-divider"></div>
-              <div class="hstat">
-                <div class="hstat-val">{{ formatDistance(totalDistanceMeters) }}</div>
-                <div class="hstat-label">Total</div>
-              </div>
-              <div class="hstat-divider"></div>
-              <div class="hstat">
-                <div class="hstat-val">{{ profile.followingCount ?? '—' }}</div>
-                <div class="hstat-label">Following</div>
-              </div>
-              <div class="hstat-divider"></div>
-              <div class="hstat">
-                <div class="hstat-val">{{ profile.followerCount ?? '—' }}</div>
-                <div class="hstat-label">Followers</div>
-              </div>
-              <div class="hstat-divider"></div>
-              <div class="hstat">
-                <div class="hstat-val" :style="{ color: disciplineData.levelColor }">{{ disciplineData.level }}</div>
-                <div class="hstat-label">Discipline</div>
-              </div>
-              <div class="hstat-divider"></div>
-              <div class="hstat">
-                <div class="hstat-val">{{ currentStreak > 0 ? '🔥' : '' }}{{ currentStreak }}</div>
-                <div class="hstat-label">Day Streak</div>
-              </div>
-            </div>
-
-            <div class="hero-actions">
               <template v-if="isOwnProfile">
-                <router-link to="/settings" class="btn btn-outline">
-                  <i class="bi bi-pencil me-2"></i>Edit Profile
-                </router-link>
-                <router-link to="/dashboard" class="btn btn-primary">
-                  <i class="bi bi-grid-3x3-gap me-2"></i>Dashboard
-                </router-link>
+                <router-link to="/settings" class="gr-btn-pill">Edit Profile</router-link>
               </template>
               <template v-else>
-                <button
-                  v-if="!following"
-                  class="btn btn-primary"
-                  @click="toggleFollow"
-                  :disabled="followLoading"
-                >
-                  <span v-if="followLoading" class="spinner-border spinner-border-sm me-2"></span>
-                  <i v-else class="bi bi-person-plus me-2"></i>Follow
+                <button v-if="!following" class="gr-btn-pill" @click="toggleFollow" :disabled="followLoading">
+                  <span v-if="followLoading" class="spinner-border spinner-border-sm me-1"></span>
+                  <span v-else>Follow</span>
                 </button>
-                <button
-                  v-else
-                  class="btn btn-following"
-                  @click="toggleFollow"
-                  :disabled="followLoading"
-                >
-                  <i class="bi bi-check me-2"></i>Following
+                <button v-else class="gr-btn-pill gr-btn-pill--following" @click="toggleFollow" :disabled="followLoading">
+                  Following
                 </button>
-                <router-link to="/feed" class="btn btn-outline">
-                  <i class="bi bi-collection me-2"></i>Feed
-                </router-link>
               </template>
+            </div>
+
+            <p v-if="profile.bio" class="gr-hero-bio">{{ profile.bio }}</p>
+
+            <!-- Archetype badge (Road Warrior style) -->
+            <span v-if="archetypeData?.label" class="gr-archetype-badge">{{ archetypeData.label }}</span>
+
+            <!-- 3-cell stat block -->
+            <div class="gr-stat-block">
+              <div class="gr-stat-cell">
+                <div class="gr-stat-cell-lbl">Runs</div>
+                <div class="gr-stat-cell-val">{{ activitiesCount }}</div>
+              </div>
+              <div class="gr-stat-cell gr-stat-cell--sep">
+                <div class="gr-stat-cell-lbl">Distance</div>
+                <div class="gr-stat-cell-val">{{ formatDistance(totalDistanceMeters) }}</div>
+              </div>
+              <div class="gr-stat-cell gr-stat-cell--sep">
+                <div class="gr-stat-cell-lbl">PRs</div>
+                <div class="gr-stat-cell-val gr-stat-cell-val--yellow">{{ personalRecords ? Object.values(personalRecords).filter(Boolean).length : '—' }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -759,8 +712,9 @@ onMounted(init)
 .profile-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: var(--rk-paper, #ffffff);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
 }
 
 /* Loading / Error */
@@ -771,161 +725,174 @@ onMounted(init)
   justify-content: center;
   min-height: 60vh;
   gap: 16px;
-  color: rgba(15,18,16,0.60);
+  color: #5A5348;
   text-align: center;
 }
-.page-error i { font-size: 5rem; color: rgba(15,18,16,0.20); }
-.page-error h2 { font-weight: 900; font-size: 1.8rem; color: rgba(15,18,16,0.80); margin: 0; }
+.page-error i { font-size: 5rem; color: #E7DFCE; }
+.page-error h2 { font-weight: 900; font-size: 1.8rem; color: #16130F; margin: 0; }
 
-/* HERO */
+/* ── HERO — Good Record ink ── */
 .profile-hero {
-  background: #000;
-  color: white;
-  padding: 48px 0 40px;
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 44px 0 40px;
+  border-bottom: 2px solid #16130F;
 }
 .hero-inner {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 40px;
   display: flex;
-  gap: 36px;
+  gap: 24px;
   align-items: flex-start;
 }
 
 /* Avatar */
-.avatar-wrap { position: relative; flex-shrink: 0; }
-.avatar-xl {
-  width: 96px;
-  height: 96px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.18);
-  border: 2px solid rgba(255,255,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 2.4rem;
-  color: white;
-  box-shadow: none;
+.gr-avatar-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  border: 2px solid #FBF6EC;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #EDE5D5;
 }
-.avatar-badge {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 0;
-  background: #0052FF;
-  border: 2px solid #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  color: white;
-}
+.gr-avatar-img { width: 100%; height: 100%; }
 
 /* Hero info */
-.hero-info { flex: 1; }
-.hero-name {
-  font-weight: 900;
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  letter-spacing: -0.03em;
-  margin: 0 0 10px;
-  color: white;
-  line-height: 1.0;
-}
-.hero-meta {
+.hero-info { flex: 1; min-width: 0; }
+
+.hero-top-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.gr-hero-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 0.9;
+  text-transform: uppercase;
+  margin: 0;
+  animation: rkRise 0.6s ease-out both;
+  color: #FBF6EC;
+}
+.gr-hero-handle {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: rgba(251,246,236,0.6);
+  margin-top: 6px;
+}
+.gr-hero-bio {
+  color: rgba(251,246,236,0.75);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0 0 16px;
+  max-width: 460px;
+}
+
+/* Archetype badge */
+.gr-archetype-badge {
+  display: inline-block;
+  background: #FFC53D;
+  color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 13px;
+  transform: rotate(-2deg);
   margin-bottom: 20px;
 }
-.meta-chip {
-  padding: 4px 12px;
-  border-radius: 0;
-  background: rgba(255,255,255,0.12);
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-}
-.meta-chip-sport { background: rgba(255,255,255,0.18); }
-.meta-chip-date { background: rgba(255,255,255,0.08); }
 
-.hero-stats {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 24px;
-  border: 1px solid rgba(255,255,255,0.2);
-  width: fit-content;
-}
-.hstat { text-align: center; padding: 14px 20px; }
-.hstat-val {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+/* 3-cell stat block */
+.gr-stat-block {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 2px solid rgba(251,246,236,0.3);
+  margin-top: 24px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  font-size: 1.4rem;
-  color: white;
-  line-height: 1;
+  animation: rkRise 0.6s ease-out 0.15s both;
 }
-.hstat-label {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.55rem;
-  font-weight: 500;
+.gr-stat-cell {
+  padding: 20px 24px;
+}
+.gr-stat-cell--sep { border-left: 2px solid rgba(251,246,236,0.3); }
+.gr-stat-cell-lbl {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.55);
-  margin-top: 4px;
+  color: rgba(251,246,236,0.55);
+  margin-bottom: 8px;
 }
-.hstat-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,0.15); }
+.gr-stat-cell-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 0.9;
+  color: #FBF6EC;
+}
+.gr-stat-cell-val--yellow { color: #FFC53D; }
 
-.hero-actions { display: flex; gap: 12px; }
+/* Action buttons */
+.gr-btn-pill {
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #FBF6EC;
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.gr-btn-pill:hover { background: #1E42D6; text-decoration: none; color: #fff; }
+.gr-btn-pill--following { background: rgba(255,255,255,0.15); }
+.gr-btn-pill--following:hover { background: rgba(239,68,68,0.3); }
+.gr-btn-pill:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Buttons */
+/* Legacy btn kept for error/notfound states inside tabs */
 .btn {
-  border: 1px solid rgba(255,255,255,0.30);
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border-radius: 0;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #16130F;
+  border-radius: 999px;
   height: 44px;
   padding: 0 20px;
-  font-weight: 900;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 0.88rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   text-decoration: none;
 }
-.btn:hover { background: rgba(255,255,255,0.25); }
-.btn-primary {
-  background: #0052FF;
-  border-color: #0052FF;
-  color: white;
-}
-.btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
+.btn:hover { background: #E7DFCE; }
+.btn-primary { background: #2A55F5; border-color: #2A55F5; color: white; }
+.btn-primary:hover:not(:disabled) { background: #1E42D6; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-following {
-  background: rgba(16,185,129,0.20);
-  border-color: rgba(255,255,255,0.30);
-  color: white;
-}
-.btn-following:hover { background: rgba(239,68,68,0.25); }
-.btn-following:hover::after { content: 'Unfollow'; }
-.btn-outline { background: transparent; border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.90); }
-.btn-outline:hover { background: rgba(255,255,255,0.12); }
+.btn-outline { background: transparent; border-color: #E7DFCE; color: #5A5348; }
+.btn-outline:hover { background: rgba(22,19,15,0.05); }
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; }
 
 /* Content tabs */
 .content-tabs-bar {
-  background: white;
-  border-bottom: 1px solid rgba(15,18,16,0.10);
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
   position: sticky;
   top: var(--nav-h, 64px);
   z-index: 50;
@@ -933,45 +900,45 @@ onMounted(init)
 .content-tabs {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 40px;
   display: flex;
 }
 .ctab {
   padding: 14px 20px;
   border: none;
   background: transparent;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 600;
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  margin-bottom: -2px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.ctab:hover { color: #000; }
-.ctab.active { color: #000; border-bottom-color: #000; }
+.ctab:hover { color: #16130F; }
+.ctab.active { color: #2A55F5; border-bottom-color: #2A55F5; }
 .ctab-count {
-  background: #F5F5F5;
-  border: 1px solid #E5E5E5;
+  background: #E7DFCE;
+  border: 1px solid #16130F;
   border-radius: 0;
   padding: 1px 7px;
   font-size: 0.6rem;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
-.ctab.active .ctab-count { background: #000; color: #fff; border-color: #000; }
+.ctab.active .ctab-count { background: #2A55F5; color: #fff; border-color: #2A55F5; }
 
 /* Content area */
 .content-area {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px 40px 64px;
 }
 
 /* Loading / Empty */
@@ -1279,9 +1246,10 @@ onMounted(init)
 }
 
 @media (max-width: 480px) {
-  .avatar-xl { width: 72px; height: 72px; font-size: 1.8rem; }
-  .hero-name { font-size: 1.5rem; }
-  .hero-actions { flex-direction: column; gap: 8px; width: 100%; }
+  .gr-avatar-wrap { width: 64px; height: 64px; }
+  .gr-hero-name { font-size: 1.8rem; }
+  .hero-top-row { flex-direction: column; gap: 12px; }
+  .gr-stat-block { grid-template-columns: repeat(3, 1fr); }
   .activities-grid { grid-template-columns: 1fr; }
   .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }

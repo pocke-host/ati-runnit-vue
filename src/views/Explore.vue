@@ -327,20 +327,22 @@ onBeforeUnmount(() => { map?.remove() })
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--nav-h, 64px));
-  background: #fff;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 /* Header */
 .explore-header {
-  border-bottom: 1px solid #E5E5E5;
-  background: #fff;
+  border-bottom: 2px solid #16130F;
+  background: #FBF6EC;
   flex-shrink: 0;
 }
 .explore-header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 16px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -348,17 +350,22 @@ onBeforeUnmount(() => { map?.remove() })
   flex-wrap: wrap;
 }
 .explore-title {
-  font-size: 1.4rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.8rem;
   font-weight: 900;
-  letter-spacing: -0.01em;
-  margin: 0;
   text-transform: uppercase;
+  margin: 0;
+  color: #16130F;
+  line-height: 0.9;
 }
 .explore-sub {
-  font-size: 0.8rem;
-  color: #767676;
-  margin: 2px 0 0;
-  letter-spacing: 0.04em;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: #5A5348;
+  margin: 6px 0 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .explore-filters {
   display: flex;
@@ -366,16 +373,17 @@ onBeforeUnmount(() => { map?.remove() })
 }
 .filter-select {
   padding: 8px 12px;
-  font-size: 0.8rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.06em;
-  border: 1px solid #E5E5E5;
-  background: #fff;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #16130F;
   cursor: pointer;
   text-transform: uppercase;
-  font-family: inherit;
 }
-.filter-select:focus { outline: 2px solid #000; }
+.filter-select:focus { outline: 2px solid #2A55F5; }
 
 /* Permission banner */
 .permission-banner {
@@ -422,9 +430,9 @@ onBeforeUnmount(() => { map?.remove() })
 .list-panel {
   width: 360px;
   flex-shrink: 0;
-  border-left: 1px solid #E5E5E5;
+  border-left: 2px solid #16130F;
   overflow-y: auto;
-  background: #fff;
+  background: #FBF6EC;
 }
 .list-loading {
   display: flex;
@@ -443,89 +451,106 @@ onBeforeUnmount(() => { map?.remove() })
 }
 
 .retry-btn {
-  background: #000;
+  background: #2A55F5;
   color: #fff;
-  border: none;
+  border: 2px solid #16130F;
+  border-radius: 999px;
   padding: 10px 20px;
-  font-family: inherit;
-  font-size: 0.78rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   cursor: pointer;
   margin-top: 4px;
+  transition: background 0.15s;
 }
-.retry-btn:hover { background: #222; }
+.retry-btn:hover { background: #1E42D6; }
 
 /* Athletes strip */
 .nearby-athletes {
   padding: 16px 16px 0;
 }
 .list-section-label {
-  font-size: 0.7rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   padding: 0 16px;
   margin-bottom: 8px;
 }
 .athlete-scroll {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
 }
 .athlete-chip {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 0;
+  padding: 10px 16px;
   cursor: pointer;
-  border-bottom: 1px solid #F5F5F5;
+  border-bottom: 1px solid #E7DFCE;
 }
-.athlete-chip:hover { background: #FAFAFA; }
+.athlete-chip:hover { background: #EDE5D5; }
 .athlete-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 999px;
   object-fit: cover;
   flex-shrink: 0;
 }
 .athlete-avatar-fallback {
-  background: #E5E5E5;
+  background: #16130F;
+  color: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.9rem;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.8rem;
 }
 .athlete-info { flex: 1; min-width: 0; }
 .athlete-name {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #16130F;
 }
-.athlete-count { font-size: 0.75rem; color: #767676; }
+.athlete-count {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 500;
+  color: #5A5348;
+}
 .follow-btn {
-  padding: 4px 12px;
-  font-size: 0.7rem;
+  padding: 5px 12px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: #000;
+  background: #2A55F5;
   color: #fff;
-  border: none;
+  border: 2px solid #16130F;
+  border-radius: 999px;
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.15s;
 }
+.follow-btn:hover { background: #1E42D6; }
 .following-label {
-  font-size: 0.7rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   flex-shrink: 0;
 }
 
@@ -535,24 +560,24 @@ onBeforeUnmount(() => { map?.remove() })
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid #F5F5F5;
+  border-bottom: 1px solid #E7DFCE;
   cursor: pointer;
   transition: background 0.1s;
 }
-.activity-row:hover { background: #FAFAFA; }
+.activity-row:hover { background: #EDE5D5; }
 .activity-row-left { display: flex; align-items: flex-start; gap: 10px; }
-.activity-sport-icon { font-size: 1rem; color: #767676; margin-top: 2px; }
-.activity-row-user { font-size: 0.75rem; color: #767676; }
-.activity-row-title { font-size: 0.85rem; font-weight: 600; }
-.activity-row-meta { display: flex; gap: 8px; font-size: 0.75rem; color: #767676; margin-top: 2px; }
-.activity-row-date { font-size: 0.72rem; color: #A0A0A0; flex-shrink: 0; }
+.activity-sport-icon { font-size: 1rem; color: #5A5348; margin-top: 2px; }
+.activity-row-user { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.65rem; font-weight: 500; color: #5A5348; }
+.activity-row-title { font-size: 0.88rem; font-weight: 700; color: #16130F; }
+.activity-row-meta { font-family: 'Spline Sans Mono', ui-monospace, monospace; display: flex; gap: 8px; font-size: 0.65rem; color: #5A5348; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.activity-row-date { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.62rem; color: #5A5348; flex-shrink: 0; }
 
 /* Mobile: stack map on top */
 @media (max-width: 768px) {
   .explore-body { flex-direction: column; }
   .map-panel { height: 280px; flex: none; }
-  .list-panel { width: 100%; border-left: none; border-top: 1px solid #E5E5E5; }
-  .explore-header-inner { padding: 12px 16px; }
+  .list-panel { width: 100%; border-left: none; border-top: 2px solid #16130F; }
+  .explore-header-inner { padding: 12px 20px; }
 }
 </style>
 
@@ -561,19 +586,19 @@ onBeforeUnmount(() => { map?.remove() })
 .map-pin {
   width: 12px;
   height: 12px;
-  background: #0052FF;
-  border: 2px solid #fff;
+  background: #2A55F5;
+  border: 2px solid #FBF6EC;
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.15s, background 0.15s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  box-shadow: 2px 2px 0 #16130F;
 }
 .map-pin--active {
   transform: scale(1.8);
-  background: #000;
+  background: #16130F;
 }
-.map-popup { font-family: Futura, "Avenir Next", system-ui, sans-serif; font-size: 12px; }
-.map-popup-user { color: #767676; margin-bottom: 2px; }
-.map-popup-title { font-weight: 700; }
-.map-popup-meta { color: #767676; margin-top: 2px; }
+.map-popup { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 12px; color: #16130F; }
+.map-popup-user { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.62rem; color: #5A5348; margin-bottom: 2px; }
+.map-popup-title { font-weight: 700; color: #16130F; }
+.map-popup-meta { font-family: 'Spline Sans Mono', ui-monospace, monospace; color: #5A5348; margin-top: 2px; font-size: 0.62rem; }
 </style>

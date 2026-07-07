@@ -45,7 +45,9 @@
       <div class="user-row-wrap">
         <div class="user-row">
           <router-link :to="`/profile/${activity.userId}`" class="avatar-link">
-            <UserAvatar :src="activity.userAvatarUrl" :name="activity.userDisplayName || ''" :size="40" />
+            <div class="gr-avatar-mono" :style="{ background: ['#2A55F5','#16130F','#FFC53D'][(activity.userDisplayName?.charCodeAt(0)||65) % 3], color: (activity.userDisplayName?.charCodeAt(0)||65) % 3 === 2 ? '#16130F' : '#fff' }">
+              {{ (activity.userDisplayName||'').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?' }}
+            </div>
           </router-link>
           <div class="user-info">
             <router-link :to="`/profile/${activity.userId}`" class="user-name-link">
@@ -53,18 +55,21 @@
             </router-link>
             <div class="user-sub">{{ formatDate(activity.createdAt) }}</div>
           </div>
+          <span v-if="activityPRs.length > 0" class="gr-pr-stamp">
+            {{ activityPRs.length === 1 ? 'PR!' : `${activityPRs.length}× PR!` }}
+          </span>
           <template v-if="!isOwn && activity.userId">
             <button
               v-if="!following"
-              class="btn btn-follow"
+              class="gr-btn-follow"
               @click="toggleFollow"
               :disabled="followLoading"
             >
               <span v-if="followLoading" class="spinner-border spinner-border-sm me-1"></span>
-              <i v-else class="bi bi-person-plus me-1"></i>Follow
+              <template v-else>+ Follow</template>
             </button>
-            <button v-else class="btn btn-following-sm" @click="toggleFollow" :disabled="followLoading">
-              <i class="bi bi-check me-1"></i>Following
+            <button v-else class="gr-btn-follow gr-btn-follow--active" @click="toggleFollow" :disabled="followLoading">
+              Following
             </button>
           </template>
         </div>
@@ -86,35 +91,39 @@
         </div>
       </div>
 
+      <!-- GR 4-CELL HEADLINE STAT STRIP -->
+      <div class="gr-stat-strip">
+        <div class="gr-stat-strip-cell">
+          <div class="gr-stat-strip-num">{{ formatDistance(activity.distanceMeters) || '—' }}</div>
+          <div class="gr-stat-strip-lbl">Dist</div>
+        </div>
+        <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+          <div class="gr-stat-strip-num">{{ computedPace }}</div>
+          <div class="gr-stat-strip-lbl">Pace</div>
+        </div>
+        <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+          <div class="gr-stat-strip-num">{{ formatDuration(activity.durationSeconds) }}</div>
+          <div class="gr-stat-strip-lbl">Time</div>
+        </div>
+        <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+          <div class="gr-stat-strip-num">{{ elevationDisplay }}</div>
+          <div class="gr-stat-strip-lbl">Elev</div>
+        </div>
+      </div>
+
       <!-- MAIN LAYOUT -->
       <div class="detail-layout">
 
         <!-- LEFT COL: Stats, Map, Reactions, Delete -->
         <div class="detail-left">
 
-          <!-- Stats -->
+          <!-- Extended Stats -->
           <div class="det-card">
             <div class="det-card-top">
-              <h3 class="det-section-title">Stats</h3>
+              <h3 class="det-section-title">Details</h3>
               <div v-if="displayClassification" class="workout-type-chip" :style="{ background: displayClassification.color }">{{ displayClassification.label }}</div>
             </div>
             <div class="stats-grid">
-              <div class="stat-box">
-                <div class="stat-label">Distance</div>
-                <div class="stat-val">{{ formatDistance(activity.distanceMeters) }}</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-label">Duration</div>
-                <div class="stat-val">{{ formatDuration(activity.durationSeconds) }}</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-label">Avg Pace</div>
-                <div class="stat-val">{{ computedPace }}</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-label">Elevation</div>
-                <div class="stat-val">{{ elevationDisplay }}</div>
-              </div>
               <div class="stat-box">
                 <div class="stat-label">Avg HR</div>
                 <div class="stat-val">{{ activity.averageHeartRate ? activity.averageHeartRate + ' bpm' : '—' }}</div>
@@ -278,28 +287,14 @@
           <!-- Reactions -->
           <div class="det-card">
             <h3 class="det-section-title">Reactions</h3>
-            <div class="reactions-row">
+            <div class="gr-reaction-bar">
               <button
-                :class="['reaction-btn', { active: userReaction === 'LIKE' }]"
-                @click="toggleReaction('LIKE')"
+                v-for="rxn in [{type:'LIKE',label:'♥ Like'},{type:'FIRE',label:'Fire'},{type:'CLAP',label:'Clap'}]"
+                :key="rxn.type"
+                :class="['gr-rxn-btn', { 'gr-rxn-btn--active': userReaction === rxn.type }]"
+                @click="toggleReaction(rxn.type)"
                 :disabled="reactionLoading"
-              >
-                ❤️ <span class="reaction-count">{{ reactionCounts.LIKE || 0 }}</span>
-              </button>
-              <button
-                :class="['reaction-btn', { active: userReaction === 'FIRE' }]"
-                @click="toggleReaction('FIRE')"
-                :disabled="reactionLoading"
-              >
-                🔥 <span class="reaction-count">{{ reactionCounts.FIRE || 0 }}</span>
-              </button>
-              <button
-                :class="['reaction-btn', { active: userReaction === 'CLAP' }]"
-                @click="toggleReaction('CLAP')"
-                :disabled="reactionLoading"
-              >
-                👏 <span class="reaction-count">{{ reactionCounts.CLAP || 0 }}</span>
-              </button>
+              >{{ rxn.label }}<template v-if="reactionCounts[rxn.type]"> {{ reactionCounts[rxn.type] }}</template></button>
             </div>
           </div>
 
@@ -332,7 +327,9 @@
 
               <div v-else class="comments">
                 <div v-for="c in comments" :key="c.id" class="comment">
-                  <div class="comment-avatar">{{ getInitial(c.user) }}</div>
+                  <div class="gr-comment-avatar" :style="{ background: ['#2A55F5','#16130F','#FFC53D'][((c.user?.displayName||'').charCodeAt(0)||65) % 3], color: ((c.user?.displayName||'').charCodeAt(0)||65) % 3 === 2 ? '#16130F' : '#fff' }">
+                    {{ ((c.user?.displayName||'').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?') }}
+                  </div>
                   <div class="comment-body">
                     <div class="comment-meta">
                       <span class="comment-author">{{ c.user?.displayName || c.user }}</span>
@@ -875,8 +872,9 @@ onMounted(init)
 .detail-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: var(--rk-paper, #ffffff);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
 }
 
 /* Loading / Error */
@@ -899,17 +897,18 @@ onMounted(init)
   align-items: center;
   gap: 6px;
   padding: 10px 20px;
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
-  border-bottom: 1px solid #333;
+  border-bottom: 2px solid #16130F;
 }
-.event-banner:hover { background: #111; color: #fff; text-decoration: none; }
+.event-banner:hover { background: #2a2720; color: #FBF6EC; text-decoration: none; }
 .event-banner-type {
   padding: 2px 8px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(251,246,236,0.12);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -922,27 +921,30 @@ onMounted(init)
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 32px;
-  background: #000;
-  color: white;
+  padding: 20px 40px;
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
 }
 .back-btn {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: white;
-  border-radius: 0;
-  min-height: 44px;
-  padding: 8px 16px;
+  background: transparent;
+  border: 2px solid #16130F;
+  color: #16130F;
+  border-radius: 999px;
+  min-height: 40px;
+  padding: 6px 16px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: background 0.2s;
+  transition: background 0.15s;
   white-space: nowrap;
 }
-.back-btn:hover { background: rgba(255,255,255,0.25); }
+.back-btn:hover { background: #E7DFCE; }
 .top-bar-meta {
   display: flex;
   align-items: center;
@@ -950,24 +952,29 @@ onMounted(init)
   flex: 1;
 }
 .sport-chip {
-  background: rgba(255,255,255,0.18);
-  border-radius: 0;
-  padding: 6px 16px;
-  font-weight: 900;
-  font-size: 0.9rem;
+  background: #16130F;
+  color: #FBF6EC;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 .top-date {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.70);
-  font-weight: 700;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: #5A5348;
 }
 .top-bar-spacer { width: 80px; }
 
 /* USER ROW */
 .user-row-wrap {
-  background: white;
-  border-bottom: 1px solid rgba(15,18,16,0.08);
-  padding: 0 32px;
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
+  padding: 0 40px;
 }
 .user-row {
   max-width: 1000px;
@@ -978,74 +985,134 @@ onMounted(init)
   padding: 18px 0;
 }
 .avatar-link { text-decoration: none; flex-shrink: 0; }
-.det-avatar {
+
+/* GR circular monogram avatar */
+.gr-avatar-mono {
   width: 44px;
   height: 44px;
-  border-radius: 0;
-  background: #000;
+  border-radius: 999px;
+  border: 2px solid #16130F;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  color: white;
-  font-size: 1.1rem;
-}
-.user-info { flex: 1; }
-.user-name-link {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-weight: 800;
   font-size: 0.95rem;
-  letter-spacing: -0.01em;
-  color: #000;
+  flex-shrink: 0;
+}
+
+/* PR stamp badge */
+.gr-pr-stamp {
+  background: #FFC53D;
+  color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: 2px solid #16130F;
+  transform: rotate(3deg);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.user-info { flex: 1; }
+.user-name-link {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  color: #16130F;
   text-decoration: none;
 }
-.user-name-link:hover { color: #000; }
+.user-name-link:hover { color: #2A55F5; }
 .user-sub {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: #767676;
+  color: #5A5348;
   margin-top: 3px;
 }
 
-/* Buttons */
+/* Follow buttons */
+.gr-btn-follow {
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.gr-btn-follow:hover:not(:disabled) { background: #1E42D6; }
+.gr-btn-follow--active { background: rgba(22,19,15,0.08); color: #16130F; }
+.gr-btn-follow--active:hover:not(:disabled) { background: rgba(239,68,68,0.15); }
+.gr-btn-follow:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* GR 4-cell stat strip */
+.gr-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 2px solid #16130F;
+  border-bottom: 2px solid #16130F;
+  background: #FBF6EC;
+}
+.gr-stat-strip-cell {
+  padding: 24px 20px;
+  text-align: center;
+}
+.gr-stat-strip-cell--div { border-left: 2px solid #16130F; }
+.gr-stat-strip-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 0.9;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: #16130F;
+  animation: rkRise 0.5s ease-out both;
+}
+.gr-stat-strip-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #5A5348;
+  margin-top: 8px;
+}
+
+/* Legacy btn — kept for delete/confirm modals */
 .btn {
-  border: none;
-  border-radius: 0;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #16130F;
+  border-radius: 999px;
   height: 40px;
   padding: 0 18px;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 0.88rem;
   display: inline-flex;
   align-items: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   font-family: inherit;
 }
-.btn-primary {
-  background: #0052FF;
-  color: white;
-}
-.btn-primary:hover:not(:disabled) { background: #003ECC; }
+.btn-primary { background: #2A55F5; border-color: #2A55F5; color: white; }
+.btn-primary:hover:not(:disabled) { background: #1E42D6; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-follow {
-  background: #0052FF;
-  color: white;
-  flex-shrink: 0;
-}
-.btn-follow:hover:not(:disabled) { background: #003ECC; }
-.btn-follow:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-following-sm {
-  background: #f0f0f0;
-  color: rgba(15,18,16,0.80);
-  border: 1px solid #E5E5E5;
-  flex-shrink: 0;
-}
-.btn-following-sm:hover:not(:disabled) { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.30); }
 .btn-delete {
   background: rgba(239,68,68,0.10);
   color: #dc2626;
-  border: 1px solid rgba(239,68,68,0.20);
+  border: 2px solid rgba(239,68,68,0.4);
 }
 .btn-delete:hover:not(:disabled) { background: rgba(239,68,68,0.18); }
 .btn-delete:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -1054,7 +1121,7 @@ onMounted(init)
 .detail-layout {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px 40px 64px;
   display: grid;
   grid-template-columns: 1fr 360px;
   gap: 24px;
@@ -1063,52 +1130,53 @@ onMounted(init)
 
 /* Cards */
 .det-card {
-  background: white;
-  border: 1px solid #E5E5E5;
+  background: #fff;
+  border: 2px solid #16130F;
   border-radius: 0;
   padding: 24px;
   box-shadow: none;
   margin-bottom: 20px;
 }
 .det-section-title {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-weight: 600;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #767676;
+  color: #5A5348;
   margin: 0 0 18px;
 }
 
-/* Stats grid */
+/* Secondary stats grid (Avg HR, Max HR, Cadence, Calories) */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: rgba(15,18,16,0.08);
-  border-radius: 0;
-  overflow: hidden;
+  grid-template-columns: repeat(2, 1fr);
+  border: 2px solid #E7DFCE;
 }
 .stat-box {
-  background: white;
   text-align: center;
   padding: 18px 12px;
+  border-right: 2px solid #E7DFCE;
+  border-bottom: 2px solid #E7DFCE;
 }
+.stat-box:nth-child(2n) { border-right: none; }
+.stat-box:nth-last-child(-n+2) { border-bottom: none; }
 .stat-label {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.55rem;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #767676;
+  color: #5A5348;
   margin-bottom: 6px;
 }
 .stat-val {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  font-size: 1.15rem;
-  color: #000;
+  font-weight: 800;
+  font-size: 1.4rem;
+  line-height: 0.95;
+  color: #16130F;
 }
 
 /* Stats card extras */
@@ -1249,42 +1317,35 @@ onMounted(init)
   position: relative;
 }
 
-/* Reactions */
-.reactions-row {
+/* GR Reaction bar */
+.gr-reaction-bar {
   display: flex;
   gap: 0;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   width: fit-content;
 }
-.reaction-btn {
+.gr-rxn-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: #fff;
   border: none;
-  border-right: 1px solid #E5E5E5;
-  border-bottom: 2px solid transparent;
-  padding: 10px 20px;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
+  border-right: 2px solid #16130F;
+  padding: 10px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color 0.15s, border-bottom-color 0.15s;
-  color: #767676;
+  transition: background 0.15s, color 0.15s;
+  color: #5A5348;
 }
-.reaction-btn:last-child { border-right: none; }
-.reaction-btn:hover:not(:disabled) { color: #000; }
-.reaction-btn.active { color: #000; border-bottom-color: #000; }
-.reaction-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.reaction-count {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.65rem;
-  font-weight: 500;
-  color: #767676;
-}
+.gr-rxn-btn:last-child { border-right: none; }
+.gr-rxn-btn:hover:not(:disabled) { background: #F0E8D8; color: #16130F; }
+.gr-rxn-btn--active { background: #2A55F5; color: #fff; }
+.gr-rxn-btn--active:hover:not(:disabled) { background: #1E42D6; color: #fff; }
+.gr-rxn-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Delete row */
 .delete-row {
@@ -1307,15 +1368,15 @@ onMounted(init)
   margin-bottom: 18px;
 }
 .comment-count-badge {
-  background: #F5F5F5;
-  border: 1px solid #E5E5E5;
+  background: #E7DFCE;
+  border: 2px solid #16130F;
   border-radius: 0;
   padding: 2px 8px;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
   font-size: 0.6rem;
-  font-weight: 500;
-  color: #767676;
+  font-weight: 600;
+  color: #16130F;
 }
 .comments-list {
   flex: 1;
@@ -1345,19 +1406,21 @@ onMounted(init)
 .comment {
   display: flex;
   gap: 10px;
-  margin-bottom: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #E7DFCE;
 }
-.comment-avatar {
+.comment:last-child { border-bottom: none; }
+.gr-comment-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 0;
-  background: #000;
+  border-radius: 999px;
+  border: 2px solid #16130F;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  color: white;
-  font-size: 0.8rem;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.7rem;
   flex-shrink: 0;
 }
 .comment-body { flex: 1; }
@@ -1367,48 +1430,49 @@ onMounted(init)
   gap: 8px;
   margin-bottom: 4px;
 }
-.comment-author { font-weight: 800; font-size: 0.82rem; letter-spacing: -0.01em; color: #000; }
+.comment-author { font-weight: 800; font-size: 0.82rem; color: #16130F; }
 .comment-time {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.58rem;
   font-weight: 500;
-  color: #767676;
+  color: #5A5348;
 }
-.comment-text { margin: 0; font-size: 0.88rem; color: #000; line-height: 1.55; }
+.comment-text { margin: 0; font-size: 0.88rem; color: #16130F; line-height: 1.55; }
 
 /* Comment form */
 .comment-form {
   display: flex;
   gap: 8px;
-  border-top: 1px solid rgba(15,18,16,0.08);
+  border-top: 2px solid #E7DFCE;
   padding-top: 14px;
 }
 .comment-input {
   flex: 1;
-  border: 1.5px solid rgba(15,18,16,0.12);
+  border: 2px solid #16130F;
   border-radius: 0;
   padding: 10px 14px;
   font-size: 0.9rem;
-  font-family: inherit;
-  background: rgba(15,18,16,0.02);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  background: #FBF6EC;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s;
+  color: #16130F;
 }
-.comment-input:focus { border-color: #000; }
+.comment-input:focus { border-color: #2A55F5; }
 .comment-input:disabled { opacity: 0.5; }
 .comment-submit {
   width: 44px;
   height: 44px;
   border-radius: 0;
-  background: #0052FF;
-  border: none;
+  background: #2A55F5;
+  border: 2px solid #16130F;
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  transition: all 0.2s;
+  transition: all 0.15s;
   flex-shrink: 0;
 }
 .comment-submit:hover:not(:disabled) { background: #003ECC; }
