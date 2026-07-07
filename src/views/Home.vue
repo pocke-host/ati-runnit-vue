@@ -288,7 +288,7 @@ function scrollTo(id) {
 .hero {
   background: #FBF6EC;
   border-bottom: 2px solid #16130F;
-  padding: 52px 0 0;
+  padding: 72px 0 0;
 }
 .hero-grid {
   display: grid;
@@ -944,7 +944,7 @@ function scrollTo(id) {
 }
 @media (max-width: 640px) {
   .home-inner { padding: 0 18px; }
-  .hero { padding: 32px 0 0; }
+  .hero { padding: 48px 0 0; }
   .hero-grid { padding-bottom: 40px; }
   .hero-h1 { font-size: clamp(44px, 13vw, 52px) !important; line-height: 0.84; }
   .hero-sub { font-size: 0.95rem; max-width: 100%; }

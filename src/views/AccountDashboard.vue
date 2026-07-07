@@ -1903,7 +1903,7 @@ onUnmounted(() => {
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:rgba(15,18,16,0.70)}
 .dash-loader{width:32px;height:32px;border:2px solid rgba(15,18,16,0.10);border-top-color:#2A55F5;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.wrap{max-width:1400px;margin:0 auto;padding:40px 20px 56px}
+.wrap{max-width:1400px;margin:0 auto;padding:56px 20px 56px}
 .dash-greeting{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:32px;padding-bottom:28px;border-bottom:2px solid #E7DFCE}
 .greeting-left{flex:1;min-width:0}
 .greeting-dateline{font-size:0.68rem;font-weight:700;letter-spacing:0.20em;color:rgba(15,18,16,0.40);text-transform:uppercase;margin-bottom:8px}

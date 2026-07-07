@@ -107,7 +107,7 @@ const stackItems = [
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 60px 0 56px;
+  padding: 80px 0 64px;
   border-bottom: 2px solid #16130F;
 }
 .gr-eyebrow-badge {
@@ -284,7 +284,7 @@ const stackItems = [
 }
 @media (max-width: 640px) {
   .page-inner { padding: 0 22px; }
-  .hero { padding: 44px 0 40px; }
+  .hero { padding: 60px 0 44px; }
   .story-section, .beliefs-section, .build-section { padding: 40px 0; }
   .final-cta { padding: 48px 22px; }
 }
