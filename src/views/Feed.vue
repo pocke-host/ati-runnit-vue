@@ -62,8 +62,8 @@
 
       <div v-else-if="sortedFeedItems.length" class="feed-grid">
         <!-- Activity Card -->
-        <article 
-          v-for="item in sortedFeedItems" 
+        <article
+          v-for="(item, itemIndex) in sortedFeedItems"
           :key="item.id + '-' + item.type"
           :class="['feed-card', `feed-card-${item.type}`]"
         >
@@ -124,59 +124,69 @@
             </div>
           </template>
 
-          <!-- ACTIVITY CARD -->
+          <!-- ACTIVITY CARD — Good Record style -->
           <template v-else-if="item.type === 'activity'">
             <router-link :to="`/activities/${item.id}`" class="act-card">
-              <!-- Sport thumbnail -->
-              <div class="act-map-thumb" :style="{ background: getSportGradient(item.sportType) }">
-                <svg viewBox="0 0 200 60" class="route-art" preserveAspectRatio="none">
-                  <polyline points="0,45 30,20 60,35 90,15 120,30 150,10 180,25 200,20"
-                            stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                </svg>
-                <span class="act-thumb-icon">{{ getSportIcon(item.sportType) }}</span>
-              </div>
 
-              <!-- Top: user + time -->
-              <div class="act-card-top">
-                <div class="act-card-user">
-                  <router-link :to="`/profile/${item.user?.id}`" class="avatar-link" @click.stop>
-                    <UserAvatar :src="item.user?.avatarUrl" :name="item.user?.displayName || ''" :size="32" />
-                  </router-link>
-                  <div>
-                    <router-link :to="`/profile/${item.user?.id}`" class="act-name" @click.stop>
-                      {{ item.user?.displayName }}<span v-if="item.user?.id === user?.id" class="act-you"> · YOU</span>
-                    </router-link>
-                    <div class="act-time">{{ formatTime(item.createdAt) }}</div>
+              <!-- User header -->
+              <div class="gr-post-top">
+                <div class="gr-post-header">
+                  <div
+                    class="gr-avatar"
+                    :style="{
+                      background: ['#2A55F5','#16130F','#FFC53D'][(item.user?.displayName?.charCodeAt(0)||65) % 3],
+                      color: (item.user?.displayName?.charCodeAt(0)||65) % 3 === 2 ? '#16130F' : '#fff'
+                    }"
+                  >{{ (item.user?.displayName||'').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?' }}</div>
+                  <div class="gr-user-info">
+                    <div class="gr-user-name">{{ item.user?.displayName }}</div>
+                    <div class="gr-user-handle">@{{ item.user?.handle || (item.user?.displayName||'').toLowerCase().replace(/\s+/g,'') }}</div>
                   </div>
+                  <div class="gr-timestamp">{{ formatTime(item.createdAt) }}</div>
                 </div>
-                <div class="act-sport-icon">{{ getSportIcon(item.sportType) }}</div>
+
+                <!-- Big Shoulders stat row -->
+                <div class="gr-stat-row">
+                  <div class="gr-stat-block">
+                    <div class="gr-stat-num">{{ formatDistance(item.distanceMeters) || '—' }}</div>
+                    <div class="gr-stat-lbl">{{ item.name || (item.sportType === 'RUN' ? 'Run' : item.sportType || 'Activity') }}</div>
+                  </div>
+                  <template v-if="item.durationSeconds && item.distanceMeters">
+                    <div class="gr-stat-block gr-stat-block--div">
+                      <div class="gr-stat-num">{{ ((s,d) => { const n=s/(d/1000); return `${Math.floor(n/60)}:${String(Math.round(n%60)).padStart(2,'0')}` })(item.durationSeconds, item.distanceMeters) }}</div>
+                      <div class="gr-pace-lbl">/KM</div>
+                    </div>
+                    <div class="gr-stat-block gr-stat-block--div">
+                      <div class="gr-stat-num">{{ formatDuration(item.durationSeconds) }}</div>
+                      <div class="gr-pace-lbl">Time</div>
+                    </div>
+                  </template>
+                </div>
               </div>
 
-              <!-- Dominant stat: distance -->
-              <div class="act-card-hero">
-                <span class="act-dist">{{ formatDistance(item.distanceMeters) || '—' }}</span>
-                <span v-if="classifyActivity(item)" class="act-chip" :style="{ background: classifyActivity(item).color }">{{ classifyActivity(item).label }}</span>
+              <!-- Route map card -->
+              <div class="gr-route-card">
+                <svg viewBox="0 0 600 260" preserveAspectRatio="none" class="gr-route-svg">
+                  <path
+                    :d="['M40,200 C120,120 160,210 240,140 C320,70 360,160 440,90 C500,40 540,110 560,70','M60,130 C140,60 220,60 300,130 C380,200 460,200 540,130','M50,80 C130,150 200,40 280,120 C360,200 430,90 560,160'][itemIndex % 3]"
+                    fill="none" stroke="#2A55F5" stroke-width="4"
+                    stroke-dasharray="1000" stroke-dashoffset="1000"
+                    class="gr-route-path"
+                  ></path>
+                  <circle :cx="[560,540,560][itemIndex%3]" :cy="[70,130,160][itemIndex%3]" r="6" fill="#2A55F5"></circle>
+                </svg>
               </div>
 
-              <!-- Secondary stats -->
-              <div class="act-card-chips">
-                <span class="act-stat-chip" v-if="item.durationSeconds"><i class="bi bi-stopwatch me-1"></i>{{ formatDuration(item.durationSeconds) }}</span>
-                <span class="act-stat-chip" v-if="item.averageHeartRate"><i class="bi bi-heart me-1"></i>{{ item.averageHeartRate }} bpm</span>
-                <span class="act-stat-chip" v-if="item.elevationGain"><i class="bi bi-graph-up me-1"></i>{{ Math.round(item.elevationGain) }}m</span>
+              <!-- Reaction bar -->
+              <div class="gr-reaction-bar" @click.stop>
+                <button
+                  v-for="rxn in [{type:'LIKE',label:'♥ Like'},{type:'FIRE',label:'Fire'},{type:'CLAP',label:'Clap'}]"
+                  :key="rxn.type"
+                  :class="['gr-rxn-btn', { 'gr-rxn-btn--active': getActivityReaction(item.id) === rxn.type }]"
+                  @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
+                >{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)"> {{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
               </div>
-              <div class="act-card-footer">
-                <div class="act-reactions" @click.stop>
-                  <button
-                    v-for="rxn in [{type:'LIKE',label:'LIKE'},{type:'FIRE',label:'FIRE'},{type:'CLAP',label:'CLAP'}]"
-                    :key="rxn.type"
-                    :class="['act-rxn-btn', {active: getActivityReaction(item.id) === rxn.type}]"
-                    @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
-                  >
-                    {{ rxn.label }}<span class="rxn-count">{{ getActivityReactionCount(item.id, rxn.type) || '' }}</span>
-                  </button>
-                </div>
-                <span class="act-view-link">View Details <i class="bi bi-arrow-right"></i></span>
-              </div>
+
             </router-link>
           </template>
         </article>
@@ -802,8 +812,9 @@ onUnmounted(() => {
 .feed-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: #fff;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
 }
 
 /* Error banner */
@@ -812,25 +823,27 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #fff3cd;
-  border-bottom: 1px solid #ffc107;
-  font-size: 0.875rem;
+  background: #FFF3CD;
+  border-bottom: 2px solid #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: #856404;
+  color: #16130F;
 }
 .feed-error-retry {
   margin-left: auto;
   padding: 4px 12px;
-  border: 1px solid #856404;
+  border: 2px solid #16130F;
   background: transparent;
-  color: #856404;
-  font-size: 0.78rem;
+  color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.feed-error-retry:hover { background: rgba(133,100,4,0.1); }
+.feed-error-retry:hover { background: rgba(22,19,15,0.06); }
 
 /* Pull-to-refresh */
 .ptr-indicator {
@@ -852,8 +865,8 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 100;
-  background: #fff;
-  border-bottom: 1px solid #E5E5E5;
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
 }
 .feed-header-inner {
   max-width: 1000px;
@@ -864,23 +877,23 @@ onUnmounted(() => {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 12px 0 8px;
-  border-bottom: 1px solid #E5E5E5;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid #E7DFCE;
 }
 .feed-brand {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.16em;
-  color: #000;
+  color: #16130F;
   text-transform: uppercase;
 }
 .feed-date-text {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 500;
   letter-spacing: 0.10em;
-  color: #767676;
+  color: #5A5348;
   text-transform: uppercase;
 }
 .feed-controls {
@@ -890,69 +903,62 @@ onUnmounted(() => {
   gap: 16px;
   padding: 8px 0;
 }
-.feed-tabs {
-  display: flex;
-  gap: 0;
-}
+.feed-tabs { display: flex; gap: 0; }
 .feed-tab {
   padding: 8px 20px;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
 }
-.feed-tab:hover { color: #000; }
-.feed-tab.active { color: #000; border-bottom-color: #000; }
-.feed-actions {
-  display: flex;
-  gap: 8px;
-}
+.feed-tab:hover { color: #16130F; }
+.feed-tab.active { color: #2A55F5; border-bottom-color: #2A55F5; }
+.feed-actions { display: flex; gap: 8px; }
 .feed-action-btn {
   width: 36px;
   height: 36px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   background: #fff;
   font-size: 1rem;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: color 0.15s, border-color 0.15s;
-  font-family: inherit;
 }
-.feed-action-btn:hover { color: #0052FF; border-color: #0052FF; }
-.feed-action-btn.active { border-color: #0052FF; background: #0052FF; color: #fff; }
+.feed-action-btn:hover { color: #2A55F5; border-color: #2A55F5; }
+.feed-action-btn.active { border-color: #2A55F5; background: #2A55F5; color: #fff; }
 
 .feed-period-bar {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  border-top: 1px solid #E5E5E5;
+  border-top: 1px solid #E7DFCE;
 }
 .period-pill {
   padding: 4px 14px;
-  border: 1px solid #E5E5E5;
-  background: #fff;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  border: 2px solid #E7DFCE;
+  background: transparent;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.62rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.period-pill:hover { color: #000; border-color: #000; }
-.period-pill.active { background: #000; color: #fff; border-color: #000; }
+.period-pill:hover { color: #16130F; border-color: #16130F; }
+.period-pill.active { background: #16130F; color: #FBF6EC; border-color: #16130F; }
 
 .feed-container {
   max-width: 1000px;
@@ -967,36 +973,169 @@ onUnmounted(() => {
   justify-content: center;
   padding: 80px 20px;
   gap: 16px;
-  color: rgba(15,18,16,0.60);
+  color: #5A5348;
 }
-
 
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  gap: 20px;
 }
 
 .feed-card {
   background: #fff;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
   overflow: hidden;
   box-shadow: none;
   position: relative;
 }
 
-.feed-card:hover {
-  transform: none;
+.feed-card:hover { transform: none; }
+
+/* ── GR ACTIVITY CARD ── */
+.feed-card-activity { background: #fff; }
+
+.act-card {
+  display: block;
+  text-decoration: none;
+  color: #16130F;
+}
+.act-card:hover { text-decoration: none; background: rgba(22,19,15,0.01); }
+
+.gr-post-top { padding: 22px 24px 0; }
+
+.gr-post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.gr-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.76rem;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+}
+.gr-user-info { flex: 1; min-width: 0; }
+.gr-user-name { font-size: 0.92rem; font-weight: 800; color: #16130F; line-height: 1.2; }
+.gr-user-handle {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #8a8a8a;
+  margin-top: 1px;
+}
+.gr-timestamp {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Moment Cards */
+/* Stat row */
+.gr-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  margin-bottom: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.gr-stat-block { display: flex; flex-direction: column; }
+.gr-stat-block--div {
+  border-left: 2px solid #E7DFCE;
+  padding-left: 16px;
+  margin-left: 16px;
+}
+.gr-stat-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 0.9;
+  color: #16130F;
+}
+.gr-stat-lbl {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8a8a8a;
+  margin-top: 4px;
+}
+.gr-pace-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  margin-top: 6px;
+}
+
+/* Route map card */
+.gr-route-card {
+  width: 100%;
+  aspect-ratio: 16/7;
+  background: #EDE5D5;
+  border-top: 2px solid #16130F;
+  position: relative;
+  overflow: hidden;
+}
+.gr-route-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.gr-route-path {
+  animation: rkDraw 2.4s ease-out 0.15s forwards;
+}
+
+/* Reaction bar */
+.gr-reaction-bar {
+  display: flex;
+  border-top: 2px solid #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.gr-rxn-btn {
+  flex: 1;
+  text-align: center;
+  padding: 13px 0;
+  border: none;
+  border-right: 2px solid #16130F;
+  background: transparent;
+  color: #5A5348;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.gr-rxn-btn:last-child { border-right: none; }
+.gr-rxn-btn--active { background: #2A55F5; color: #fff; }
+.gr-rxn-btn:hover:not(.gr-rxn-btn--active) { background: rgba(42,85,245,0.06); color: #2A55F5; }
+
+/* ── MOMENT CARDS ── */
 .feed-card-moment .moment-image {
   position: relative;
   width: 100%;
   padding-top: 133%;
   overflow: hidden;
-  background: rgba(15,18,16,0.05);
+  background: #EDE5D5;
   cursor: pointer;
 }
 
@@ -1038,162 +1177,7 @@ onUnmounted(() => {
   font-size: 0.95rem;
 }
 
-/* Activity Cards — editorial */
-.act-card {
-  display: block;
-  padding: 20px;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
-.act-card:hover { text-decoration: none; background: #fafafa; }
-.act-card:active { background: #f0f0f0; }
-
-/* Sport thumbnail */
-.act-map-thumb {
-  height: 96px;
-  margin: -20px -20px 16px;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.route-art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.act-thumb-icon {
-  position: absolute;
-  bottom: 10px;
-  right: 14px;
-  font-size: 1.6rem;
-  line-height: 1;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
-}
-
-.act-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid #E5E5E5;
-}
-.act-view-link {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #000;
-  white-space: nowrap;
-}
-.act-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-.act-card-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.act-avatar {
-  width: 32px;
-  height: 32px;
-  background: #000;
-  color: #fff;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 900;
-  text-decoration: none;
-  flex-shrink: 0;
-}
-.act-name {
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #000;
-  text-decoration: none;
-  display: block;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-}
-.act-name:hover { color: #000; text-decoration: none; }
-.act-you {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: #767676;
-}
-.act-time {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: #767676;
-  margin-top: 2px;
-}
-.act-sport-icon {
-  font-size: 1.4rem;
-  line-height: 1;
-  opacity: 0.60;
-}
-.act-card-hero {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.act-dist {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 2rem;
-  font-weight: 600;
-  color: #000;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.act-chip {
-  font-size: 0.65rem;
-  font-weight: 900;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: #fff;
-  padding: 3px 8px;
-}
-.act-card-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.act-stat-chip {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: #767676;
-  background: #fff;
-  padding: 4px 10px;
-  border: 1px solid #E5E5E5;
-}
-
-.feed-workout-chip {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: white;
-}
+/* (old activity card styles removed — replaced by GR styles above) */
 
 /* Shared Card Info */
 .card-info {
@@ -1577,9 +1561,9 @@ onUnmounted(() => {
 }
 
 .reaction-btn.active {
-  background: #0052FF;
+  background: #2A55F5;
   color: white;
-  border-color: #0052FF;
+  border-color: #2A55F5;
   transform: scale(1.05);
 }
 
@@ -1911,37 +1895,5 @@ onUnmounted(() => {
   letter-spacing: 0.06em; margin: 0 0 20px;
 }
 
-.act-reactions {
-  display: flex;
-  gap: 0;
-  border: 1px solid #E5E5E5;
-}
-.act-rxn-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border: none;
-  border-right: 1px solid #E5E5E5;
-  border-bottom: 2px solid transparent;
-  background: none;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #767676;
-  cursor: pointer;
-  transition: color 0.15s, border-bottom-color 0.15s;
-}
-.act-rxn-btn:last-child { border-right: none; }
-.act-rxn-btn:hover { color: #000; }
-.act-rxn-btn.active { color: #000; border-bottom-color: #000; }
-.rxn-count {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.6rem;
-  font-weight: 500;
-  color: #767676;
-}
+/* (old reaction btn styles removed — replaced by gr-rxn-btn above) */
 </style>

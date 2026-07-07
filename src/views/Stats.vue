@@ -980,15 +980,17 @@ onUnmounted(() => {
 .stats-page {
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
-  background: #fff;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
 }
 
 /* ── HERO ───────────────────────────────────────── */
 .hero {
-  background: #000;
-  color: white;
+  background: #16130F;
+  color: #FBF6EC;
   padding: 48px 24px 44px;
+  border-bottom: 2px solid #16130F;
 }
 .hero-inner {
   max-width: 900px;
@@ -996,19 +998,22 @@ onUnmounted(() => {
   text-align: center;
 }
 .hero-kicker {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.22em;
-  color: rgba(255,255,255,0.45);
+  color: rgba(251,246,236,0.5);
   text-transform: uppercase;
   margin-bottom: 12px;
 }
 .hero-title {
-  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
   font-weight: 900;
+  text-transform: uppercase;
   margin: 0 0 28px;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  line-height: 0.88;
+  color: #FBF6EC;
 }
 
 /* 7-day dots */
@@ -1028,20 +1033,21 @@ onUnmounted(() => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(251,246,236,0.18);
+  border: 1px solid rgba(251,246,236,0.25);
   transition: background 0.2s;
 }
 .hero-dot-active {
-  background: #0052FF;
-  border-color: #0052FF;
-  box-shadow: 0 0 6px rgba(0,82,255,0.6);
+  background: #2A55F5;
+  border-color: #2A55F5;
+  box-shadow: 2px 2px 0 rgba(42,85,245,0.4);
 }
 .hero-dot-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.60rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: rgba(255,255,255,0.35);
+  color: rgba(251,246,236,0.4);
   text-transform: uppercase;
 }
 
@@ -1053,8 +1059,8 @@ onUnmounted(() => {
   flex-wrap: wrap;
 }
 .hero-chip {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(251,246,236,0.08);
+  border: 2px solid rgba(251,246,236,0.2);
   border-radius: 0;
   padding: 16px 28px;
   display: flex;
@@ -1064,12 +1070,15 @@ onUnmounted(() => {
   min-width: 120px;
 }
 .chip-val {
-  font-size: 1.5rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2rem;
   font-weight: 900;
-  color: white;
-  line-height: 1;
+  color: #FBF6EC;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
 }
 .chip-val-unit {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -1109,8 +1118,8 @@ onUnmounted(() => {
   position: sticky;
   top: var(--nav-h, 64px);
   z-index: 50;
-  background: #fff;
-  border-bottom: 1px solid #E5E5E5;
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
   -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
           mask-image: linear-gradient(to right, #000 85%, transparent 100%);
 }
@@ -1133,18 +1142,19 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  font-size: 0.72rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.15s, border-color 0.15s;
-  font-family: inherit;
+  margin-bottom: -2px;
 }
-.jumpnav-btn:hover { color: #000; }
-.jumpnav-btn.active { color: #000; border-bottom-color: #000; }
+.jumpnav-btn:hover { color: #16130F; }
+.jumpnav-btn.active { color: #2A55F5; border-bottom-color: #2A55F5; }
 
 /* ── SECTION SHARED ────────────────────────────── */
 .stats-content {
@@ -1161,45 +1171,47 @@ onUnmounted(() => {
   gap: 12px;
 }
 .section-kicker {
-  font-size: 0.68rem;
-  font-weight: 900;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(15,18,16,0.40);
+  color: #5A5348;
   display: block;
   padding-bottom: 12px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   width: 100%;
 }
 .section-title {
-  font-size: 1.1rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
   font-weight: 900;
-  color: rgba(15,18,16,0.85);
+  color: #16130F;
   margin: 0 0 20px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  line-height: 0.9;
 }
 .section-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.period-toggle { display: flex; border: 1px solid #E5E5E5; }
+.period-toggle { display: flex; border: 2px solid #16130F; }
 .period-btn {
   padding: 6px 14px;
-  font-size: 0.72rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: #fff;
+  background: #FBF6EC;
   border: none;
   cursor: pointer;
-  color: #767676;
+  color: #5A5348;
   transition: background 0.15s, color 0.15s;
-  font-family: inherit;
 }
-.period-btn + .period-btn { border-left: 1px solid #E5E5E5; }
-.period-btn.active { background: #000; color: #fff; }
+.period-btn + .period-btn { border-left: 2px solid #16130F; }
+.period-btn.active { background: #2A55F5; color: #fff; }
 
 /* ── RACE PREDICTIONS ──────────────────────────── */
 .race-pred-grid {
@@ -1209,7 +1221,7 @@ onUnmounted(() => {
   margin-bottom: 12px;
 }
 .race-pred-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 24px 20px 20px;
   display: flex;
   flex-direction: column;
@@ -1241,7 +1253,7 @@ onUnmounted(() => {
 
 /* ── FITNESS ───────────────────────────────────── */
 .fitness-chart-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 24px;
   margin-bottom: 16px;
 }
@@ -1291,7 +1303,7 @@ onUnmounted(() => {
   height: 100% !important;
 }
 .fitness-empty-note {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 20px 24px;
   font-size: 0.80rem;
   color: #767676;
@@ -1303,7 +1315,7 @@ onUnmounted(() => {
   gap: 16px;
 }
 .fitness-metric-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 20px 18px 16px;
   display: flex;
   flex-direction: column;
@@ -1345,7 +1357,7 @@ onUnmounted(() => {
 /* ── TRAINING LOG HEATMAP ──────────────────────── */
 .heatmap-card {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 20px 20px 16px;
 }
 .heatmap-scroll { overflow-x: auto; padding-bottom: 4px; }
@@ -1404,7 +1416,7 @@ onUnmounted(() => {
 }
 .insight-card {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 20px 18px 18px;
   display: flex;
   flex-direction: column;
@@ -1508,7 +1520,7 @@ onUnmounted(() => {
   color: #767676;
   margin-bottom: 2px;
 }
-.pr-card.pr-card-set .pr-icon-wrap { background: #000; color: white; }
+.pr-card.pr-card-set .pr-icon-wrap { background: #2A55F5; color: white; }
 .pr-label  { font-weight: 900; font-size: 0.88rem; color: rgba(15,18,16,0.85); line-height: 1.25; }
 .pr-value  { font-size: 1.25rem; font-weight: 900; color: #000; }
 .pr-link   { font-size: 0.75rem; font-weight: 700; color: #767676; text-decoration: none; }
@@ -1518,7 +1530,7 @@ onUnmounted(() => {
 /* ── CHART CARDS ───────────────────────────────── */
 .chart-card {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 24px;
   height: 280px;
@@ -1542,7 +1554,7 @@ onUnmounted(() => {
 }
 .legend-list {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -1563,7 +1575,7 @@ onUnmounted(() => {
 }
 .milestone-card {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 28px 16px 22px;
   display: flex;
@@ -1580,7 +1592,7 @@ onUnmounted(() => {
 .archetype-card {
   display: grid;
   grid-template-columns: 200px 1fr;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
 }
 .arch-card-left {
   padding: 28px 24px;

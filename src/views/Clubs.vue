@@ -2,59 +2,59 @@
 <template>
   <main class="clubs-page">
     <!-- HERO -->
-    <section class="hero">
-      <div class="container-xxl">
-        <h1 class="display-5 fw-bold mb-3">Clubs</h1>
-        <p class="lead mb-0">
-          Connect with athletes who share your passions. Join a club and train together.
-        </p>
+    <section class="gr-clubs-hero">
+      <div class="gr-clubs-hero-inner">
+        <div>
+          <h1 class="gr-clubs-headline">Find your crew.</h1>
+          <p class="gr-clubs-sub">Or start trouble.</p>
+        </div>
+        <button class="gr-create-pill" @click="createModalOpen = true">＋ Create Club</button>
       </div>
     </section>
 
     <!-- TAB BAR -->
-    <section class="controls">
-      <div class="container-xxl">
+    <section class="gr-controls">
+      <div class="gr-controls-inner">
         <!-- Tabs -->
-        <div class="tab-bar mb-4">
+        <div class="gr-tab-bar">
           <button
-            class="tab-btn"
+            class="gr-tab-btn"
             :class="{ active: activeTab === 'discover' }"
             @click="activeTab = 'discover'"
           >
-            <i class="bi bi-compass me-2"></i>Discover
+            Discover
           </button>
           <button
-            class="tab-btn"
+            class="gr-tab-btn"
             :class="{ active: activeTab === 'my' }"
             @click="activeTab = 'my'"
           >
-            <i class="bi bi-people-fill me-2"></i>My Clubs
-            <span v-if="myClubs.length" class="tab-badge">{{ myClubs.length }}</span>
+            My Clubs<span v-if="myClubs.length" class="gr-tab-badge">{{ myClubs.length }}</span>
           </button>
           <button
-            class="tab-btn"
+            class="gr-tab-btn"
             :class="{ active: activeTab === 'invite' }"
             @click="activeTab = 'invite'"
           >
-            <i class="bi bi-link-45deg me-2"></i>Invite Links
+            Invite Links
           </button>
           <button
-            class="tab-btn"
+            class="gr-tab-btn"
             :class="{ active: activeTab === 'map' }"
             @click="activeTab = 'map'; loadMapClubs()"
           >
-            <i class="bi bi-map me-2"></i>Map
+            Map
           </button>
         </div>
 
         <!-- Filters (only on Discover tab) -->
-        <div v-if="activeTab === 'discover'" class="filter-bar">
+        <div v-if="activeTab === 'discover'" class="gr-filter-bar">
           <!-- Sport Pills -->
-          <div class="sport-pills">
+          <div class="gr-sport-pills">
             <button
               v-for="s in ['All', ...sports]"
               :key="s"
-              class="sport-pill"
+              class="gr-sport-pill"
               :class="{ active: sport === s }"
               @click="sport = s"
             >
@@ -63,12 +63,12 @@
           </div>
 
           <!-- Search & Sort -->
-          <div class="search-sort">
-            <div class="search-box">
+          <div class="gr-search-sort">
+            <div class="gr-search-box">
               <i class="bi bi-search"></i>
-              <input v-model.trim="q" class="form-control" placeholder="Search clubs…" />
+              <input v-model.trim="q" class="gr-search-input" placeholder="Search clubs…" />
             </div>
-            <select v-model="sortBy" class="form-select sort-select">
+            <select v-model="sortBy" class="gr-sort-select">
               <option value="popular">Most popular</option>
               <option value="new">Newest</option>
             </select>
@@ -84,118 +84,92 @@
     </div>
 
     <!-- DISCOVER TAB -->
-    <section v-else-if="activeTab === 'discover'" class="list">
-      <div class="container-xxl">
-        <div class="row g-4">
-          <div
-            class="col-12 col-sm-6 col-lg-4"
-            v-for="club in filtered"
+    <section v-else-if="activeTab === 'discover'" class="gr-list">
+      <div class="gr-list-inner">
+        <div class="gr-clubs-grid">
+          <article
+            class="gr-club-card"
+            v-for="(club, ci) in filtered"
             :key="club.id"
           >
-            <article class="club-card h-100">
-              <div
-                class="thumb"
-                :style="{ backgroundImage: club.imageUrl ? `url(${club.imageUrl})` : 'none' }"
+            <div class="gr-club-card-top">
+              <div class="gr-club-mono" :style="{ background: ci === 0 ? '#2A55F5' : '#16130F', color: '#fff' }">
+                {{ (club.name||'?').slice(0,2).toUpperCase() }}
+              </div>
+              <div class="gr-club-meta">
+                <div class="gr-club-name">{{ club.name }}</div>
+                <div class="gr-club-sub">{{ club.city ? club.city + ' · ' : '' }}{{ formatK(club.memberCount ?? club.members ?? 0) }} members</div>
+              </div>
+            </div>
+            <p class="gr-club-desc">{{ club.description }}</p>
+            <div class="gr-club-actions">
+              <button
+                v-if="!isJoined(club.id)"
+                class="gr-btn-join"
+                :disabled="joiningId === club.id"
+                @click="joinClub(club.id)"
               >
-                <span class="sport-tag">{{ club.sport || 'General' }}</span>
-              </div>
-              <div class="body">
-                <h5 class="title mb-1">{{ club.name }}</h5>
-                <p class="text-muted small mb-2">
-                  <i class="bi bi-people-fill me-1"></i>{{ formatK(club.memberCount ?? club.members ?? 0) }} members
-                </p>
-                <p class="small mb-3 flex-grow-1">{{ club.description }}</p>
-                <div class="d-flex gap-2 align-items-center mt-auto">
-                  <button
-                    v-if="!isJoined(club.id)"
-                    class="btn-join"
-                    :disabled="joiningId === club.id"
-                    @click="joinClub(club.id)"
-                  >
-                    <span v-if="joiningId === club.id" class="spinner-border spinner-border-sm me-1"></span>
-                    Join
-                  </button>
-                  <template v-else>
-                    <button class="chat-btn" @click="openChat(club)">
-                      <i class="bi bi-chat-dots-fill me-1"></i>Chat
-                    </button>
-                    <button
-                      class="btn-leave"
-                      :disabled="joiningId === club.id"
-                      @click="leaveClub(club.id)"
-                    >
-                      <span v-if="joiningId === club.id" class="spinner-border spinner-border-sm me-1"></span>
-                      Leave
-                    </button>
-                  </template>
-                </div>
-              </div>
-            </article>
-          </div>
+                <span v-if="joiningId === club.id" class="spinner-border spinner-border-sm me-1"></span>
+                <template v-else>Join</template>
+              </button>
+              <template v-else>
+                <button class="gr-btn-chat" @click="openChat(club)">Chat</button>
+                <button class="gr-btn-leave" :disabled="joiningId === club.id" @click="leaveClub(club.id)">
+                  <span v-if="joiningId === club.id" class="spinner-border spinner-border-sm"></span>
+                  <template v-else>Leave</template>
+                </button>
+              </template>
+            </div>
+          </article>
 
           <!-- Empty -->
-          <div class="col-12" v-if="filtered.length === 0">
-            <div class="empty">
-              <i class="bi bi-search display-4 text-muted d-block mb-3"></i>
-              <h5 class="mb-1">No clubs found</h5>
-              <p class="text-muted m-0">Try another sport or search term.</p>
-            </div>
+          <div class="gr-clubs-empty" v-if="filtered.length === 0">
+            <i class="bi bi-search"></i>
+            <h5>No clubs found</h5>
+            <p>Try another sport or search term.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- MY CLUBS TAB -->
-    <section v-else-if="activeTab === 'my'" class="list">
-      <div class="container-xxl">
-        <div v-if="myClubs.length === 0" class="empty">
-          <i class="bi bi-people display-4 text-muted d-block mb-3"></i>
-          <h5 class="mb-1">You haven't joined any clubs yet</h5>
-          <p class="text-muted mb-3">Head to Discover to find clubs that match your sport.</p>
-          <button class="btn-join" @click="activeTab = 'discover'">Discover Clubs</button>
+    <section v-else-if="activeTab === 'my'" class="gr-list">
+      <div class="gr-list-inner">
+        <div v-if="myClubs.length === 0" class="gr-clubs-empty">
+          <i class="bi bi-people"></i>
+          <h5>No clubs yet</h5>
+          <p>Head to Discover to find clubs that match your sport.</p>
+          <button class="gr-btn-join" @click="activeTab = 'discover'">Discover Clubs</button>
         </div>
-        <div v-else class="row g-4">
-          <div
-            class="col-12 col-sm-6 col-lg-4"
-            v-for="club in myClubs"
+        <div v-else class="gr-clubs-grid">
+          <article
+            class="gr-club-card"
+            v-for="(club, ci) in myClubs"
             :key="club.id"
           >
-            <article class="club-card h-100">
-              <div
-                class="thumb"
-                :style="{ backgroundImage: club.imageUrl ? `url(${club.imageUrl})` : 'none' }"
-              >
-                <span class="sport-tag">{{ club.sport || 'General' }}</span>
+            <div class="gr-club-card-top">
+              <div class="gr-club-mono" :style="{ background: ci === 0 ? '#2A55F5' : '#16130F', color: '#fff' }">
+                {{ (club.name||'?').slice(0,2).toUpperCase() }}
               </div>
-              <div class="body">
-                <h5 class="title mb-1">{{ club.name }}</h5>
-                <p class="text-muted small mb-2">
-                  <i class="bi bi-people-fill me-1"></i>{{ formatK(club.memberCount ?? club.members ?? 0) }} members
-                  <span v-if="club.city" class="ms-2"><i class="bi bi-geo-alt me-1"></i>{{ club.city }}</span>
-                </p>
-                <p class="small mb-3 flex-grow-1">{{ club.description }}</p>
-                <!-- Set Location for owners -->
-                <div v-if="isOwner(club) && !club.latitude" class="mb-2">
-                  <button class="btn-set-location" @click="openSetLocation(club)">
-                    <i class="bi bi-geo-alt-fill me-1"></i>Set Location
-                  </button>
-                </div>
-                <div class="d-flex gap-2 align-items-center mt-auto">
-                  <button class="chat-btn flex-grow-1" @click="openChat(club)">
-                    <i class="bi bi-chat-dots-fill me-1"></i>Open Chat
-                  </button>
-                  <button
-                    class="btn-leave"
-                    :disabled="joiningId === club.id"
-                    @click="leaveClub(club.id)"
-                  >
-                    <span v-if="joiningId === club.id" class="spinner-border spinner-border-sm me-1"></span>
-                    Leave
-                  </button>
-                </div>
+              <div class="gr-club-meta">
+                <div class="gr-club-name">{{ club.name }}</div>
+                <div class="gr-club-sub">{{ club.city ? club.city + ' · ' : '' }}{{ formatK(club.memberCount ?? club.members ?? 0) }} members</div>
               </div>
-            </article>
-          </div>
+            </div>
+            <p class="gr-club-desc">{{ club.description }}</p>
+            <div class="gr-club-actions">
+              <div v-if="isOwner(club) && !club.latitude">
+                <button class="gr-btn-join" style="background:transparent;color:#16130F;" @click="openSetLocation(club)">
+                  Set Location
+                </button>
+              </div>
+              <button class="gr-btn-chat" style="flex:1" @click="openChat(club)">Open Chat</button>
+              <button class="gr-btn-leave" :disabled="joiningId === club.id" @click="leaveClub(club.id)">
+                <span v-if="joiningId === club.id" class="spinner-border spinner-border-sm"></span>
+                <template v-else>Leave</template>
+              </button>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -882,286 +856,343 @@ onMounted(() => {
 <style scoped>
 /* ===== Design Tokens ===== */
 .clubs-page {
-  font-family: Futura, "Avenir Next", system-ui, -apple-system, sans-serif;
-  background: #fff;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  background: #FBF6EC;
+  color: #16130F;
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
 }
 
-/* ===== HERO ===== */
-.hero {
-  background: #000;
-  color: white;
-  padding: 80px 0 60px;
+/* ===== GR HERO ===== */
+.gr-clubs-hero {
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
+  padding: 56px 0 48px;
 }
-
-.hero h1 {
-  color: white;
-  font-size: clamp(2.4rem, 5vw, 3.75rem);
+.gr-clubs-hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.gr-clubs-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(3rem, 7vw, 5rem);
   font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 0.96;
+  line-height: 0.85;
+  text-transform: uppercase;
+  color: #16130F;
+  margin: 0;
+  animation: rkRise 0.6s ease-out both;
 }
-
-.hero .lead {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1rem;
-  font-weight: 400;
-  max-width: 500px;
-  line-height: 1.6;
+.gr-clubs-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #5A5348;
+  margin: 12px 0 0;
 }
+.gr-create-pill {
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 #16130F;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.gr-create-pill:hover { background: #1E42D6; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #16130F; }
 
-/* ===== CONTROLS ===== */
-.controls {
-  background: white;
-  padding: 24px 0;
-  border-bottom: 1px solid #E5E7EB;
+/* ===== GR CONTROLS ===== */
+.gr-controls {
+  background: #FBF6EC;
+  padding: 0;
+  border-bottom: 2px solid #16130F;
   position: sticky;
   top: var(--nav-h, 64px);
   z-index: 100;
 }
-
-/* ===== TAB BAR ===== */
-.tab-bar {
-  display: flex;
-  gap: 4px;
-  border-bottom: 2px solid #E5E7EB;
-  padding-bottom: 0;
+.gr-controls-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 
-.tab-btn {
-  position: relative;
+/* ===== GR TAB BAR ===== */
+.gr-tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #16130F;
+  margin-bottom: 0;
+}
+.gr-tab-btn {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
+  padding: 14px 20px;
   border: none;
   background: transparent;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
   transition: color 0.15s, border-color 0.15s;
 }
-
-.tab-btn:hover { color: #000; }
-
-.tab-btn.active {
-  color: #000;
-  border-bottom-color: #000;
-}
-
-.tab-badge {
+.gr-tab-btn:hover { color: #16130F; }
+.gr-tab-btn.active { color: #2A55F5; border-bottom-color: #2A55F5; }
+.gr-tab-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 16px;
   min-width: 16px;
   padding: 0 4px;
-  background: #000;
+  background: #2A55F5;
   color: white;
   border-radius: 0;
   font-size: 0.55rem;
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   margin-left: 6px;
 }
 
-.filter-bar {
+.gr-filter-bar {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 16px 0;
 }
 
-/* Sport Pills */
-.sport-pills {
+/* GR Sport Pills (filter tabs) */
+.gr-sport-pills {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
-
-.sport-pill {
-  padding: 6px 16px;
+.gr-sport-pill {
+  padding: 5px 14px;
   border: none;
   border-bottom: 2px solid transparent;
   border-radius: 0;
   background: transparent;
-  color: #767676;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-weight: 600;
-  font-size: 0.68rem;
+  color: #5A5348;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.64rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
 }
+.gr-sport-pill:hover { color: #16130F; }
+.gr-sport-pill.active { color: #2A55F5; border-bottom-color: #2A55F5; }
 
-.sport-pill:hover { color: #000; }
-
-.sport-pill.active {
-  color: #000;
-  border-bottom-color: #000;
-}
-
-/* Search & Sort */
-.search-sort {
+/* GR Search & Sort */
+.gr-search-sort {
   display: flex;
   gap: 12px;
   align-items: center;
 }
-
-.search-box {
+.gr-search-box {
   position: relative;
   flex: 1;
   max-width: 400px;
 }
-
-.search-box i {
+.gr-search-box i {
   position: absolute;
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #9CA3AF;
+  color: #5A5348;
   font-size: 16px;
 }
-
-.search-box .form-control {
+.gr-search-input {
   height: 44px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
-  padding-left: 40px;
-  font-family: inherit;
-  font-size: 15px;
-}
-
-.search-box .form-control:focus {
+  padding-left: 42px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.9rem;
+  background: #FBF6EC;
+  color: #16130F;
   outline: none;
-  border-color: #767676;
-  box-shadow: none;
+  width: 100%;
+  transition: border-color 0.15s;
 }
-
-.sort-select {
+.gr-search-input:focus { border-color: #2A55F5; }
+.gr-search-input::placeholder { color: #5A5348; }
+.gr-sort-select {
   width: auto;
   min-width: 160px;
   height: 44px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.sort-select:focus {
-  border-color: #767676;
-  box-shadow: none;
-}
-
-/* ===== CLUB CARDS ===== */
-.list {
-  padding: 40px 0 60px;
-}
-
-.club-card {
-  border: 1px solid #E5E5E5;
-  border-radius: 0;
-  overflow: hidden;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-}
-
-.club-card:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: #D1D5DB;
-}
-
-.club-card .thumb {
-  position: relative;
-  height: 180px;
-  background: #000 center/cover no-repeat;
-}
-
-.sport-tag {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 0;
-}
-
-.club-card .body {
-  padding: 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.club-card .title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #000;
-}
-
-/* Buttons */
-.btn-join {
-  padding: 10px 18px;
-  border: 2px solid #0052FF;
-  border-radius: 0;
-  background: #0052FF;
-  color: white;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
   font-weight: 600;
-  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  background: #FBF6EC;
+  color: #16130F;
+  padding: 0 12px;
+}
+.gr-sort-select:focus { outline: none; border-color: #2A55F5; }
+
+/* ===== GR CLUB CARDS ===== */
+.gr-list {
+  padding: 40px 0 80px;
+}
+.gr-list-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.gr-clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border: 2px solid #16130F;
+}
+.gr-club-card {
+  border-right: 2px solid #16130F;
+  border-bottom: 2px solid #16130F;
+  padding: 24px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gr-club-card:nth-child(2n) { border-right: none; }
+.gr-club-card:nth-last-child(-n+2):nth-child(odd),
+.gr-club-card:last-child { border-bottom: none; }
+.gr-club-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.gr-club-mono {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 2px solid #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.gr-club-meta { flex: 1; min-width: 0; }
+.gr-club-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.95;
+  color: #16130F;
+}
+.gr-club-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: #5A5348;
+  margin-top: 5px;
+}
+.gr-club-desc {
+  font-size: 0.88rem;
+  color: #5A5348;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+.gr-club-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* GR club action buttons */
+.gr-btn-join {
+  background: transparent;
+  color: #16130F;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
-
-.btn-join:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
-.btn-join:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.btn-leave {
-  padding: 10px 14px;
-  border: 1px solid #E5E5E5;
-  border-radius: 0;
-  background: white;
-  color: #767676;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-weight: 600;
+.gr-btn-join:hover:not(:disabled) { background: #16130F; color: #FBF6EC; }
+.gr-btn-join:disabled { opacity: 0.6; cursor: not-allowed; }
+.gr-btn-chat {
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gr-btn-chat:hover { background: #1E42D6; }
+.gr-btn-leave {
+  background: transparent;
+  color: #5A5348;
+  border: 2px solid #E7DFCE;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
-  white-space: nowrap;
 }
+.gr-btn-leave:hover:not(:disabled) { border-color: #dc2626; color: #dc2626; }
+.gr-btn-leave:disabled { opacity: 0.6; cursor: not-allowed; }
+.gr-clubs-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 64px 24px;
+  color: #5A5348;
+}
+.gr-clubs-empty i { font-size: 3rem; margin-bottom: 16px; display: block; }
+.gr-clubs-empty h5 { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.5rem; font-weight: 800; text-transform: uppercase; color: #16130F; margin-bottom: 8px; }
+.gr-clubs-empty p { font-size: 0.9rem; }
 
-.btn-leave:hover:not(:disabled) { border-color: #dc2626; color: #dc2626; }
-.btn-leave:disabled { opacity: 0.6; cursor: not-allowed; }
-
-/* Chat button on cards */
+/* Legacy chat-btn (chat drawer open button) */
 .chat-btn {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
   border: none;
   border-radius: 0;
-  background: #000;
+  background: #2A55F5;
   color: white;
   font-family: inherit;
   font-weight: 600;
