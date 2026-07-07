@@ -145,7 +145,12 @@
           aria-label="Open navigation menu"
           aria-controls="mobile-drawer"
         >
-          <i :class="mobileMenuOpen ? 'bi bi-x-lg' : 'bi bi-list'" aria-hidden="true"></i>
+          <i v-if="mobileMenuOpen" class="bi bi-x-lg" aria-hidden="true"></i>
+          <div v-else class="hamburger-bars" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </button>
 
       </div>
@@ -1022,14 +1027,28 @@ onUnmounted(() => {
   border: none;
   background: transparent;
   border-radius: 0;
-  color: #000;
+  color: #16130F;
   font-size: 1.2rem;
   cursor: pointer;
   align-items: center;
   justify-content: center;
   transition: opacity 0.15s;
+  flex-shrink: 0;
 }
 .mobile-menu-toggle:hover { opacity: 0.7; }
+
+/* 3-bar ink hamburger icon (Good Record spec: 22px wide, 3×2px bars, gap 4px) */
+.hamburger-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 22px;
+}
+.hamburger-bars span {
+  display: block;
+  height: 2px;
+  background: #16130F;
+}
 
 .me-2 { margin-right: 8px; }
 .spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(0,0,0,0.10); border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
