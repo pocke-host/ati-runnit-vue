@@ -10,39 +10,24 @@
     <!-- Editorial Header + Tabs -->
     <div class="feed-header-bar">
       <div class="feed-header-inner">
-        <div class="feed-dateline">
-          <span class="feed-brand">RUNNIT FEED</span>
-          <span class="feed-date-text">{{ feedDateline }}</span>
+        <div class="feed-headline-row">
+          <div>
+            <h1 class="feed-title">The Feed</h1>
+            <div class="feed-subline">What your crew's been up to.</div>
+          </div>
+          <div class="feed-date-text">{{ feedDateline }}</div>
         </div>
-        <div class="feed-controls">
+        <div class="feed-controls-bar">
           <div class="feed-tabs">
             <button :class="['feed-tab', {active: activeTab === 'all'}]"      @click="activeTab = 'all'">All</button>
             <button :class="['feed-tab', {active: activeTab === 'following'}]" @click="activeTab = 'following'">Following</button>
             <button :class="['feed-tab', {active: activeTab === 'mine'}]"      @click="activeTab = 'mine'">Mine</button>
           </div>
-          <div class="feed-actions">
-            <button
-              class="feed-action-btn"
-              @click="showCreateEvent = true"
-              title="Create multisport event"
-            ><i class="bi bi-collection-play"></i></button>
-            <button
-              :class="['feed-action-btn', {active: sortOrder === 'newest'}]"
-              @click="sortOrder = 'newest'"
-              title="Newest"
-            ><i class="bi bi-clock"></i></button>
-            <button
-              :class="['feed-action-btn', {active: sortOrder === 'popular'}]"
-              @click="sortOrder = 'popular'"
-              title="Popular"
-            ><i class="bi bi-fire"></i></button>
+          <div class="feed-time-chips">
+            <button :class="['time-chip', {active: timePeriod === 'all'}]"   @click="timePeriod = 'all'">All Time</button>
+            <button :class="['time-chip', {active: timePeriod === 'month'}]" @click="timePeriod = 'month'">Month</button>
+            <button :class="['time-chip', {active: timePeriod === 'week'}]"  @click="timePeriod = 'week'">Week</button>
           </div>
-        </div>
-        <div class="feed-period-bar">
-          <button :class="['period-pill', {active: timePeriod === 'week'}]"  @click="timePeriod = 'week'">Past Week</button>
-          <button :class="['period-pill', {active: timePeriod === 'month'}]" @click="timePeriod = 'month'">Past Month</button>
-          <button :class="['period-pill', {active: timePeriod === 'year'}]"  @click="timePeriod = 'year'">Past Year</button>
-          <button :class="['period-pill', {active: timePeriod === 'all'}]"   @click="timePeriod = 'all'">All Time</button>
         </div>
       </div>
     </div>
@@ -142,6 +127,7 @@
                     <div class="gr-user-name">{{ item.user?.displayName }}</div>
                     <div class="gr-user-handle">@{{ item.user?.handle || (item.user?.displayName||'').toLowerCase().replace(/\s+/g,'') }}</div>
                   </div>
+                  <span class="gr-sport-tag" :class="(item.sportType === 'RUN' || item.sportType === 'BIKE') ? 'gr-sport-tag--cobalt' : 'gr-sport-tag--outline'">{{ item.sportType === 'RUN' ? 'Run' : item.sportType === 'BIKE' ? 'Bike' : item.sportType === 'WALK' ? 'Walk' : item.sportType === 'SWIM' ? 'Swim' : item.sportType || 'Activity' }}</span>
                   <div class="gr-timestamp">{{ formatTime(item.createdAt) }}</div>
                 </div>
 
@@ -167,14 +153,20 @@
               <!-- Route map card -->
               <div class="gr-route-card">
                 <svg viewBox="0 0 600 260" preserveAspectRatio="none" class="gr-route-svg">
+                  <g stroke="#dcd3c1" stroke-width="1" fill="none">
+                    <path d="M0,65 H600"/><path d="M0,130 H600"/><path d="M0,195 H600"/>
+                    <path d="M150,0 V260"/><path d="M300,0 V260"/><path d="M450,0 V260"/>
+                  </g>
                   <path
                     :d="['M40,200 C120,120 160,210 240,140 C320,70 360,160 440,90 C500,40 540,110 560,70','M60,130 C140,60 220,60 300,130 C380,200 460,200 540,130','M50,80 C130,150 200,40 280,120 C360,200 430,90 560,160'][itemIndex % 3]"
                     fill="none" stroke="#2A55F5" stroke-width="4"
                     stroke-dasharray="1000" stroke-dashoffset="1000"
                     class="gr-route-path"
                   ></path>
+                  <circle :cx="[40,60,50][itemIndex%3]" :cy="[200,130,80][itemIndex%3]" r="5" fill="#fff" stroke="#2A55F5" stroke-width="3"></circle>
                   <circle :cx="[560,540,560][itemIndex%3]" :cy="[70,130,160][itemIndex%3]" r="6" fill="#2A55F5"></circle>
                 </svg>
+                <span v-if="item.name" class="gr-route-name-chip">{{ item.name }}</span>
               </div>
 
               <!-- Reaction bar -->
@@ -861,7 +853,7 @@ onUnmounted(() => {
 /* ── HEADER BAR ── */
 .feed-header-bar {
   position: fixed;
-  top: var(--nav-h, 64px);
+  top: var(--nav-h, 66px);
   left: 0;
   right: 0;
   z-index: 100;
@@ -869,101 +861,100 @@ onUnmounted(() => {
   border-bottom: 2px solid #16130F;
 }
 .feed-header-inner {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
 }
-.feed-dateline {
+.feed-headline-row {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
-  padding: 10px 0 8px;
-  border-bottom: 1px solid #E7DFCE;
+  padding: 20px 0 14px;
 }
-.feed-brand {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  color: #16130F;
+.feed-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 3rem;
+  line-height: 0.82;
   text-transform: uppercase;
+  color: #16130F;
+  margin: 0;
+}
+.feed-subline {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #8a8a8a;
+  margin-top: 8px;
 }
 .feed-date-text {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.10em;
-  color: #5A5348;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #8a8a8a;
   text-transform: uppercase;
+  white-space: nowrap;
 }
-.feed-controls {
+.feed-controls-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 8px 0;
+  border-top: 2px solid #16130F;
 }
 .feed-tabs { display: flex; gap: 0; }
 .feed-tab {
-  padding: 8px 20px;
+  position: relative;
+  padding: 12px 0;
+  margin-right: 26px;
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #5A5348;
+  color: #8a8a8a;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 .feed-tab:hover { color: #16130F; }
-.feed-tab.active { color: #2A55F5; border-bottom-color: #2A55F5; }
-.feed-actions { display: flex; gap: 8px; }
-.feed-action-btn {
-  width: 36px;
-  height: 36px;
-  border: 2px solid #E7DFCE;
-  background: #fff;
-  font-size: 1rem;
-  color: #5A5348;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.15s, border-color 0.15s;
+.feed-tab.active { color: #16130F; }
+.feed-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 3px;
+  background: #2A55F5;
 }
-.feed-action-btn:hover { color: #2A55F5; border-color: #2A55F5; }
-.feed-action-btn.active { border-color: #2A55F5; background: #2A55F5; color: #fff; }
-
-.feed-period-bar {
+.feed-time-chips {
   display: flex;
-  align-items: center;
   gap: 8px;
-  padding: 8px 0;
-  border-top: 1px solid #E7DFCE;
+  padding: 10px 0;
 }
-.period-pill {
-  padding: 4px 14px;
-  border: 2px solid #E7DFCE;
-  background: transparent;
+.time-chip {
+  padding: 7px 13px;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #5a5348;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5A5348;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
-.period-pill:hover { color: #16130F; border-color: #16130F; }
-.period-pill.active { background: #16130F; color: #FBF6EC; border-color: #16130F; }
+.time-chip:hover { color: #16130F; }
+.time-chip.active { background: #16130F; color: #FBF6EC; }
 
 .feed-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 182px 24px 60px;
+  padding: 196px 32px 60px;
 }
 
 .feed-loading {
@@ -978,7 +969,7 @@ onUnmounted(() => {
 
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
@@ -1097,6 +1088,35 @@ onUnmounted(() => {
 }
 .gr-route-path {
   animation: rkDraw 2.4s ease-out 0.15s forwards;
+}
+
+/* Sport tag chip */
+.gr-sport-tag {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border: 1.5px solid;
+  flex-shrink: 0;
+}
+.gr-sport-tag--cobalt { background: #EEF1FF; color: #2A55F5; border-color: #2A55F5; }
+.gr-sport-tag--outline { background: #FBF6EC; color: #5a5348; border-color: #16130F; }
+
+/* Route name chip */
+.gr-route-name-chip {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  background: #16130F;
+  color: #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 9px;
 }
 
 /* Reaction bar */
@@ -1802,9 +1822,12 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .feed-header-inner { padding: 0 12px; }
-  .feed-container { padding-top: 168px; padding-left: 12px; padding-right: 12px; }
-  .feed-tabs { gap: 6px; padding: 0 12px; }
+  .feed-header-inner { padding: 0 16px; }
+  .feed-container { padding-top: 180px; padding-left: 16px; padding-right: 16px; }
+  .feed-tabs { gap: 0; }
+  .feed-title { font-size: 2rem; }
+  .feed-headline-row { padding: 14px 0 10px; }
+  .feed-grid { grid-template-columns: 1fr; }
 
   /* 44px minimum touch target for tabs */
   .feed-tab { min-height: 44px; padding: 12px 16px; font-size: 0.82rem; }

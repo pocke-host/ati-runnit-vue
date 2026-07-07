@@ -26,7 +26,7 @@
       <header class="dash-greeting">
         <div class="greeting-left">
           <div class="greeting-dateline">{{ todayLine }}</div>
-          <h1 class="greeting-headline">{{ greeting }}, {{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}</h1>
+          <h1 class="greeting-headline">{{ greeting }}, <span class="greeting-name-cobalt">{{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}</span></h1>
         </div>
         <div class="greeting-right">
           <div class="training-block-badge" :style="{ borderColor: trainingBlock.color, color: trainingBlock.color }">
@@ -284,13 +284,13 @@
                 </div>
                 <div class="dash-insight-item">
                   <span class="dash-insight-key">Form</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#0052FF' : dashInsights.formScore > -5 ? '#767676' : '#ef4444' }">
+                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#2A55F5' : dashInsights.formScore > -5 ? '#767676' : '#ef4444' }">
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
                 <div class="dash-insight-item" v-if="dashInsights.acwr !== null">
                   <span class="dash-insight-key">ACWR</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#0052FF' : dashInsights.acwr < 1.5 ? '#767676' : '#ef4444' }">
+                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#2A55F5' : dashInsights.acwr < 1.5 ? '#767676' : '#ef4444' }">
                     {{ dashInsights.acwr }}
                   </span>
                 </div>
@@ -1671,7 +1671,7 @@ onUnmounted(() => {
 }
 .ptr-spinner {
   font-size: 1.4rem;
-  color: #0052FF;
+  color: #2A55F5;
   transition: transform 0.2s ease;
 }
 .ptr-spinner.spinning i {
@@ -1695,7 +1695,7 @@ onUnmounted(() => {
 .streak-banner-text { flex: 1; min-width: 180px; line-height: 1.4; }
 .streak-banner-cta {
   padding: 6px 14px;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1705,7 +1705,7 @@ onUnmounted(() => {
   white-space: nowrap;
   flex-shrink: 0;
 }
-.streak-banner-cta:hover { background: #003ECC; color: #fff; }
+.streak-banner-cta:hover { background: #1E42D6; color: #fff; }
 
 /* ── Activity skeleton list ── */
 .sk-activity-list {
@@ -1899,7 +1899,7 @@ onUnmounted(() => {
 }
 
 /* Keep all other existing styles */
-.dash{min-height:100vh;padding-top:var(--nav-h,64px);background:#FBF6EC;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#16130F}
+.dash{min-height:100vh;padding-top:var(--nav-h,66px);background:#FBF6EC;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#16130F}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:rgba(15,18,16,0.70)}
 .dash-loader{width:32px;height:32px;border:2px solid rgba(15,18,16,0.10);border-top-color:#2A55F5;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -1908,8 +1908,9 @@ onUnmounted(() => {
 .greeting-left{flex:1;min-width:0}
 .greeting-dateline{font-size:0.68rem;font-weight:700;letter-spacing:0.20em;color:rgba(15,18,16,0.40);text-transform:uppercase;margin-bottom:8px}
 .greeting-headline{font-family:'Big Shoulders Display',system-ui,sans-serif;font-size:clamp(2rem,3.5vw,3.5rem);font-weight:900;text-transform:uppercase;line-height:0.88;color:#16130F;margin:0}
+.greeting-name-cobalt{color:#2A55F5}
 .greeting-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px;flex-shrink:0}
-.training-block-badge{font-size:0.68rem;font-weight:900;letter-spacing:0.16em;text-transform:uppercase;border:1.5px solid;padding:5px 12px;white-space:nowrap}
+.training-block-badge{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.64rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:2px solid;padding:5px 12px;white-space:nowrap;transform:rotate(2deg);display:inline-block}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap}
 .perf-strip{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid #16130F;margin-bottom:32px;background:#16130F;gap:2px}
 .perf-cell{background:#fff;padding:28px 24px;display:flex;flex-direction:column}
@@ -1919,6 +1920,8 @@ onUnmounted(() => {
 .perf-change{font-size:0.73rem;font-weight:600;color:rgba(15,18,16,0.38);margin-top:6px}
 .perf-change--up{color:#fff;background:#2A55F5;padding:1px 6px;display:inline-block}
 .perf-change--down{color:rgba(15,18,16,0.45)}
+.perf-cell.streak-at-risk{background:#FFF8E1}
+.perf-cell:has(.perf-label:first-child){}
 .dashboard-grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
 .charts-section{display:flex;flex-direction:column;gap:24px}
 .sidebar-section{display:flex;flex-direction:column;gap:24px}
@@ -1942,7 +1945,7 @@ onUnmounted(() => {
 .chart-metric{text-align:right}
 .metric-value{font-size:1.8rem;font-weight:900;color:#2A55F5}
 .metric-label{font-size:0.75rem;color:rgba(15,18,16,0.60);display:block;margin-top:2px}
-.profile-card{background:#fff;border:2px solid #E7DFCE;border-radius:0;padding:24px;box-shadow:none}
+.profile-card{background:#fff;border:2px solid #16130F;border-radius:0;padding:24px;box-shadow:4px 4px 0 #16130F}
 .profile-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #E7DFCE}
 .avatar-large{width:64px;height:64px;background:#16130F;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.7rem;color:#FBF6EC}
 .profile-info{flex:1}
@@ -2045,7 +2048,7 @@ onUnmounted(() => {
 .btn{border:2px solid #E7DFCE;background:#fff;color:#000;border-radius:0;height:44px;padding:0 16px;font-weight:900;letter-spacing:0.02em;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all 0.2s}
 .btn:hover{transform:translateY(-1px);border-color:rgba(15,18,16,0.18);background:rgba(255,255,255,0.72)}
 .btn-primary{background:#2A55F5;border-color:#2A55F5;color:#fff}
-.btn-primary:hover{background:#1E42D6;border-color:#003ECC}
+.btn-primary:hover{background:#1E42D6;border-color:#1E42D6}
 .btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .btn-outline{background:rgba(255,255,255,0.50);border-color:rgba(15,18,16,0.16)}
 .btn-ghost{background:rgba(255,255,255,0.40);border-color:rgba(15,18,16,0.10)}
@@ -2142,7 +2145,7 @@ textarea.form-control{resize:vertical;min-height:72px}
   color: rgba(255,255,255,0.28);
   text-transform: uppercase;
 }
-.week-day.is-today .wday-label { color: #0052FF; }
+.week-day.is-today .wday-label { color: #2A55F5; }
 .wday-dot-wrap {
   width: 38px;
   height: 38px;
@@ -2163,13 +2166,13 @@ textarea.form-control{resize:vertical;min-height:72px}
   flex-shrink: 0;
 }
 .wday-done {
-  background: rgba(0, 82, 255, 0.18);
-  border: 2px solid #0052FF;
+  background: rgba(42, 85, 245, 0.18);
+  border: 2px solid #2A55F5;
 }
 .wday-done:hover { transform: scale(1.12); }
 .week-day.is-today .wday-done {
-  background: #0052FF;
-  border-color: #0052FF;
+  background: #2A55F5;
+  border-color: #2A55F5;
 }
 .wday-empty {
   background: rgba(255,255,255,0.04);
@@ -2180,19 +2183,19 @@ textarea.form-control{resize:vertical;min-height:72px}
   border: 1.5px dashed rgba(255,255,255,0.10);
 }
 .wday-multi {
-  background: #0052FF;
+  background: #2A55F5;
   color: white;
   font-size: 0.75rem;
   font-weight: 700;
   cursor: default;
-  border: 2px solid #0052FF;
+  border: 2px solid #2A55F5;
 }
 .wday-date {
   font-size: 0.6rem;
   color: rgba(255,255,255,0.25);
   font-weight: 600;
 }
-.week-day.is-today .wday-date { color: #0052FF; font-weight: 700; }
+.week-day.is-today .wday-date { color: #2A55F5; font-weight: 700; }
 .week-strip-totals {
   display: flex;
   align-items: center;
@@ -2272,8 +2275,8 @@ textarea.form-control{resize:vertical;min-height:72px}
   flex-shrink: 0;
 }
 .tw-done-badge {
-  background: #EBF0FF;
-  color: #0052FF;
+  background: #EEF1FF;
+  color: #2A55F5;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.10em;
@@ -2294,11 +2297,11 @@ textarea.form-control{resize:vertical;min-height:72px}
 .profile-nudge { padding: 16px; border: 1px solid #E5E5E5; margin-bottom: 16px; }
 .nudge-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .nudge-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; color: #767676; }
-.nudge-pct { font-size: 0.78rem; font-weight: 900; color: #0052FF; }
-.nudge-bar { height: 3px; background: #E5E5E5; margin-bottom: 12px; }
-.nudge-fill { height: 100%; background: #0052FF; transition: width 0.4s; }
+.nudge-pct { font-size: 0.78rem; font-weight: 900; color: #2A55F5; }
+.nudge-bar { height: 3px; background: #E7DFCE; margin-bottom: 12px; }
+.nudge-fill { height: 100%; background: #2A55F5; transition: width 0.4s; }
 .nudge-list { list-style: none; padding: 0; margin: 0 0 12px; }
-.nudge-item { font-size: 0.78rem; color: #767676; padding: 2px 0; display: flex; align-items: center; }
-.nudge-cta { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: #0052FF; text-decoration: none; }
+.nudge-item { font-size: 0.78rem; color: #5a5348; padding: 2px 0; display: flex; align-items: center; }
+.nudge-cta { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: #2A55F5; text-decoration: none; }
 .nudge-cta:hover { text-decoration: underline; }
 </style>

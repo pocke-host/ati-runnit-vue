@@ -1,192 +1,171 @@
 <template>
   <main class="register-page">
-    <!-- LEFT: Clean, minimal form -->
-    <section class="form-side">
-      <div class="register-container">
-        <!-- Logo/Brand -->
-        <div class="brand-mark mb-4">
-          <div class="logo-circle">R</div>
-          <h2 class="brand-name mb-0">RUNNIT</h2>
-        </div>
 
-        <h1 class="h2 fw-bold mb-2">Create your account</h1>
-        <p class="text-muted mb-4">Track every workout. Train smarter. Connect with athletes.</p>
+    <!-- LEFT: Form panel -->
+    <section class="gr-form-side">
+      <div class="gr-form-container">
+        <h1 class="gr-form-headline">Create your account.</h1>
+        <p class="gr-form-copy">Log every mile. Chase your crew. Post the receipts.</p>
 
-        <!-- Social Buttons (Simplified) -->
-        <div class="social-buttons mb-4">
-          <button type="button" class="btn btn-social" @click="onSocial('google')" :disabled="googleLoading">
-            <span v-if="googleLoading" class="spinner-border spinner-border-sm"></span>
+        <!-- Social Buttons -->
+        <div class="gr-social-btns">
+          <button type="button" class="gr-social-btn" @click="onSocial('google')" :disabled="googleLoading">
+            <span v-if="googleLoading" class="gr-spinner"></span>
             <svg v-else width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
               <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
               <path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
               <path d="M9 3.582c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 7.29C4.672 5.163 6.656 3.582 9 3.582z" fill="#EA4335"/>
             </svg>
-            {{ googleLoading ? 'Signing in...' : 'Continue with Google' }}
+            {{ googleLoading ? 'Signing in…' : 'Continue with Google' }}
           </button>
-          <button type="button" class="btn btn-social" disabled style="opacity:0.45;cursor:not-allowed">
+          <button type="button" class="gr-social-btn" disabled style="opacity:0.45;cursor:not-allowed">
             <i class="bi bi-apple"></i>
             Continue with Apple
           </button>
         </div>
-        <div v-if="googleError" class="alert alert-danger py-2 mb-3">{{ googleError }}</div>
+        <div v-if="googleError" class="gr-error-msg">{{ googleError }}</div>
 
-        <div class="divider">
-          <span>or</span>
-        </div>
+        <div class="gr-divider"><span>or</span></div>
 
         <!-- Email Form -->
-        <form @submit.prevent="submit" novalidate class="mt-4">
-          <div class="mb-3">
+        <form @submit.prevent="submit" novalidate class="gr-form">
+          <div class="gr-field">
+            <label class="gr-field-label" for="displayName">Full name</label>
             <input
               id="displayName"
               v-model.trim="displayName"
               type="text"
-              class="form-control"
-              placeholder="Full name"
+              class="gr-input"
+              placeholder="Jordan Rivera"
               required
               autofocus
               autocomplete="name"
             />
           </div>
-
-          <div class="mb-3">
+          <div class="gr-field">
+            <label class="gr-field-label" for="email">Email</label>
             <input
               id="email"
               v-model.trim="email"
               type="email"
-              class="form-control"
-              placeholder="Email"
+              class="gr-input"
+              placeholder="you@email.com"
               required
               autocomplete="email"
             />
           </div>
-
-          <div class="mb-3">
-            <div class="password-input">
+          <div class="gr-field">
+            <label class="gr-field-label" for="password">Password</label>
+            <div class="gr-password-wrap">
               <input
                 :type="showPwd ? 'text' : 'password'"
                 id="password"
                 v-model="password"
-                class="form-control"
-                placeholder="Password (min 8 characters)"
+                class="gr-input"
+                placeholder="Min 8 characters"
                 minlength="8"
                 required
                 autocomplete="new-password"
               />
-              <button
-                class="password-toggle"
-                type="button"
-                @click="showPwd = !showPwd"
-                aria-label="Toggle password visibility"
-              >
+              <button class="gr-pwd-toggle" type="button" @click="showPwd = !showPwd" aria-label="Toggle password visibility">
                 <i :class="showPwd ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
               </button>
             </div>
           </div>
 
-          <!-- Password strength meter -->
-          <div v-if="password.length > 0" class="pwd-strength mb-3">
-            <div class="pwd-strength-bars">
-              <div
-                v-for="i in 4" :key="i"
-                class="pwd-bar"
-                :style="{ background: i <= pwdStrength.score ? pwdStrength.color : '#E5E5E5' }"
-              ></div>
+          <div v-if="password.length > 0" class="gr-pwd-strength">
+            <div class="gr-pwd-bars">
+              <div v-for="i in 4" :key="i" class="gr-pwd-bar" :style="{ background: i <= pwdStrength.score ? pwdStrength.color : '#E7DFCE' }"></div>
             </div>
-            <span class="pwd-strength-label" :style="{ color: pwdStrength.color }">{{ pwdStrength.label }}</span>
+            <span class="gr-pwd-label" :style="{ color: pwdStrength.color }">{{ pwdStrength.label }}</span>
           </div>
 
-          <div class="form-check mb-3">
-            <input id="tos" class="form-check-input" type="checkbox" v-model="agree" />
-            <label class="form-check-label small" for="tos">
-              I agree to the <a href="/terms" class="link">Terms of Service</a> and <a href="/privacy" class="link">Privacy Policy</a>
-            </label>
-          </div>
-
-          <!-- Role Selector -->
-          <div class="role-selector mb-3">
-            <div class="role-label">I am joining as</div>
-            <div class="role-tiles">
-              <button
-                type="button"
-                class="role-tile"
-                :class="{ 'role-tile--selected': role === 'athlete' }"
-                @click="role = 'athlete'"
-              >
-                <i class="bi bi-person-running role-tile-icon"></i>
-                <div class="role-tile-name">I'm an Athlete</div>
-                <div class="role-tile-sub">Track workouts and follow plans</div>
-              </button>
-              <button
-                type="button"
-                class="role-tile"
-                :class="{ 'role-tile--selected': role === 'coach' }"
-                @click="role = 'coach'"
-              >
-                <i class="bi bi-clipboard2-pulse-fill role-tile-icon"></i>
-                <div class="role-tile-name">I'm a Coach</div>
-                <div class="role-tile-sub">Manage athletes and build plans</div>
-              </button>
-            </div>
-          </div>
-
-          <div v-if="error" class="alert alert-danger py-2 mb-3" role="alert">
-            {{ error }}
-          </div>
-
-          <button
-            class="btn btn-primary w-100"
-            :disabled="!canSubmit || loading"
-          >
-            <span v-if="!loading">Create Account</span>
-            <span v-else>
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Creating account...
+          <label class="gr-tos-label" @click="agree = !agree">
+            <span class="gr-tos-check" :class="{ 'gr-tos-check--checked': agree }">
+              <span v-if="agree">✓</span>
             </span>
+            I agree to the <a href="/terms" class="gr-tos-link" @click.stop>Terms of Service</a> and <a href="/privacy" class="gr-tos-link" @click.stop>Privacy Policy</a>
+          </label>
+
+          <div class="gr-role-label-text">I'm joining as</div>
+          <div class="gr-role-tiles">
+            <button type="button" class="gr-role-tile" :class="{ 'gr-role-tile--active': role === 'athlete' }" @click="role = 'athlete'">
+              <div class="gr-role-name">Athlete</div>
+              <div class="gr-role-sub">Track workouts &amp; follow plans</div>
+            </button>
+            <button type="button" class="gr-role-tile" :class="{ 'gr-role-tile--active': role === 'coach' }" @click="role = 'coach'">
+              <div class="gr-role-name">Coach</div>
+              <div class="gr-role-sub">Manage athletes &amp; build plans</div>
+            </button>
+          </div>
+
+          <div v-if="error" class="gr-error-msg" role="alert">{{ error }}</div>
+
+          <button class="gr-submit-btn" :disabled="!canSubmit || loading">
+            <span v-if="!loading">Create Account →</span>
+            <span v-else class="gr-submit-loading"><span class="gr-spinner"></span>Creating account…</span>
           </button>
         </form>
 
-        <p class="text-center text-muted small mt-4 mb-0">
-          Already have an account?
-          <router-link to="/join-us" class="link">Sign in</router-link>
-        </p>
+        <p class="gr-signin-link">Already have an account? <router-link to="/join-us" class="gr-signin-link-a">Sign in</router-link></p>
       </div>
     </section>
 
-    <!-- RIGHT: Visual with floating cards around text -->
-    <section class="visual-side">
-      <div class="visual-content">
-        <!-- Floating Stat Cards (positioned around text) -->
-        <div class="stat-card card-1">
-          <div class="stat-icon">🏃</div>
-          <div class="stat-value">127</div>
-          <div class="stat-label">ACTIVITIES</div>
-        </div>
+    <!-- RIGHT: Proof panel -->
+    <section class="gr-proof-side">
+      <div class="gr-proof-content">
+        <span class="gr-proof-badge">Proof or it didn't happen</span>
+        <h2 class="gr-proof-headline">Every mile,<br>on the record.</h2>
+        <p class="gr-proof-copy">Join thousands of runners logging their sessions, chasing crowns, and dragging their crew out at dawn.</p>
 
-        <div class="stat-card card-2">
-          <div class="stat-icon">⚡</div>
-          <div class="stat-value">8:42</div>
-          <div class="stat-label">AVG PACE</div>
-        </div>
-
-        <div class="stat-card card-3">
-          <div class="stat-icon">🔥</div>
-          <div class="stat-value">24</div>
-          <div class="stat-label">DAY STREAK</div>
-        </div>
-
-        <!-- Main Message (centered) -->
-        <div class="visual-message">
-          <h2 class="visual-title">
-            Track every session.<br>
-            Train with AI.<br>
-            Connect with athletes.
-          </h2>
-          <p class="visual-subtitle">Join thousands who've simplified their training.</p>
+        <div class="gr-stamps-cluster">
+          <!-- Receipt card -->
+          <div class="gr-receipt-card">
+            <div class="gr-receipt-header">
+              <div class="gr-receipt-avatar">MK</div>
+              <div>
+                <div class="gr-receipt-name">Morning Long Run</div>
+                <div class="gr-receipt-handle">@maya.k</div>
+              </div>
+            </div>
+            <div class="gr-receipt-map">
+              <svg viewBox="0 0 280 96" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+                <path d="M16,76 C60,40 80,66 120,50 C165,32 190,58 230,30 C250,18 264,34 272,26" fill="none" stroke="#2A55F5" stroke-width="3" stroke-dasharray="500" stroke-dashoffset="0"></path>
+                <circle cx="272" cy="26" r="4" fill="#2A55F5"></circle>
+              </svg>
+            </div>
+            <div class="gr-receipt-stats">
+              <div class="gr-receipt-stat">
+                <div class="gr-receipt-stat-lbl">DIST</div>
+                <div class="gr-receipt-stat-val">13.1</div>
+              </div>
+              <div class="gr-receipt-stat gr-receipt-stat--div">
+                <div class="gr-receipt-stat-lbl">PACE</div>
+                <div class="gr-receipt-stat-val">7:22</div>
+              </div>
+              <div class="gr-receipt-stat gr-receipt-stat--div">
+                <div class="gr-receipt-stat-lbl">TIME</div>
+                <div class="gr-receipt-stat-val">1:36</div>
+              </div>
+            </div>
+          </div>
+          <!-- Streak stamp -->
+          <div class="gr-stamp gr-stamp--streak">
+            <div class="gr-stamp-big">24</div>
+            <div class="gr-stamp-lbl">Day Streak</div>
+          </div>
+          <!-- Avg pace stamp -->
+          <div class="gr-stamp gr-stamp--pace">
+            <div class="gr-stamp-big">8:42</div>
+            <div class="gr-stamp-lbl">Avg Pace</div>
+          </div>
+          <!-- PR chip -->
+          <div class="gr-pr-chip">★ New PR</div>
         </div>
       </div>
     </section>
+
   </main>
 </template>
 
@@ -244,7 +223,7 @@ const submit = async () => {
   if (!canSubmit.value) return
   loading.value = true
   error.value = ''
-  
+
   try {
     await authStore.register(email.value, password.value, displayName.value, role.value)
     sessionStorage.setItem('needs_onboarding', 'true')
@@ -304,440 +283,410 @@ const onSocial = (provider) => {
 </script>
 
 <style scoped>
-/* ===== Design Tokens ===== */
+@keyframes rkDraw { to { stroke-dashoffset: 0; } }
+
 .register-page {
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: var(--r-white);
+  background: #FBF6EC;
+  color: #16130F;
 }
 
-/* ===== LEFT SIDE: Form ===== */
-.form-side {
+/* ── LEFT: Form ── */
+.gr-form-side {
+  border-right: 2px solid #16130F;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: var(--r-white);
+  background: #FBF6EC;
 }
-
-.register-container {
+.gr-form-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
 }
-
-/* Brand Mark */
-.brand-mark {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 0;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
+.gr-form-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  color: white;
+  font-size: 3rem;
+  line-height: 0.82;
+  text-transform: uppercase;
+  color: #16130F;
+  margin: 0 0 12px;
+}
+.gr-form-copy {
+  font-size: 1rem;
+  color: #5a5348;
+  margin: 0 0 26px;
 }
 
-.brand-name {
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: #000;
-}
-
-/* Typography */
-.register-page h1 {
-  color: #000;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.text-muted {
-  color: #6B7280;
-  font-size: 15px;
-}
-
-/* Social Buttons */
-.social-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.btn-social {
-  width: 100%;
-  height: 48px;
-  border: 1px solid #E5E7EB;
-  border-radius: 0;
-  background: white;
-  color: #1F2937;
-  font-weight: 600;
-  font-size: 15px;
+/* Social buttons */
+.gr-social-btns { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; }
+.gr-social-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: all 0.2s ease;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 14px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #16130F;
+  cursor: pointer;
+  transition: background 0.12s;
 }
-
-.btn-social:hover {
-  background: #F9FAFB;
-  border-color: #D1D5DB;
-}
-
-.btn-social svg {
-  flex-shrink: 0;
-}
+.gr-social-btn:hover:not(:disabled) { background: #F1EADC; }
 
 /* Divider */
-.divider {
-  position: relative;
-  text-align: center;
-  margin: 24px 0;
+.gr-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a89e88;
+}
+.gr-divider::before, .gr-divider::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: #E7DFCE;
 }
 
-.divider::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: #E5E7EB;
+/* Form */
+.gr-form { display: flex; flex-direction: column; gap: 12px; }
+.gr-field { display: flex; flex-direction: column; gap: 6px; }
+.gr-field-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5a5348;
 }
-
-.divider span {
-  position: relative;
-  background: white;
-  padding: 0 12px;
-  font-size: 13px;
-  color: #9CA3AF;
-  font-weight: 500;
-}
-
-/* Form Inputs */
-.form-control {
-  height: 48px;
-  border: 1px solid #E5E7EB;
-  border-radius: 0;
-  padding: 0 16px;
-  font-size: 15px;
-  transition: all 0.2s ease;
-}
-
-.form-control::placeholder {
-  color: #9CA3AF;
-}
-
-.form-control:focus {
+.gr-input {
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 13px 14px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.92rem;
+  color: #16130F;
+  width: 100%;
   outline: none;
-  border-color: #000;
-  box-shadow: none;
+  transition: border-color 0.15s;
 }
+.gr-input:focus { border-color: #2A55F5; }
+.gr-input::placeholder { color: #8a8a8a; }
 
-/* Password Input with Toggle */
-.password-input {
-  position: relative;
-}
-
-.password-toggle {
+/* Password */
+.gr-password-wrap { position: relative; }
+.gr-password-wrap .gr-input { padding-right: 48px; }
+.gr-pwd-toggle {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #9CA3AF;
-  font-size: 18px;
   cursor: pointer;
-  padding: 4px;
-  transition: color 0.2s ease;
+  color: #5a5348;
+  font-size: 1rem;
+  padding: 0;
 }
 
-.password-toggle:hover {
-  color: #6B7280;
-}
+/* Pwd strength */
+.gr-pwd-strength { display: flex; align-items: center; gap: 8px; }
+.gr-pwd-bars { display: flex; gap: 4px; flex: 1; }
+.gr-pwd-bar { height: 4px; flex: 1; background: #E7DFCE; transition: background 0.2s; }
+.gr-pwd-label { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
 
-/* Checkbox */
-.form-check-input {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #D1D5DB;
-  border-radius: 0;
-  cursor: pointer;
-}
-
-.form-check-input:checked {
-  background-color: #000;
-  border-color: #000;
-}
-
-.form-check-label {
-  color: #6B7280;
-  margin-left: 8px;
-  cursor: pointer;
-}
-
-/* Links */
-.link {
-  color: #000;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-/* Primary Button */
-.btn-primary {
-  height: 48px;
-  background: #0052FF;
-  border: none;
-  border-radius: 0;
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.01em;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #003ECC;
-  transform: none;
-  box-shadow: none;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Role Selector */
-.role-selector { display: flex; flex-direction: column; gap: 8px; }
-.role-label { font-size: 13px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; }
-.role-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.role-tile {
+/* ToS */
+.gr-tos-label {
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
-  padding: 14px 16px;
-  border: 1.5px solid #E5E7EB;
-  border-radius: 0;
+  gap: 10px;
+  font-size: 0.86rem;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.gr-tos-check {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #16130F;
   background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  color: #fff;
+}
+.gr-tos-check--checked { background: #2A55F5; border-color: #2A55F5; }
+.gr-tos-link { font-weight: 800; color: #16130F; border-bottom: 1.5px solid #2A55F5; text-decoration: none; }
+
+/* Role selector */
+.gr-role-label-text {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5a5348;
+}
+.gr-role-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gr-role-tile {
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 18px;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  transition: background 0.15s;
 }
-.role-tile:hover:not(.role-tile--selected) { border-color: #000; }
-.role-tile--selected { background: #000; border-color: #000; color: #fff; }
-.role-tile-icon { font-size: 20px; margin-bottom: 2px; }
-.role-tile--selected .role-tile-icon { color: #fff; }
-.role-tile-name { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
-.role-tile-sub { font-size: 11px; color: #9CA3AF; line-height: 1.3; }
-.role-tile--selected .role-tile-sub { color: rgba(255,255,255,0.65); }
+.gr-role-tile--active { background: #16130F; color: #FBF6EC; box-shadow: 3px 3px 0 #2A55F5; }
+.gr-role-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+.gr-role-sub { font-size: 0.78rem; color: inherit; opacity: 0.65; margin-top: 6px; }
+.gr-role-tile--active .gr-role-sub { opacity: 0.65; color: #FBF6EC; }
 
-/* Password strength */
-.pwd-strength {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.pwd-strength-bars {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-}
-.pwd-bar {
-  flex: 1;
-  height: 4px;
-  transition: background 0.2s;
-}
-.pwd-strength-label {
-  font-size: 12px;
-  font-weight: 700;
-  min-width: 44px;
-  text-align: right;
-  transition: color 0.2s;
-}
-
-/* Alert */
-.alert-danger {
-  background: #FEF2F2;
-  border: 1px solid #FCA5A5;
-  border-radius: 0;
-  color: #DC2626;
-  font-size: 14px;
-}
-
-/* ===== RIGHT SIDE: Visual ===== */
-.visual-side {
-  position: relative;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px;
-  overflow: hidden;
-}
-
-
-.visual-content {
-  position: relative;
+/* Submit */
+.gr-submit-btn {
   width: 100%;
-  max-width: 600px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 16px 0;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #16130F;
+  transition: background 0.15s;
+}
+.gr-submit-btn:hover:not(:disabled) { background: #1E42D6; }
+.gr-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.gr-submit-loading { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* Error */
+.gr-error-msg {
+  background: #fef2f2;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  padding: 10px 14px;
+  font-size: 0.85rem;
 }
 
-/* Visual Message (CENTERED) */
-.visual-message {
-  text-align: center;
-  color: white;
+/* Sign-in link */
+.gr-signin-link { text-align: center; font-size: 0.88rem; color: #5a5348; margin-top: 18px; margin-bottom: 0; }
+.gr-signin-link-a { font-weight: 800; color: #16130F; border-bottom: 2px solid #2A55F5; text-decoration: none; }
+
+/* Spinner */
+.gr-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: grSpin 0.75s linear infinite;
+}
+@keyframes grSpin { to { transform: rotate(360deg); } }
+
+/* ── RIGHT: Proof panel ── */
+.gr-proof-side {
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 44px 48px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.gr-proof-content {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
-
-.visual-title {
-  font-size: 42px;
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 20px;
-  letter-spacing: -0.02em;
-}
-
-.visual-subtitle {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-/* Floating Stat Cards (POSITIONED AROUND TEXT) */
-.stat-card {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 0;
-  padding: 20px 28px;
-  box-shadow: none;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  min-width: 120px;
-  z-index: 1;
-}
-
-/* Card 1: Top Left (Activities) */
-.card-1 {
-  top: 15%;
-  left: 5%;
-  animation: float-1 6s ease-in-out infinite;
-}
-
-/* Card 2: Right Side (Avg Pace) */
-.card-2 {
-  top: 45%;
-  right: 8%;
-  animation: float-2 5s ease-in-out infinite;
-  animation-delay: 1s;
-}
-
-/* Card 3: Bottom Left (Streak) */
-.card-3 {
-  bottom: 20%;
-  left: 8%;
-  animation: float-3 7s ease-in-out infinite;
-  animation-delay: 2s;
-}
-
-.stat-icon {
-  font-size: 36px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.stat-value {
-  font-size: 32px;
+.gr-proof-badge {
+  display: inline-block;
+  background: #2A55F5;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
   font-weight: 800;
-  color: #000;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 11px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #6B7280;
+  padding: 6px 12px;
+  transform: rotate(-2deg);
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+.gr-proof-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 3.6rem;
+  line-height: 0.84;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  color: #FBF6EC;
+}
+.gr-proof-copy {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: rgba(251,246,236,0.68);
+  max-width: 400px;
+  margin: 0;
+}
+
+/* Stamps cluster */
+.gr-stamps-cluster {
+  position: relative;
+  flex: 1;
+  margin-top: 36px;
+  min-height: 320px;
+}
+
+/* Receipt card */
+.gr-receipt-card {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 260px;
+  background: #FBF6EC;
+  color: #16130F;
+  border: 2px solid #FBF6EC;
+  transform: rotate(-4deg);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.35);
+}
+.gr-receipt-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border-bottom: 2px solid #16130F;
+}
+.gr-receipt-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #2A55F5;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.64rem;
+  flex-shrink: 0;
+}
+.gr-receipt-name { font-weight: 800; font-size: 0.78rem; }
+.gr-receipt-handle {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  color: #8a8a8a;
+  margin-top: 2px;
+}
+.gr-receipt-map {
+  height: 80px;
+  background: #EDE5D5;
+  position: relative;
+  border-bottom: 2px solid #16130F;
+  overflow: hidden;
+}
+.gr-receipt-stats {
+  display: flex;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+}
+.gr-receipt-stat {
+  flex: 1;
+  padding: 10px 12px;
+}
+.gr-receipt-stat--div { border-left: 2px solid #16130F; }
+.gr-receipt-stat-lbl { font-size: 0.46rem; letter-spacing: 0.1em; color: #8a8a8a; }
+.gr-receipt-stat-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+/* Streak stamp */
+.gr-stamp {
+  position: absolute;
+  text-align: center;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.35);
+}
+.gr-stamp--streak {
+  right: 30px;
+  top: 0;
+  width: 140px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #FBF6EC;
+  transform: rotate(5deg);
+  padding: 18px 16px;
+}
+.gr-stamp--pace {
+  right: 0;
+  bottom: 24px;
+  width: 150px;
+  background: #FFC53D;
+  color: #16130F;
+  border: 2px solid #FBF6EC;
+  transform: rotate(-3deg);
+  padding: 18px 16px;
+}
+.gr-stamp-big {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 0.8;
+}
+.gr-stamp-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 6px;
 }
 
-/* Different float animations for variety */
-@keyframes float-1 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) translateX(10px) rotate(2deg);
-  }
+/* PR chip */
+.gr-pr-chip {
+  position: absolute;
+  left: 70px;
+  bottom: 40px;
+  background: #16130F;
+  color: #FFC53D;
+  border: 2px solid #FFC53D;
+  transform: rotate(4deg);
+  padding: 9px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-@keyframes float-2 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-15px) translateX(-8px) rotate(-2deg);
-  }
-}
-
-@keyframes float-3 {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-18px) translateX(12px) rotate(3deg);
-  }
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 991px) {
-  .register-page {
-    grid-template-columns: 1fr;
-  }
-  
-  .visual-side {
-    display: none;
-  }
-  
-  .form-side {
-    padding: 40px 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .register-container {
-    max-width: 100%;
-  }
-  
-  .brand-mark {
-    justify-content: center;
-  }
-  
-  h1 {
-    font-size: 24px;
-  }
+@media (max-width: 900px) {
+  .register-page { grid-template-columns: 1fr; }
+  .gr-proof-side { display: none; }
+  .gr-form-side { border-right: none; padding: 60px 20px; }
 }
 </style>
