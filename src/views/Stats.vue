@@ -373,22 +373,18 @@
         </div>
         <div class="milestone-grid">
           <div class="milestone-card">
-            <div class="milestone-icon">🗺️</div>
             <div class="milestone-val">{{ formatDistance(careerMeters) }}</div>
             <div class="milestone-label">Total Distance</div>
           </div>
           <div class="milestone-card">
-            <div class="milestone-icon">⏱️</div>
             <div class="milestone-val">{{ formatDuration(careerSeconds) }}</div>
             <div class="milestone-label">Total Time</div>
           </div>
           <div class="milestone-card">
-            <div class="milestone-icon">⛰️</div>
             <div class="milestone-val">{{ formatElevation(careerElevation) }}</div>
             <div class="milestone-label">Total Elevation</div>
           </div>
           <div class="milestone-card">
-            <div class="milestone-icon">🏅</div>
             <div class="milestone-val">{{ activities.length }}</div>
             <div class="milestone-label">Total Activities</div>
           </div>
@@ -979,7 +975,7 @@ onUnmounted(() => {
 <style scoped>
 .stats-page {
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--nav-h, 66px);
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
@@ -1571,22 +1567,37 @@ onUnmounted(() => {
 .milestone-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 0;
+  border: 2px solid #16130F;
 }
 .milestone-card {
   background: white;
-  border: 2px solid #E7DFCE;
+  border-right: 2px solid #16130F;
   border-radius: 0;
-  padding: 28px 16px 22px;
+  padding: 24px 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
 }
-.milestone-icon  { font-size: 2rem; line-height: 1; }
-.milestone-val   { font-size: 1.4rem; font-weight: 900; color: #000; }
-.milestone-label { font-size: 0.75rem; font-weight: 700; color: rgba(15,18,16,0.50); text-transform: uppercase; letter-spacing: 0.06em; }
+.milestone-card:last-child { border-right: none; }
+.milestone-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  color: #16130F;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.milestone-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #5a5348;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
 
 /* ── ATHLETE ARCHETYPE ─────────────────────────── */
 .archetype-card {
@@ -1657,7 +1668,6 @@ onUnmounted(() => {
 /* ── RESPONSIVE ────────────────────────────────── */
 @media (max-width: 900px) {
   .pr-grid              { grid-template-columns: repeat(2, 1fr); }
-  .milestone-grid       { grid-template-columns: repeat(2, 1fr); }
   .section-split        { grid-template-columns: 1fr; }
   .fitness-metric-row   { grid-template-columns: repeat(2, 1fr); }
   .race-pred-grid       { grid-template-columns: repeat(2, 1fr); }
@@ -1665,7 +1675,8 @@ onUnmounted(() => {
 }
 @media (max-width: 768px) {
   .pr-grid              { grid-template-columns: repeat(2, 1fr); }
-  .milestone-grid       { grid-template-columns: repeat(2, 1fr); }
+  /* milestone stays 4-col on tablet but shrinks */
+  .milestone-val        { font-size: 1.4rem; }
   .hero-chips           { flex-wrap: wrap; gap: 8px; }
   .hero-chip            { font-size: 0.8rem; padding: 8px 14px; }
   .chart-card canvas    { max-height: 200px; }
@@ -1679,13 +1690,18 @@ onUnmounted(() => {
   .hero-title           { font-size: 2rem; }
   .hero-chips           { gap: 12px; }
   .hero-chip            { min-width: 100px; padding: 12px 18px; }
-  .stats-content        { padding: 28px 16px 64px; }
+  .stats-content        { padding: 24px 16px 64px; }
   .insights-row         { grid-template-columns: 1fr; }
   .race-pred-grid       { grid-template-columns: repeat(2, 1fr); }
+  /* milestone: 2×2 on mobile */
+  .milestone-grid       { grid-template-columns: repeat(2, 1fr); }
+  .milestone-card       { border-bottom: 2px solid #16130F; }
+  .milestone-card:nth-child(odd)  { border-right: 2px solid #16130F; }
+  .milestone-card:nth-child(even) { border-right: none; }
+  .milestone-card:nth-last-child(-n+2) { border-bottom: none; }
 }
 @media (max-width: 480px) {
   .pr-grid              { grid-template-columns: 1fr; }
-  .milestone-grid       { grid-template-columns: repeat(2, 1fr); }
   .hero-title           { font-size: 1.8rem; }
   .section-title        { font-size: 1.2rem; }
   .pr-card              { padding: 16px; }
