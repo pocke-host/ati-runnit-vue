@@ -1151,7 +1151,7 @@ watch(zipcode, () => {
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 44px 0;
+  padding: 68px 0 52px;
 }
 .hero-inner {
   display: grid;

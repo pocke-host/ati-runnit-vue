@@ -985,7 +985,7 @@ onUnmounted(() => {
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 48px 24px 44px;
+  padding: 72px 24px 48px;
   border-bottom: 2px solid #16130F;
 }
 .hero-inner {
@@ -1708,7 +1708,7 @@ onUnmounted(() => {
   .pr-value             { font-size: 1.3rem; }
   .fitness-metric-row   { grid-template-columns: 1fr 1fr; }
   .race-pred-grid       { grid-template-columns: 1fr 1fr; }
-  .hero                 { padding: 32px 16px 28px; }
+  .hero                 { padding: 48px 16px 36px; }
   .stats-content        { padding: 20px 12px 80px; }
   .jumpnav-inner        { padding: 0 12px; }
   .heatmap-cell         { width: 8px; height: 8px; }

@@ -121,7 +121,7 @@ const faqs = [
 .sp-hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 52px 24px;
+  padding: 72px 24px 56px;
   text-align: center;
 }
 .sp-hero-inner {
