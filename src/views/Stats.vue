@@ -46,8 +46,7 @@
             </div>
             <div class="hero-chip hero-chip--streak">
               <span class="chip-val">{{ streak.current }}<span class="chip-val-unit"> wk</span></span>
-              <span class="chip-label">Active Streak</span>
-              <span class="chip-delta" style="color:rgba(255,255,255,0.45)" v-if="streak.best >= 2">Best: {{ streak.best }}wk</span>
+              <span class="chip-label">Streak · Best {{ streak.best }}wk</span>
             </div>
           </template>
         </div>
@@ -110,7 +109,10 @@
             <div class="pr-icon-wrap">
               <i :class="`bi ${pr.icon}`"></i>
             </div>
-            <div class="pr-label">{{ pr.label }}</div>
+            <div class="pr-info">
+              <div class="pr-label">{{ pr.label }}</div>
+              <div class="pr-sublabel" v-if="pr.data">{{ pr.id.includes('longest') || pr.id.includes('elevation') ? 'Single activity' : 'Personal best' }}</div>
+            </div>
             <template v-if="pr.data">
               <div class="pr-value">{{ formatPRValue(pr) }}</div>
               <router-link v-if="pr.data.id" :to="`/activities/${pr.data.id}`" class="pr-link">View activity →</router-link>
@@ -1029,22 +1031,22 @@ onUnmounted(() => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(251,246,236,0.18);
-  border: 1px solid rgba(251,246,236,0.25);
+  background: rgba(251,246,236,0.08);
+  border: 2px solid rgba(251,246,236,0.3);
   transition: background 0.2s;
 }
 .hero-dot-active {
   background: #2A55F5;
   border-color: #2A55F5;
-  box-shadow: 2px 2px 0 rgba(42,85,245,0.4);
 }
 .hero-dot-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.60rem;
-  font-weight: 700;
+  font-size: 0.5rem;
+  font-weight: 600;
   letter-spacing: 0.06em;
-  color: rgba(251,246,236,0.4);
+  color: rgba(251,246,236,0.5);
   text-transform: uppercase;
+  margin-top: 5px;
 }
 
 /* Chips */
@@ -1056,9 +1058,9 @@ onUnmounted(() => {
 }
 .hero-chip {
   background: rgba(251,246,236,0.08);
-  border: 2px solid rgba(251,246,236,0.2);
+  border: 2px solid rgba(251,246,236,0.28);
   border-radius: 0;
-  padding: 16px 28px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1068,22 +1070,25 @@ onUnmounted(() => {
 .chip-val {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 800;
   color: #FBF6EC;
-  line-height: 0.9;
+  line-height: 0.85;
   font-variant-numeric: tabular-nums;
 }
 .chip-val-unit {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 700;
+  color: rgba(251,246,236,0.55);
+  margin-left: 3px;
 }
 .chip-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.55);
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: rgba(251,246,236,0.5);
   text-transform: uppercase;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
+  margin-top: 5px;
 }
 .chip-delta {
   font-size: 0.62rem;
@@ -1182,12 +1187,12 @@ onUnmounted(() => {
 }
 .section-title {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-size: 1.4rem;
+  font-size: 2.1rem;
   font-weight: 900;
   color: #16130F;
-  margin: 0 0 20px;
+  margin: 0 0 14px;
   text-transform: uppercase;
-  line-height: 0.9;
+  line-height: 0.85;
 }
 .section-header-row {
   display: flex;
@@ -1498,7 +1503,7 @@ onUnmounted(() => {
 }
 .pr-card {
   background: white;
-  border: 1.5px solid rgba(15,18,16,0.09);
+  border: 2px solid rgba(22,19,15,0.15);
   border-radius: 0;
   padding: 22px 16px 18px;
   display: flex;
@@ -1506,29 +1511,44 @@ onUnmounted(() => {
   align-items: center;
   text-align: center;
   gap: 8px;
-  opacity: 0.65;
+  opacity: 0.45;
 }
 .pr-card.pr-card-set {
   opacity: 1;
-  border-color: #000;
-  border-left: 3px solid #000;
+  border: 2px solid #16130F;
 }
 .pr-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #f0f0f0;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(22,19,15,0.08);
+  border: 2px solid rgba(22,19,15,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   color: #767676;
-  margin-bottom: 2px;
+  flex-shrink: 0;
 }
-.pr-card.pr-card-set .pr-icon-wrap { background: #2A55F5; color: white; }
-.pr-label  { font-weight: 900; font-size: 0.88rem; color: rgba(15,18,16,0.85); line-height: 1.25; }
-.pr-value  { font-size: 1.25rem; font-weight: 900; color: #000; }
-.pr-link   { font-size: 0.75rem; font-weight: 700; color: #767676; text-decoration: none; }
+.pr-card.pr-card-set .pr-icon-wrap { background: #16130F; color: #fff; border-color: #16130F; }
+.pr-grid .pr-card.pr-card-set:first-child .pr-icon-wrap { background: #2A55F5; border-color: #2A55F5; }
+.pr-info   { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.pr-label  { font-weight: 800; font-size: 0.92rem; color: #16130F; line-height: 1.25; }
+.pr-sublabel {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 0.62rem;
+  color: #8a8a8a;
+}
+.pr-value  {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.8;
+  color: #16130F;
+}
+.pr-link   { font-size: 0.72rem; font-weight: 600; color: #8a8a8a; text-decoration: none; }
 .pr-link:hover { text-decoration: underline; }
 .pr-empty  { font-size: 0.78rem; color: rgba(15,18,16,0.40); font-weight: 600; }
 
@@ -1559,17 +1579,23 @@ onUnmounted(() => {
 }
 .legend-list {
   background: white;
-  border: 2px solid #E7DFCE;
-  padding: 20px;
+  border: 2px solid #16130F;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
-.legend-row   { display: flex; align-items: center; gap: 14px; }
+.legend-row   { display: flex; align-items: center; gap: 12px; padding: 15px 18px; border-bottom: 2px solid #E7DFCE; }
+.legend-row:last-child { border-bottom: none; }
 .legend-dot   { width: 14px; height: 14px; border-radius: 0; border: 2px solid #16130F; flex-shrink: 0; }
 .legend-info  { display: flex; justify-content: space-between; flex: 1; align-items: center; }
-.legend-type  { font-weight: 900; font-size: 0.9rem; color: rgba(15,18,16,0.85); }
-.legend-count { font-size: 0.80rem; font-weight: 700; color: rgba(15,18,16,0.50); }
+.legend-type  { font-weight: 800; font-size: 0.95rem; color: #16130F; }
+.legend-count {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgba(15,18,16,0.50);
+}
 .legend-empty { font-size: 0.85rem; color: rgba(15,18,16,0.40); text-align: center; padding: 20px; }
 
 /* ── ALL-TIME TOTALS ───────────────────────────── */
@@ -1583,30 +1609,31 @@ onUnmounted(() => {
   background: white;
   border-right: 2px solid #16130F;
   border-radius: 0;
-  padding: 24px 16px 20px;
+  padding: 20px 18px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   gap: 6px;
 }
 .milestone-card:last-child { border-right: none; }
 .milestone-card:last-child .milestone-val { color: #2A55F5; }
 .milestone-val {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 900;
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 800;
   color: #16130F;
-  line-height: 1;
+  line-height: 0.8;
   font-variant-numeric: tabular-nums;
 }
 .milestone-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.58rem;
+  font-size: 0.54rem;
   font-weight: 700;
-  color: #5a5348;
+  color: #8a8a8a;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  margin-bottom: 8px;
 }
 
 /* ── ATHLETE ARCHETYPE ─────────────────────────── */
@@ -1685,10 +1712,7 @@ onUnmounted(() => {
 }
 @media (max-width: 768px) {
   .pr-grid              { grid-template-columns: repeat(2, 1fr); }
-  /* milestone stays 4-col on tablet but shrinks */
-  .milestone-val        { font-size: 1.4rem; }
   .hero-chips           { flex-wrap: wrap; gap: 8px; }
-  .hero-chip            { font-size: 0.8rem; padding: 8px 14px; }
   .chart-card canvas    { max-height: 200px; }
   .stats-content        { padding: 28px 16px 64px; }
   .jumpnav-inner        { padding: 0 16px; }
@@ -1699,7 +1723,7 @@ onUnmounted(() => {
 @media (max-width: 600px) {
   .hero-title           { font-size: 2rem; }
   .hero-chips           { gap: 12px; }
-  .hero-chip            { min-width: 100px; padding: 12px 18px; }
+  .hero-chip            { min-width: 0; }
   .stats-content        { padding: 24px 16px 64px; }
   .insights-row         { grid-template-columns: 1fr; }
   .race-pred-grid       { grid-template-columns: repeat(2, 1fr); }
@@ -1713,7 +1737,6 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .pr-grid              { grid-template-columns: 1fr; }
   .hero-title           { font-size: 1.8rem; }
-  .section-title        { font-size: 1.2rem; }
   .fitness-metric-row   { grid-template-columns: 1fr 1fr; }
   .race-pred-grid       { grid-template-columns: 1fr 1fr; }
   .hero                 { padding: 48px 16px 36px; }
@@ -1725,13 +1748,13 @@ onUnmounted(() => {
   .heatmap-week         { gap: 1px; }
   /* hero chips: 2×2 grid, left-aligned */
   .hero-chips           { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; justify-items: start; }
-  .hero-chip            { width: 100%; align-items: flex-start; padding: 14px 16px; min-width: 0; }
+  .hero-chip            { width: 100%; align-items: flex-start; padding: 14px; min-width: 0; }
   /* hero activity dots: spread out and bigger */
   .hero-dots            { justify-content: space-between; }
   .hero-dot             { width: 30px; height: 30px; }
   /* PR cards: horizontal row layout */
-  .pr-card              { flex-direction: row; align-items: center; text-align: left; padding: 16px; gap: 14px; }
+  .pr-card              { flex-direction: row; align-items: center; text-align: left; padding: 16px 18px; gap: 14px; }
   .pr-icon-wrap         { flex-shrink: 0; margin-bottom: 0; }
-  .pr-value             { font-size: 1.3rem; }
+  .pr-value             { font-size: 1.9rem; }
 }
 </style>
