@@ -288,6 +288,7 @@ const onSocial = (provider) => {
 .register-page {
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   min-height: 100vh;
+  padding-top: var(--nav-h, 66px);
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: #FBF6EC;

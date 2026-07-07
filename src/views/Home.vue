@@ -276,6 +276,7 @@ function scrollTo(id) {
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
+  padding-top: var(--nav-h, 66px);
 }
 .home-inner {
   max-width: 1040px;
@@ -932,28 +933,39 @@ function scrollTo(id) {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 860px) {
-  .hero-grid { grid-template-columns: 1fr; }
+  .hero-grid { grid-template-columns: 1fr; gap: 24px; }
   .hero-stack { display: none; }
   .two-col--text-left,
-  .two-col--photo-left { grid-template-columns: 1fr; }
-  .two-col--photo-left .moment-photo { height: 260px; }
+  .two-col--photo-left { grid-template-columns: 1fr; gap: 24px; }
+  .two-col--photo-left .moment-photo { height: 240px; }
   .crews-grid { grid-template-columns: repeat(2, 1fr); }
-  .two-up-grid { grid-template-columns: 1fr; }
+  .two-up-grid { grid-template-columns: 1fr; gap: 16px; }
+  .section-body { max-width: 100%; }
 }
 @media (max-width: 640px) {
-  .home-inner { padding: 0 22px; }
-  .hero { padding: 36px 0 0; }
-  .hero-h1 { font-size: 52px !important; }
-  .hero-sub { font-size: 0.97rem; }
-  .hero-actions { flex-direction: column; gap: 12px; }
+  .home-inner { padding: 0 18px; }
+  .hero { padding: 32px 0 0; }
+  .hero-grid { padding-bottom: 40px; }
+  .hero-h1 { font-size: clamp(44px, 13vw, 52px) !important; line-height: 0.84; }
+  .hero-sub { font-size: 0.95rem; max-width: 100%; }
+  .hero-actions { flex-direction: column; align-items: stretch; gap: 12px; }
   .btn-pill-primary { width: 100%; text-align: center; justify-content: center; }
-  .content-section { padding: 40px 0; }
-  .section-h2 { font-size: 40px !important; }
-  .feature-box-h2 { font-size: 34px; }
-  .crews-grid { grid-template-columns: 1fr; }
-  .final-cta { padding: 48px 22px; }
-  .cta-h2 { font-size: 64px !important; }
+  .hero-link { text-align: center; }
+  .content-section { padding: 36px 0; }
+  .section-h2 { font-size: clamp(34px, 10vw, 40px) !important; }
+  .feature-box-h2 { font-size: clamp(28px, 9vw, 34px); }
+  .feature-box { padding: 20px; }
+  .crews-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .crew-card { padding: 14px; }
+  .two-col--photo-left .moment-photo { height: 200px; }
+  .leaderboard .lb-name { font-size: 0.82rem; }
+  .leaderboard .lb-dist { font-size: 0.82rem; }
+  .final-cta { padding: 48px 18px; }
+  .cta-h2 { font-size: clamp(56px, 15vw, 72px) !important; }
+  .cta-sub { font-size: 0.7rem; }
   .cta-form { flex-direction: column; border-radius: 0; max-width: 100%; }
-  .cta-form-btn { text-align: center; }
+  .cta-form-btn { text-align: center; border-radius: 0; }
+  .syncs-row { flex-wrap: wrap; gap: 6px 10px; }
+  .crews-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 </style>

@@ -1,87 +1,119 @@
 <template>
-  <main class="auth-page">
-    <section class="form-side">
-      <div class="auth-container">
-        <div class="brand-mark mb-4">
-          <div class="logo-circle">R</div>
-          <h2 class="brand-name mb-0">RUNNIT</h2>
-        </div>
+  <main class="rp-page">
 
-        <!-- Invalid/missing token -->
-        <div v-if="!token" class="error-card">
-          <p class="error-title">Invalid reset link</p>
-          <p class="error-body">This link is missing a reset token. Please request a new one.</p>
-          <router-link to="/forgot-password" class="btn btn-primary w-100 mt-3">Request new link</router-link>
-        </div>
+    <!-- Ticker -->
+    <div class="rp-ticker" aria-hidden="true">
+      <div class="rp-ticker-track">
+        <span>&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
+        <span aria-hidden="true">&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
+      </div>
+    </div>
 
-        <!-- Success state -->
-        <div v-else-if="done" class="sent-card">
-          <div class="sent-icon">✓</div>
-          <p class="sent-title">Password updated!</p>
-          <p class="sent-body">Your password has been changed. Sign in with your new password.</p>
-          <router-link to="/join-us" class="btn btn-primary w-100 mt-3">Sign in</router-link>
-        </div>
+    <!-- Logo bar -->
+    <div class="rp-logo-bar">
+      <span class="rp-logo-text">RUNNIT<span class="rp-logo-dot">.</span></span>
+    </div>
 
-        <!-- Form state -->
-        <template v-else>
-          <h1 class="h2 fw-bold mb-2">Set new password</h1>
-          <p class="text-muted mb-4">Choose a strong password for your RUNNIT account.</p>
+    <!-- Card -->
+    <div class="rp-body">
 
-          <form @submit.prevent="submit" novalidate>
-            <div class="mb-3">
-              <div class="password-input">
-                <input
-                  :type="showPwd ? 'text' : 'password'"
-                  v-model="password"
-                  class="form-control"
-                  placeholder="New password (min 8 characters)"
-                  minlength="8"
-                  required
-                  autocomplete="new-password"
-                />
-                <button type="button" class="password-toggle" @click="showPwd = !showPwd" aria-label="Toggle visibility">
-                  <i :class="showPwd ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                </button>
-              </div>
-            </div>
+      <!-- Invalid token -->
+      <div v-if="!token" class="rp-state">
+        <div class="rp-state-icon rp-state-icon--warn">!</div>
+        <h1 class="rp-headline">Bad link.</h1>
+        <p class="rp-sub">This reset link is missing a token. Request a new one below.</p>
+        <router-link to="/forgot-password" class="rp-btn rp-btn--full">Request New Link</router-link>
+      </div>
 
-            <!-- Password strength -->
-            <div v-if="password.length > 0" class="pwd-strength mb-3">
-              <div class="pwd-strength-bars">
-                <div v-for="i in 4" :key="i" class="pwd-bar"
-                     :style="{ background: i <= pwdStrength.score ? pwdStrength.color : '#E5E5E5' }"></div>
-              </div>
-              <span class="pwd-strength-label" :style="{ color: pwdStrength.color }">{{ pwdStrength.label }}</span>
-            </div>
+      <!-- Success state -->
+      <div v-else-if="done" class="rp-state">
+        <div class="rp-state-icon">✓</div>
+        <h1 class="rp-headline">You're all set.</h1>
+        <p class="rp-sub">Your password has been updated. Sign in with your new credentials.</p>
+        <router-link to="/join-us" class="rp-btn rp-btn--full">Sign In →</router-link>
+      </div>
 
-            <div class="mb-3">
+      <!-- Form state -->
+      <template v-else>
+        <router-link to="/forgot-password" class="rp-back">← Back to reset</router-link>
+        <h1 class="rp-headline">Set new password.</h1>
+        <p class="rp-sub">Choose something strong. You'll be running again in no time.</p>
+
+        <form @submit.prevent="submit" novalidate>
+
+          <!-- New password -->
+          <div class="rp-field">
+            <label class="rp-label" for="rp-pwd">New Password</label>
+            <div class="rp-pwd-wrap">
               <input
+                id="rp-pwd"
                 :type="showPwd ? 'text' : 'password'"
-                v-model="confirm"
-                class="form-control"
-                placeholder="Confirm new password"
+                v-model="password"
+                class="rp-input"
+                placeholder="Min 8 characters"
+                minlength="8"
                 required
                 autocomplete="new-password"
               />
+              <button
+                type="button"
+                class="rp-eye"
+                @click="showPwd = !showPwd"
+                :aria-label="showPwd ? 'Hide password' : 'Show password'"
+              >
+                <svg v-if="showPwd" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+                <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
             </div>
+          </div>
 
-            <div v-if="error" class="alert alert-danger py-2 mb-3">{{ error }}</div>
+          <!-- Strength meter -->
+          <div v-if="password.length > 0" class="rp-strength">
+            <div class="rp-strength-bars">
+              <div
+                v-for="i in 4"
+                :key="i"
+                class="rp-strength-bar"
+                :class="{ 'rp-strength-bar--on': i <= pwdStrength.score }"
+                :style="i <= pwdStrength.score ? { background: pwdStrength.color } : {}"
+              ></div>
+            </div>
+            <span class="rp-strength-label" :style="{ color: pwdStrength.color }">{{ pwdStrength.label }}</span>
+          </div>
 
-            <button class="btn btn-primary w-100" :disabled="loading || !canSubmit">
-              <span v-if="!loading">Update Password</span>
-              <span v-else>
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                Updating…
-              </span>
-            </button>
-          </form>
-        </template>
+          <!-- Confirm password -->
+          <div class="rp-field">
+            <label class="rp-label" for="rp-confirm">Confirm Password</label>
+            <input
+              id="rp-confirm"
+              :type="showPwd ? 'text' : 'password'"
+              v-model="confirm"
+              class="rp-input"
+              :class="{ 'rp-input--mismatch': confirm.length > 0 && confirm !== password }"
+              placeholder="Same as above"
+              required
+              autocomplete="new-password"
+            />
+            <p v-if="confirm.length > 0 && confirm !== password" class="rp-mismatch">Passwords don't match</p>
+          </div>
 
-        <p class="text-center text-muted small mt-4 mb-0">
-          <router-link to="/join-us" class="link">← Back to sign in</router-link>
-        </p>
-      </div>
-    </section>
+          <div v-if="error" class="rp-error">{{ error }}</div>
+
+          <button class="rp-btn rp-btn--full" :disabled="loading || !canSubmit" type="submit">
+            <span v-if="!loading">Update Password</span>
+            <span v-else class="rp-spinner-row">
+              <span class="rp-spinner"></span>Updating…
+            </span>
+          </button>
+
+        </form>
+      </template>
+
+    </div>
   </main>
 </template>
 
@@ -148,84 +180,241 @@ const submit = async () => {
 </script>
 
 <style scoped>
-.auth-page {
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, sans-serif;
+@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+
+.rp-page {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
+  padding-top: var(--nav-h, 66px);
+}
+
+/* Ticker */
+.rp-ticker {
+  width: 100%;
+  background: #16130F;
+  border-bottom: 3px solid #2A55F5;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.rp-ticker-track {
+  display: flex;
+  white-space: nowrap;
+  animation: rkMarq 28s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #FBF6EC;
+  padding: 7px 0;
+}
+@media (prefers-reduced-motion: reduce) { .rp-ticker-track { animation: none; } }
+
+/* Logo bar */
+.rp-logo-bar {
+  width: 100%;
+  padding: 18px 32px;
+  border-bottom: 2px solid #16130F;
+  display: flex;
+  align-items: center;
+}
+.rp-logo-text {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #16130F;
+}
+.rp-logo-dot { color: #2A55F5; }
+
+/* Card body */
+.rp-body {
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 24px 60px;
+}
+
+.rp-back {
+  display: inline-block;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5a5348;
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+.rp-back:hover { color: #16130F; }
+
+.rp-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.4rem, 7vw, 3.2rem);
+  line-height: 0.85;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  color: #16130F;
+}
+
+.rp-sub {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #5a5348;
+  margin: 0 0 32px;
+}
+
+/* Fields */
+.rp-field { margin-bottom: 18px; }
+.rp-label {
+  display: block;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5a5348;
+  margin-bottom: 7px;
+}
+.rp-pwd-wrap { position: relative; }
+.rp-input {
+  width: 100%;
+  height: 48px;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 0 44px 0 14px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.95rem;
+  color: #16130F;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.rp-input:focus { border-color: #2A55F5; }
+.rp-input::placeholder { color: #8a8a8a; }
+.rp-input--mismatch { border-color: #DC2626; }
+
+.rp-mismatch {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #DC2626;
+  margin: 5px 0 0;
+}
+
+.rp-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #5a5348;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.rp-eye:hover { color: #16130F; }
+
+/* Strength bars */
+.rp-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -8px 0 18px;
+}
+.rp-strength-bars { display: flex; gap: 5px; flex: 1; }
+.rp-strength-bar {
+  flex: 1;
+  height: 4px;
+  background: #E7DFCE;
+  border: 1px solid #16130F;
+  transition: background 0.2s;
+}
+.rp-strength-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  min-width: 44px;
+  text-align: right;
+}
+
+/* Error */
+.rp-error {
+  background: #FEF2F2;
+  border: 2px solid #FCA5A5;
+  color: #DC2626;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+/* Button */
+.rp-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 15px 28px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 #16130F;
+  cursor: pointer;
+  transition: background 0.15s;
 }
-.form-side {
+.rp-btn:hover:not(:disabled) { background: #1E42D6; color: #fff; }
+.rp-btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+.rp-btn--full { width: 100%; margin-top: 4px; }
+
+.rp-spinner-row { display: flex; align-items: center; gap: 8px; }
+.rp-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* State screens (invalid token / success) */
+.rp-state { text-align: center; }
+.rp-state-icon {
+  width: 52px;
+  height: 52px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  box-shadow: 3px 3px 0 #16130F;
+  font-size: 1.4rem;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  width: 100%;
+  margin: 0 auto 20px;
 }
-.auth-container { width: 100%; max-width: 400px; }
-.brand-mark { display: flex; align-items: center; gap: 12px; }
-.logo-circle {
-  width: 48px; height: 48px; background: #000;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 900; color: white;
-}
-.brand-name { font-size: 24px; font-weight: 900; letter-spacing: 0.08em; color: #000; }
-h1 { color: #000; font-weight: 700; }
-.text-muted { color: #6B7280; font-size: 15px; }
+.rp-state-icon--warn { background: #DC2626; }
 
-.form-control {
-  height: 48px; border: 1px solid #E5E7EB; border-radius: 0;
-  padding: 0 16px; font-size: 15px; width: 100%; font-family: inherit;
-  transition: border-color 0.2s; box-sizing: border-box;
+@media (max-width: 640px) {
+  .rp-logo-bar { padding: 14px 18px; }
+  .rp-body { padding: 32px 18px 48px; }
 }
-.form-control:focus { outline: none; border-color: #000; box-shadow: none; }
-.form-control::placeholder { color: #9CA3AF; }
-
-.password-input { position: relative; }
-.password-toggle {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; color: #9CA3AF; font-size: 18px; cursor: pointer;
-}
-
-.pwd-strength { display: flex; align-items: center; gap: 10px; }
-.pwd-strength-bars { display: flex; gap: 4px; flex: 1; }
-.pwd-bar { flex: 1; height: 4px; transition: background 0.2s; }
-.pwd-strength-label { font-size: 12px; font-weight: 700; min-width: 44px; text-align: right; }
-
-.btn-primary {
-  height: 48px; background: #0052FF; border: none; border-radius: 0;
-  color: white; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.12em;
-  text-transform: uppercase; cursor: pointer; transition: background 0.2s;
-  width: 100%; display: flex; align-items: center; justify-content: center;
-}
-.btn-primary:hover:not(:disabled) { background: #003ECC; }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.alert-danger {
-  background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 0;
-  color: #DC2626; font-size: 14px; padding: 10px 14px;
-}
-.link { color: #000; text-decoration: none; font-weight: 600; }
-.link:hover { text-decoration: underline; }
-
-.sent-card, .error-card {
-  text-align: center; padding: 32px 24px; border: 1px solid #E5E5E5;
-}
-.sent-icon {
-  width: 56px; height: 56px; background: #000; color: #fff;
-  font-size: 24px; font-weight: 900;
-  display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
-}
-.sent-title, .error-title { font-size: 18px; font-weight: 700; color: #000; margin-bottom: 8px; }
-.sent-body, .error-body { font-size: 14px; color: #6B7280; line-height: 1.6; margin: 0; }
-
-.w-100 { width: 100%; }
-.mt-3 { margin-top: 16px; }
-.mb-3 { margin-bottom: 16px; }
-.mb-4 { margin-bottom: 24px; }
-.mt-4 { margin-top: 24px; }
-.mb-0 { margin-bottom: 0; }
-.me-2 { margin-right: 8px; }
-.py-2 { padding-top: 8px; padding-bottom: 8px; }
 </style>

@@ -803,7 +803,7 @@ onUnmounted(() => {
 <style scoped>
 .feed-page {
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--nav-h, 66px);
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
@@ -869,7 +869,7 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 20px 0 14px;
+  padding: 28px 0 14px;
 }
 .feed-title {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;

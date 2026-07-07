@@ -1143,7 +1143,7 @@ watch(zipcode, () => {
   min-height: 100vh;
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  padding-top: var(--nav-h, 66px);
+  padding-top: calc(var(--nav-h, 66px) + 20px);
   color: #16130F;
 }
 
