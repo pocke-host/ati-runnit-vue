@@ -12,6 +12,7 @@ const routes = [
   { path: '/signup',         name: 'Signup',        component: () => import('@/views/AccountRegister.vue') },
   { path: '/features',       name: 'Features',      component: () => import('@/views/Features.vue') },
   { path: '/about',          name: 'About',         component: () => import('@/views/About.vue') },
+  { path: '/pricing',        name: 'Pricing',       component: () => import('@/views/Pricing.vue') },
   { path: '/subscribe',         name: 'Subscribe',       component: () => import('@/views/Subscribe.vue') },
   { path: '/subscribe/success', name: 'CheckoutSuccess', component: () => import('@/views/CheckoutSuccess.vue') },
   { path: '/subscribe/cancel',  name: 'CheckoutCancel',  component: () => import('@/views/CheckoutCancel.vue') },

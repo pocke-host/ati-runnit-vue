@@ -5,7 +5,7 @@
     <section class="hero">
       <div class="page-inner">
         <span class="gr-eyebrow-badge">What's inside</span>
-        <h1 class="hero-h1">Everything a run<br>should remember.</h1>
+        <h1 class="hero-h1">Everything a session<br>should remember.</h1>
         <p class="hero-sub">Track, share, compete, train. The whole kit that used to take five apps — in one, built by people who'd rather be running.</p>
       </div>
     </section>

@@ -44,7 +44,7 @@
               <span class="chip-val">{{ formatDuration(thisWeek.durationSeconds) }}</span>
               <span class="chip-label">Time This Week</span>
             </div>
-            <div class="hero-chip">
+            <div class="hero-chip hero-chip--streak">
               <span class="chip-val">{{ streak.current }}<span class="chip-val-unit"> wk</span></span>
               <span class="chip-label">Active Streak</span>
               <span class="chip-delta" style="color:rgba(255,255,255,0.45)" v-if="streak.best >= 2">Best: {{ streak.best }}wk</span>
@@ -1094,6 +1094,8 @@ onUnmounted(() => {
 .delta-up   { color: #4ade80; }
 .delta-down { color: #f87171; }
 
+.hero-chip--streak .chip-val { color: #FFC53D; }
+
 .chip-skeleton {
   display: block;
   background: linear-gradient(90deg, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 75%);
@@ -1169,10 +1171,10 @@ onUnmounted(() => {
 .section-kicker {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.62rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #5A5348;
+  color: #2A55F5;
   display: block;
   padding-bottom: 12px;
   border-bottom: 2px solid #E7DFCE;
@@ -1217,12 +1219,18 @@ onUnmounted(() => {
   margin-bottom: 12px;
 }
 .race-pred-card {
-  border: 2px solid #E7DFCE;
+  border: 2px solid #16130F;
   padding: 24px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+.race-pred-card:last-child {
+  background: #2A55F5;
+  color: #fff;
+}
+.race-pred-card:last-child .race-pred-dist { color: rgba(255,255,255,0.8); }
+.race-pred-card:last-child .race-pred-sub  { color: rgba(255,255,255,0.75); }
 .race-pred-dist {
   font-size: 0.70rem;
   font-weight: 900;
@@ -1236,6 +1244,7 @@ onUnmounted(() => {
   color: #000;
   line-height: 1.1;
 }
+.race-pred-card:last-child .race-pred-time { color: #fff; }
 .race-pred-sub {
   font-size: 0.68rem;
   color: #767676;
@@ -1557,7 +1566,7 @@ onUnmounted(() => {
   gap: 14px;
 }
 .legend-row   { display: flex; align-items: center; gap: 14px; }
-.legend-dot   { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.legend-dot   { width: 14px; height: 14px; border-radius: 0; border: 2px solid #16130F; flex-shrink: 0; }
 .legend-info  { display: flex; justify-content: space-between; flex: 1; align-items: center; }
 .legend-type  { font-weight: 900; font-size: 0.9rem; color: rgba(15,18,16,0.85); }
 .legend-count { font-size: 0.80rem; font-weight: 700; color: rgba(15,18,16,0.50); }
@@ -1582,6 +1591,7 @@ onUnmounted(() => {
   gap: 6px;
 }
 .milestone-card:last-child { border-right: none; }
+.milestone-card:last-child .milestone-val { color: #2A55F5; }
 .milestone-val {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: clamp(1.5rem, 3vw, 2rem);
@@ -1704,8 +1714,6 @@ onUnmounted(() => {
   .pr-grid              { grid-template-columns: 1fr; }
   .hero-title           { font-size: 1.8rem; }
   .section-title        { font-size: 1.2rem; }
-  .pr-card              { padding: 16px; }
-  .pr-value             { font-size: 1.3rem; }
   .fitness-metric-row   { grid-template-columns: 1fr 1fr; }
   .race-pred-grid       { grid-template-columns: 1fr 1fr; }
   .hero                 { padding: 48px 16px 36px; }
@@ -1715,5 +1723,15 @@ onUnmounted(() => {
   .heatmap-months       { grid-auto-columns: 10px; }
   .heatmap-grid         { gap: 1px; }
   .heatmap-week         { gap: 1px; }
+  /* hero chips: 2×2 grid, left-aligned */
+  .hero-chips           { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; justify-items: start; }
+  .hero-chip            { width: 100%; align-items: flex-start; padding: 14px 16px; min-width: 0; }
+  /* hero activity dots: spread out and bigger */
+  .hero-dots            { justify-content: space-between; }
+  .hero-dot             { width: 30px; height: 30px; }
+  /* PR cards: horizontal row layout */
+  .pr-card              { flex-direction: row; align-items: center; text-align: left; padding: 16px; gap: 14px; }
+  .pr-icon-wrap         { flex-shrink: 0; margin-bottom: 0; }
+  .pr-value             { font-size: 1.3rem; }
 }
 </style>

@@ -38,8 +38,8 @@
         <div class="navbar-links navbar-links--public" v-if="!isAuthenticated">
           <router-link to="/features" class="nav-link nav-link-gr">Features</router-link>
           <router-link to="/about" class="nav-link nav-link-gr">About</router-link>
-          <router-link to="/subscribe" class="nav-link nav-link-gr">Pricing</router-link>
-          <router-link to="/waitlist" class="nav-link nav-link-gr-cta">Get Early Access</router-link>
+          <router-link to="/pricing" class="nav-link nav-link-gr">Pricing</router-link>
+          <router-link to="/waitlist" class="nav-link nav-link-gr-cta">Join Waitlist</router-link>
         </div>
 
         <!-- Auth icons -->
@@ -188,12 +188,12 @@
 
           <!-- Quick: messages + notifications -->
           <div class="drawer-quick">
-            <button class="drawer-link" @click="dmStore.open(); mobileMenuOpen = false">
+            <button class="drawer-link drawer-link--quick" @click="dmStore.open(); mobileMenuOpen = false">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 9 9 0 0 1-4-1L3 20l1.5-4.5a8.5 8.5 0 1 1 16.5-4Z"/></svg>
               Messages
               <span v-if="dmStore.unreadCount > 0" class="drawer-badge">{{ dmStore.unreadCount }}</span>
             </button>
-            <router-link to="/notifications" class="drawer-link" @click="mobileMenuOpen = false">
+            <router-link to="/notifications" class="drawer-link drawer-link--quick" @click="mobileMenuOpen = false">
               <span class="drawer-bell-wrap">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.5 21a1.7 1.7 0 0 1-3 0"/></svg>
                 <span v-if="unreadCount > 0" class="drawer-bell-dot"></span>
@@ -226,6 +226,7 @@
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18"/></svg>
                 Feed
               </router-link>
+              <div class="drawer-section-divider"></div>
               <div class="drawer-track-wrap">
                 <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
                   <span class="drawer-track-icon">▶</span>
@@ -282,7 +283,7 @@
           <nav class="drawer-nav">
             <router-link to="/features" class="drawer-link" @click="mobileMenuOpen = false">Features</router-link>
             <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">About</router-link>
-            <router-link to="/subscribe" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
+            <router-link to="/pricing" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
           </nav>
           <div class="drawer-footer">
             <router-link to="/join-us" class="drawer-link" @click="mobileMenuOpen = false">Login</router-link>
@@ -1324,6 +1325,22 @@ onUnmounted(() => {
   height: 2px;
   background: rgba(251, 246, 236, 0.15);
   margin: 4px 20px;
+}
+
+/* Hairline within nav — between Feed and Track */
+.drawer-section-divider {
+  height: 2px;
+  background: rgba(251, 246, 236, 0.15);
+  margin: 10px 20px;
+}
+
+/* Quick action links use Hanken Grotesk (not mono) per spec */
+.drawer-link--quick {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .drawer-badge {
   margin-left: auto;

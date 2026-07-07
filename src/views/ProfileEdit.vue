@@ -134,7 +134,7 @@
 
             <div class="pe-field">
               <label class="pe-label">Profile Visibility</label>
-              <div class="pe-toggle-row">
+              <div class="pe-toggle-row pe-toggle-visibility">
                 <button
                   type="button"
                   :class="['pe-toggle-btn', form.isPublic ? 'active' : '']"
@@ -491,8 +491,8 @@ onMounted(() => {
 
 /* Card */
 .pe-card {
-  border: 1px solid #E5E5E5;
-  padding: 32px;
+  border: 2px solid #16130F;
+  padding: 28px;
   background: #fff;
 }
 
@@ -586,12 +586,13 @@ onMounted(() => {
 
 /* Section label */
 .pe-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #767676;
-  margin-bottom: 20px;
+  color: #2A55F5;
+  margin-bottom: 16px;
 }
 
 /* Form fields */
@@ -666,32 +667,35 @@ onMounted(() => {
 /* Toggle row */
 .pe-toggle-row {
   display: flex;
-  gap: 0;
+  border: 2px solid #16130F;
+  overflow: hidden;
 }
 
 .pe-toggle-btn {
   flex: 1;
   height: 44px;
-  border: 1px solid #E5E5E5;
+  border: none;
+  border-right: 1px solid rgba(22,19,15,0.15);
   background: #fff;
-  color: #767676;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  color: #5a5348;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.15s;
   font-family: inherit;
-  margin-right: -1px;
 }
-.pe-toggle-btn:last-child { margin-right: 0; }
+.pe-toggle-btn:last-child { border-right: none; }
 .pe-toggle-btn.active {
-  background: #000;
-  border-color: #000;
+  background: #16130F;
   color: #fff;
-  position: relative;
-  z-index: 1;
 }
-.pe-toggle-btn:hover:not(.active) { background: #f5f5f5; color: #000; }
+.pe-toggle-btn:hover:not(.active) { background: rgba(22,19,15,0.05); color: #16130F; }
+/* Visibility toggle: active = cobalt */
+.pe-toggle-visibility .pe-toggle-btn.active {
+  background: #2A55F5;
+  color: #fff;
+}
 
 .pe-divider {
   border: none;
@@ -722,7 +726,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 4px 4px 0 #16130F;
+  box-shadow: 3px 3px 0 #16130F;
   transition: background 0.15s;
 }
 .btn-save:hover:not(:disabled) { background: #1E42D6; }
@@ -740,48 +744,53 @@ onMounted(() => {
 
 /* Danger zone */
 .pe-danger-card {
-  border-color: #fecaca;
+  border: 2px solid #C0392B;
+  margin-top: 20px;
 }
 
-.danger-label { color: #dc2626; }
+.danger-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: #C0392B;
+}
 
 .danger-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .danger-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 4px;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.9;
+  color: #16130F;
+  margin-bottom: 2px;
 }
 .danger-sub {
-  font-size: 0.82rem;
-  color: #767676;
+  font-size: 0.84rem;
+  color: #5a5348;
   line-height: 1.5;
 }
 
 .btn-danger {
-  height: 40px;
-  padding: 0 24px;
+  width: 100%;
+  padding: 13px 0;
   background: transparent;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  border: 2px solid #C0392B;
+  color: #C0392B;
   border-radius: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
-  font-family: inherit;
-  flex-shrink: 0;
+  transition: background 0.15s;
+  margin-top: 4px;
 }
-.btn-danger:hover { background: #fef2f2; border-color: #dc2626; }
+.btn-danger:hover { background: rgba(192,57,43,0.06); }
 
 /* Responsive */
 @media (max-width: 720px) {
@@ -795,7 +804,6 @@ onMounted(() => {
   }
   .danger-row {
     flex-direction: column;
-    align-items: flex-start;
   }
   .pe-wrap {
     /* extra bottom padding so iOS keyboard doesn't cover the save button */
