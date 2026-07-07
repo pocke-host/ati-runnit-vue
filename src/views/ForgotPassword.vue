@@ -1,56 +1,66 @@
 <template>
-  <main class="auth-page">
-    <section class="form-side">
-      <div class="auth-container">
-        <div class="brand-mark mb-4">
-          <div class="logo-circle">R</div>
-          <h2 class="brand-name mb-0">RUNNIT</h2>
-        </div>
+  <main class="fp-page">
 
-        <h1 class="h2 fw-bold mb-2">Forgot password?</h1>
-        <p class="text-muted mb-4">Enter your email and we'll send a reset link your way.</p>
+    <!-- Ticker -->
+    <div class="fp-ticker" aria-hidden="true">
+      <div class="fp-ticker-track">
+        <span>&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
+        <span aria-hidden="true">&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
+      </div>
+    </div>
 
-        <!-- Success state -->
-        <div v-if="sent" class="sent-card">
-          <div class="sent-icon">✓</div>
-          <p class="sent-title">Check your inbox</p>
-          <p class="sent-body">
-            If <strong>{{ submittedEmail }}</strong> is registered, a reset link is on its way.
-            Check your spam folder if you don't see it within a minute.
-          </p>
-          <router-link to="/join-us" class="btn btn-primary w-100 mt-3">Back to sign in</router-link>
-        </div>
+    <!-- Logo bar -->
+    <div class="fp-logo-bar">
+      <span class="fp-logo-text">RUNNIT<span class="fp-logo-dot">.</span></span>
+    </div>
 
-        <!-- Form state -->
-        <form v-else @submit.prevent="submit" novalidate>
-          <div class="mb-3">
+    <!-- Card -->
+    <div class="fp-body">
+
+      <!-- Success state -->
+      <div v-if="sent" class="fp-success">
+        <div class="fp-success-icon">✓</div>
+        <h1 class="fp-headline">Check your inbox.</h1>
+        <p class="fp-sub">
+          If <strong>{{ submittedEmail }}</strong> is registered, a reset link is on its way.
+          Check your spam folder if you don't see it within a minute.
+        </p>
+        <router-link to="/join-us" class="fp-btn fp-btn--full">Back to sign in →</router-link>
+      </div>
+
+      <!-- Form state -->
+      <template v-else>
+        <router-link to="/join-us" class="fp-back">← Back to sign in</router-link>
+        <h1 class="fp-headline">Reset your password.</h1>
+        <p class="fp-sub">Enter your email and we'll send a reset link your way.</p>
+
+        <form @submit.prevent="submit" novalidate>
+          <div class="fp-field">
+            <label class="fp-label" for="email">Email</label>
             <input
+              id="email"
               v-model.trim="email"
               type="email"
-              class="form-control"
-              placeholder="Email address"
+              class="fp-input"
+              placeholder="you@email.com"
               required
               autocomplete="email"
               autofocus
             />
           </div>
 
-          <div v-if="error" class="alert alert-danger py-2 mb-3">{{ error }}</div>
+          <div v-if="error" class="fp-error">{{ error }}</div>
 
-          <button class="btn btn-primary w-100" :disabled="loading || !email">
+          <button class="fp-btn fp-btn--full" :disabled="loading || !email" type="submit">
             <span v-if="!loading">Send Reset Link</span>
-            <span v-else>
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Sending…
+            <span v-else class="fp-spinner-row">
+              <span class="fp-spinner"></span>Sending…
             </span>
           </button>
         </form>
+      </template>
 
-        <p class="text-center text-muted small mt-4 mb-0">
-          <router-link to="/join-us" class="link">← Back to sign in</router-link>
-        </p>
-      </div>
-    </section>
+    </div>
   </main>
 </template>
 
@@ -83,132 +93,190 @@ const submit = async () => {
 </script>
 
 <style scoped>
-.auth-page {
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, sans-serif;
+@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+
+.fp-page {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: #fff;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
+  padding-top: var(--nav-h, 66px);
 }
-.form-side {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  width: 100%;
-}
-.auth-container {
-  width: 100%;
-  max-width: 400px;
-}
-.brand-mark {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo-circle {
-  width: 48px;
-  height: 48px;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 900;
-  color: white;
-}
-.brand-name {
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: #000;
-}
-h1 { color: #000; font-weight: 700; }
-.text-muted { color: #6B7280; font-size: 15px; }
 
-.form-control {
-  height: 48px;
-  border: 1px solid #E5E7EB;
-  border-radius: 0;
-  padding: 0 16px;
-  font-size: 15px;
+/* Ticker */
+.fp-ticker {
   width: 100%;
-  font-family: inherit;
-  transition: border-color 0.2s;
+  background: #16130F;
+  border-bottom: 3px solid #2A55F5;
+  overflow: hidden;
+  flex-shrink: 0;
 }
-.form-control:focus { outline: none; border-color: #000; box-shadow: none; }
-.form-control::placeholder { color: #9CA3AF; }
-
-.btn-primary {
-  height: 48px;
-  background: #0052FF;
-  border: none;
-  border-radius: 0;
-  color: white;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+.fp-ticker-track {
+  display: flex;
+  white-space: nowrap;
+  animation: rkMarq 28s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.2s;
+  color: #FBF6EC;
+  padding: 7px 0;
+}
+@media (prefers-reduced-motion: reduce) { .fp-ticker-track { animation: none; } }
+
+/* Logo bar */
+.fp-logo-bar {
   width: 100%;
+  padding: 18px 32px;
+  border-bottom: 2px solid #16130F;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
-.btn-primary:hover:not(:disabled) { background: #003ECC; }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.fp-logo-text {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #16130F;
+}
+.fp-logo-dot { color: #2A55F5; }
 
-.alert-danger {
+/* Card body */
+.fp-body {
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 24px 60px;
+}
+
+.fp-back {
+  display: inline-block;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5a5348;
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+.fp-back:hover { color: #16130F; }
+
+.fp-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.4rem, 7vw, 3.2rem);
+  line-height: 0.85;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  color: #16130F;
+}
+
+.fp-sub {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #5a5348;
+  margin: 0 0 32px;
+}
+.fp-sub strong { color: #16130F; font-weight: 700; }
+
+/* Fields */
+.fp-field { margin-bottom: 18px; }
+.fp-label {
+  display: block;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5a5348;
+  margin-bottom: 7px;
+}
+.fp-input {
+  width: 100%;
+  height: 48px;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 0 14px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.95rem;
+  color: #16130F;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.fp-input:focus { border-color: #2A55F5; }
+.fp-input::placeholder { color: #8a8a8a; }
+
+/* Error */
+.fp-error {
   background: #FEF2F2;
-  border: 1px solid #FCA5A5;
-  border-radius: 0;
+  border: 2px solid #FCA5A5;
   color: #DC2626;
-  font-size: 14px;
+  font-size: 0.85rem;
   padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
-.link { color: #000; text-decoration: none; font-weight: 600; }
-.link:hover { text-decoration: underline; }
-
-/* Sent confirmation card */
-.sent-card {
-  text-align: center;
-  padding: 32px 24px;
-  border: 1px solid #E5E5E5;
-}
-.sent-icon {
-  width: 56px;
-  height: 56px;
-  background: #000;
+/* Button */
+.fp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2A55F5;
   color: #fff;
-  font-size: 24px;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 15px 28px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 #16130F;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.fp-btn:hover:not(:disabled) { background: #1E42D6; color: #fff; }
+.fp-btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+.fp-btn--full { width: 100%; margin-top: 4px; }
+
+.fp-spinner-row { display: flex; align-items: center; gap: 8px; }
+.fp-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Success state */
+.fp-success { text-align: center; }
+.fp-success-icon {
+  width: 52px;
+  height: 52px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  box-shadow: 3px 3px 0 #16130F;
+  font-size: 1.4rem;
   font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-}
-.sent-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 8px;
-}
-.sent-body {
-  font-size: 14px;
-  color: #6B7280;
-  line-height: 1.6;
-  margin: 0;
+  margin: 0 auto 20px;
 }
 
-.w-100 { width: 100%; }
-.mt-3 { margin-top: 16px; }
-.mb-3 { margin-bottom: 16px; }
-.mb-4 { margin-bottom: 24px; }
-.mt-4 { margin-top: 24px; }
-.mb-0 { margin-bottom: 0; }
-.me-2 { margin-right: 8px; }
-.py-2 { padding-top: 8px; padding-bottom: 8px; }
+@media (max-width: 640px) {
+  .fp-logo-bar { padding: 14px 18px; }
+  .fp-body { padding: 32px 18px 48px; }
+}
 </style>
