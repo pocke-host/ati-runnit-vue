@@ -214,7 +214,7 @@ onMounted(async () => {
 .my-coach-page {
   min-height: 100vh;
   background: #fff;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   font-family: Futura, "Futura PT", "Avenir Next", system-ui, sans-serif;
 }
 

@@ -90,7 +90,7 @@ const handlePortal = async () => {
 .billing-page {
   min-height: 100vh;
   background: #fff;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   font-family: Futura, 'Avenir Next', system-ui, sans-serif;
 }
 .billing-wrap {

@@ -126,7 +126,7 @@ function handleUpgrade() {
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 56px 0 44px;
+  padding: 76px 0 60px;
   text-align: center;
   border-bottom: 2px solid #16130F;
 }
@@ -305,7 +305,7 @@ function handleUpgrade() {
 }
 @media (max-width: 640px) {
   .page-inner { padding: 0 22px; }
-  .hero { padding: 40px 0 32px; }
+  .hero { padding: 56px 0 40px; }
   .pricing-section { padding: 32px 0; }
   .final-cta { padding: 44px 22px; }
 }

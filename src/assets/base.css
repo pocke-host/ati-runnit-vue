@@ -11,7 +11,8 @@
 
 :root {
   /* ── Layout ── */
-  --nav-h: calc(64px + env(safe-area-inset-top, 0px));
+  --nav-h: calc(66px + env(safe-area-inset-top, 0px));
+  --page-top: calc(var(--nav-h) + 28px); /* nav clearance + breathing room — desktop + mobile */
   --spec-h: 35px; /* SpecBar height — shown only on marketing/unauthenticated pages */
   --coach-bar-h: 28px;
   --tab-h: 64px;
@@ -210,6 +211,14 @@ a:hover { text-decoration: none; }
 }
 
 /* ── Mobile Typography Hierarchy ── */
+/* Mobile nav is 56px — update --nav-h so --page-top stays accurate */
+@media (max-width: 640px) {
+  :root {
+    --nav-h: calc(56px + env(safe-area-inset-top, 0px));
+    --page-top: calc(var(--nav-h) + 24px); /* slightly tighter breathing room on mobile */
+  }
+}
+
 /* Addresses flat heading/body contrast on small screens.
    Ensures clear visual rhythm: display > headline > subheading > body */
 @media (max-width: 480px) {

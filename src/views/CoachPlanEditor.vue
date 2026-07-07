@@ -506,7 +506,7 @@ onMounted(async () => {
 .plan-editor {
   min-height: 100vh;
   background: #fff;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   font-family: "Futura PT", Futura, "Century Gothic", system-ui, sans-serif;
 }
 
@@ -732,7 +732,7 @@ onMounted(async () => {
   letter-spacing: 0.04em; text-transform: uppercase;
 }
 
-.plan-editor-loading { min-height: 100vh; padding-top: var(--nav-h, 64px); display: flex; align-items: center; justify-content: center; }
+.plan-editor-loading { min-height: 100vh; padding-top: var(--page-top); display: flex; align-items: center; justify-content: center; }
 .loading-state { display: flex; align-items: center; color: #767676; font-size: 0.9rem; }
 
 .spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(0,0,0,0.10); border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }

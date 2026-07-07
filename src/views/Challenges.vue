@@ -502,7 +502,7 @@ onMounted(() => {
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   background: #FBF6EC;
   min-height: 100vh;
-  padding-top: var(--nav-h, 66px);
+  padding-top: var(--page-top);
 }
 
 /* ===== HERO ===== */
