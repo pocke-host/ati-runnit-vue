@@ -107,6 +107,7 @@ const annual = ref(false)
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
+  padding-top: var(--nav-h);
 }
 .page-inner {
   max-width: 1040px;
