@@ -1,9 +1,6 @@
 <!-- ========== ConnectDevices.vue ========== -->
 <template>
   <div class="connect-devices">
-    <h2>Connect Your Devices</h2>
-    <p>Automatically sync your workouts from your favorite fitness platforms</p>
-
     <!-- Status Banner -->
     <div v-if="statusMessage" :class="['status-banner', statusType]">
       <i :class="statusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
@@ -13,7 +10,9 @@
     <div class="devices-grid">
       <!-- Garmin -->
       <div class="device-card">
-        <div class="device-icon">🏃</div>
+        <div class="device-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
         <h3>Garmin</h3>
         <p>Sync runs, rides, and more from your Garmin device</p>
 
@@ -43,15 +42,12 @@
 
       <!-- Strava -->
       <div class="device-card">
-        <div class="device-icon">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Strava_Logo.svg" alt="Strava" class="brand-logo" loading="lazy" />
-        </div>
+        <div class="device-strava-logo">STRAVA</div>
         <h3>Strava</h3>
         <p>Automatically import every run, ride, and swim you log on Strava</p>
 
         <template v-if="!stravaConnected">
-          <button class="btn btn-strava" @click="connectStrava" :disabled="loading">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+          <button class="btn btn-primary" @click="connectStrava" :disabled="loading">
             Connect Strava
           </button>
         </template>
@@ -74,7 +70,9 @@
 
       <!-- Zwift -->
       <div class="device-card">
-        <div class="device-icon">🚴</div>
+        <div class="device-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v5M14 17H9m5 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
+        </div>
         <h3>Zwift</h3>
         <p>Sync rides and runs from Zwift</p>
 
@@ -98,7 +96,9 @@
 
       <!-- Apple Health -->
       <div class="device-card">
-        <div class="device-icon">⌚</div>
+        <div class="device-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z"/></svg>
+        </div>
         <h3>Apple Health</h3>
         <p>On iPhone: install the RUNNIT app and grant HealthKit access for automatic sync. On web: import a GPX file.</p>
         <div class="apple-actions">
@@ -116,7 +116,9 @@
 
       <!-- COROS (Coming Soon) -->
       <div class="device-card device-coming-soon">
-        <div class="device-icon">⌚</div>
+        <div class="device-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+        </div>
         <h3>COROS</h3>
         <p>Sync workouts from COROS watches</p>
         <div class="coming-soon-badge">COMING SOON</div>
@@ -124,7 +126,9 @@
 
       <!-- Wahoo -->
       <div class="device-card">
-        <div class="device-icon">🚲</div>
+        <div class="device-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5ZM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
         <h3>Wahoo</h3>
         <p>Sync rides and workouts from Wahoo ELEMNT, KICKR, and SYSTM</p>
         <template v-if="!wahooConnected">
@@ -151,7 +155,9 @@
 
       <!-- Fitbit (Coming Soon) -->
       <div class="device-card device-coming-soon">
-        <div class="device-icon">📊</div>
+        <div class="device-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        </div>
         <h3>Fitbit</h3>
         <p>Sync steps, runs, and wellness data</p>
         <div class="coming-soon-badge">COMING SOON</div>
@@ -407,20 +413,6 @@ onMounted(() => {
 .connect-devices {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
-}
-
-.connect-devices h2 {
-  font-weight: 900;
-  font-size: 2rem;
-  margin-bottom: 12px;
-  letter-spacing: -0.02em;
-}
-
-.connect-devices > p {
-  color: rgba(15,18,16,0.55);
-  margin-bottom: 40px;
-  font-size: 0.95rem;
 }
 
 /* Status Banner */
@@ -457,42 +449,54 @@ onMounted(() => {
 /* Card */
 .device-card {
   background: #fff;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
-  padding: 32px 28px;
+  padding: 20px;
   text-align: center;
-  box-shadow: none;
-  transition: border-color 0.15s;
-}
-
-.device-card:hover:not(.device-coming-soon) {
-  border-color: #ccc;
 }
 
 .device-coming-soon {
-  opacity: 0.5;
+  opacity: 0.45;
   pointer-events: none;
 }
 
-.device-icon {
-  font-size: 3rem;
-  margin-bottom: 14px;
+.device-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #16130F;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.device-strava-logo {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  color: #FC4C02;
+  margin-bottom: 8px;
   line-height: 1;
 }
 
 .device-card h3 {
-  font-weight: 900;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-  letter-spacing: 0.02em;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
   text-transform: uppercase;
+  margin: 0 0 8px;
+  color: #16130F;
+  line-height: 1;
 }
 
 .device-card p {
-  color: rgba(15,18,16,0.55);
-  margin-bottom: 24px;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  color: #5a5348;
+  margin: 0 0 16px;
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 /* Buttons */
@@ -515,14 +519,13 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #0052FF;
-  border-color: #0052FF;
+  background: #2A55F5;
+  border-color: #16130F;
   color: #fff;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #003ECC;
-  border-color: #003ECC;
+  background: #1E42D6;
 }
 
 .btn-primary:disabled {
@@ -531,13 +534,13 @@ onMounted(() => {
 }
 
 .btn-outline {
-  background: transparent;
-  border-color: #E5E5E5;
-  color: rgba(15,18,16,0.80);
+  background: #fff;
+  border-color: #16130F;
+  color: #16130F;
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #f5f5f5;
+  background: rgba(22,19,15,0.05);
 }
 
 /* Connected state */
@@ -574,21 +577,6 @@ onMounted(() => {
   color: rgba(15,18,16,0.45);
 }
 
-.btn-strava {
-  background: #FC4C02;
-  border-color: #FC4C02;
-  color: #fff;
-}
-.btn-strava:hover:not(:disabled) {
-  background: #e04400;
-  border-color: #e04400;
-}
-.brand-logo {
-  width: 80px;
-  height: auto;
-  object-fit: contain;
-}
-.device-icon img { display: block; margin: 0 auto; }
 
 .btn-disconnect {
   background: none;
