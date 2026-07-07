@@ -38,8 +38,8 @@
         <div class="navbar-links navbar-links--public" v-if="!isAuthenticated">
           <router-link to="/features" class="nav-link nav-link-gr">Features</router-link>
           <router-link to="/about" class="nav-link nav-link-gr">About</router-link>
-          <router-link to="/subscribe" class="nav-link nav-link-gr">Pricing</router-link>
-          <router-link to="/waitlist" class="nav-link nav-link-gr-cta">Get Early Access</router-link>
+          <router-link to="/pricing" class="nav-link nav-link-gr">Pricing</router-link>
+          <router-link to="/waitlist" class="nav-link nav-link-gr-cta">Join Waitlist</router-link>
         </div>
 
         <!-- Auth icons -->
@@ -283,7 +283,7 @@
           <nav class="drawer-nav">
             <router-link to="/features" class="drawer-link" @click="mobileMenuOpen = false">Features</router-link>
             <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">About</router-link>
-            <router-link to="/subscribe" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
+            <router-link to="/pricing" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
           </nav>
           <div class="drawer-footer">
             <router-link to="/join-us" class="drawer-link" @click="mobileMenuOpen = false">Login</router-link>
