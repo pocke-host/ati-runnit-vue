@@ -711,7 +711,7 @@ onMounted(init)
 <style scoped>
 .profile-page {
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;

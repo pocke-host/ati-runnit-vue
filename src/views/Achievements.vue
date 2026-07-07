@@ -158,7 +158,7 @@ onMounted(async () => {
   --gold: #FFD700;
   --special: #0052FF;
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   background: #fff;
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }

@@ -921,7 +921,7 @@ watch([currentYear, currentMonth], fetchEvents)
 <style scoped>
 .cal-page {
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   background: #fff;
   font-family: Futura, "Futura PT", "Avenir Next", Avenir, system-ui, sans-serif;
 }

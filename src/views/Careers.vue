@@ -92,7 +92,7 @@ const values = [
 
 <style scoped>
 .editorial-page {
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
   min-height: 100vh;
   background: #fff;
 }

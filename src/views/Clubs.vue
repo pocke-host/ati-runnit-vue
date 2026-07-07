@@ -860,7 +860,7 @@ onMounted(() => {
   background: #FBF6EC;
   color: #16130F;
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--page-top);
 }
 
 /* ===== GR HERO ===== */

@@ -11,7 +11,8 @@
 
 :root {
   /* ── Layout ── */
-  --nav-h: calc(64px + env(safe-area-inset-top, 0px));
+  --nav-h: calc(66px + env(safe-area-inset-top, 0px));
+  --page-top: calc(var(--nav-h) + 28px); /* nav clearance + breathing room */
   --spec-h: 35px; /* SpecBar height — shown only on marketing/unauthenticated pages */
   --coach-bar-h: 28px;
   --tab-h: 64px;

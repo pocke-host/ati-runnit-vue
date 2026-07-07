@@ -744,7 +744,7 @@ onMounted(async () => {
 .plan-detail-page {
   min-height: 100vh;
   background: var(--r-offwhite);
-  padding-top: var(--nav-h);
+  padding-top: var(--page-top);
   font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
 
@@ -767,7 +767,7 @@ onMounted(async () => {
 .sk-bar-sm  { width: 120px; }
 .sk-bar-md  { width: 220px; height: 20px; }
 .sk-bar-lg  { width: 320px; height: 32px; }
-.plan-skeleton { padding-top: var(--nav-h, 64px); }
+.plan-skeleton { padding-top: var(--page-top); }
 .sk-header {
   background: #000;
   padding: 40px 24px 36px;
