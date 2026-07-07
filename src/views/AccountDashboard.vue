@@ -1899,7 +1899,7 @@ onUnmounted(() => {
 }
 
 /* Keep all other existing styles */
-.dash{min-height:100vh;padding-top:var(--nav-h,66px);background:#FBF6EC;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#16130F}
+.dash{min-height:100vh;padding-top:var(--page-top);background:#FBF6EC;font-family:'Hanken Grotesk',system-ui,sans-serif;color:#16130F}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:rgba(15,18,16,0.70)}
 .dash-loader{width:32px;height:32px;border:2px solid rgba(15,18,16,0.10);border-top-color:#2A55F5;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
