@@ -117,7 +117,7 @@
       <div class="gr-proof-content">
         <span class="gr-proof-badge">Proof or it didn't happen</span>
         <h2 class="gr-proof-headline">Every mile,<br>on the record.</h2>
-        <p class="gr-proof-copy">Join thousands of runners logging their sessions, chasing crowns, and dragging their crew out at dawn.</p>
+        <p class="gr-proof-copy">Join thousands of athletes logging their sessions, chasing crowns, and dragging their crew out at dawn.</p>
 
         <div class="gr-stamps-cluster">
           <!-- Receipt card -->

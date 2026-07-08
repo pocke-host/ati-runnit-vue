@@ -1,29 +1,36 @@
 # Runnit Views — Claude Instructions
 
-## Design System
-- `border-radius: 0` everywhere — no rounded corners
-- `box-shadow: none` — no shadows on cards, drawers, hovers
+## Design System — Good Record (active)
+- `border-radius: 0` everywhere — no rounded corners (exception: pill CTAs use `border-radius: 999px`)
+- Cards get `box-shadow: none` by default; CTAs and hero cards use **hard offset shadows** like `4px 4px 0 #16130F`
 - No CSS gradients except on map/image overlays
-- Page background: `#fff`
-- Hero sections: `background: #000`
-- **Primary buttons: `background: #0052FF`, white text, uppercase, `letter-spacing: 0.12em`, `font-weight: 600`, `font-size: 0.78rem`, `border: 2px solid #0052FF`**
-- **Primary button hover: `background: #003ECC`, `border-color: #003ECC`**
-- Secondary/ghost buttons: white bg, border `1px solid #E5E5E5`
+- Page background: `#FBF6EC` (Paper)
+- Hero sections: `background: #16130F` (Ink), `color: #FBF6EC`
+- **Primary buttons: cobalt pill — `background: #2A55F5`, `color: #fff`, `border: 2px solid #16130F`, `border-radius: 999px`, `box-shadow: 4px 4px 0 #16130F`, Spline Mono 700 uppercase**
+- **Primary button hover: `background: #1E42D6`**
+- Secondary/ghost buttons: white bg, `border: 2px solid #16130F`, no border-radius
 - Danger buttons: keep red (`#dc2626` / `#ef4444`)
-- Font: `Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, ...`
-- Active state: `border-bottom: 2px solid #000` (underline, not filled)
-- Borders: `1px solid #E5E5E5`
+- Body font: `'Hanken Grotesk', system-ui, sans-serif`
+- Display font: `'Big Shoulders Display', system-ui, sans-serif` — weight 800-900, UPPERCASE, `line-height: 0.8-0.9`
+- Label/stat font: `'Spline Sans Mono', ui-monospace, monospace` — weight 600-700, uppercase, tabular-nums
+- Active nav state: 3px cobalt underline (`border-bottom: 3px solid #2A55F5`)
+- Borders: `2px solid #16130F` (ink) for form elements/cards; `2px solid #E7DFCE` (hairline) for dividers
+- Audience: **athletes** (not "runners") in all body copy
 
-## Design Tokens
+## Design Tokens — Good Record
 ```css
-/* Electric Blue brand system — do NOT use olive or orange */
---rk-void:    #000000   /* black — hero backgrounds, text */
---rk-signal:  #0052FF   /* electric blue — primary CTA, active states */
---rk-signal-light: #EBF0FF  /* tinted surface */
---rk-ash:     #767676   /* secondary text */
---rk-rule:    #E5E5E5   /* borders */
---rk-smoke:   #F5F5F5   /* alternate bg */
---nav-h: 64px
+--rk-paper:   #FBF6EC   /* page background */
+--rk-card:    #FFFFFF   /* card background */
+--rk-void:    #16130F   /* ink — text, borders, hero bg */
+--rk-signal:  #2A55F5   /* cobalt — primary CTA, active states */
+--rk-signal-hover: #1E42D6  /* cobalt hover */
+--rk-signal-light: #EEF1FF  /* cobalt tinted surface */
+--rk-yellow:  #FFC53D   /* yellow — streaks, PRs, achievements only */
+--rk-muted:   #5A5348   /* muted text */
+--rk-ash:     #8A8A8A   /* secondary text */
+--rk-hairline: #E7DFCE  /* dividers, subtle borders */
+--rk-warm:    #F1EADC   /* warm cream — week rail, hover states */
+--nav-h: 66px
 --tab-h: 64px
 ```
 

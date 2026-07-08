@@ -554,7 +554,7 @@ const getSportIcon = (sportType) => {
 
 const getSportGradient = (sportType) => {
   const gradients = {
-    RUN:  'linear-gradient(135deg, #0052FF 0%, #003ECC 100%)',
+    RUN:  'linear-gradient(135deg, #2A55F5 0%, #003ECC 100%)',
     BIKE: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
     SWIM: 'linear-gradient(135deg, #0077B6 0%, #023E8A 100%)',
     HIKE: 'linear-gradient(135deg, #2D6A4F 0%, #1B4332 100%)',
@@ -846,7 +846,7 @@ onUnmounted(() => {
   transition: height 0.2s ease, opacity 0.15s ease;
   pointer-events: none;
 }
-.ptr-spinner { font-size: 1.4rem; color: #0052FF; }
+.ptr-spinner { font-size: 1.4rem; color: #2A55F5; }
 .ptr-spinner.spinning i { animation: ptr-spin 0.7s linear infinite; }
 @keyframes ptr-spin { to { transform: rotate(360deg); } }
 
@@ -1342,7 +1342,7 @@ onUnmounted(() => {
 }
 
 .moment-badge-type {
-  background: #0052FF;
+  background: #2A55F5;
   color: white;
 }
 

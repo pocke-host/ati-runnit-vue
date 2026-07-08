@@ -1,280 +1,299 @@
 <!-- src/views/AccountSettings.vue -->
 <template>
   <div class="settings-page">
-    <!-- Back bar -->
-    <header class="settings-header">
-      <button class="back-btn" @click="router.push('/dashboard')">
-        <i class="bi bi-arrow-left me-2"></i>Dashboard
-      </button>
-      <div class="settings-logo">RUNNIT</div>
-    </header>
 
-    <div class="settings-body">
-      <!-- ── PROFILE ─────────────────────────────── -->
-      <section class="settings-section">
-        <div class="section-label">Profile</div>
+    <!-- Title bar -->
+    <div class="st-title-bar">
+      <h1 class="st-page-title">Settings</h1>
+    </div>
 
-        <div class="settings-card">
-          <!-- Avatar -->
-          <div class="profile-avatar-row">
-            <div class="profile-avatar">{{ userInitial }}</div>
-            <div class="profile-avatar-info">
-              <div class="profile-name">{{ user?.displayName || 'Athlete' }}</div>
-              <div class="profile-email">{{ user?.email }}</div>
+    <!-- Two-column layout -->
+    <div class="st-layout">
+
+      <!-- Sidebar nav -->
+      <nav class="st-sidebar">
+        <div class="st-sidebar-item st-sidebar-item--active">Account</div>
+        <div class="st-sidebar-item">Units &amp; Display</div>
+        <div class="st-sidebar-item">Privacy</div>
+        <div class="st-sidebar-item">Connected Apps</div>
+        <div class="st-sidebar-item">Notifications</div>
+        <div class="st-sidebar-item">Billing</div>
+      </nav>
+
+      <!-- Right panel -->
+      <div class="st-panel">
+
+        <!-- ── PROFILE ─────────────────────────────── -->
+        <section class="settings-section">
+          <div class="section-label">Account</div>
+
+          <div class="settings-card">
+            <!-- Avatar row -->
+            <div class="profile-avatar-row">
+              <div class="profile-avatar">{{ userInitial }}</div>
+              <div class="profile-avatar-info">
+                <div class="profile-name">{{ user?.displayName || 'Athlete' }}</div>
+                <div class="profile-email">{{ user?.email }}</div>
+              </div>
+              <button class="st-photo-btn">Change Photo</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Display Name -->
+            <div class="field-group">
+              <label class="field-label">Display Name</label>
+              <div class="field-input-wrap">
+                <input
+                  v-model="displayName"
+                  type="text"
+                  class="field-input"
+                  placeholder="Your name"
+                  :disabled="savingProfile"
+                />
+                <button
+                  class="btn btn-primary btn-sm"
+                  @click="saveProfile"
+                  :disabled="savingProfile || displayName === user?.displayName"
+                >
+                  <span v-if="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Email (read-only) -->
+            <div class="field-group">
+              <label class="field-label">Email</label>
+              <div class="field-readonly">{{ user?.email }}</div>
+            </div>
+
+            <div v-if="profileStatus" :class="['field-status', profileStatusType]">
+              <i :class="profileStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
+              {{ profileStatus }}
             </div>
           </div>
+        </section>
 
-          <div class="divider"></div>
+        <!-- ── UNITS ──────────────────────────────── -->
+        <section class="settings-section">
+          <div class="section-label">Units</div>
+          <div class="section-sublabel">Choose how distances, elevation, and pace are displayed.</div>
 
-          <!-- Display Name -->
-          <div class="field-row">
-            <label class="field-label">Display Name</label>
-            <div class="field-input-wrap">
-              <input
-                v-model="displayName"
-                type="text"
-                class="field-input"
-                placeholder="Your name"
-                :disabled="savingProfile"
-              />
-              <button
-                class="btn btn-primary btn-sm"
-                @click="saveProfile"
-                :disabled="savingProfile || displayName === user?.displayName"
-              >
-                <span v-if="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
-                Save
-              </button>
-            </div>
-          </div>
+          <div class="unit-cards">
+            <button
+              :class="['unit-card', { active: unitSystem === 'imperial' }]"
+              @click="selectUnit('imperial')"
+            >
+              <div class="unit-flag">🇺🇸</div>
+              <div class="unit-name">Imperial</div>
+              <div class="unit-examples">
+                <span class="unit-example">mi</span>
+                <span class="unit-example">ft</span>
+                <span class="unit-example">min/mi</span>
+              </div>
+              <div class="unit-check" v-if="unitSystem === 'imperial'">
+                <i class="bi bi-check-lg"></i>
+              </div>
+            </button>
 
-          <!-- Email (read-only) -->
-          <div class="field-row">
-            <label class="field-label">Email</label>
-            <div class="field-readonly">{{ user?.email }}</div>
-          </div>
-
-          <div v-if="profileStatus" :class="['field-status', profileStatusType]">
-            <i :class="profileStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
-            {{ profileStatus }}
-          </div>
-        </div>
-      </section>
-
-      <!-- ── UNITS ──────────────────────────────── -->
-      <section class="settings-section">
-        <div class="section-label">Units</div>
-        <div class="section-sublabel">Choose how distances, elevation, and pace are displayed.</div>
-
-        <div class="unit-cards">
-          <button
-            :class="['unit-card', { active: unitSystem === 'imperial' }]"
-            @click="selectUnit('imperial')"
-          >
-            <div class="unit-flag">🇺🇸</div>
-            <div class="unit-name">Imperial</div>
-            <div class="unit-examples">
-              <span class="unit-example">mi</span>
-              <span class="unit-example">ft</span>
-              <span class="unit-example">min/mi</span>
-            </div>
-            <div class="unit-check" v-if="unitSystem === 'imperial'">
-              <i class="bi bi-check-lg"></i>
-            </div>
-          </button>
-
-          <button
-            :class="['unit-card', { active: unitSystem === 'metric' }]"
-            @click="selectUnit('metric')"
-          >
-            <div class="unit-flag">📏</div>
-            <div class="unit-name">Metric</div>
-            <div class="unit-examples">
-              <span class="unit-example">km</span>
-              <span class="unit-example">m</span>
-              <span class="unit-example">min/km</span>
-            </div>
-            <div class="unit-check" v-if="unitSystem === 'metric'">
-              <i class="bi bi-check-lg"></i>
-            </div>
-          </button>
-        </div>
-
-        <!-- Live preview -->
-        <div class="unit-preview">
-          <div class="unit-preview-label">Preview</div>
-          <div class="unit-preview-row">
-            <div class="preview-item">
-              <div class="preview-val">{{ previewDistance }}</div>
-              <div class="preview-key">Distance</div>
-            </div>
-            <div class="preview-item">
-              <div class="preview-val">{{ previewPace }}</div>
-              <div class="preview-key">Pace</div>
-            </div>
-            <div class="preview-item">
-              <div class="preview-val">{{ previewElevation }}</div>
-              <div class="preview-key">Elevation</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── PRIVACY ────────────────────────────── -->
-      <section class="settings-section">
-        <div class="section-label">Privacy</div>
-        <div class="settings-card">
-          <div class="field-row">
-            <div>
-              <div class="field-label">Profile Visibility</div>
-              <div class="field-hint">Control who can see your profile and activities.</div>
-            </div>
-            <button class="btn btn-sm" @click="router.push('/profile/edit')">
-              <i class="bi bi-pencil me-1"></i>Edit in Profile
+            <button
+              :class="['unit-card', { active: unitSystem === 'metric' }]"
+              @click="selectUnit('metric')"
+            >
+              <div class="unit-flag">📏</div>
+              <div class="unit-name">Metric</div>
+              <div class="unit-examples">
+                <span class="unit-example">km</span>
+                <span class="unit-example">m</span>
+                <span class="unit-example">min/km</span>
+              </div>
+              <div class="unit-check" v-if="unitSystem === 'metric'">
+                <i class="bi bi-check-lg"></i>
+              </div>
             </button>
           </div>
-        </div>
-      </section>
 
-      <!-- ── SAFETY ─────────────────────────────── -->
-      <section class="settings-section">
-        <div class="section-label">Safety</div>
-        <div class="section-sublabel">Emergency contacts are notified when you trigger SOS during a run.</div>
-
-        <div class="settings-card">
-          <!-- Contact list -->
-          <div v-if="contacts.length === 0" class="contact-empty">No emergency contacts added.</div>
-          <div v-else class="contact-list">
-            <div v-for="c in contacts" :key="c.id" class="contact-row">
-              <div class="contact-info">
-                <span class="contact-name">{{ c.name }}</span>
-                <span v-if="c.phone" class="contact-detail">{{ c.phone }}</span>
-                <span v-if="c.email" class="contact-detail">{{ c.email }}</span>
+          <!-- Live preview -->
+          <div class="unit-preview">
+            <div class="unit-preview-label">Preview</div>
+            <div class="unit-preview-row">
+              <div class="preview-item">
+                <div class="preview-val">{{ previewDistance }}</div>
+                <div class="preview-key">Distance</div>
               </div>
-              <button class="btn-remove-contact" @click="removeContact(c.id)" title="Remove">
-                <i class="bi bi-trash"></i>
+              <div class="preview-item">
+                <div class="preview-val">{{ previewPace }}</div>
+                <div class="preview-key">Pace</div>
+              </div>
+              <div class="preview-item">
+                <div class="preview-val">{{ previewElevation }}</div>
+                <div class="preview-key">Elevation</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── PRIVACY ────────────────────────────── -->
+        <section class="settings-section">
+          <div class="section-label">Privacy</div>
+          <div class="settings-card">
+            <div class="field-row">
+              <div>
+                <div class="field-label">Profile Visibility</div>
+                <div class="field-hint">Control who can see your profile and activities.</div>
+              </div>
+              <button class="btn btn-sm" @click="router.push('/profile/edit')">
+                <i class="bi bi-pencil me-1"></i>Edit in Profile
               </button>
             </div>
           </div>
+        </section>
 
-          <div class="divider"></div>
+        <!-- ── SAFETY ─────────────────────────────── -->
+        <section class="settings-section">
+          <div class="section-label">Safety</div>
+          <div class="section-sublabel">Emergency contacts are notified when you trigger SOS during a session.</div>
 
-          <!-- Add form -->
-          <form class="contact-form" @submit.prevent="addContact">
-            <div class="field-row contact-form-row">
-              <input
-                v-model.trim="newContact.name"
-                class="field-input"
-                placeholder="Name *"
-                required
-                maxlength="100"
-              />
-              <input
-                v-model.trim="newContact.phone"
-                class="field-input"
-                placeholder="Phone"
-                maxlength="30"
-              />
-              <input
-                v-model.trim="newContact.email"
-                class="field-input"
-                placeholder="Email"
-                type="email"
-                maxlength="150"
-              />
-              <button type="submit" class="btn btn-primary btn-sm" :disabled="addingContact || !newContact.name">
-                <span v-if="addingContact" class="spinner-border spinner-border-sm me-1"></span>
-                Add
-              </button>
+          <div class="settings-card">
+            <!-- Contact list -->
+            <div v-if="contacts.length === 0" class="contact-empty">No emergency contacts added.</div>
+            <div v-else class="contact-list">
+              <div v-for="c in contacts" :key="c.id" class="contact-row">
+                <div class="contact-info">
+                  <span class="contact-name">{{ c.name }}</span>
+                  <span v-if="c.phone" class="contact-detail">{{ c.phone }}</span>
+                  <span v-if="c.email" class="contact-detail">{{ c.email }}</span>
+                </div>
+                <button class="btn-remove-contact" @click="removeContact(c.id)" title="Remove">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
-          </form>
 
-          <div v-if="contactStatus" :class="['field-status', contactStatusType]">
-            <i :class="contactStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
-            {{ contactStatus }}
-          </div>
-        </div>
-      </section>
+            <div class="divider"></div>
 
-      <!-- ── SECURITY ──────────────────────────── -->
-      <section class="settings-section">
-        <div class="section-label">Security</div>
-        <div class="section-sublabel">Change your password. You'll need your current password to confirm.</div>
+            <!-- Add form -->
+            <form class="contact-form" @submit.prevent="addContact">
+              <div class="contact-form-row">
+                <input
+                  v-model.trim="newContact.name"
+                  class="field-input"
+                  placeholder="Name *"
+                  required
+                  maxlength="100"
+                />
+                <input
+                  v-model.trim="newContact.phone"
+                  class="field-input"
+                  placeholder="Phone"
+                  maxlength="30"
+                />
+                <input
+                  v-model.trim="newContact.email"
+                  class="field-input"
+                  placeholder="Email"
+                  type="email"
+                  maxlength="150"
+                />
+                <button type="submit" class="btn btn-primary btn-sm" :disabled="addingContact || !newContact.name">
+                  <span v-if="addingContact" class="spinner-border spinner-border-sm me-1"></span>
+                  Add
+                </button>
+              </div>
+            </form>
 
-        <div class="settings-card">
-          <div class="field-row">
-            <label class="field-label" for="current-password">Current Password</label>
-            <input
-              id="current-password"
-              v-model="currentPassword"
-              type="password"
-              class="field-input"
-              placeholder="Current password"
-              autocomplete="current-password"
-              :disabled="savingPassword"
-            />
+            <div v-if="contactStatus" :class="['field-status', contactStatusType]">
+              <i :class="contactStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
+              {{ contactStatus }}
+            </div>
           </div>
-          <div class="field-row">
-            <label class="field-label" for="new-password">New Password</label>
-            <input
-              id="new-password"
-              v-model="newPassword"
-              type="password"
-              class="field-input"
-              placeholder="At least 8 characters"
-              autocomplete="new-password"
-              :disabled="savingPassword"
-            />
-          </div>
-          <div class="field-row">
-            <label class="field-label" for="confirm-password">Confirm Password</label>
-            <div class="field-input-wrap">
+        </section>
+
+        <!-- ── SECURITY ──────────────────────────── -->
+        <section class="settings-section">
+          <div class="section-label">Security</div>
+          <div class="section-sublabel">Change your password. You'll need your current password to confirm.</div>
+
+          <div class="settings-card">
+            <div class="field-group">
+              <label class="field-label" for="current-password">Current Password</label>
               <input
-                id="confirm-password"
-                v-model="confirmPassword"
+                id="current-password"
+                v-model="currentPassword"
                 type="password"
                 class="field-input"
-                placeholder="Repeat new password"
+                placeholder="Current password"
+                autocomplete="current-password"
+                :disabled="savingPassword"
+              />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="new-password">New Password</label>
+              <input
+                id="new-password"
+                v-model="newPassword"
+                type="password"
+                class="field-input"
+                placeholder="At least 8 characters"
                 autocomplete="new-password"
                 :disabled="savingPassword"
               />
-              <button
-                class="btn btn-primary btn-sm"
-                @click="changePassword"
-                :disabled="savingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 8"
-              >
-                <span v-if="savingPassword" class="spinner-border spinner-border-sm me-1"></span>
-                Update
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="confirm-password">Confirm Password</label>
+              <div class="field-input-wrap">
+                <input
+                  id="confirm-password"
+                  v-model="confirmPassword"
+                  type="password"
+                  class="field-input"
+                  placeholder="Repeat new password"
+                  autocomplete="new-password"
+                  :disabled="savingPassword"
+                />
+                <button
+                  class="btn btn-primary btn-sm"
+                  @click="changePassword"
+                  :disabled="savingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 8"
+                >
+                  <span v-if="savingPassword" class="spinner-border spinner-border-sm me-1"></span>
+                  Update
+                </button>
+              </div>
+            </div>
+            <div v-if="newPassword && confirmPassword && newPassword !== confirmPassword" class="field-status error">
+              <i class="bi bi-exclamation-circle-fill"></i> Passwords don't match
+            </div>
+            <div v-if="passwordStatus" :class="['field-status', passwordStatusType]">
+              <i :class="passwordStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
+              {{ passwordStatus }}
+            </div>
+          </div>
+        </section>
+
+        <!-- ── DANGER ZONE ────────────────────────── -->
+        <section class="settings-section">
+          <div class="section-label">Danger Zone</div>
+          <div class="settings-card">
+            <div class="field-row">
+              <div>
+                <div class="field-label">Sign Out</div>
+                <div class="field-hint">You'll need to log back in to access your account.</div>
+              </div>
+              <button class="btn btn-outline-danger btn-sm" @click="handleLogout">
+                <i class="bi bi-box-arrow-right me-1"></i>Sign Out
               </button>
             </div>
-          </div>
-          <div v-if="newPassword && confirmPassword && newPassword !== confirmPassword" class="field-status error">
-            <i class="bi bi-exclamation-circle-fill"></i> Passwords don't match
-          </div>
-          <div v-if="passwordStatus" :class="['field-status', passwordStatusType]">
-            <i :class="passwordStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
-            {{ passwordStatus }}
-          </div>
-        </div>
-      </section>
-
-      <!-- ── DANGER ZONE ────────────────────────── -->
-      <section class="settings-section">
-        <div class="section-label danger-label">Account</div>
-        <div class="settings-card">
-          <div class="field-row">
-            <div>
-              <div class="field-label">Sign Out</div>
-              <div class="field-hint">You'll need to log back in to access your account.</div>
+            <div class="st-danger-zone">
+              <a href="#" class="st-delete-link">Delete account</a>
             </div>
-            <button class="btn btn-outline-danger btn-sm" @click="handleLogout">
-              <i class="bi bi-box-arrow-right me-1"></i>Sign Out
-            </button>
           </div>
-        </div>
-      </section>
-    </div>
-  </div>
+        </section>
+
+      </div><!-- /st-panel -->
+    </div><!-- /st-layout -->
+  </div><!-- /settings-page -->
 </template>
 
 <script setup>
@@ -455,53 +474,67 @@ onMounted(() => {
 <style scoped>
 .settings-page {
   min-height: 100vh;
-  background: var(--rk-paper, #ffffff);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
+  padding-top: var(--nav-h, 66px);
 }
 
-/* ── Header ── */
-.settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  height: 64px;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15,18,16,0.10);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* ── Title bar ── */
+.st-title-bar {
+  padding: 28px 28px 20px;
+  border-bottom: 2px solid #16130F;
 }
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: rgba(15,18,16,0.70);
-  cursor: pointer;
-  padding: 8px 0;
-  transition: color 0.2s;
-  font-family: inherit;
-}
-.back-btn:hover { color: rgba(15,18,16,0.95); }
-
-.settings-logo {
+.st-page-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  font-size: 1rem;
-  letter-spacing: 0.08em;
-  color: #000;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 0.85;
+  text-transform: uppercase;
+  margin: 0;
+  color: #16130F;
 }
 
-/* ── Body ── */
-.settings-body {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 32px 24px 80px;
+/* ── Two-column layout ── */
+.st-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  border-top: none;
+  min-height: calc(100vh - var(--nav-h, 66px) - 80px);
+}
+
+/* ── Sidebar ── */
+.st-sidebar {
+  border-right: 2px solid #16130F;
+  padding: 16px 0;
+  background: #FBF6EC;
+  position: sticky;
+  top: var(--nav-h, 66px);
+  align-self: start;
+}
+.st-sidebar-item {
+  padding: 12px 22px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5a5348;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.st-sidebar-item:hover { color: #16130F; }
+.st-sidebar-item--active {
+  background: #2A55F5;
+  color: #fff;
+  border-left: 4px solid #16130F;
+  padding-left: 18px;
+}
+.st-sidebar-item--active:hover { color: #fff; }
+
+/* ── Panel ── */
+.st-panel {
+  padding: 28px;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -511,77 +544,109 @@ onMounted(() => {
 .settings-section { display: flex; flex-direction: column; gap: 12px; }
 
 .section-label {
-  font-size: 0.75rem;
-  font-weight: 900;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(15,18,16,0.55);
+  letter-spacing: 0.14em;
+  color: #2A55F5;
 }
 .section-sublabel {
   font-size: 0.88rem;
-  color: rgba(15,18,16,0.55);
+  color: #5a5348;
   margin-top: -6px;
+  line-height: 1.5;
 }
-.danger-label { color: #dc2626; }
 
 /* ── Card ── */
 .settings-card {
-  background: white;
-  border: 1px solid #E5E5E5;
-  border-radius: 0;
-  padding: 24px;
+  background: #fff;
+  border: 2px solid #16130F;
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
-.divider { height: 1px; background: rgba(15,18,16,0.08); margin: 0 -4px; }
+.divider { height: 2px; background: #E7DFCE; }
 
-/* ── Profile ── */
+/* ── Profile avatar row ── */
 .profile-avatar-row {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 .profile-avatar {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  background: #000;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900;
-  color: white;
-  font-size: 1.6rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: #2A55F5;
+  border: 2px solid #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #fff;
+  font-size: 1.2rem;
   flex-shrink: 0;
 }
+.profile-avatar-info { flex: 1; }
 .profile-name {
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: rgba(15,18,16,0.92);
+  font-weight: 800;
+  font-size: 1rem;
+  color: #16130F;
 }
 .profile-email {
-  font-size: 0.88rem;
-  color: rgba(15,18,16,0.55);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #8a8a8a;
   margin-top: 2px;
 }
+.st-photo-btn {
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  padding: 8px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #16130F;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.st-photo-btn:hover { background: #E7DFCE; }
 
-/* ── Fields ── */
+/* ── Field groups (vertical label+input) ── */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Field row (horizontal label+button) ── */
 .field-row {
   display: flex;
   align-items: center;
   gap: 16px;
   justify-content: space-between;
 }
+
 .field-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 700;
-  font-size: 0.9rem;
-  color: rgba(15,18,16,0.80);
-  white-space: nowrap;
-  min-width: 120px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5a5348;
+  display: block;
 }
 .field-hint {
   font-size: 0.82rem;
-  color: rgba(15,18,16,0.50);
+  color: #8a8a8a;
   margin-top: 2px;
+  line-height: 1.4;
 }
 .field-input-wrap {
   display: flex;
@@ -590,43 +655,88 @@ onMounted(() => {
 }
 .field-input {
   flex: 1;
-  padding: 10px 14px;
-  border: 1px solid #E5E5E5;
-  border-radius: 0;
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: rgba(15,18,16,0.90);
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 2px solid #16130F;
   background: #fff;
-  transition: all 0.2s;
-}
-.field-input:focus {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.92rem;
+  color: #16130F;
   outline: none;
-  border-color: #767676;
-  box-shadow: none;
-  background: white;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
 }
-.field-input:disabled { opacity: 0.60; cursor: not-allowed; }
+.field-input:focus { border-color: #2A55F5; }
+.field-input:disabled { opacity: 0.55; cursor: not-allowed; background: #F1EADC; }
+.field-input::placeholder { color: #8a8a8a; }
 
 .field-readonly {
   flex: 1;
-  padding: 10px 14px;
-  border-radius: 0;
-  background: rgba(15,18,16,0.04);
-  border: 1px solid #E5E5E5;
-  font-size: 0.95rem;
-  color: rgba(15,18,16,0.55);
+  height: 46px;
+  padding: 0 14px;
+  border: 2px solid #E7DFCE;
+  background: #F1EADC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.92rem;
+  color: #5a5348;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 .field-status {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   padding: 10px 14px;
-  border-radius: 0;
+  border: 2px solid;
 }
-.field-status.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.20); color: #047857; }
-.field-status.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; }
+.field-status.success { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.3); color: #047857; }
+.field-status.error { background: #FEF2F2; border-color: #FCA5A5; color: #DC2626; }
+
+/* ── Buttons ── */
+.btn {
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #16130F;
+  height: 40px;
+  padding: 0 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.btn:hover:not(:disabled) { background: #E7DFCE; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary {
+  background: #2A55F5;
+  border-color: #16130F;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 #16130F;
+}
+.btn-primary:hover:not(:disabled) { background: #1E42D6; }
+.btn-primary:disabled { box-shadow: none; }
+
+.btn-outline-danger {
+  background: transparent;
+  border-color: #C0392B;
+  color: #C0392B;
+}
+.btn-outline-danger:hover:not(:disabled) { background: rgba(192,57,43,0.06); }
+
+.btn-sm { height: 36px; padding: 0 14px; font-size: 0.66rem; }
 
 /* ── Unit Cards ── */
 .unit-cards {
@@ -636,30 +746,31 @@ onMounted(() => {
 }
 .unit-card {
   position: relative;
-  background: white;
-  border: 2px solid rgba(15,18,16,0.12);
-  border-radius: 0;
+  background: #fff;
+  border: 2px solid #16130F;
   padding: 24px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  font-family: inherit;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  transition: background 0.15s;
 }
-.unit-card:hover { border-color: rgba(15,18,16,0.25); transform: none; box-shadow: none; }
+.unit-card:hover { background: #F1EADC; }
 .unit-card.active {
-  border-color: #767676;
-  background: #f9f9f9;
-  box-shadow: none;
+  background: #16130F;
+  color: #FBF6EC;
+  box-shadow: 3px 3px 0 #2A55F5;
 }
 .unit-flag { font-size: 2rem; }
 .unit-name {
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: rgba(15,18,16,0.90);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  line-height: 0.9;
 }
 .unit-examples {
   display: flex;
@@ -668,43 +779,48 @@ onMounted(() => {
   justify-content: center;
 }
 .unit-example {
-  background: rgba(15,18,16,0.06);
-  color: rgba(15,18,16,0.65);
+  background: rgba(22,19,15,0.08);
+  color: #5a5348;
   padding: 4px 10px;
-  border-radius: 0;
-  font-size: 0.8rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 .unit-card.active .unit-example {
-  background: #f0f0f0;
-  color: #000;
+  background: rgba(251,246,236,0.15);
+  color: #FBF6EC;
 }
 .unit-check {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: #000;
-  color: white;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.9rem;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  background: #2A55F5;
+  border: 2px solid #FBF6EC;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
   font-weight: 900;
 }
 
 /* ── Unit Preview ── */
 .unit-preview {
-  background: white;
-  border: 1px solid #E5E5E5;
-  border-radius: 0;
+  background: #fff;
+  border: 2px solid #16130F;
   padding: 20px 24px;
 }
 .unit-preview-label {
-  font-size: 0.72rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  color: rgba(15,18,16,0.45);
+  letter-spacing: 0.12em;
+  color: #8a8a8a;
   margin-bottom: 14px;
 }
 .unit-preview-row {
@@ -714,94 +830,94 @@ onMounted(() => {
 }
 .preview-item { text-align: center; }
 .preview-val {
-  font-size: 1.3rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.8rem;
   font-weight: 900;
-  color: #000;
-  letter-spacing: -0.01em;
+  color: #16130F;
+  line-height: 1;
 }
 .preview-key {
-  font-size: 0.78rem;
-  color: rgba(15,18,16,0.50);
-  margin-top: 4px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8a8a8a;
+  margin-top: 5px;
 }
-
-/* ── Buttons ── */
-.btn {
-  border: 1px solid #E5E5E5;
-  background: rgba(255,255,255,0.60);
-  color: rgba(15,18,16,0.78);
-  border-radius: 0;
-  height: 40px;
-  padding: 0 18px;
-  font-weight: 700;
-  font-family: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary {
-  background: #0052FF;
-  border-color: #0052FF;
-  color: white;
-}
-.btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
-.btn-outline-danger {
-  background: transparent;
-  border-color: rgba(220,38,38,0.30);
-  color: #dc2626;
-}
-.btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
-.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }
 
 /* ── Emergency Contacts ── */
 .contact-empty {
-  font-size: 0.85rem;
-  color: rgba(15,18,16,0.45);
-  padding: 4px 0;
+  font-size: 0.88rem;
+  color: #8a8a8a;
 }
-.contact-list { display: flex; flex-direction: column; gap: 10px; }
+.contact-list { display: flex; flex-direction: column; gap: 8px; }
 .contact-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding: 10px 14px;
-  border: 1px solid #E5E5E5; background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 2px solid #E7DFCE;
+  background: #F1EADC;
 }
 .contact-info { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; }
-.contact-name { font-weight: 700; font-size: 0.9rem; color: #000; }
-.contact-detail { font-size: 0.80rem; color: #767676; }
+.contact-name { font-weight: 700; font-size: 0.9rem; color: #16130F; }
+.contact-detail { font-size: 0.78rem; color: #8a8a8a; }
 .btn-remove-contact {
-  width: 32px; height: 32px; border: 1px solid #E5E5E5; background: #fff;
-  color: #767676; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; font-size: 0.85rem; flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #E7DFCE;
+  background: #fff;
+  color: #8a8a8a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
   transition: border-color 0.15s, color 0.15s;
 }
-.btn-remove-contact:hover { border-color: #dc2626; color: #dc2626; }
+.btn-remove-contact:hover { border-color: #C0392B; color: #C0392B; }
 
 .contact-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
   gap: 10px;
   align-items: center;
-  justify-content: unset;
 }
+
+/* ── Danger zone ── */
+.st-danger-zone {
+  padding-top: 16px;
+  border-top: 2px solid #E7DFCE;
+}
+.st-delete-link {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #C0392B;
+  text-decoration: none;
+}
+.st-delete-link:hover { text-decoration: underline; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .settings-body { padding: 20px 16px 60px; }
-  .section-card { padding: 20px 16px; }
+  .st-layout { grid-template-columns: 1fr; }
+  .st-sidebar { display: flex; overflow-x: auto; border-right: none; border-bottom: 2px solid #16130F; padding: 0; position: static; }
+  .st-sidebar-item { white-space: nowrap; padding: 12px 18px; }
+  .st-sidebar-item--active { padding-left: 14px; }
+  .st-panel { padding: 20px 16px; }
   .unit-cards { grid-template-columns: 1fr 1fr; }
+  .contact-form-row { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 480px) {
   .field-row { flex-direction: column; align-items: flex-start; }
-  .field-input-wrap { width: 100%; }
   .field-readonly { width: 100%; }
   .unit-preview-row { grid-template-columns: repeat(2, 1fr); }
   .unit-cards { grid-template-columns: 1fr; }
-  .section-title { font-size: 1rem; }
   .contact-form-row { grid-template-columns: 1fr 1fr; }
 }
 </style>
