@@ -213,15 +213,15 @@ onMounted(async () => {
 <style scoped>
 .my-coach-page {
   min-height: 100vh;
-  background: #fff;
+  background: #FBF6EC;
   padding-top: var(--page-top);
-  font-family: Futura, "Futura PT", "Avenir Next", system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
-.page-hero { background: #000; color: #fff; padding: 40px 24px 32px; }
+.page-hero { background: #16130F; color: #FBF6EC; padding: 40px 24px 32px; }
 .hero-inner { max-width: 800px; margin: 0 auto; }
-.hero-kicker { font-size: 0.68rem; letter-spacing: 0.20em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 10px; }
-.hero-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; margin: 0; letter-spacing: -0.01em; }
+.hero-kicker { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.20em; color: #2A55F5; text-transform: uppercase; margin-bottom: 10px; }
+.hero-title { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; margin: 0; text-transform: uppercase; line-height: 0.9; }
 
 .content-wrap { max-width: 800px; margin: 0 auto; padding: 32px 24px 80px; }
 
@@ -233,81 +233,82 @@ onMounted(async () => {
 /* No coach */
 .no-coach-card {
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: 60px 24px; border: 1px solid #E5E5E5;
+  padding: 60px 24px; border: 2px solid #E7DFCE; background: #fff;
 }
-.no-coach-icon { font-size: 3rem; color: #ccc; margin-bottom: 16px; }
-.no-coach-title { font-size: 1.2rem; font-weight: 900; margin: 0 0 12px; }
-.no-coach-desc { font-size: 0.88rem; color: #767676; max-width: 360px; margin: 0 0 24px; line-height: 1.6; }
+.no-coach-icon { font-size: 3rem; color: #E7DFCE; margin-bottom: 16px; }
+.no-coach-title { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.2rem; font-weight: 900; margin: 0 0 12px; text-transform: uppercase; color: #16130F; }
+.no-coach-desc { font-size: 0.88rem; color: #5A5348; max-width: 360px; margin: 0 0 24px; line-height: 1.6; }
 .btn-find-coach {
-  height: 44px; padding: 0 32px; background: #0052FF; color: #fff; border: none;
-  font-size: 0.80rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  height: 44px; padding: 0 32px; background: #2A55F5; color: #fff; border: 2px solid #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.80rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
   text-decoration: none; display: inline-flex; align-items: center; cursor: pointer;
+  border-radius: 999px; box-shadow: 3px 3px 0 #16130F;
 }
-.btn-find-coach:hover { background: #003ECC; }
+.btn-find-coach:hover { background: #1E42D6; }
 
 /* Pending */
 .pending-card {
-  padding: 28px; border: 1px solid #E5E5E5;
+  padding: 28px; border: 2px solid #E7DFCE; background: #fff;
   display: flex; flex-direction: column; gap: 10px;
 }
 .pending-badge {
   display: inline-flex; align-items: center;
-  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
-  color: #0052FF; background: #EBF0FF; padding: 4px 10px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  color: #2A55F5; background: #EEF1FF; padding: 4px 10px;
   width: fit-content;
 }
-.pending-desc { font-size: 0.88rem; color: #767676; margin: 0; }
+.pending-desc { font-size: 0.88rem; color: #5A5348; margin: 0; }
 .btn-browse-link {
-  font-size: 0.82rem; font-weight: 700; color: #000; text-decoration: none; width: fit-content;
+  font-size: 0.82rem; font-weight: 700; color: #2A55F5; text-decoration: none; width: fit-content;
 }
 .btn-browse-link:hover { text-decoration: underline; }
 
 /* Coach card */
 .coach-card {
   display: flex; align-items: center; gap: 16px;
-  padding: 20px; border: 1px solid #E5E5E5; margin-bottom: 24px;
+  padding: 20px; border: 2px solid #E7DFCE; background: #fff; margin-bottom: 24px;
 }
 .coach-avatar {
-  width: 52px; height: 52px; background: #000; color: #fff;
+  width: 52px; height: 52px; background: #16130F; color: #FBF6EC;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem; font-weight: 900; flex-shrink: 0;
+  font-size: 1.3rem; font-weight: 900; flex-shrink: 0; border-radius: 999px;
 }
-.coach-name { font-size: 1rem; font-weight: 900; color: #000; margin-bottom: 6px; }
+.coach-name { font-size: 1rem; font-weight: 900; color: #16130F; margin-bottom: 6px; }
 .coach-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .coach-sport-badge {
-  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
-  background: #f0f0f0; color: #000; padding: 2px 8px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  background: #F1EADC; color: #5A5348; padding: 2px 8px;
 }
-.coach-email { font-size: 0.78rem; color: #767676; }
+.coach-email { font-size: 0.78rem; color: #8A8A8A; }
 
 /* Tabs */
-.tab-bar { display: flex; border-bottom: 1px solid #E5E5E5; margin-bottom: 20px; }
+.tab-bar { display: flex; border-bottom: 2px solid #E7DFCE; margin-bottom: 20px; }
 .tab {
   padding: 12px 24px; background: none; border: none;
-  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  color: rgba(15,18,16,0.45); cursor: pointer; font-family: inherit;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(22,19,15,0.45); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
   transition: color 0.15s, border-color 0.15s;
 }
-.tab.active { color: #000; border-bottom-color: #000; }
+.tab.active { color: #16130F; border-bottom-color: #2A55F5; }
 .tab-badge {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 18px; height: 18px; padding: 0 4px;
-  background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700; margin-left: 6px;
+  background: #C0392B; color: #fff; font-size: 0.6rem; font-weight: 700; margin-left: 6px;
 }
 
 /* Messages */
 .messages-wrap {
   display: flex; flex-direction: column;
-  height: calc(100vh - var(--nav-h, 64px) - 340px);
+  height: calc(100vh - var(--nav-h, 66px) - 340px);
   min-height: 360px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
 }
 .messages-thread { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 .msg-state {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 10px; flex: 1;
-  color: rgba(15,18,16,0.40); text-align: center;
+  color: rgba(22,19,15,0.40); text-align: center;
 }
 .msg-state p { font-size: 0.85rem; margin: 0; font-weight: 600; }
 .msg-list { display: flex; flex-direction: column; gap: 10px; }
@@ -317,28 +318,28 @@ onMounted(async () => {
 }
 .msg-mine { align-self: flex-end; align-items: flex-end; }
 .msg-theirs { align-self: flex-start; align-items: flex-start; }
-.msg-sender { font-size: 0.65rem; font-weight: 700; color: #767676; letter-spacing: 0.06em; }
+.msg-sender { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.65rem; font-weight: 700; color: #8A8A8A; letter-spacing: 0.06em; }
 .msg-body { padding: 10px 14px; font-size: 0.88rem; line-height: 1.5; word-break: break-word; }
-.msg-mine .msg-body { background: #000; color: #fff; }
-.msg-theirs .msg-body { background: #f0f0f0; color: #000; }
-.msg-time { font-size: 0.65rem; color: rgba(15,18,16,0.40); font-weight: 600; }
+.msg-mine .msg-body { background: #16130F; color: #FBF6EC; }
+.msg-theirs .msg-body { background: #F1EADC; color: #16130F; }
+.msg-time { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.65rem; color: rgba(22,19,15,0.40); font-weight: 600; }
 
-.msg-input-row { display: flex; border-top: 1px solid #E5E5E5; flex-shrink: 0; }
+.msg-input-row { display: flex; border-top: 2px solid #E7DFCE; flex-shrink: 0; }
 .msg-input {
   flex: 1; border: none; padding: 14px 16px; font-size: 0.88rem;
   font-family: inherit; resize: none; outline: none; background: #fff;
 }
 .msg-send {
-  width: 52px; background: #000; color: #fff; border: none;
+  width: 52px; background: #2A55F5; color: #fff; border: none;
   font-size: 1rem; cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; transition: opacity 0.12s;
+  display: flex; align-items: center; justify-content: center; transition: background 0.12s;
 }
-.msg-send:hover { opacity: 0.85; }
+.msg-send:hover { background: #1E42D6; }
 .msg-send:disabled { opacity: 0.40; cursor: not-allowed; }
 
 .spinner-border {
-  width: 1.2rem; height: 1.2rem; border: 2px solid rgba(0,0,0,0.10);
-  border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block;
+  width: 1.2rem; height: 1.2rem; border: 2px solid rgba(22,19,15,0.10);
+  border-top-color: #2A55F5; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block;
 }
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 @keyframes spin { to { transform: rotate(360deg); } }

@@ -63,9 +63,9 @@ defineEmits(['action'])
   align-items: center;
   height: 40px;
   padding: 0 24px;
-  border: 2px solid var(--rk-signal, #0052FF);
+  border: 2px solid var(--rk-signal, #2A55F5);
   background: transparent;
-  color: var(--rk-signal, #0052FF);
+  color: var(--rk-signal, #2A55F5);
   font-size: 0.78rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -78,7 +78,7 @@ defineEmits(['action'])
 }
 
 .empty-state-btn:hover {
-  background: var(--rk-signal, #0052FF);
+  background: var(--rk-signal, #2A55F5);
   color: #fff;
 }
 </style>

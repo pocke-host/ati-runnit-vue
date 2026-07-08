@@ -156,17 +156,17 @@ onMounted(async () => {
   --bronze: #CD7F32;
   --silver: #A8A9AD;
   --gold: #FFD700;
-  --special: #0052FF;
+  --special: #2A55F5;
   min-height: 100vh;
   padding-top: var(--page-top);
   background: #fff;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* HERO */
 .hero {
-  background: #000;
-  color: white;
+  background: #16130F;
+  color: #FBF6EC;
   padding: 56px 24px 48px;
 }
 .hero-inner {
@@ -243,14 +243,14 @@ onMounted(async () => {
   gap: 7px;
 }
 .tab-btn:hover { color: rgba(15,18,16,0.80); }
-.tab-btn.active { color: #767676; border-bottom-color: #000; }
+.tab-btn.active { color: #16130F; border-bottom-color: #2A55F5; }
 .tab-count {
-  background: rgba(15,18,16,0.08);
+  background: rgba(22,19,15,0.08);
   border-radius: 0;
   padding: 2px 8px;
   font-size: 0.75rem;
 }
-.tab-btn.active .tab-count { background: #f0f0f0; color: #767676; }
+.tab-btn.active .tab-count { background: #F1EADC; color: #5A5348; }
 
 /* GRID */
 .grid-section {
@@ -301,13 +301,13 @@ onMounted(async () => {
   opacity: 0.75;
 }
 .badge-card.earned {
-  box-shadow: none;
-  border-color: #000;
+  box-shadow: 3px 3px 0 #16130F;
+  border-color: #16130F;
 }
-.badge-card.earned.tier-bronze { border-color: #000; }
-.badge-card.earned.tier-silver { border-color: #000; }
-.badge-card.earned.tier-gold { border-color: #000; }
-.badge-card.earned.tier-special { border-color: #000; }
+.badge-card.earned.tier-bronze { border-color: #16130F; }
+.badge-card.earned.tier-silver { border-color: #16130F; }
+.badge-card.earned.tier-gold { border-color: #16130F; }
+.badge-card.earned.tier-special { border-color: #2A55F5; }
 .badge-card:hover { transform: none; }
 .badge-card.locked:hover { transform: none; }
 
@@ -337,11 +337,11 @@ onMounted(async () => {
 .tier-pill-bronze { background: rgba(205,127,50,0.15); color: var(--bronze); }
 .tier-pill-silver { background: rgba(168,169,173,0.18); color: #808285; }
 .tier-pill-gold { background: rgba(255,215,0,0.18); color: #b8930a; }
-.tier-pill-special { background: #EBF0FF; color: var(--special); }
+.tier-pill-special { background: #EEF1FF; color: var(--special); }
 
 /* Status labels */
 .badge-status { font-size: 0.78rem; font-weight: 700; }
-.earned-label { color: #0052FF; }
+.earned-label { color: #2A55F5; }
 .locked-label { color: rgba(15,18,16,0.45); }
 .badge-date { font-size: 0.72rem; color: rgba(15,18,16,0.50); }
 
@@ -356,7 +356,7 @@ onMounted(async () => {
 }
 .badge-progress-fill {
   height: 100%;
-  background: #000;
+  background: #2A55F5;
   border-radius: 0;
   transition: width 0.4s ease;
 }

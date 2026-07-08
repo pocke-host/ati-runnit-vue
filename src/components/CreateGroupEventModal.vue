@@ -160,20 +160,20 @@ async function submit() {
 }
 .modal-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 24px; border-bottom: 1px solid #E5E5E5;
+  padding: 20px 24px; border-bottom: 2px solid #E7DFCE;
 }
 .modal-title { font-size: 13px; font-weight: 700; letter-spacing: 0.15em; }
 .btn-close-modal { background: none; border: none; cursor: pointer; padding: 0; font-size: 16px; }
 .modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
 .modal-footer {
-  padding: 16px 24px; border-top: 1px solid #E5E5E5;
+  padding: 16px 24px; border-top: 2px solid #E7DFCE;
   display: flex; gap: 10px; justify-content: flex-end;
 }
 
 .field-group { display: flex; flex-direction: column; gap: 6px; }
 .field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #767676; }
 .field-input {
-  border: 1px solid #E5E5E5; border-radius: 0; padding: 9px 12px;
+  border: 2px solid #E7DFCE; border-radius: 0; padding: 9px 12px;
   font-size: 14px; outline: none; width: 100%; background: #fff;
   font-family: inherit;
 }
@@ -182,7 +182,7 @@ textarea.field-input { resize: vertical; }
 
 .sport-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .sport-pill {
-  background: #fff; border: 1px solid #E5E5E5; border-radius: 0;
+  background: #fff; border: 2px solid #E7DFCE; border-radius: 0;
   padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit;
   letter-spacing: 0.05em;
 }
@@ -191,7 +191,7 @@ textarea.field-input { resize: vertical; }
 .friend-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
 .friend-row {
   display: flex; align-items: center; gap: 10px; cursor: pointer;
-  padding: 8px; border: 1px solid #E5E5E5;
+  padding: 8px; border: 2px solid #E7DFCE;
 }
 .friend-row.selected { border-color: #000; background: #f9f9f9; }
 .friend-check { accent-color: #000; }
@@ -207,15 +207,15 @@ textarea.field-input { resize: vertical; }
 .error-msg { font-size: 13px; color: #c0392b; }
 
 .btn-cancel {
-  background: none; border: 1px solid #E5E5E5; border-radius: 0;
+  background: none; border: 2px solid #E7DFCE; border-radius: 0;
   padding: 9px 18px; font-size: 13px; cursor: pointer; font-family: inherit;
   letter-spacing: 0.08em;
 }
 .btn-create {
-  background: #0052FF; color: #fff; border: none; border-radius: 0;
+  background: #2A55F5; color: #fff; border: none; border-radius: 0;
   padding: 9px 22px; font-size: 13px; cursor: pointer; font-family: inherit;
   letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.15s;
 }
-.btn-create:hover:not(:disabled) { background: #003ECC; }
+.btn-create:hover:not(:disabled) { background: #1E42D6; }
 .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

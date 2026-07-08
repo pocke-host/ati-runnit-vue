@@ -193,7 +193,7 @@ onMounted(async () => {
 .admin-page {
   min-height: 100vh;
   background: #fff;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* Header */

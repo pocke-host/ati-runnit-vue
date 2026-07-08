@@ -814,7 +814,7 @@ onUnmounted(() => {
   padding: 16px;
   max-width: 600px;
   margin: 0 auto;
-  font-family: "Futura PT", "Futura", "Century Gothic", sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* ── Header ── */
@@ -1011,8 +1011,8 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
-.control-btn-start  { background: #0052FF; color: #fff; }
-.control-btn-start:hover:not(:disabled)  { background: #003ECC; }
+.control-btn-start  { background: #2A55F5; color: #fff; }
+.control-btn-start:hover:not(:disabled)  { background: #1E42D6; }
 .control-btn-pause  { background: #555; color: #fff; }
 .control-btn-pause:hover  { background: #333; }
 .control-btn-finish { background: #dc2626; color: #fff; }

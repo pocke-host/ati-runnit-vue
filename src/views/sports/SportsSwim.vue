@@ -115,8 +115,7 @@ const feats = [
   background: var(--r-offwhite);
   overflow-x:hidden;
 
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* HERO */
@@ -226,7 +225,7 @@ const feats = [
 }
 .feature-img {
   height: 160px;
-  background: #f5f5f5;
+  background: #FBF6EC;
 }
 
 /* CTA */

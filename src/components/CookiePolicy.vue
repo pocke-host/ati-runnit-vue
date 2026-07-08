@@ -195,7 +195,7 @@ const sections = [
 
 <style scoped>
 .cookie-page {
-  font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   background: #fff;
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
@@ -270,7 +270,7 @@ const sections = [
 }
 
 .toc-link:hover {
-  background: #f5f5f5;
+  background: #FBF6EC;
   color: #000;
 }
 
@@ -278,14 +278,14 @@ const sections = [
 .cookie-body {
   background: #fff;
   border-radius: 0;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 48px;
 }
 
 .cookie-section {
   padding-bottom: 40px;
   margin-bottom: 40px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 
 .cookie-section:last-of-type {
@@ -350,7 +350,7 @@ const sections = [
   overflow-x: auto;
   margin-top: 24px;
   border-radius: 0;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
 }
 
 .cookie-table {
@@ -360,7 +360,7 @@ const sections = [
 }
 
 .cookie-table thead {
-  background: #f5f5f5;
+  background: #FBF6EC;
 }
 
 .cookie-table th {
@@ -371,14 +371,14 @@ const sections = [
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.10em;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   white-space: nowrap;
 }
 
 .cookie-table td {
   padding: 12px 16px;
   color: #555;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   vertical-align: top;
 }
 

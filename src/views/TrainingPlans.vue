@@ -271,19 +271,19 @@
 
                 <!-- Phase breakdown -->
                 <div class="phase-breakdown">
-                  <div class="phase-strip" title="Base phase" style="background:#767676">
+                  <div class="phase-strip" title="Base phase" style="background:#5A5348">
                     <span class="phase-strip-label">Base</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.base }}w</span>
                   </div>
-                  <div class="phase-strip" title="Build phase" style="background:#0052FF">
+                  <div class="phase-strip" title="Build phase" style="background:#2A55F5">
                     <span class="phase-strip-label">Build</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.build }}w</span>
                   </div>
-                  <div class="phase-strip" title="Peak phase" style="background:#000000">
+                  <div class="phase-strip" title="Peak phase" style="background:#16130F">
                     <span class="phase-strip-label">Peak</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.peak }}w</span>
                   </div>
-                  <div v-if="preview.phaseBreakdown.taper > 0" class="phase-strip" title="Taper" style="background:#767676">
+                  <div v-if="preview.phaseBreakdown.taper > 0" class="phase-strip" title="Taper" style="background:#8A8A8A">
                     <span class="phase-strip-label">Taper</span>
                     <span class="phase-strip-weeks">{{ preview.phaseBreakdown.taper }}w</span>
                   </div>
@@ -878,17 +878,17 @@ onBeforeRouteLeave((to, from, next) => {
   padding-top: var(--page-top);
   min-height: calc(100vh - var(--nav-h, 64px));
   background: #fff;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* Hero */
 .hero {
   padding: 42px 0 22px;
-  border-bottom: 1px solid rgba(15,18,16,0.08);
-  background: #000;
-  color: white;
+  border-bottom: 2px solid rgba(22,19,15,0.08);
+  background: #16130F;
+  color: #FBF6EC;
 }
-.eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-bottom: 8px; }
+.eyebrow { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.75rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #2A55F5; margin-bottom: 8px; }
 .hero .lead { color: rgba(255,255,255,0.76); }
 
 /* Status Toast */
@@ -914,32 +914,32 @@ onBeforeRouteLeave((to, from, next) => {
 /* My Plans Grid */
 .plans-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 .plan-card {
-  background: white; border: 1px solid #E5E5E5; border-radius: 0; padding: 24px;
-  cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: white; border: 2px solid #E7DFCE; border-radius: 0; padding: 24px;
+  cursor: pointer; transition: border-color 0.15s;
 }
-.plan-card:hover { transform: none; }
-.plan-card-active { border-color: #767676; }
+.plan-card:hover { border-color: #16130F; }
+.plan-card-active { border-color: #2A55F5; box-shadow: 3px 3px 0 #2A55F5; }
 .plan-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
 .plan-sport-icon { font-size: 2.2rem; }
 .plan-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .plan-badge { padding: 4px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; text-transform: capitalize; }
 .plan-badge-level.beginner     { background: #f0f0f0; color: #555; }
 .plan-badge-level.intermediate { background: #1a1a1a; color: #fff; }
-.plan-badge-level.advanced     { background: #000; color: #fff; }
-.plan-badge-active { background: rgba(0,0,0,0.08); color: #000; }
+.plan-badge-level.advanced     { background: #16130F; color: #FBF6EC; }
+.plan-badge-active { background: rgba(42,85,245,0.10); color: #2A55F5; }
 .plan-name { font-weight: 900; font-size: 1.05rem; margin: 0 0 4px; color: rgba(15,18,16,0.92); }
 .plan-meta { font-size: 0.82rem; color: rgba(15,18,16,0.55); margin: 0 0 14px; }
 .plan-progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: rgba(15,18,16,0.65); margin-bottom: 6px; }
 .plan-progress-bar { height: 6px; background: rgba(15,18,16,0.08); border-radius: 0; overflow: hidden; }
-.plan-progress-fill { height: 100%; background: #000; border-radius: 0; transition: width 0.5s; }
+.plan-progress-fill { height: 100%; background: #2A55F5; border-radius: 0; transition: width 0.5s; }
 
 /* Wizard */
 .new-plan-section { max-width: 860px; }
-.wizard { background: white; border: 1px solid #E5E5E5; border-radius: 0; overflow: hidden; }
+.wizard { background: white; border: 2px solid #E7DFCE; border-radius: 0; overflow: hidden; }
 
 /* Step indicator bar */
 .wizard-steps-bar {
-  display: flex; background: #f8f8f8; border-bottom: 1px solid #E5E5E5; padding: 20px 28px; gap: 0;
+  display: flex; background: #F1EADC; border-bottom: 2px solid #E7DFCE; padding: 20px 28px; gap: 0;
 }
 .wsb-step {
   display: flex; align-items: center; gap: 8px; flex: 1;
@@ -953,10 +953,10 @@ onBeforeRouteLeave((to, from, next) => {
   display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 900;
   flex-shrink: 0; background: white;
 }
-.wsb-step.active { color: #000; }
-.wsb-step.active .wsb-dot { border-color: #000; background: #000; color: white; }
+.wsb-step.active { color: #16130F; }
+.wsb-step.active .wsb-dot { border-color: #16130F; background: #16130F; color: #FBF6EC; }
 .wsb-step.done { color: rgba(15,18,16,0.55); }
-.wsb-step.done .wsb-dot { border-color: #0052FF; background: #0052FF; color: white; }
+.wsb-step.done .wsb-dot { border-color: #2A55F5; background: #2A55F5; color: white; }
 .wsb-label { display: none; }
 @media (min-width: 580px) { .wsb-label { display: inline; } }
 
@@ -973,7 +973,7 @@ onBeforeRouteLeave((to, from, next) => {
   border-radius: 0; cursor: pointer; transition: all 0.2s; font-family: inherit;
 }
 .goal-tab:hover { border-color: rgba(15,18,16,0.22); transform: translateY(-1px); }
-.goal-tab.active { border-color: #000; background: rgba(0,0,0,0.04); }
+.goal-tab.active { border-color: #16130F; background: rgba(22,19,15,0.04); }
 .goal-emoji { font-size: 1.8rem; }
 .goal-name { font-weight: 700; font-size: 0.85rem; color: rgba(15,18,16,0.85); white-space: nowrap; }
 
@@ -981,15 +981,15 @@ onBeforeRouteLeave((to, from, next) => {
 .field-group { margin-bottom: 24px; }
 .field-label { display: block; font-weight: 700; font-size: 0.88rem; color: rgba(15,18,16,0.75); margin-bottom: 8px; }
 .field-input {
-  padding: 10px 14px; border: 1px solid #E5E5E5; border-radius: 0;
+  padding: 10px 14px; border: 2px solid #E7DFCE; border-radius: 0;
   font-family: inherit; font-size: 0.95rem; background: #fff; cursor: text; width: 100%;
 }
-.field-input:focus { outline: none; border-color: #767676; }
+.field-input:focus { outline: none; border-color: #2A55F5; }
 .field-input-row { display: flex; align-items: center; gap: 10px; }
 .field-unit { font-size: 0.9rem; font-weight: 700; color: rgba(15,18,16,0.55); white-space: nowrap; }
 .field-hint { font-size: 0.83rem; color: rgba(15,18,16,0.55); margin-top: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
 .field-error { font-size: 0.83rem; color: #dc2626; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-.hint-warn { color: #0052FF; }
+.hint-warn { color: #2A55F5; }
 .optional-label { font-weight: 400; color: rgba(15,18,16,0.45); font-size: 0.82rem; }
 .mt-2 { margin-top: 8px; }
 
@@ -998,10 +998,10 @@ onBeforeRouteLeave((to, from, next) => {
 .fitness-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .fitness-toggle input[type="checkbox"] { display: none; }
 .toggle-track {
-  width: 40px; height: 22px; background: rgba(15,18,16,0.15); border-radius: 11px;
+  width: 40px; height: 22px; background: rgba(15,18,16,0.15); border-radius: 0;
   position: relative; transition: background 0.2s; flex-shrink: 0;
 }
-.fitness-toggle input:checked + .toggle-track { background: #000; }
+.fitness-toggle input:checked + .toggle-track { background: #2A55F5; }
 .toggle-track::after {
   content: ''; position: absolute; top: 3px; left: 3px;
   width: 16px; height: 16px; border-radius: 50%; background: white;
@@ -1015,7 +1015,7 @@ onBeforeRouteLeave((to, from, next) => {
 .level-chip { padding: 3px 10px; border-radius: 0; font-size: 0.78rem; font-weight: 700; text-transform: capitalize; }
 .level-chip.beginner     { background: #f0f0f0; color: #555; }
 .level-chip.intermediate { background: #1a1a1a; color: #fff; }
-.level-chip.advanced     { background: #000; color: #fff; }
+.level-chip.advanced     { background: #16130F; color: #FBF6EC; }
 
 /* Days grid */
 .days-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -1026,20 +1026,20 @@ onBeforeRouteLeave((to, from, next) => {
   cursor: pointer; font-family: inherit; transition: all 0.2s;
 }
 .day-btn:hover { border-color: rgba(15,18,16,0.25); }
-.day-btn.active { border-color: #000; background: rgba(0,0,0,0.05); }
+.day-btn.active { border-color: #16130F; background: rgba(22,19,15,0.05); }
 .day-abbr { font-weight: 900; font-size: 0.88rem; color: rgba(15,18,16,0.85); }
 .day-full { font-size: 0.7rem; color: rgba(15,18,16,0.45); display: none; }
 @media (min-width: 500px) { .day-full { display: block; } }
 
 /* Preview card */
-.preview-card { background: #fff; border: 1px solid #E5E5E5; }
+.preview-card { background: #fff; border: 2px solid #E7DFCE; }
 .preview-header { padding: 24px 28px 20px; border-bottom: 1px solid rgba(15,18,16,0.08); }
 .preview-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .preview-name { font-weight: 900; font-size: 1.3rem; color: rgba(15,18,16,0.92); margin: 0; }
 .engine-badge {
   display: inline-flex; align-items: center;
-  background: #EBF0FF; border: 1px solid #0052FF;
-  color: #0052FF; padding: 4px 12px; border-radius: 0;
+  background: #EEF1FF; border: 1px solid #2A55F5;
+  color: #2A55F5; padding: 4px 12px; border-radius: 0;
   font-size: 0.78rem; font-weight: 700;
 }
 .preview-meta-row { display: flex; gap: 20px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; flex-wrap: wrap; }
@@ -1063,7 +1063,7 @@ onBeforeRouteLeave((to, from, next) => {
 .preview-workouts { display: flex; gap: 8px; flex-wrap: wrap; }
 .preview-workout {
   flex: 1; min-width: 90px; padding: 12px 10px;
-  background: #fff; border: 1px solid #E5E5E5; border-radius: 0; text-align: center;
+  background: #fff; border: 2px solid #E7DFCE; border-radius: 0; text-align: center;
 }
 .preview-workout.is-rest { opacity: 0.45; }
 .wo-day { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.45); margin-bottom: 6px; }
@@ -1074,8 +1074,8 @@ onBeforeRouteLeave((to, from, next) => {
 /* Start date */
 .preview-start { padding: 20px 28px; border-bottom: 1px solid rgba(15,18,16,0.08); display: flex; align-items: center; gap: 16px; }
 .start-label { font-weight: 700; font-size: 0.9rem; color: rgba(15,18,16,0.75); min-width: 80px; }
-.start-input { padding: 10px 14px; border: 1px solid #E5E5E5; border-radius: 0; font-family: inherit; font-size: 0.95rem; background: #fff; cursor: pointer; }
-.start-input:focus { outline: none; border-color: #767676; }
+.start-input { padding: 10px 14px; border: 2px solid #E7DFCE; border-radius: 0; font-family: inherit; font-size: 0.95rem; background: #fff; cursor: pointer; }
+.start-input:focus { outline: none; border-color: #2A55F5; }
 
 /* Preview actions */
 .preview-actions { padding: 20px 28px; display: flex; justify-content: flex-end; gap: 12px; }
@@ -1085,15 +1085,15 @@ onBeforeRouteLeave((to, from, next) => {
 
 /* Buttons */
 .btn {
-  border: 1px solid #E5E5E5; background: rgba(255,255,255,0.60);
+  border: 2px solid #E7DFCE; background: rgba(255,255,255,0.60);
   color: rgba(15,18,16,0.78); border-radius: 0; height: 42px; padding: 0 20px;
   font-weight: 700; font-family: inherit;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: #0052FF; border-color: #0052FF; color: white; }
-.btn-primary:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
+.btn-primary { background: #2A55F5; border-color: #2A55F5; color: white; }
+.btn-primary:hover:not(:disabled) { background: #1E42D6; border-color: #1E42D6; }
 .btn-ghost { background: transparent; border-color: rgba(15,18,16,0.14); }
 .btn-ghost:hover:not(:disabled) { background: rgba(15,18,16,0.04); }
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; }
@@ -1145,12 +1145,12 @@ onBeforeRouteLeave((to, from, next) => {
   width: 100%;
 }
 .template-card:hover { border-color: #767676; }
-.template-selected { border-color: #0052FF !important; background: #EBF0FF; }
+.template-selected { border-color: #2A55F5 !important; background: #EEF1FF; }
 .template-emoji { font-size: 1.6rem; flex-shrink: 0; }
 .template-info { flex: 1; min-width: 0; }
 .template-name { font-weight: 900; font-size: 0.95rem; color: #000; }
 .template-meta { font-size: 0.78rem; color: #767676; font-weight: 600; margin-top: 2px; }
-.template-check { font-size: 1.1rem; color: #0052FF; flex-shrink: 0; margin-left: auto; }
+.template-check { font-size: 1.1rem; color: #2A55F5; flex-shrink: 0; margin-left: auto; }
 
 @media (max-width: 640px) {
   .templates-grid { grid-template-columns: 1fr; }

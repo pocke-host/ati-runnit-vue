@@ -30,10 +30,10 @@ const paddedNum = computed(() => String(props.num).padStart(3, '0'))
   text-transform: uppercase;
   color: #767676;
 }
-.si-num  { color: #0052FF; }
+.si-num  { color: #2A55F5; }
 .si-dash { color: inherit; }
 .si-label { color: inherit; }
 
 .section-index--dark { color: rgba(255,255,255,0.55); }
-.section-index--dark .si-num { color: #0052FF; }
+.section-index--dark .si-num { color: #2A55F5; }
 </style>

@@ -745,7 +745,7 @@ onMounted(async () => {
   min-height: 100vh;
   background: var(--r-offwhite);
   padding-top: var(--page-top);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* Page loading */
@@ -780,7 +780,7 @@ onMounted(async () => {
   display: flex;
   gap: 4px;
   padding: 0 24px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   background: #fff;
 }
 .sk-tab {
@@ -797,7 +797,7 @@ onMounted(async () => {
   padding: 24px;
 }
 .sk-workout-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -848,13 +848,13 @@ onMounted(async () => {
 .confirm-modal {
   background: #fff; width: 100%; max-width: 400px; padding: 28px;
   display: flex; flex-direction: column; gap: 12px;
-  font-family: Futura, "Avenir Next", system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 .confirm-title { font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; }
 .confirm-body { font-size: 0.88rem; color: #555; margin: 0; }
 .confirm-actions { display: flex; gap: 10px; margin-top: 8px; }
 .confirm-btn-cancel {
-  flex: 1; height: 44px; border: 1px solid #E5E5E5; background: #fff;
+  flex: 1; height: 44px; border: 2px solid #E7DFCE; background: #fff;
   color: #767676; font-family: inherit; font-weight: 700; font-size: 0.82rem;
   text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
 }
@@ -876,13 +876,13 @@ onMounted(async () => {
 .week-jump-today {
   flex-shrink: 0;
   padding: 0 14px;
-  border: none; border-right: 1px solid #E5E5E5;
-  background: #0052FF; color: #fff;
+  border: none; border-right: 2px solid #E7DFCE;
+  background: #2A55F5; color: #fff;
   font-size: 0.70rem; font-weight: 700; letter-spacing: 0.08em;
   text-transform: uppercase; cursor: pointer; font-family: inherit;
   white-space: nowrap; transition: background 0.15s;
 }
-.week-jump-today:hover { background: #003ECC; }
+.week-jump-today:hover { background: #1E42D6; }
 .week-tabs { display: flex; padding: 0 24px; gap: 4px; min-width: max-content; flex: 1; }
 .week-tab {
   position: relative; display: flex; flex-direction: column; align-items: center;
@@ -938,7 +938,7 @@ onMounted(async () => {
 
 /* Workout type colors */
 .type-easy, .type-recovery   { color: #047857; }
-.type-tempo                  { color: #0052FF; }
+.type-tempo                  { color: #2A55F5; }
 .type-long                   { color: #000; }
 .type-interval               { color: #b91c1c; }
 .type-endurance              { color: #047857; }
@@ -981,7 +981,7 @@ onMounted(async () => {
   transition: color 0.15s;
 }
 .steps-toggle:hover { color: #000; }
-.steps-expanded { margin-top: 8px; border: 1px solid #F0F0F0; padding: 8px; background: #FAFAFA; }
+.steps-expanded { margin-top: 8px; border: 2px solid #E7DFCE; padding: 8px; background: #FAFAFA; }
 .step-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F5F5F5; flex-wrap: wrap; }
 .step-row:last-child { border-bottom: none; }
 .step-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
@@ -1025,7 +1025,7 @@ onMounted(async () => {
 }
 .rpe-chip {
   font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
-  background: rgba(0,82,255,0.08); color: #0052FF; padding: 2px 8px;
+  background: rgba(42,85,245,0.08); color: #2A55F5; padding: 2px 8px;
 }
 .athlete-note-text { font-size: 0.82rem; color: rgba(15,18,16,0.55); font-style: italic; flex: 1; min-width: 0; }
 .note-edit-btn { background: none; border: none; color: #ccc; font-size: 0.7rem; cursor: pointer; padding: 0 4px; }
@@ -1046,9 +1046,9 @@ onMounted(async () => {
 }
 .wba-btn:hover { border-color: #000; color: #000; }
 .wba-btn-start {
-  background: #0052FF; border-color: #0052FF; color: #fff;
+  background: #2A55F5; border-color: #2A55F5; color: #fff;
 }
-.wba-btn-start:hover { background: #003ECC; border-color: #003ECC; color: #fff; }
+.wba-btn-start:hover { background: #1E42D6; border-color: #1E42D6; color: #fff; }
 
 /* Post-completion panel */
 .completion-panel {
@@ -1071,7 +1071,7 @@ onMounted(async () => {
   transition: all 0.12s;
 }
 .rpe-btn:hover { border-color: #fff; color: #fff; }
-.rpe-btn.active { background: #0052FF; border-color: #0052FF; color: #fff; }
+.rpe-btn.active { background: #2A55F5; border-color: #2A55F5; color: #fff; }
 .cp-notes {
   background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
   color: #fff; padding: 10px 12px; font-family: inherit; font-size: 0.85rem;
@@ -1086,15 +1086,15 @@ onMounted(async () => {
   text-transform: uppercase; padding: 8px 16px; cursor: pointer;
 }
 .cp-save-btn {
-  background: #0052FF; border: none; color: #fff;
+  background: #2A55F5; border: none; color: #fff;
   font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; padding: 8px 20px; cursor: pointer;
 }
-.cp-save-btn:hover { background: #003ECC; }
+.cp-save-btn:hover { background: #1E42D6; }
 
 /* Adjust panel */
 .adjust-panel {
-  background: #fff; border: 1px solid #E5E5E5; border-top: none;
+  background: #fff; border: 2px solid #E7DFCE; border-top: none;
   padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
 }
 .ap-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #767676; margin-bottom: 4px; }
@@ -1102,28 +1102,28 @@ onMounted(async () => {
 .ap-field { display: flex; flex-direction: column; gap: 4px; }
 .ap-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #999; }
 .ap-input {
-  height: 38px; border: 1px solid #E5E5E5; padding: 0 10px;
+  height: 38px; border: 2px solid #E7DFCE; padding: 0 10px;
   font-family: inherit; font-size: 0.88rem; outline: none;
 }
 .ap-input:focus { border-color: #000; }
 .ap-textarea {
-  border: 1px solid #E5E5E5; padding: 8px 10px; font-family: inherit;
+  border: 2px solid #E7DFCE; padding: 8px 10px; font-family: inherit;
   font-size: 0.85rem; outline: none; resize: none; width: 100%; box-sizing: border-box;
 }
 .ap-textarea:focus { border-color: #000; }
 .ap-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
 .ap-cancel {
-  background: none; border: 1px solid #E5E5E5; color: #767676;
+  background: none; border: 2px solid #E7DFCE; color: #767676;
   font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; padding: 8px 16px; cursor: pointer;
 }
 .ap-save {
-  background: #0052FF; border: none; color: #fff;
+  background: #2A55F5; border: none; color: #fff;
   font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; padding: 8px 20px; cursor: pointer;
   display: inline-flex; align-items: center;
 }
-.ap-save:hover:not(:disabled) { background: #003ECC; }
+.ap-save:hover:not(:disabled) { background: #1E42D6; }
 .ap-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Workout outer wrapper */
@@ -1143,8 +1143,8 @@ onMounted(async () => {
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: #0052FF; border-color: transparent; color: white; }
-.btn-primary:hover:not(:disabled) { background: #003ECC; }
+.btn-primary { background: #2A55F5; border-color: transparent; color: white; }
+.btn-primary:hover:not(:disabled) { background: #1E42D6; }
 .btn-outline-danger { background: rgba(255,255,255,0.70); border-color: rgba(220,38,38,0.30); color: #dc2626; }
 .btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
 .btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }

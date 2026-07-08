@@ -202,11 +202,11 @@ watch(() => dmStore.messages.length, async () => {
   width: 380px;
   max-width: 100vw;
   background: #ffffff;
-  border-left: 1px solid #E5E5E5;
+  border-left: 2px solid #E7DFCE;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  font-family: Futura, 'Avenir Next', system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* Header */
@@ -216,7 +216,7 @@ watch(() => dmStore.messages.length, async () => {
   gap: 12px;
   padding: 0 20px;
   height: 60px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   flex-shrink: 0;
 }
 .dm-title {
@@ -321,7 +321,7 @@ watch(() => dmStore.messages.length, async () => {
 /* Compose search */
 .dm-compose-search {
   padding: 16px 20px 8px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 .dm-search-wrap {
   position: relative;
@@ -338,7 +338,7 @@ watch(() => dmStore.messages.length, async () => {
 .dm-search-input {
   width: 100%;
   height: 40px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 0 12px 0 36px;
   font-size: 0.88rem;
@@ -363,7 +363,7 @@ watch(() => dmStore.messages.length, async () => {
   padding: 16px 20px;
   border: none;
   background: transparent;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   cursor: pointer;
   text-align: left;
   transition: background 0.1s;
@@ -446,7 +446,7 @@ watch(() => dmStore.messages.length, async () => {
   border-radius: 0;
 }
 .sent .dm-bubble { background: #000; color: white; }
-.received .dm-bubble { background: #f5f5f5; color: #000; }
+.received .dm-bubble { background: #FBF6EC; color: #000; }
 
 .dm-bubble-time {
   font-size: 0.68rem;
@@ -460,13 +460,13 @@ watch(() => dmStore.messages.length, async () => {
   display: flex;
   align-items: center;
   gap: 0;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
   padding: 12px 16px;
   flex-shrink: 0;
 }
 .dm-input {
   flex: 1;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-right: none;
   padding: 10px 14px;
   font-size: 0.88rem;
@@ -478,8 +478,8 @@ watch(() => dmStore.messages.length, async () => {
 }
 .dm-input:focus { border-color: #000; }
 .dm-send-btn {
-  border: 1px solid #0052FF;
-  background: #0052FF;
+  border: 1px solid #2A55F5;
+  background: #2A55F5;
   color: white;
   width: 42px;
   height: 42px;
@@ -492,7 +492,7 @@ watch(() => dmStore.messages.length, async () => {
   transition: background 0.15s;
   flex-shrink: 0;
 }
-.dm-send-btn:hover:not(:disabled) { background: #003ECC; border-color: #003ECC; }
+.dm-send-btn:hover:not(:disabled) { background: #1E42D6; border-color: #1E42D6; }
 .dm-send-btn:disabled { background: #E5E5E5; border-color: #E5E5E5; color: #767676; cursor: not-allowed; }
 
 /* Transitions */

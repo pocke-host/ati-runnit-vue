@@ -138,8 +138,7 @@ const onSubmit = () => {
   padding-top: var(--page-top);
   min-height: calc(100vh - var(--nav-h) - var(--footer-h));
   background: var(--r-offwhite);
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* ===== HERO: cinematic + subtle “simulation” feel ===== */
@@ -179,7 +178,7 @@ const onSubmit = () => {
   align-items:center;
   justify-content:space-between;
   padding: 14px 16px;
-  background: #f5f5f5;
+  background: #FBF6EC;
   border-bottom: 1px solid rgba(15,18,16,0.10);
 }
 .panel-title{
@@ -211,7 +210,7 @@ const onSubmit = () => {
 .form-control,
 .form-select{
   border-radius: 0;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   height: 46px;
   background: #fff;
 }
@@ -235,10 +234,10 @@ textarea.form-control{
 
 /* Button */
 .btn-primary{
-  --bs-btn-bg: #0052FF;
-  --bs-btn-border-color: #0052FF;
-  --bs-btn-hover-bg: #003ECC;
-  --bs-btn-hover-border-color: #003ECC;
+  --bs-btn-bg: #2A55F5;
+  --bs-btn-border-color: #2A55F5;
+  --bs-btn-hover-bg: #1E42D6;
+  --bs-btn-hover-border-color: #1E42D6;
 
   font-weight: 900;
   letter-spacing: .02em;

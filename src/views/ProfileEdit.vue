@@ -699,7 +699,7 @@ onMounted(() => {
 
 .pe-divider {
   border: none;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
   margin: 28px 0 24px;
 }
 

@@ -53,7 +53,7 @@ const fontSize = computed(() => Math.round(props.size * 0.38))
   color: #fff;
   font-weight: 900;
   line-height: 1;
-  font-family: Futura, "Avenir Next", system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   letter-spacing: 0.03em;
 }
 </style>

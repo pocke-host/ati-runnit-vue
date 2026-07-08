@@ -22,7 +22,7 @@
   align-items: center;
   justify-content: center;
   padding: 80px 24px;
-  font-family: Futura, 'Avenir Next', system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 .cancel-inner {
   text-align: center;
@@ -31,8 +31,8 @@
 .cancel-icon {
   width: 64px;
   height: 64px;
-  background: #f5f5f5;
-  border: 1px solid #E5E5E5;
+  background: #FBF6EC;
+  border: 2px solid #E7DFCE;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -62,7 +62,7 @@ defineProps({
 }
 
 .sk-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   background: #fff;
   overflow: hidden;
 }
@@ -97,7 +97,7 @@ defineProps({
   border-right: none;
   border-top: none;
 }
-.sk-activity-row + .sk-activity-row { border-top: 1px solid #E5E5E5; }
+.sk-activity-row + .sk-activity-row { border-top: 2px solid #E7DFCE; }
 .sk-icon {
   width: 36px;
   height: 36px;
