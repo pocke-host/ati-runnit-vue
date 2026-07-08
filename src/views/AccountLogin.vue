@@ -1,22 +1,29 @@
 <template>
   <main class="login-page">
-    <!-- LEFT: Simple form -->
-    <section class="form-side">
-      <div class="login-container">
-        <!-- Logo/Brand -->
-        <div class="brand-mark mb-4">
-          <div class="logo-circle">R</div>
-          <h2 class="brand-name mb-0">RUNNIT</h2>
+    <div class="login-wrap">
+      <!-- Ticker -->
+      <div class="login-ticker" aria-hidden="true">
+        <div class="login-ticker-track">
+          <span>&nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ NO OFF-SEASON &nbsp;</span>
+          <span>&nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ NO OFF-SEASON &nbsp;</span>
         </div>
+      </div>
 
-        <h1 class="h2 fw-bold mb-2">Welcome back</h1>
-        <p class="text-muted mb-4">Sign in to continue tracking your progress.</p>
+      <!-- Logo bar -->
+      <div class="login-logo-bar">
+        <span class="login-logo-text">RUNNIT<span class="login-logo-dot">.</span></span>
+      </div>
 
-        <!-- Social Buttons -->
-        <div class="social-buttons mb-4">
-          <button type="button" class="btn btn-social" @click="handleGoogleSignIn" :disabled="googleLoading">
-            <span v-if="googleLoading" class="spinner-border spinner-border-sm"></span>
-            <svg v-else width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <!-- Card body -->
+      <div class="login-body">
+        <h1 class="login-headline">Welcome back.</h1>
+        <p class="login-sub">Pick up where your legs left off.</p>
+
+        <!-- Social buttons -->
+        <div class="login-social">
+          <button type="button" class="login-social-btn" @click="handleGoogleSignIn" :disabled="googleLoading">
+            <span v-if="googleLoading" class="login-spinner"></span>
+            <svg v-else width="16" height="16" viewBox="0 0 18 18" fill="none">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
               <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
               <path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
@@ -24,129 +31,77 @@
             </svg>
             {{ googleLoading ? 'Signing in...' : 'Continue with Google' }}
           </button>
-          <button type="button" class="btn btn-social" @click="handleAppleSignIn" disabled style="opacity:0.45;cursor:not-allowed">
+          <button type="button" class="login-social-btn" @click="handleAppleSignIn" disabled style="opacity:0.45;cursor:not-allowed">
             <i class="bi bi-apple"></i>
             Continue with Apple
           </button>
         </div>
-        <div v-if="googleError" class="alert alert-danger py-2 mb-3">{{ googleError }}</div>
+        <div v-if="googleError" class="login-alert">{{ googleError }}</div>
 
-        <div class="divider">
-          <span>or</span>
+        <!-- Divider -->
+        <div class="login-divider">
+          <span class="login-divider-line"></span>
+          <span class="login-divider-text">or</span>
+          <span class="login-divider-line"></span>
         </div>
 
-        <!-- Email Form -->
-        <form @submit="onSubmit" novalidate class="mt-4">
-          <div class="mb-3">
+        <!-- Form fields -->
+        <form @submit="onSubmit" novalidate>
+          <div class="login-field">
+            <label class="login-label" for="email">Email</label>
             <input
               id="email"
               v-model.trim="email"
               type="email"
-              class="form-control"
-              placeholder="Email"
+              class="login-input"
+              placeholder="you@email.com"
               required
               autocomplete="email"
             />
           </div>
 
-          <div class="mb-3">
-            <div class="password-input">
+          <div class="login-field">
+            <div class="login-label-row">
+              <label class="login-label" for="password">Password</label>
+              <router-link to="/forgot-password" class="login-forgot">Forgot?</router-link>
+            </div>
+            <div class="login-pwd-wrap">
               <input
                 :type="showPwd ? 'text' : 'password'"
                 id="password"
                 v-model="password"
-                class="form-control"
-                placeholder="Password"
+                class="login-input"
+                placeholder="Min 8 characters"
                 required
                 autocomplete="current-password"
               />
-              <button
-                class="password-toggle"
-                type="button"
-                @click="showPwd = !showPwd"
-                aria-label="Toggle password visibility"
-              >
+              <button class="login-pwd-toggle" type="button" @click="showPwd = !showPwd" aria-label="Toggle password visibility">
                 <i :class="showPwd ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
               </button>
             </div>
           </div>
 
-          <div class="form-options mb-3">
-            <label class="remember-label">
-              <input type="checkbox" v-model="remember" />
-              <span>Remember me</span>
-            </label>
-            <router-link to="/forgot-password" class="forgot-link">Forgot password?</router-link>
-          </div>
+          <div v-if="error" class="login-alert" role="alert">{{ error }}</div>
 
-          <div v-if="error" class="alert alert-danger py-2 mb-3" role="alert">
-            {{ error }}
-          </div>
-
-          <!-- Lockout warning -->
-          <div v-if="isLocked" class="lockout-bar mb-3">
-            <i class="bi bi-shield-exclamation me-2"></i>
+          <div v-if="isLocked" class="login-lockout">
+            <i class="bi bi-shield-exclamation"></i>
             Account locked — try again in <strong>{{ lockCountdown }}s</strong>
           </div>
 
-          <button
-            class="btn btn-primary w-100"
-            :disabled="loading || isLocked"
-            type="submit"
-          >
-            <span v-if="!loading">Sign In</span>
-            <span v-else>
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Signing in...
+          <button class="login-submit" :disabled="loading || isLocked" type="submit">
+            <span v-if="!loading">Sign In →</span>
+            <span v-else class="login-spinner-wrap">
+              <span class="login-spinner"></span>Signing in...
             </span>
           </button>
         </form>
 
-        <p class="text-center text-muted small mt-4 mb-0">
-          Don't have an account?
-          <router-link to="/signup" class="link">Sign up</router-link>
+        <p class="login-signup-link">
+          New here?
+          <router-link to="/signup" class="login-link">Create an account</router-link>
         </p>
       </div>
-    </section>
-
-    <!-- RIGHT: Minimal motivational visual -->
-    <section class="visual-side">
-      <div class="visual-content">
-        <!-- Stats Preview -->
-        <div class="stats-preview">
-          <div class="stat-item">
-            <div class="stat-number">24</div>
-            <div class="stat-label">Day Streak</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-number">127</div>
-            <div class="stat-label">Activities</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-number">8:42</div>
-            <div class="stat-label">Avg Pace</div>
-          </div>
-        </div>
-
-        <!-- Message -->
-        <div class="visual-message">
-          <h2 class="visual-title">Your progress is waiting.</h2>
-          <p class="visual-subtitle">
-            Sign in to continue your training journey and see how far you've come.
-          </p>
-        </div>
-
-        <!-- Quote -->
-        <div class="quote-card">
-          <div class="quote-icon">"</div>
-          <p class="quote-text">
-            Consistency isn't about perfection. It's about showing up.
-          </p>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 </template>
 
@@ -299,418 +254,254 @@ const handleAppleSignIn = () => {}
 </script>
 
 <style scoped>
-/* ===== Design Tokens ===== */
-.login-page {
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: var(--r-white);
-}
+@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@keyframes spin { to { transform: rotate(360deg) } }
 
-/* ===== LEFT SIDE: Form ===== */
-.form-side {
+.login-page {
+  min-height: 100vh;
+  background: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: var(--r-white);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
-.login-container {
+.login-wrap {
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
+  border: 2px solid #16130F;
+  background: #fff;
+  overflow: hidden;
 }
 
-/* Brand Mark */
-.brand-mark {
+/* Ticker */
+.login-ticker {
+  background: #16130F;
+  border-bottom: 3px solid #2A55F5;
+  overflow: hidden;
+}
+.login-ticker-track {
+  display: flex;
+  white-space: nowrap;
+  animation: rkMarq 24s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #FBF6EC;
+  padding: 7px 0;
+}
+@media (prefers-reduced-motion: reduce) { .login-ticker-track { animation: none; } }
+
+/* Logo bar */
+.login-logo-bar {
+  height: 60px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  padding: 0 32px;
+  border-bottom: 2px solid #16130F;
 }
-
-.logo-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 0;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
+.login-logo-text {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  color: white;
+  font-style: italic;
+  font-size: 1.6rem;
+  color: #16130F;
+  letter-spacing: 0.01em;
+}
+.login-logo-dot { color: #2A55F5; font-style: normal; }
+
+/* Card body */
+.login-body {
+  padding: 36px 32px;
 }
 
-.brand-name {
-  font-size: 24px;
+.login-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(40px, 8vw, 52px);
   font-weight: 900;
-  letter-spacing: 0.08em;
-  color: #000;
+  line-height: 0.85;
+  text-transform: uppercase;
+  color: #16130F;
+  margin: 0 0 10px;
 }
 
-/* Typography */
-.login-page h1 {
-  color: #000;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+.login-sub {
+  font-size: 0.94rem;
+  color: #5A5348;
+  margin: 0 0 22px;
+  line-height: 1.5;
 }
 
-.text-muted {
-  color: #6B7280;
-  font-size: 15px;
-}
-
-/* Social Buttons */
-.social-buttons {
+/* Social buttons */
+.login-social {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  margin-bottom: 6px;
 }
-
-.btn-social {
+.login-social-btn {
   width: 100%;
-  height: 48px;
-  border: 1px solid #E5E7EB;
-  border-radius: 0;
-  background: white;
-  color: #1F2937;
-  font-weight: 600;
-  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: all 0.2s ease;
+  border: 2px solid #16130F;
+  background: #fff;
+  color: #16130F;
+  padding: 13px 0;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.88rem;
   cursor: pointer;
+  transition: background 0.15s;
 }
-
-.btn-social:hover {
-  background: #F9FAFB;
-  border-color: #D1D5DB;
-}
-
-.btn-social svg {
-  flex-shrink: 0;
-}
+.login-social-btn:hover:not(:disabled) { background: #FBF6EC; }
+.login-social-btn svg { flex-shrink: 0; }
 
 /* Divider */
-.divider {
-  position: relative;
-  text-align: center;
-  margin: 24px 0;
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a89e88;
 }
+.login-divider-line { flex: 1; height: 2px; background: #E7DFCE; }
 
-.divider::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: #E5E7EB;
+/* Form fields */
+.login-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.login-label-row { display: flex; justify-content: space-between; align-items: baseline; }
+.login-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5A5348;
 }
-
-.divider span {
-  position: relative;
-  background: white;
-  padding: 0 12px;
-  font-size: 13px;
-  color: #9CA3AF;
-  font-weight: 500;
+.login-forgot {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2A55F5;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
 }
+.login-forgot:hover { border-bottom-color: #2A55F5; }
 
-/* Form Inputs */
-.form-control {
-  height: 48px;
-  border: 1px solid #E5E7EB;
-  border-radius: 0;
-  padding: 0 16px;
-  font-size: 16px; /* 16px minimum — prevents iOS from auto-zooming on focus */
-  transition: all 0.2s ease;
-}
-
-.form-control::placeholder {
-  color: #9CA3AF;
-}
-
-.form-control:focus {
+.login-input {
+  width: 100%;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 13px 14px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 16px; /* 16px prevents iOS auto-zoom */
+  color: #16130F;
   outline: none;
-  border-color: #000;
-  box-shadow: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
 }
+.login-input::placeholder { color: #a89e88; }
+.login-input:focus { border-color: #2A55F5; }
 
-/* Password Input */
-.password-input {
-  position: relative;
-}
-/* Ensure typed text doesn't slide under the toggle button */
-.password-input .form-control {
-  padding-right: 52px;
-}
-
-.password-toggle {
+.login-pwd-wrap { position: relative; }
+.login-pwd-wrap .login-input { padding-right: 48px; }
+.login-pwd-toggle {
   position: absolute;
-  right: 0;
-  top: 0;
-  width: 48px;
-  height: 48px;
-  background: none;
-  border: none;
-  color: #9CA3AF;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-  /* 48px touch target — safe on all iPhones including SE */
+  right: 0; top: 0;
+  width: 48px; height: 100%;
+  background: none; border: none;
+  color: #8A8A8A; font-size: 1rem;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: color 0.15s;
 }
-
-.password-toggle:hover {
-  color: #6B7280;
-}
-
-/* Form Options */
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.remember-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #6B7280;
-  cursor: pointer;
-}
-
-.remember-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #D1D5DB;
-  border-radius: 0;
-  cursor: pointer;
-}
-
-.remember-label input[type="checkbox"]:checked {
-  accent-color: #000;
-}
-
-.forgot-link {
-  font-size: 14px;
-  color: #000;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.forgot-link:hover {
-  text-decoration: underline;
-}
-
-/* Links */
-.link {
-  color: #000;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-/* Primary Button */
-.btn-primary {
-  height: 48px;
-  background: #0052FF;
-  border: none;
-  border-radius: 0;
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.01em;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #003ECC;
-  transform: none;
-  box-shadow: none;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.login-pwd-toggle:hover { color: #16130F; }
 
 /* Alert */
-.alert-danger {
+.login-alert {
   background: #FEF2F2;
-  border: 1px solid #FCA5A5;
-  border-radius: 0;
+  border: 2px solid #FCA5A5;
   color: #DC2626;
-  font-size: 14px;
+  font-size: 0.84rem;
+  padding: 10px 14px;
+  margin-bottom: 12px;
 }
-
-/* Lockout bar */
-.lockout-bar {
+.login-lockout {
   background: #FFF7ED;
-  border: 1px solid #FED7AA;
+  border: 2px solid #FED7AA;
   color: #C2410C;
-  font-size: 13px;
+  font-size: 0.84rem;
   font-weight: 600;
   padding: 10px 14px;
   display: flex;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-/* ===== RIGHT SIDE: Visual ===== */
-.visual-side {
-  position: relative;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px;
-  overflow: hidden;
-}
-
-
-.visual-content {
-  position: relative;
+/* Submit pill */
+.login-submit {
   width: 100%;
-  max-width: 500px;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-
-/* Stats Preview */
-.stats-preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 32px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 0;
-  box-shadow: none;
-  backdrop-filter: blur(10px);
-}
-
-.stat-item {
-  text-align: center;
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 32px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 15px 0;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
   font-weight: 800;
-  color: #000;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.stat-label {
-  font-size: 12px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6B7280;
-  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #16130F;
+  transition: background 0.15s, box-shadow 0.15s;
+  margin-top: 20px;
 }
+.login-submit:hover:not(:disabled) { background: #1E42D6; }
+.login-submit:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 
-.stat-divider {
-  width: 1px;
-  height: 40px;
-  background: #E5E7EB;
+.login-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
 }
+.login-spinner-wrap { display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-/* Visual Message */
-.visual-message {
+/* Bottom link */
+.login-signup-link {
   text-align: center;
-  color: white;
+  font-size: 0.86rem;
+  color: #5A5348;
+  margin: 18px 0 0;
 }
-
-.visual-title {
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
+.login-link {
+  font-weight: 800;
+  color: #16130F;
+  text-decoration: none;
+  border-bottom: 2px solid #2A55F5;
 }
-
-.visual-subtitle {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-/* Quote Card */
-.quote-card {
-  position: relative;
-  padding: 28px 32px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0;
-  backdrop-filter: blur(10px);
-}
-
-.quote-icon {
-  position: absolute;
-  top: -10px;
-  left: 20px;
-  font-size: 72px;
-  color: rgba(255, 255, 255, 0.2);
-  line-height: 1;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, sans-serif;
-}
-
-.quote-text {
-  position: relative;
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.95);
-  font-style: italic;
-  line-height: 1.6;
-  margin: 0;
-  padding-top: 20px;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 991px) {
-  .login-page {
-    grid-template-columns: 1fr;
-  }
-  
-  .visual-side {
-    display: none;
-  }
-  
-  .form-side {
-    padding: 40px 20px;
-  }
-}
+.login-link:hover { color: #2A55F5; }
 
 @media (max-width: 480px) {
-  .login-container {
-    max-width: 100%;
-  }
-  
-  .brand-mark {
-    justify-content: center;
-  }
-  
-  h1 {
-    font-size: 24px;
-  }
-
-  .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+  .login-page { padding: 20px 0; align-items: flex-start; }
+  .login-wrap { max-width: 100%; border-left: none; border-right: none; }
+  .login-body { padding: 28px 20px; }
+  .login-logo-bar { padding: 0 20px; }
 }
 </style>
