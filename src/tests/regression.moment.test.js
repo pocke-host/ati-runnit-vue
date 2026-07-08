@@ -144,3 +144,57 @@ describe('Moment Store — cache initialization', () => {
     expect(store.feed).toEqual([])
   })
 })
+
+describe('Moment Store — video moment', () => {
+  it('createMoment with video URL in photoUrl prepends to feed', async () => {
+    const videoMoment = {
+      ...MOCK_MOMENT,
+      id: 202,
+      photoUrl: 'https://cdn.runnit.app/moments/202.mp4',
+    }
+    axios.post.mockResolvedValueOnce({ data: videoMoment })
+
+    const store = useMomentStore()
+    const result = await store.createMoment({
+      photoUrl: 'https://cdn.runnit.app/moments/202.mp4',
+      caption: 'Sprint intervals done.',
+    })
+
+    expect(result.id).toBe(202)
+    expect(store.feed[0].photoUrl).toMatch(/\.mp4$/)
+  })
+
+  it('createMoment with explicit videoUrl field stores correctly', async () => {
+    const videoMoment = {
+      ...MOCK_MOMENT,
+      id: 203,
+      photoUrl: null,
+      videoUrl: 'https://cdn.runnit.app/moments/203.mp4',
+    }
+    axios.post.mockResolvedValueOnce({ data: videoMoment })
+
+    const store = useMomentStore()
+    const result = await store.createMoment({
+      videoUrl: 'https://cdn.runnit.app/moments/203.mp4',
+      caption: 'Recovery jog.',
+    })
+
+    expect(result.id).toBe(203)
+    expect(store.feed[0].videoUrl).toBe('https://cdn.runnit.app/moments/203.mp4')
+  })
+
+  it('video moment is written to feed cache', async () => {
+    const videoMoment = {
+      ...MOCK_MOMENT,
+      id: 204,
+      photoUrl: 'https://cdn.runnit.app/moments/204.mov',
+    }
+    axios.post.mockResolvedValueOnce({ data: videoMoment })
+
+    const store = useMomentStore()
+    await store.createMoment({ photoUrl: 'https://cdn.runnit.app/moments/204.mov' })
+
+    const cached = JSON.parse(localStorage.getItem('runnit_moments_feed_cache'))
+    expect(cached[0].id).toBe(204)
+  })
+})

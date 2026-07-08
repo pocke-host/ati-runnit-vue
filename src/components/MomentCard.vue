@@ -16,16 +16,31 @@
       </div>
     </div>
 
-    <!-- Photo -->
-    <div class="moment-photo">
-      <img :src="moment.photoUrl" :alt="`${moment.userDisplayName}'s moment`" loading="lazy" />
+    <!-- Media (photo or video) -->
+    <div class="moment-media">
+      <video
+        v-if="moment.videoUrl || (moment.photoUrl && (moment.photoUrl.includes('.mp4') || moment.photoUrl.includes('.mov') || moment.photoUrl.includes('.webm')))"
+        :src="moment.videoUrl || moment.photoUrl"
+        controls
+        playsinline
+        preload="metadata"
+        class="moment-video"
+      ></video>
+      <img
+        v-else-if="moment.photoUrl"
+        :src="moment.photoUrl"
+        :alt="`${moment.userDisplayName}'s moment`"
+        loading="lazy"
+        class="moment-img"
+      />
     </div>
 
-    <!-- Song Info -->
+    <!-- Song Info (only when present) -->
     <div class="moment-content">
-      <div class="song-info">
+      <div v-if="moment.songTitle" class="song-info">
         <i class="bi bi-music-note-beamed me-2"></i>
-        <strong>{{ moment.songTitle }}</strong> - {{ moment.songArtist }}
+        <strong>{{ moment.songTitle }}</strong>
+        <span v-if="moment.songArtist"> - {{ moment.songArtist }}</span>
         <a v-if="moment.songLink" :href="moment.songLink" target="_blank" class="ms-2">
           <i class="bi bi-spotify"></i>
         </a>
@@ -126,11 +141,24 @@ const formatDate = (dateString) => {
   object-fit: cover;
 }
 
-.moment-photo img {
+.moment-media {
+  width: 100%;
+  background: #16130F;
+  border-top: 2px solid #16130F;
+  border-bottom: 2px solid #16130F;
+}
+.moment-img {
   width: 100%;
   height: auto;
   max-height: 600px;
   object-fit: cover;
+  display: block;
+}
+.moment-video {
+  width: 100%;
+  max-height: 480px;
+  display: block;
+  background: #000;
 }
 
 .moment-content {
