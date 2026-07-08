@@ -255,7 +255,7 @@ const sections = [
 
 <style scoped>
 .privacy-page {
-  font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   background: #fff;
   min-height: 100vh;
   padding-top: var(--nav-h, 64px);
@@ -330,7 +330,7 @@ const sections = [
 }
 
 .toc-link:hover {
-  background: #f5f5f5;
+  background: #FBF6EC;
   color: #000;
 }
 
@@ -338,14 +338,14 @@ const sections = [
 .policy-body {
   background: #fff;
   border-radius: 0;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 48px;
 }
 
 .policy-section {
   padding-bottom: 40px;
   margin-bottom: 40px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 
 .policy-section:last-of-type {
@@ -450,7 +450,7 @@ const sections = [
 }
 
 .contact-email {
-  color: #0052FF;
+  color: #2A55F5;
   text-decoration: underline;
 }
 

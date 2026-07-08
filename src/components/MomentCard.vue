@@ -103,7 +103,7 @@ const formatDate = (dateString) => {
   border-radius: 0;
   overflow: hidden;
   box-shadow: none;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
 }
 
 .moment-header {

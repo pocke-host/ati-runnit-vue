@@ -57,7 +57,7 @@ onMounted(async () => {
 
 <style scoped>
 .callback-page {
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   min-height: 100vh;
   display: flex;
   align-items: center;

@@ -49,17 +49,17 @@
       <!-- ACTIVITY LIST -->
       <div class="list-panel">
         <div v-if="loading" class="list-loading">
-          <div class="spinner-border" style="width:1.2rem;height:1.2rem;border-color:#E5E5E5;border-top-color:#000"></div>
+          <div class="spinner-border" style="width:1.2rem;height:1.2rem;border-color:#E7DFCE;border-top-color:#2A55F5"></div>
         </div>
 
         <div v-else-if="loadError" class="list-empty">
-          <i class="bi bi-exclamation-circle" style="font-size:2rem;color:#E5E5E5"></i>
+          <i class="bi bi-exclamation-circle" style="font-size:2rem;color:#C0392B"></i>
           <p>{{ loadError }}</p>
           <button class="retry-btn" @click="loadNearby">Try Again</button>
         </div>
 
         <div v-else-if="!activities.length" class="list-empty">
-          <i class="bi bi-map" style="font-size:2rem;color:#E5E5E5"></i>
+          <i class="bi bi-map" style="font-size:2rem;color:#E7DFCE"></i>
           <p>No activities found nearby.<br>Try increasing the radius or changing sport.</p>
         </div>
 
@@ -423,7 +423,7 @@ onBeforeUnmount(() => { map?.remove() })
   justify-content: center;
   gap: 10px;
   font-size: 0.85rem;
-  color: #767676;
+  color: #8A8A8A;
 }
 
 /* List panel */
@@ -446,7 +446,7 @@ onBeforeUnmount(() => { map?.remove() })
   gap: 12px;
   padding: 48px 24px;
   text-align: center;
-  color: #767676;
+  color: #8A8A8A;
   font-size: 0.85rem;
 }
 

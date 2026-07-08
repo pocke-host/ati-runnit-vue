@@ -1220,7 +1220,7 @@ onMounted(() => {
 /* ===== INVITE CARDS ===== */
 .invite-card {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 20px;
 }
@@ -1247,7 +1247,7 @@ onMounted(() => {
 
 .invite-link-input {
   flex: 1;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 8px 12px;
   font-size: 13px;
@@ -1308,7 +1308,7 @@ onMounted(() => {
 .btn-cta {
   display: inline-block;
   padding: 14px 40px;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
   text-decoration: none;
   border: none;
@@ -1321,7 +1321,7 @@ onMounted(() => {
 }
 
 .btn-cta:hover {
-  background: #003ECC;
+  background: #1E42D6;
   transform: none;
   box-shadow: none;
 }
@@ -1341,7 +1341,7 @@ onMounted(() => {
   width: 380px;
   height: 100vh;
   background: white;
-  border-left: 1px solid #E5E5E5;
+  border-left: 2px solid #E7DFCE;
   z-index: 1050;
   display: flex;
   flex-direction: column;
@@ -1500,7 +1500,7 @@ onMounted(() => {
 
 .chat-input {
   flex: 1;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 10px 14px;
   font-family: inherit;
@@ -1612,11 +1612,11 @@ onMounted(() => {
   transform: translateX(-50%);
   width: min(520px, 100vw);
   background: #fff;
-  border-top: 1px solid #E5E5E5;
-  border-left: 1px solid #E5E5E5;
-  border-right: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
+  border-left: 2px solid #E7DFCE;
+  border-right: 2px solid #E7DFCE;
   z-index: 10000;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
 }
 
 .create-modal-header {
@@ -1624,7 +1624,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 .create-modal-title {
   font-size: 0.78rem;
@@ -1661,7 +1661,7 @@ onMounted(() => {
 .create-input {
   width: 100%;
   height: 44px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   padding: 0 14px;
   font-size: 0.9rem;
@@ -1700,7 +1700,7 @@ onMounted(() => {
 .btn-cancel {
   height: 44px;
   padding: 0 20px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   background: #fff;
   color: #767676;
   font-size: 0.8rem;
@@ -1711,12 +1711,12 @@ onMounted(() => {
   font-family: inherit;
   transition: all 0.15s;
 }
-.btn-cancel:hover { background: #f5f5f5; color: #000; }
+.btn-cancel:hover { background: #FBF6EC; color: #000; }
 
 .btn-create {
   height: 44px;
   padding: 0 28px;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
   border: none;
   border-radius: 0;
@@ -1730,7 +1730,7 @@ onMounted(() => {
   font-family: inherit;
   transition: background 0.15s;
 }
-.btn-create:hover:not(:disabled) { background: #003ECC; }
+.btn-create:hover:not(:disabled) { background: #1E42D6; }
 .btn-create:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* slide-up transition for modal */
@@ -1741,13 +1741,13 @@ onMounted(() => {
 .clubs-map {
   width: 100%;
   height: 520px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
 }
 .map-strip {
   font-size: 0.82rem;
   color: #767676;
   background: #fafafa;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 10px 14px;
   margin-bottom: 14px;
 }
@@ -1756,7 +1756,7 @@ onMounted(() => {
 .btn-set-location {
   display: inline-flex; align-items: center;
   height: 34px; padding: 0 14px;
-  border: 1px solid #E5E5E5; background: #fff;
+  border: 2px solid #E7DFCE; background: #fff;
   color: #000; font-family: inherit; font-size: 0.78rem;
   font-weight: 700; cursor: pointer; transition: border-color 0.15s;
   width: 100%;

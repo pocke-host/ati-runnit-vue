@@ -613,7 +613,7 @@ onMounted(() => {
 .coming-soon-badge {
   display: inline-block;
   padding: 6px 14px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;

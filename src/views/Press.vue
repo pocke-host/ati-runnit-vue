@@ -139,8 +139,8 @@ const facts = [
   display: flex;
   flex-direction: column;
   gap: 1px;
-  background: #E5E5E5;
-  border: 1px solid #E5E5E5;
+  background: #E7DFCE;
+  border: 2px solid #E7DFCE;
 }
 .press-item {
   background: #fff;

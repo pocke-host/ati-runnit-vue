@@ -89,9 +89,9 @@ const handlePortal = async () => {
 <style scoped>
 .billing-page {
   min-height: 100vh;
-  background: #fff;
+  background: #FBF6EC;
   padding-top: var(--page-top);
-  font-family: Futura, 'Avenir Next', system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 .billing-wrap {
   max-width: 560px;
@@ -104,35 +104,42 @@ const handlePortal = async () => {
 .billing-back {
   display: inline-flex;
   align-items: center;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #767676;
+  color: #8A8A8A;
   text-decoration: none;
   margin-bottom: 20px;
   transition: color 0.15s;
 }
-.billing-back:hover { color: #000; }
+.billing-back:hover { color: #2A55F5; }
 .billing-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: 2rem;
-  font-weight: 800;
-  color: #000;
+  font-weight: 900;
+  color: #16130F;
   margin: 0;
-  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  line-height: 0.9;
 }
 
 .billing-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
+  background: #fff;
+  box-shadow: 4px 4px 0 #16130F;
 }
 .billing-section { padding: 28px 28px; }
 .billing-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: #767676;
+  color: #2A55F5;
   margin-bottom: 12px;
+  text-transform: uppercase;
 }
 .billing-tier-row {
   display: flex;
@@ -142,24 +149,26 @@ const handlePortal = async () => {
 .tier-pill {
   display: inline-block;
   padding: 6px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  border-radius: 0;
+  border-radius: 999px;
 }
-.tier-free { background: #f5f5f5; color: #767676; border: 1px solid #E5E5E5; }
-.tier-premium { background: #000; color: #fff; }
-.tier-duo { background: #000; color: #fff; }
+.tier-free { background: #F1EADC; color: #5A5348; border: 2px solid #E7DFCE; }
+.tier-premium { background: #16130F; color: #FBF6EC; border: 2px solid #16130F; }
+.tier-duo { background: #16130F; color: #FBF6EC; border: 2px solid #16130F; }
 .billing-status {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.78rem;
-  color: #767676;
+  color: #8A8A8A;
   text-transform: capitalize;
 }
-.billing-divider { border: none; border-top: 1px solid #E5E5E5; }
+.billing-divider { border: none; border-top: 2px solid #E7DFCE; }
 .billing-desc {
   font-size: 0.9rem;
-  color: #767676;
+  color: #5A5348;
   line-height: 1.6;
   margin-bottom: 24px;
 }
@@ -169,23 +178,25 @@ const handlePortal = async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
   font-size: 0.82rem;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   text-decoration: none;
   padding: 14px 28px;
-  border-radius: 0;
-  border: none;
+  border-radius: 999px;
+  border: 2px solid #16130F;
+  box-shadow: 3px 3px 0 #16130F;
   cursor: pointer;
   transition: background 0.15s;
   width: fit-content;
   min-width: 200px;
 }
-.btn-billing-primary:hover:not(:disabled) { background: #003ECC; }
-.btn-billing-primary:disabled { background: #E5E5E5; color: #767676; cursor: not-allowed; }
+.btn-billing-primary:hover:not(:disabled) { background: #1E42D6; }
+.btn-billing-primary:disabled { background: #E7DFCE; color: #8A8A8A; cursor: not-allowed; box-shadow: none; border-color: #E7DFCE; }
 
 .btn-spinner {
   width: 16px;
@@ -200,7 +211,7 @@ const handlePortal = async () => {
 
 .billing-error {
   font-size: 0.82rem;
-  color: #ef4444;
+  color: #C0392B;
   margin: 0;
 }
 
@@ -211,10 +222,10 @@ const handlePortal = async () => {
 }
 .billing-link {
   font-size: 0.82rem;
-  color: #767676;
+  color: #8A8A8A;
   text-decoration: none;
   transition: color 0.15s;
 }
-.billing-link:hover { color: #000; }
+.billing-link:hover { color: #2A55F5; }
 .me-2 { margin-right: 8px; }
 </style>

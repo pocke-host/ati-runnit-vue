@@ -93,7 +93,7 @@
     <div class="modal-backdrop" v-if="confirmDelete" @click.self="confirmDelete = false">
       <div class="modal-box modal-box-sm">
         <h2 class="modal-title">Delete event?</h2>
-        <p style="color:#767676;font-size:.9rem">This won't delete the individual activities.</p>
+        <p style="color:#8A8A8A;font-size:.9rem">This won't delete the individual activities.</p>
         <div class="modal-actions">
           <button class="btn-ghost-sm" @click="confirmDelete = false" :disabled="deleting">Cancel</button>
           <button class="btn-danger-sm" @click="deleteEvent" :disabled="deleting">
@@ -111,7 +111,7 @@
   </div>
 
   <div v-else-if="loading" class="loading-center">
-    <div class="spinner-border" style="width:1.5rem;height:1.5rem;border-color:#E5E5E5;border-top-color:#000"></div>
+    <div class="spinner-border" style="width:1.5rem;height:1.5rem;border-color:#E7DFCE;border-top-color:#2A55F5"></div>
   </div>
 </template>
 
@@ -200,32 +200,35 @@ onMounted(loadEvent)
 </script>
 
 <style scoped>
-.event-detail-page { background: #fff; min-height: 100vh; }
+.event-detail-page { background: #FBF6EC; min-height: 100vh; font-family: 'Hanken Grotesk', system-ui, sans-serif; }
 
 .event-hero {
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
   padding: 48px 24px 40px;
 }
 .event-hero-inner { max-width: 760px; margin: 0 auto; }
 .event-kicker {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: #2A55F5;
   margin-bottom: 10px;
 }
 .event-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: clamp(1.8rem, 5vw, 3rem);
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 0.9;
+  text-transform: uppercase;
   margin: 0 0 24px;
 }
 .event-totals { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 24px; }
 .total-chip { display: flex; flex-direction: column; gap: 2px; }
-.total-val { font-size: 1.6rem; font-weight: 900; }
-.total-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.total-val { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.6rem; font-weight: 900; }
+.total-label { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(251,246,236,0.6); }
 .event-actions { display: flex; gap: 8px; }
 
 .event-body { max-width: 760px; margin: 0 auto; padding: 40px 24px; }
@@ -235,42 +238,44 @@ onMounted(loadEvent)
 .timeline-item { display: flex; gap: 20px; }
 .timeline-track { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
 .timeline-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
-.timeline-line { width: 2px; flex: 1; background: #E5E5E5; margin: 6px 0; min-height: 24px; }
+.timeline-line { width: 2px; flex: 1; background: #E7DFCE; margin: 6px 0; min-height: 24px; }
 
 .seg-card {
   flex: 1;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
+  background: #fff;
   padding: 16px 20px;
   margin-bottom: 16px;
   cursor: pointer;
   transition: border-color 0.15s;
 }
-.seg-card:hover { border-color: #000; }
+.seg-card:hover { border-color: #16130F; }
 .seg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .seg-badge {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   padding: 3px 10px;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.seg-order { font-size: 0.75rem; color: #767676; }
+.seg-order { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.75rem; color: #8A8A8A; }
 .seg-stats { display: flex; gap: 24px; flex-wrap: wrap; }
 .seg-stat { display: flex; flex-direction: column; gap: 2px; }
-.seg-stat-val { font-size: 1.1rem; font-weight: 700; }
-.seg-stat-lbl { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #767676; }
-.seg-view-link { font-size: 0.75rem; color: #767676; margin-top: 10px; }
+.seg-stat-val { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.1rem; font-weight: 900; color: #16130F; }
+.seg-stat-lbl { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8A8A; }
+.seg-view-link { font-size: 0.75rem; color: #2A55F5; margin-top: 10px; }
 
 /* Notes */
-.event-notes { margin-top: 32px; border-top: 1px solid #E5E5E5; padding-top: 24px; }
-.notes-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #767676; margin-bottom: 8px; }
-.notes-text { font-size: 0.9rem; color: #333; line-height: 1.6; white-space: pre-wrap; }
+.event-notes { margin-top: 32px; border-top: 2px solid #E7DFCE; padding-top: 24px; }
+.notes-label { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #2A55F5; margin-bottom: 8px; }
+.notes-text { font-size: 0.9rem; color: #5A5348; line-height: 1.6; white-space: pre-wrap; }
 
 /* Modal */
 .delete-error-banner {
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.20);
-  color: #dc2626;
+  background: rgba(192,57,43,0.08);
+  border: 2px solid rgba(192,57,43,0.20);
+  color: #C0392B;
   font-size: 0.88rem;
   font-weight: 600;
   padding: 12px 24px;
@@ -281,18 +286,18 @@ onMounted(loadEvent)
 }
 
 .modal-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  position: fixed; inset: 0; background: rgba(22,19,15,0.60);
   display: flex; align-items: center; justify-content: center;
   z-index: 1000; padding: 16px;
 }
-.modal-box { background: #fff; width: 100%; max-width: 600px; padding: 32px; max-height: 90vh; overflow-y: auto; }
+.modal-box { background: #fff; width: 100%; max-width: 600px; padding: 32px; max-height: 90vh; overflow-y: auto; border: 2px solid #16130F; box-shadow: 6px 6px 0 #16130F; }
 .modal-box-sm { max-width: 400px; }
-.modal-title { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 20px; }
+.modal-title { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 20px; color: #16130F; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
-.btn-ghost-sm { padding: 8px 16px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #E5E5E5; background: #fff; cursor: pointer; }
-.btn-ghost-sm:hover { border-color: #000; }
-.btn-danger-sm { padding: 8px 16px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; background: #ef4444; color: #fff; cursor: pointer; }
+.btn-ghost-sm { padding: 8px 16px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: 2px solid #E7DFCE; background: #fff; cursor: pointer; color: #16130F; }
+.btn-ghost-sm:hover { border-color: #16130F; }
+.btn-danger-sm { padding: 8px 16px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: 2px solid #C0392B; background: #C0392B; color: #fff; cursor: pointer; }
 
 .loading-center { display: flex; justify-content: center; align-items: center; min-height: 40vh; }
 </style>

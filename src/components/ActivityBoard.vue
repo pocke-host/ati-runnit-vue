@@ -82,7 +82,7 @@ function formattedPace(secPerKm) {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #767676;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 
 .board-row {
@@ -91,7 +91,7 @@ function formattedPace(secPerKm) {
   gap: 16px;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   background: #fff;
   animation: rkRise 0.5s ease-out both;
 }

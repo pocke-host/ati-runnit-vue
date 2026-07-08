@@ -183,16 +183,16 @@ onUnmounted(() => {
   padding: 3px 10px;
   align-self: flex-start;
 }
-.badge-live { background: #0052FF; color: #fff; }
-.badge-ended { background: #767676; color: #fff; }
+.badge-live { background: #2A55F5; color: #fff; }
+.badge-ended { background: #8A8A8A; color: #FBF6EC; }
 
-.live-name { font-size: 18px; font-weight: 800; color: #000; letter-spacing: -0.01em; }
+.live-name { font-size: 18px; font-weight: 800; color: #16130F; letter-spacing: -0.01em; }
 
 .live-stats { display: flex; gap: 16px; flex-wrap: wrap; }
-.live-stat { font-size: 13px; color: #444; display: flex; align-items: center; gap: 4px; }
+.live-stat { font-size: 13px; color: #5A5348; display: flex; align-items: center; gap: 4px; }
 .live-stat-emoji { font-size: 15px; }
 
-.live-updated { font-size: 11px; color: #767676; letter-spacing: 0.05em; }
+.live-updated { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 11px; color: #8A8A8A; letter-spacing: 0.05em; }
 
 .live-not-found, .live-loading {
   position: absolute;

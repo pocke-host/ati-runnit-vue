@@ -452,7 +452,7 @@
     height: 72px;
     border-radius: 50%;
     padding: 3px;
-    background: linear-gradient(45deg, #0052FF, #0099FF);
+    background: linear-gradient(45deg, #2A55F5, #0099FF);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -464,7 +464,7 @@
   }
   
   .ring-avatar.has-unviewed {
-    background: linear-gradient(45deg, #0052FF, #0099FF);
+    background: linear-gradient(45deg, #2A55F5, #0099FF);
   }
   
   .ring-avatar:not(.has-unviewed) {
@@ -809,7 +809,7 @@
   }
   
   .upload-area:hover {
-    border-color: var(--rk-signal, #0052FF);
+    border-color: var(--rk-signal, #2A55F5);
     background: rgba(196,106,42,0.08);
   }
   
@@ -881,13 +881,13 @@
   }
   
   .btn-primary {
-    background: #0052FF;
-    border-color: #0052FF;
+    background: #2A55F5;
+    border-color: #2A55F5;
     color: white;
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: #003ECC;
+    background: #1E42D6;
   }
   
   .btn-primary:disabled {

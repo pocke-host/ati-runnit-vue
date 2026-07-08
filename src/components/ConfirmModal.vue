@@ -56,7 +56,7 @@ const cancel = () => emit('update:modelValue', false)
   display: flex;
   flex-direction: column;
   gap: 12px;
-  font-family: Futura, "Avenir Next", system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .confirm-title {
@@ -83,7 +83,7 @@ const cancel = () => emit('update:modelValue', false)
 .confirm-btn-cancel {
   flex: 1;
   height: 44px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   background: #fff;
   color: #767676;
   font-family: inherit;
@@ -94,7 +94,7 @@ const cancel = () => emit('update:modelValue', false)
   cursor: pointer;
   transition: background 0.15s;
 }
-.confirm-btn-cancel:hover { background: #f5f5f5; }
+.confirm-btn-cancel:hover { background: #FBF6EC; }
 
 .confirm-btn-action {
   flex: 1;
@@ -111,8 +111,8 @@ const cancel = () => emit('update:modelValue', false)
 
 .confirm-btn-danger  { background: #dc2626; color: #fff; }
 .confirm-btn-danger:hover  { background: #b91c1c; }
-.confirm-btn-primary { background: #0052FF; color: #fff; }
-.confirm-btn-primary:hover { background: #003ECC; }
+.confirm-btn-primary { background: #2A55F5; color: #fff; }
+.confirm-btn-primary:hover { background: #1E42D6; }
 
 /* Transition */
 .confirm-fade-enter-active,

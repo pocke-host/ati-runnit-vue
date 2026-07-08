@@ -237,16 +237,16 @@ const handleSubmit = async () => {
   min-height: 100vh;
   background: #fff;
   padding: 40px 20px;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .moment-card {
   max-width: 600px;
   margin: 0 auto;
   background: #fff;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
-  border: 1px solid rgba(15,18,16,0.12);
+  border: 2px solid rgba(22,19,15,0.12);
   box-shadow: none;
   padding: 32px;
 }
@@ -270,7 +270,7 @@ const handleSubmit = async () => {
   height: 40px;
   border-radius: 0;
   border: 1px solid rgba(15,18,16,0.14);
-  background: #f5f5f5;
+  background: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -384,7 +384,7 @@ const handleSubmit = async () => {
 
 .song-section {
   margin-bottom: 24px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 16px;
 }
 
@@ -428,7 +428,7 @@ const handleSubmit = async () => {
 
 .btn {
   border: 1px solid rgba(15,18,16,0.14);
-  background: #f5f5f5;
+  background: #FBF6EC;
   color: rgba(15,18,16,0.78);
   border-radius: 0;
   height: 44px;
@@ -444,8 +444,8 @@ const handleSubmit = async () => {
 }
 
 .btn:hover {
-  border-color: #E5E5E5;
-  background: #fff;
+  border-color: #16130F;
+  background: #F1EADC;
 }
 
 .btn-primary {

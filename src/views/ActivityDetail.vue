@@ -237,7 +237,7 @@
             </div>
 
             <div class="course-pr-banner" v-if="coursePR && String(coursePR.id) === String(activity?.id)">
-              <i class="bi bi-trophy-fill me-2" style="color:#0052FF"></i>
+              <i class="bi bi-trophy-fill me-2" style="color:#2A55F5"></i>
               <strong>Course PR!</strong>&nbsp;This is your fastest time on this route.
             </div>
 
@@ -1188,19 +1188,20 @@ onMounted(init)
 }
 .det-card-top .det-section-title { margin: 0; }
 .workout-type-chip {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
   padding: 4px 10px;
 }
 /* HR Zone block */
 .hr-zone-block {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
 }
 .hr-zone-label {
   font-size: 0.62rem;
@@ -1230,9 +1231,10 @@ onMounted(init)
   bottom: 14px;
   left: 50%;
   transform: translateX(-50%);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 900;
-  color: #000;
+  color: #16130F;
   letter-spacing: 0.06em;
   white-space: nowrap;
 }
@@ -1253,16 +1255,16 @@ onMounted(init)
   gap: 4px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
   font-size: 0.9rem;
-  color: rgba(15,18,16,0.70);
+  color: rgba(22,19,15,0.70);
 }
 .gear-label { font-weight: 700; margin-right: 4px; }
 .gear-value { color: rgba(15,18,16,0.85); }
 .notes-row {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
 }
 .notes-label {
   font-size: 0.75rem;
@@ -1282,7 +1284,7 @@ onMounted(init)
 /* HERO MAP */
 .hero-map-section {
   width: 100%;
-  background: #000;
+  background: #16130F;
 }
 .hero-map-inner {
   height: 440px;
@@ -1291,7 +1293,7 @@ onMounted(init)
 }
 .elev-strip {
   background: #fff;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   padding: 10px 24px 14px;
 }
 .elev-meta {
@@ -1310,7 +1312,7 @@ onMounted(init)
 .elev-meta-gain {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #0052FF;
+  color: #2A55F5;
 }
 .elev-chart-wrap {
   height: 80px;
@@ -1475,7 +1477,7 @@ onMounted(init)
   transition: all 0.15s;
   flex-shrink: 0;
 }
-.comment-submit:hover:not(:disabled) { background: #003ECC; }
+.comment-submit:hover:not(:disabled) { background: #1E42D6; }
 .comment-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* PR Banner */
@@ -1542,7 +1544,7 @@ onMounted(init)
 /* Utilities */
 .me-1 { margin-right: 4px; }
 .me-2 { margin-right: 8px; }
-.spinner-border { width: 2rem; height: 2rem; border: 3px solid rgba(15,18,16,0.15); border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; }
+.spinner-border { width: 2rem; height: 2rem; border: 3px solid rgba(22,19,15,0.15); border-top-color: #2A55F5; border-radius: 50%; animation: spin 0.75s linear infinite; }
 .spinner-border-sm { width: 1rem; height: 1rem; border-width: 2px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -1587,51 +1589,53 @@ onMounted(init)
   margin-bottom: 14px;
 }
 .similar-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #767676;
+  color: #8A8A8A;
 }
 .similar-table {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
 }
 .similar-row {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1fr 1fr 32px;
   align-items: center;
   padding: 10px 14px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   text-decoration: none;
   color: inherit;
   transition: background 0.12s;
   gap: 8px;
 }
 .similar-row:last-child { border-bottom: none; }
-.similar-row:not(.similar-row-head):not(.similar-row-current):hover { background: #f9f9f9; }
+.similar-row:not(.similar-row-head):not(.similar-row-current):hover { background: #F1EADC; }
 .similar-row-head {
-  background: #F5F5F5;
+  background: #F1EADC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #767676;
+  color: #8A8A8A;
 }
 .similar-row-current {
-  background: #EBF0FF;
+  background: #EEF1FF;
   font-weight: 700;
 }
-.sr-date { font-size: 0.80rem; color: #767676; }
+.sr-date { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.80rem; color: #8A8A8A; }
 .sr-dist, .sr-pace, .sr-dur { font-size: 0.85rem; font-weight: 700; }
 .sr-trend { display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 .sr-this {
   font-size: 0.58rem;
   font-weight: 900;
   letter-spacing: 0.12em;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
   padding: 2px 5px;
 }
@@ -1656,24 +1660,25 @@ onMounted(init)
 }
 .course-table th {
   text-align: left;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #767676;
+  color: #8A8A8A;
   padding: 8px 12px;
-  border-bottom: 2px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
-.course-table td { padding: 10px 12px; border-bottom: 1px solid #F5F5F5; }
+.course-table td { padding: 10px 12px; border-bottom: 2px solid #E7DFCE; }
 .course-table tbody tr:last-child td { border-bottom: none; }
-.course-row-this { background: #EBF0FF; }
+.course-row-this { background: #EEF1FF; }
 .course-rank { font-size: 1rem; }
-.rank-num { font-size: 0.82rem; font-weight: 700; color: #767676; }
-.course-time { font-weight: 700; font-variant-numeric: tabular-nums; }
-.course-pace { color: #767676; font-variant-numeric: tabular-nums; }
+.rank-num { font-size: 0.82rem; font-weight: 700; color: #8A8A8A; }
+.course-time { font-weight: 700; font-variant-numeric: tabular-nums; color: #16130F; }
+.course-pace { color: #8A8A8A; font-variant-numeric: tabular-nums; }
 .course-vs { font-weight: 700; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
 .course-this-badge {
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;

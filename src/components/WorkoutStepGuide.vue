@@ -152,8 +152,8 @@ const typeColor = computed(() => ({
   background: #000;
   color: #fff;
   padding: 16px 20px;
-  border-bottom: 2px solid #0052FF;
-  font-family: Futura, "Avenir Next", system-ui, sans-serif;
+  border-bottom: 2px solid #2A55F5;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .wsg-header {
@@ -202,7 +202,7 @@ const typeColor = computed(() => ({
 .wsg-step-target {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #0052FF;
+  color: #2A55F5;
   margin-bottom: 4px;
 }
 
@@ -224,7 +224,7 @@ const typeColor = computed(() => ({
 
 .wsg-prog-fill {
   height: 100%;
-  background: #0052FF;
+  background: #2A55F5;
   transition: width 1s linear;
 }
 
@@ -276,6 +276,6 @@ const typeColor = computed(() => ({
 }
 
 .wsg-dot-active {
-  background: #0052FF;
+  background: #2A55F5;
 }
 </style>

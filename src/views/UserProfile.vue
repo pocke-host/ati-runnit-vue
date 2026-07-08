@@ -977,13 +977,13 @@ onMounted(init)
 }
 .act-card {
   background: white;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   border-radius: 0;
   overflow: hidden;
   box-shadow: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: border-color 0.15s;
 }
-.act-card:hover { transform: none; box-shadow: none; }
+.act-card:hover { border-color: #16130F; }
 .act-sport-banner {
   display: flex;
   align-items: center;
@@ -993,13 +993,13 @@ onMounted(init)
   border-bottom: 1px solid rgba(15,18,16,0.07);
 }
 .act-sport-icon { font-size: 1.8rem; line-height: 1; }
-.act-type-label { font-weight: 900; font-size: 0.88rem; color: #000; flex: 1; letter-spacing: -0.01em; }
+.act-type-label { font-weight: 900; font-size: 0.88rem; color: #16130F; flex: 1; letter-spacing: -0.01em; }
 .act-time {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: #767676;
+  color: #8A8A8A;
 }
 .act-stats {
   display: grid;
@@ -1013,20 +1013,20 @@ onMounted(init)
   padding: 14px 8px;
 }
 .act-stat-label {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.55rem;
-  font-weight: 500;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #767676;
+  color: #8A8A8A;
   margin-bottom: 4px;
 }
 .act-stat-val {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 900;
   font-size: 1rem;
-  color: #000;
+  color: #16130F;
 }
 
 .load-more-row {
@@ -1102,7 +1102,7 @@ onMounted(init)
   height: 44px;
   border-radius: 50%;
   background: rgba(255,255,255,0.95);
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1123,17 +1123,17 @@ onMounted(init)
 }
 .moment-modal-user { display: flex; align-items: center; gap: 12px; }
 .m-avatar {
-  width: 40px; height: 40px; border-radius: 0;
-  background: #000;
+  width: 40px; height: 40px; border-radius: 999px;
+  background: #16130F;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; color: white; font-size: 1rem; flex-shrink: 0;
+  font-weight: 900; color: #FBF6EC; font-size: 1rem; flex-shrink: 0;
 }
-.m-name { font-weight: 800; font-size: 0.92rem; letter-spacing: -0.01em; }
+.m-name { font-weight: 800; font-size: 0.92rem; letter-spacing: -0.01em; color: #16130F; }
 .m-time {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 500;
-  color: #767676;
+  color: #8A8A8A;
 }
 .moment-song {
   display: flex;
@@ -1149,7 +1149,7 @@ onMounted(init)
 .song-link {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #000;
+  color: #2A55F5;
   text-decoration: none;
 }
 .song-link:hover { opacity: 0.8; }
@@ -1176,10 +1176,10 @@ onMounted(init)
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .pbadge-card.locked { filter: grayscale(0.85); opacity: 0.70; }
-.pbadge-card.earned.tier-bronze { box-shadow: none; border: 1px solid #000; }
-.pbadge-card.earned.tier-silver { box-shadow: none; border: 1px solid #000; }
-.pbadge-card.earned.tier-gold { box-shadow: none; border: 1px solid #000; }
-.pbadge-card.earned.tier-special { box-shadow: none; border: 1px solid #000; }
+.pbadge-card.earned.tier-bronze { box-shadow: 2px 2px 0 #16130F; border: 2px solid #16130F; }
+.pbadge-card.earned.tier-silver { box-shadow: 2px 2px 0 #16130F; border: 2px solid #16130F; }
+.pbadge-card.earned.tier-gold { box-shadow: 2px 2px 0 #16130F; border: 2px solid #16130F; }
+.pbadge-card.earned.tier-special { box-shadow: 2px 2px 0 #2A55F5; border: 2px solid #2A55F5; }
 .pbadge-card:hover:not(.locked) { transform: none; }
 .pbadge-icon-wrap {
   width: 56px;
@@ -1205,7 +1205,7 @@ onMounted(init)
 .ptier-pill-silver { background: rgba(168,169,173,0.18); color: #808285; }
 .ptier-pill-gold { background: rgba(255,215,0,0.16); color: #b8930a; }
 .ptier-pill-special { background: rgba(124,58,237,0.12); color: #7C3AED; }
-.pbadge-status-earned { font-size: 0.72rem; font-weight: 700; color: #0052FF; }
+.pbadge-status-earned { font-size: 0.72rem; font-weight: 700; color: #2A55F5; }
 .pbadge-status-locked { font-size: 0.72rem; font-weight: 700; color: rgba(15,18,16,0.40); }
 
 @media (max-width: 900px) {
@@ -1258,26 +1258,26 @@ onMounted(init)
 .events-list { display: flex; flex-direction: column; }
 .event-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0; border-bottom: 1px solid #E5E5E5;
+  padding: 16px 0; border-bottom: 2px solid #E7DFCE;
   text-decoration: none; color: inherit; gap: 12px;
 }
-.event-row:hover .event-row-name { text-decoration: underline; }
+.event-row:hover .event-row-name { color: #2A55F5; }
 .event-type-badge {
   display: inline-block; padding: 2px 8px;
-  background: #000; color: #fff;
-  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  background: #16130F; color: #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   margin-bottom: 4px;
 }
-.event-row-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
-.event-row-meta { font-size: 0.75rem; color: #767676; }
+.event-row-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; color: #16130F; }
+.event-row-meta { font-size: 0.75rem; color: #8A8A8A; }
 .event-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .event-row-dist { font-size: 0.9rem; font-weight: 700; }
 .event-row-arrow { color: #A0A0A0; font-size: 0.8rem; }
 
 /* ── Archetype Section ── */
 .archetype-section {
-  background: #000;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #16130F;
+  border-bottom: 2px solid rgba(251,246,236,0.08);
 }
 .arch-inner {
   max-width: 960px;
@@ -1336,16 +1336,17 @@ onMounted(init)
   align-items: center;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 .journey-row:last-child { border-bottom: none; }
 .journey-row-icon {
   width: 44px;
   height: 44px;
-  border: 2px solid #000;
+  border: 2px solid #16130F;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -1355,13 +1356,13 @@ onMounted(init)
 .journey-row-label {
   font-size: 0.90rem;
   font-weight: 900;
-  color: #000;
+  color: #16130F;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .journey-row-sub {
   font-size: 0.76rem;
-  color: #767676;
+  color: #8A8A8A;
   margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -1369,9 +1370,10 @@ onMounted(init)
   max-width: 300px;
 }
 .journey-row-date {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #767676;
+  color: #8A8A8A;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -1392,8 +1394,9 @@ onMounted(init)
 }
 .hero-archetype-badge {
   display: inline-block;
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1402,8 +1405,8 @@ onMounted(init)
 }
 .hero-archetype-tagline {
   font-size: 0.78rem;
-  color: #767676;
-  font-weight: 300;
+  color: #5A5348;
+  font-weight: 400;
 }
 .records-grid {
   display: grid;
@@ -1413,23 +1416,25 @@ onMounted(init)
   max-width: 900px;
 }
 .pr-card {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
+  background: #fff;
   padding: 20px 16px;
   text-align: center;
 }
-.pr-card:hover { border-color: #0052FF; }
+.pr-card:hover { border-color: #2A55F5; box-shadow: 3px 3px 0 #2A55F5; }
 .pr-distance {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #767676;
+  color: #8A8A8A;
   margin-bottom: 8px;
 }
 .pr-time {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #0052FF;
+  color: #2A55F5;
   letter-spacing: -0.02em;
   margin-bottom: 4px;
 }

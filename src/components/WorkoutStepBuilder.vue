@@ -262,10 +262,10 @@ const moveDown = (idx) => {
 
 <style scoped>
 .step-builder {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   padding: 16px;
   background: #FAFAFA;
-  font-family: "Futura PT", Futura, system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .sb-summary {
@@ -277,7 +277,7 @@ const moveDown = (idx) => {
   color: #767676;
   margin-bottom: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #EBEBEB;
+  border-bottom: 2px solid #E7DFCE;
 }
 .sb-sep { color: #D0D0D0; }
 
@@ -285,7 +285,7 @@ const moveDown = (idx) => {
 
 .sb-step {
   background: #fff;
-  border: 1px solid #EBEBEB;
+  border: 2px solid #E7DFCE;
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
@@ -303,7 +303,7 @@ const moveDown = (idx) => {
 }
 
 .sb-sel {
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   background: #fff;
   font-family: inherit;
   font-size: 0.78rem;
@@ -326,7 +326,7 @@ const moveDown = (idx) => {
 .sb-num {
   width: 58px;
   padding: 5px 8px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   font-family: inherit;
   font-size: 0.82rem;
   font-weight: 600;
@@ -340,7 +340,7 @@ const moveDown = (idx) => {
 .sb-btns { display: flex; gap: 3px; margin-left: auto; }
 .sb-btn {
   width: 26px; height: 26px;
-  background: #fff; border: 1px solid #E5E5E5;
+  background: #fff; border: 2px solid #E7DFCE;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 0.75rem; color: #767676;
   transition: all 0.15s; border-radius: 0;
@@ -361,7 +361,7 @@ const moveDown = (idx) => {
 .sb-zones { display: flex; gap: 3px; }
 .sb-zone-pill {
   width: 30px; height: 26px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   background: #fff; color: #767676;
   font-size: 0.7rem; font-weight: 700;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -377,7 +377,7 @@ const moveDown = (idx) => {
 .sb-range-wrap { display: flex; align-items: center; gap: 6px; }
 .sb-range-input {
   width: 50px; padding: 5px 6px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   font-family: inherit; font-size: 0.78rem; font-weight: 600;
   text-align: center; outline: none; border-radius: 0;
 }
@@ -390,7 +390,7 @@ const moveDown = (idx) => {
   width: 100%;
   padding: 5px 8px;
   border: none;
-  border-top: 1px solid #F0F0F0;
+  border-top: 2px solid #E7DFCE;
   background: transparent;
   font-family: inherit;
   font-size: 0.75rem;

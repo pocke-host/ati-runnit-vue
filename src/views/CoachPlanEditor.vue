@@ -507,7 +507,7 @@ onMounted(async () => {
   min-height: 100vh;
   background: #fff;
   padding-top: var(--page-top);
-  font-family: "Futura PT", Futura, "Century Gothic", system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* Sticky editor bar */
@@ -549,7 +549,7 @@ onMounted(async () => {
   background: rgba(255,255,255,0.2);
   flex-shrink: 0; transition: background 0.2s;
 }
-.dirty-dot.dirty { background: #0052FF; }
+.dirty-dot.dirty { background: #2A55F5; }
 .editor-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .athlete-chip { padding: 3px 10px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; }
 .sport-badge { padding: 3px 10px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -584,14 +584,14 @@ onMounted(async () => {
 }
 
 /* Week tabs */
-.week-tabs-wrap { border-bottom: 1px solid #E5E5E5; }
+.week-tabs-wrap { border-bottom: 2px solid #E7DFCE; }
 .week-tabs-scroll { display: flex; align-items: center; max-width: 1100px; margin: 0 auto; padding: 0 24px; overflow-x: auto; scrollbar-width: none; }
 .week-tabs-scroll::-webkit-scrollbar { display: none; }
 .week-tabs { display: flex; gap: 0; }
 .week-tab-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; padding-left: 16px; flex-shrink: 0; }
 .week-action-btn {
   padding: 6px 12px;
-  background: #fff; border: 1px solid #E5E5E5; color: #767676;
+  background: #fff; border: 2px solid #E7DFCE; color: #767676;
   font-family: inherit; font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
   display: flex; align-items: center; gap: 5px; text-decoration: none;
@@ -599,8 +599,8 @@ onMounted(async () => {
 }
 .week-action-btn:hover { border-color: #000; color: #000; }
 .copy-week-bar {
-  background: #F5F5F5;
-  border-top: 1px solid #E5E5E5;
+  background: #FBF6EC;
+  border-top: 2px solid #E7DFCE;
   padding: 10px 24px;
   display: flex;
   align-items: center;
@@ -611,11 +611,11 @@ onMounted(async () => {
 .copy-week-targets { display: flex; gap: 6px; flex-wrap: wrap; }
 .copy-target-btn {
   padding: 6px 14px;
-  background: #fff; border: 1px solid #E5E5E5; color: #000;
+  background: #fff; border: 2px solid #E7DFCE; color: #000;
   font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer;
   transition: all 0.15s;
 }
-.copy-target-btn:hover { border-color: #0052FF; color: #0052FF; }
+.copy-target-btn:hover { border-color: #2A55F5; color: #2A55F5; }
 .copy-target-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .copy-close-btn {
   margin-left: auto; background: none; border: none; color: #767676;
@@ -636,7 +636,7 @@ onMounted(async () => {
 
 .week-theme-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px; }
 .theme-input {
-  border: none; border-bottom: 1px solid #E5E5E5;
+  border: none; border-bottom: 2px solid #E7DFCE;
   padding: 8px 0; font-size: 0.95rem; font-weight: 600; color: #000;
   outline: none; font-family: inherit; background: transparent;
 }
@@ -645,10 +645,10 @@ onMounted(async () => {
 
 /* Workout cards */
 .workout-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
-.workout-card { border: 1px solid #E5E5E5; padding: 20px; }
+.workout-card { border: 2px solid #E7DFCE; padding: 20px; }
 .workout-top-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .day-select, .type-select {
-  padding: 6px 10px; border: 1px solid #E5E5E5; background: #fff;
+  padding: 6px 10px; border: 2px solid #E7DFCE; background: #fff;
   font-size: 0.82rem; font-weight: 600; font-family: inherit;
   color: #000; outline: none; cursor: pointer;
   border-radius: 0;
@@ -667,14 +667,14 @@ onMounted(async () => {
 .field-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; color: #767676; text-transform: uppercase; }
 .input-unit-row { display: flex; align-items: center; gap: 8px; }
 .field-input {
-  width: 80px; padding: 7px 10px; border: 1px solid #E5E5E5;
+  width: 80px; padding: 7px 10px; border: 2px solid #E7DFCE;
   font-size: 0.9rem; font-weight: 600; font-family: inherit;
   color: #000; outline: none; border-radius: 0; background: #fff;
 }
 .field-input:focus { border-color: #000; }
 .unit-label { font-size: 0.78rem; color: #767676; font-weight: 600; }
 .desc-textarea {
-  width: 100%; padding: 10px; border: 1px solid #E5E5E5;
+  width: 100%; padding: 10px; border: 2px solid #E7DFCE;
   font-size: 0.88rem; font-family: inherit; color: #000;
   resize: none; outline: none; overflow: hidden;
   min-height: 60px; border-radius: 0;
@@ -682,7 +682,7 @@ onMounted(async () => {
 .desc-textarea:focus { border-color: #000; }
 
 /* Step builder in workout card */
-.workout-steps-section { border-top: 1px solid #F0F0F0; padding-top: 12px; }
+.workout-steps-section { border-top: 2px solid #E7DFCE; padding-top: 12px; }
 .steps-toggle-btn {
   display: flex; align-items: center; gap: 6px;
   background: none; border: none; font-family: inherit;
@@ -696,7 +696,7 @@ onMounted(async () => {
 .btn-save-lib {
   display: flex; align-items: center; gap: 4px;
   padding: 6px 14px; background: #fff; color: #767676;
-  border: 1px solid #E5E5E5; font-family: inherit;
+  border: 2px solid #E7DFCE; font-family: inherit;
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
   text-transform: uppercase; cursor: pointer; transition: all 0.15s;
 }
@@ -724,7 +724,7 @@ onMounted(async () => {
 .modal-actions { display: flex; gap: 10px; }
 .btn-cancel {
   flex: 1; padding: 12px; background: #fff; color: #000;
-  border: 1px solid #E5E5E5; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  border: 2px solid #E7DFCE; font-size: 0.82rem; font-weight: 600; cursor: pointer;
 }
 .btn-confirm-delete {
   flex: 1; padding: 12px; background: #ef4444; color: #fff;
@@ -791,7 +791,7 @@ onMounted(async () => {
 .week-meta-right { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
 .phase-select {
   background: #fff;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 600;
@@ -804,8 +804,8 @@ onMounted(async () => {
 
 /* Auto volume panel */
 .auto-vol-bar {
-  background: #F5F5F5;
-  border-top: 1px solid #E5E5E5;
+  background: #FBF6EC;
+  border-top: 2px solid #E7DFCE;
   padding: 10px 24px;
   display: flex;
   align-items: center;

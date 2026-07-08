@@ -206,7 +206,7 @@ onMounted(async () => {
 .cef-hint { font-weight: 400; letter-spacing: 0; text-transform: none; font-size: 0.68rem; }
 .cef-input {
   padding: 10px 12px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   font-size: 0.9rem;
   font-family: inherit;
   background: #fff;
@@ -219,8 +219,8 @@ onMounted(async () => {
 .seg-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
 .seg-row { display: flex; align-items: center; gap: 8px; }
 .seg-drag-handle { color: #A0A0A0; cursor: grab; font-size: 1rem; }
-.seg-label-select { width: 130px; flex-shrink: 0; padding: 8px 10px; border: 1px solid #E5E5E5; font-size: 0.82rem; font-family: inherit; }
-.seg-activity-select { flex: 1; padding: 8px 10px; border: 1px solid #E5E5E5; font-size: 0.82rem; font-family: inherit; }
+.seg-label-select { width: 130px; flex-shrink: 0; padding: 8px 10px; border: 2px solid #E7DFCE; font-size: 0.82rem; font-family: inherit; }
+.seg-activity-select { flex: 1; padding: 8px 10px; border: 2px solid #E7DFCE; font-size: 0.82rem; font-family: inherit; }
 .seg-remove { border: none; background: none; color: #A0A0A0; cursor: pointer; font-size: 1rem; padding: 4px; line-height: 1; }
 .seg-remove:hover { color: #ef4444; }
 
@@ -234,9 +234,9 @@ onMounted(async () => {
 
 .cef-error { font-size: 0.82rem; color: #ef4444; }
 
-.cef-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid #E5E5E5; }
-.btn-ghost { padding: 10px 20px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid #E5E5E5; background: #fff; cursor: pointer; }
-.btn-primary { padding: 10px 24px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; background: #0052FF; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-.btn-primary:hover { background: #003ECC; }
+.cef-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 2px solid #E7DFCE; }
+.btn-ghost { padding: 10px 20px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: 2px solid #E7DFCE; background: #fff; cursor: pointer; }
+.btn-primary { padding: 10px 24px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; background: #2A55F5; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-primary:hover { background: #1E42D6; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

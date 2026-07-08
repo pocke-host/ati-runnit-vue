@@ -127,7 +127,7 @@ onMounted(() => {
   min-height: 100vh;
   background: #fff;
   padding-top: var(--page-top);
-  font-family: "Futura PT", Futura, "Century Gothic", system-ui, sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .hero { background: #000; color: #fff; padding: 56px 24px 48px; }
@@ -144,52 +144,52 @@ onMounted(() => {
   border: 2px solid #000;
   margin-bottom: 32px;
 }
-.banner-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; color: #767676; text-transform: uppercase; margin-bottom: 10px; }
+.banner-label { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; color: #2A55F5; text-transform: uppercase; margin-bottom: 10px; }
 .banner-body { display: flex; align-items: center; gap: 12px; }
-.coach-avatar-sm { width: 36px; height: 36px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; }
+.coach-avatar-sm { width: 36px; height: 36px; background: #16130F; color: #FBF6EC; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; border-radius: 999px; }
 .banner-name { font-weight: 700; font-size: 0.95rem; flex: 1; }
-.btn-dm { padding: 8px 18px; background: #0052FF; color: #fff; border: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
-.btn-dm:hover { background: #003ECC; }
+.btn-dm { padding: 8px 18px; background: #2A55F5; color: #fff; border: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.btn-dm:hover { background: #1E42D6; }
 
 /* Coach grid */
 .coach-grid { display: flex; flex-direction: column; gap: 12px; }
-.coach-card { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border: 1px solid #E5E5E5; }
-.coach-avatar { width: 52px; height: 52px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; flex-shrink: 0; }
+.coach-card { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border: 2px solid #E7DFCE; }
+.coach-avatar { width: 52px; height: 52px; background: #16130F; color: #FBF6EC; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; flex-shrink: 0; border-radius: 999px; }
 .coach-info { flex: 1; min-width: 0; }
-.coach-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
-.coach-meta { font-size: 0.78rem; color: #767676; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-.coach-rate { font-weight: 700; color: #0052FF; font-size: 0.78rem; }
+.coach-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; color: #16130F; }
+.coach-meta { font-size: 0.78rem; color: #8A8A8A; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.coach-rate { font-weight: 700; color: #2A55F5; font-size: 0.78rem; }
 .sports-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.sport-chip { padding: 3px 10px; border: 1px solid #E5E5E5; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #000; }
+.sport-chip { font-family: 'Spline Sans Mono', ui-monospace, monospace; padding: 3px 10px; border: 2px solid #E7DFCE; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #5A5348; }
 .coach-action { display: flex; align-items: center; gap: 8px; padding-top: 4px; flex-shrink: 0; }
 .btn-request {
-  padding: 10px 20px; background: #0052FF; color: #fff; border: none;
+  padding: 10px 20px; background: #2A55F5; color: #fff; border: none;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   cursor: pointer;
 }
-.btn-request:hover { background: #003ECC; }
+.btn-request:hover { background: #1E42D6; }
 .btn-request:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-requested {
-  padding: 10px 20px; background: #fff; color: #767676;
-  border: 1px solid #E5E5E5; font-size: 0.78rem; font-weight: 600; cursor: not-allowed;
+  padding: 10px 20px; background: #fff; color: #8A8A8A;
+  border: 2px solid #E7DFCE; font-size: 0.78rem; font-weight: 600; cursor: not-allowed;
 }
 .btn-hire {
-  padding: 10px 20px; background: #fff; color: #0052FF;
-  border: 2px solid #0052FF; font-size: 0.78rem; font-weight: 700;
+  padding: 10px 20px; background: #fff; color: #2A55F5;
+  border: 2px solid #2A55F5; font-size: 0.78rem; font-weight: 700;
   letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
 }
-.btn-hire:hover { background: #EBF0FF; }
+.btn-hire:hover { background: #EEF1FF; }
 .badge-your-coach {
-  padding: 6px 12px; background: #EBF0FF; color: #0052FF;
+  padding: 6px 12px; background: #EEF1FF; color: #2A55F5;
   font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
 }
 
-.request-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.20); color: #dc2626; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; }
-.empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 24px; color: #767676; text-align: center; }
+.request-error { background: rgba(192,57,43,0.08); border: 2px solid rgba(192,57,43,0.20); color: #C0392B; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; }
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 24px; color: #8A8A8A; text-align: center; }
 .empty-icon { font-size: 2.5rem; }
 .empty-state p { font-size: 0.9rem; margin: 0; }
 
-.spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(0,0,0,0.10); border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
+.spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(22,19,15,0.10); border-top-color: #2A55F5; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 .me-2 { margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }

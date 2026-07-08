@@ -178,8 +178,7 @@ const steps = [
   overflow-x:hidden;
   background: var(--r-offwhite);
 
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* HERO fills between fixed nav/footer */
@@ -313,8 +312,8 @@ const steps = [
 /* Media tile */
 .media-tile{
   height: 360px;
-  background: #f5f5f5;
-  border: 1px solid #E5E5E5;
+  background: #FBF6EC;
+  border: 2px solid #E7DFCE;
   border: 1px solid rgba(15,18,16,0.10);
   box-shadow: none;
 }
@@ -328,7 +327,7 @@ const steps = [
 }
 .feature-img {
   height: 160px;
-  background: #f5f5f5;
+  background: #FBF6EC;
 }
 
 /* How cards */
@@ -342,7 +341,7 @@ const steps = [
 .step{
   background: #f0f0f0;
   color: #000;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #E7DFCE;
   font-weight: 900;
   margin-bottom: 10px;
   display:inline-block;
