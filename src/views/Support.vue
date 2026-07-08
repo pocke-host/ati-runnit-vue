@@ -1,6 +1,14 @@
 <template>
   <main class="support-page">
 
+    <!-- Ticker -->
+    <div class="sp-ticker-wrap" aria-hidden="true">
+      <div class="sp-ticker">
+        <span>&nbsp;★ HELP IS ON THE WAY ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ DRAG YOUR CREW OUT AT 6AM ★ HELP IS ON THE WAY ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ DRAG YOUR CREW OUT AT 6AM&nbsp;</span>
+        <span>&nbsp;★ HELP IS ON THE WAY ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ DRAG YOUR CREW OUT AT 6AM ★ HELP IS ON THE WAY ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ DRAG YOUR CREW OUT AT 6AM&nbsp;</span>
+      </div>
+    </div>
+
     <!-- INK HERO -->
     <section class="sp-hero">
       <div class="sp-hero-inner">
@@ -55,7 +63,7 @@
         <div class="sp-contact-card">
           <div class="sp-contact-left">
             <h2 class="sp-contact-title">Still stuck?</h2>
-            <p class="sp-contact-sub">We're a small team of runners — real humans, usually back to you within a day.</p>
+            <p class="sp-contact-sub">We're a small team of athletes — real humans, usually back to you within a day.</p>
           </div>
           <div class="sp-contact-right">
             <a href="mailto:support@runnit.live" class="sp-contact-btn sp-contact-btn--primary">Email Support</a>
@@ -109,13 +117,35 @@ const faqs = [
 </script>
 
 <style scoped>
+@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
 .support-page {
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  padding-top: calc(var(--nav-h, 66px) + 20px);
+  padding-top: var(--nav-h, 66px);
   min-height: 100vh;
   color: #16130F;
 }
+
+/* Ticker */
+.sp-ticker-wrap {
+  overflow: hidden;
+  background: #16130F;
+  border-bottom: 3px solid #2A55F5;
+}
+.sp-ticker {
+  display: flex;
+  white-space: nowrap;
+  animation: rkMarq 26s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 246, 236, 0.6);
+  padding: 9px 0;
+}
+@media (prefers-reduced-motion: reduce) { .sp-ticker { animation: none; } }
 
 /* HERO */
 .sp-hero {

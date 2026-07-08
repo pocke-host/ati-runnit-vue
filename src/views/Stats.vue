@@ -129,6 +129,7 @@
         <div class="section-header">
           <span class="section-kicker">Race Predictions</span>
         </div>
+        <p class="race-pred-note">Based on your fastest recent effort — actual race times depend on conditions and fitness.</p>
         <div class="race-pred-grid">
           <div v-for="(time, dist) in performanceMetrics.racePreds" :key="dist" class="race-pred-card">
             <div class="race-pred-dist">{{ dist }}</div>
@@ -136,7 +137,6 @@
             <div class="race-pred-sub">Riegel estimate</div>
           </div>
         </div>
-        <p class="race-pred-note">Based on your fastest recent effort — actual race times depend on conditions and fitness level.</p>
       </section>
 
       <!-- FITNESS -->
@@ -177,7 +177,7 @@
             <div class="fm-val">{{ performanceMetrics.consistency }}<span class="fm-unit">%</span></div>
             <div class="fm-sub">{{ consistencyLabel }}</div>
             <div class="perf-bar-bg">
-              <div class="perf-bar" :style="{ width: performanceMetrics.consistency + '%', background: '#0052FF' }"></div>
+              <div class="perf-bar" :style="{ width: performanceMetrics.consistency + '%', background: '#2A55F5' }"></div>
             </div>
           </div>
           <div class="fitness-metric-card">
@@ -185,7 +185,7 @@
             <div class="fm-val">{{ performanceMetrics.fitnessScore }}</div>
             <div class="fm-sub">Chronic Training Load</div>
             <div class="perf-bar-bg">
-              <div class="perf-bar" :style="{ width: performanceMetrics.fitnessScore + '%', background: '#0052FF' }"></div>
+              <div class="perf-bar" :style="{ width: performanceMetrics.fitnessScore + '%', background: '#2A55F5' }"></div>
             </div>
           </div>
           <div class="fitness-metric-card">
@@ -222,7 +222,7 @@
             <div class="acwr-gauge">
               <div class="acwr-zone" style="width:40%; background:#E5E5E5"></div>
               <div class="acwr-zone" style="width:10%; background:#EBF0FF"></div>
-              <div class="acwr-zone" style="width:15%; background:#0052FF"></div>
+              <div class="acwr-zone" style="width:15%; background:#2A55F5"></div>
               <div class="acwr-zone" style="width:10%; background:#111111"></div>
               <div class="acwr-zone" style="width:25%; background:#ef4444"></div>
               <div class="acwr-needle" :style="{ left: Math.min(98, (acwrScore / 2) * 100) + '%' }"></div>
@@ -245,11 +245,11 @@
           <div class="insight-card" v-if="daysSinceLastActivity !== null">
             <div class="insight-head">
               <span class="insight-label">Last Activity</span>
-              <span class="insight-badge" :style="{ background: daysSinceLastActivity === 0 ? '#0052FF' : daysSinceLastActivity <= 2 ? '#767676' : '#ef4444' }">
+              <span class="insight-badge" :style="{ background: daysSinceLastActivity === 0 ? '#2A55F5' : daysSinceLastActivity <= 2 ? '#767676' : '#ef4444' }">
                 {{ daysSinceLastActivity === 0 ? 'Today' : daysSinceLastActivity === 1 ? 'Yesterday' : `${daysSinceLastActivity}d ago` }}
               </span>
             </div>
-            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#0052FF' : daysSinceLastActivity <= 3 ? '#767676' : '#ef4444' }">
+            <div class="insight-val" :style="{ color: daysSinceLastActivity <= 1 ? '#2A55F5' : daysSinceLastActivity <= 3 ? '#767676' : '#ef4444' }">
               {{ daysSinceLastActivity }}
               <span class="insight-unit">{{ daysSinceLastActivity === 1 ? 'day' : 'days' }}</span>
             </div>
@@ -633,7 +633,7 @@ const performanceMetrics = computed(() => {
 
 const formColor = computed(() => {
   const f = performanceMetrics.value?.formScore ?? 0
-  if (f > 10)  return '#0052FF'
+  if (f > 10)  return '#2A55F5'
   if (f > -5)  return '#767676'
   return '#ef4444'
 })
@@ -703,8 +703,8 @@ const acwrInfo = computed(() => {
   const a = acwrScore.value
   if (a === null) return null
   if (a < 0.8)  return { label: 'Undertraining',    color: '#767676', desc: 'Gradually increase volume to build fitness' }
-  if (a < 1.0)  return { label: 'Optimal Base',     color: '#0052FF', desc: 'Solid aerobic foundation, safe to add load' }
-  if (a < 1.3)  return { label: 'Productive Load',  color: '#0052FF', desc: 'Good training stimulus, manage recovery' }
+  if (a < 1.0)  return { label: 'Optimal Base',     color: '#2A55F5', desc: 'Solid aerobic foundation, safe to add load' }
+  if (a < 1.3)  return { label: 'Productive Load',  color: '#2A55F5', desc: 'Good training stimulus, manage recovery' }
   if (a < 1.5)  return { label: 'Caution Zone',     color: '#000000', desc: 'Monitor fatigue — consider an easy day' }
   return           { label: 'High Injury Risk',  color: '#ef4444', desc: 'Reduce load or take a rest day now' }
 })
@@ -875,7 +875,7 @@ function initWeeklyChart() {
         label: `Distance (${distanceLabel.value})`,
         data: activeChartData.value.map(w => w.dist),
         backgroundColor: 'rgba(0,82,255,0.75)',
-        borderColor: '#0052FF',
+        borderColor: '#2A55F5',
         borderWidth: 0,
         borderRadius: 0,
       }]
@@ -928,13 +928,13 @@ function initVo2maxChart() {
       datasets: [{
         label: 'VO2max estimate',
         data: pts.map(p => p.vo2max),
-        borderColor: '#0052FF',
+        borderColor: '#2A55F5',
         backgroundColor: 'rgba(0,82,255,0.06)',
         fill: true,
         tension: 0.35,
         borderWidth: 2.5,
         pointRadius: pts.length > 15 ? 0 : 3,
-        pointBackgroundColor: '#0052FF',
+        pointBackgroundColor: '#2A55F5',
       }]
     },
     options: {
@@ -1219,13 +1219,17 @@ onUnmounted(() => {
 /* ── RACE PREDICTIONS ──────────────────────────── */
 .race-pred-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   margin-bottom: 12px;
+}
+@media (min-width: 640px) {
+  .race-pred-grid { grid-template-columns: repeat(4, 1fr); }
 }
 .race-pred-card {
   border: 2px solid #16130F;
-  padding: 24px 20px 20px;
+  background: #fff;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1234,57 +1238,71 @@ onUnmounted(() => {
   background: #2A55F5;
   color: #fff;
 }
-.race-pred-card:last-child .race-pred-dist { color: rgba(255,255,255,0.8); }
-.race-pred-card:last-child .race-pred-sub  { color: rgba(255,255,255,0.75); }
+.race-pred-card:last-child .race-pred-dist { opacity: 0.8; }
+.race-pred-card:last-child .race-pred-sub  { opacity: 0.75; }
 .race-pred-dist {
-  font-size: 0.70rem;
-  font-weight: 900;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(15,18,16,0.45);
+  letter-spacing: 0.1em;
+  color: #8a8a8a;
 }
 .race-pred-time {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #000;
-  line-height: 1.1;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #16130F;
+  line-height: 0.85;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
 }
 .race-pred-card:last-child .race-pred-time { color: #fff; }
 .race-pred-sub {
-  font-size: 0.68rem;
-  color: #767676;
-  font-weight: 600;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: #8a8a8a;
+  margin-top: 4px;
 }
 .race-pred-note {
-  font-size: 0.72rem;
-  color: #767676;
-  margin: 0;
+  font-size: 0.82rem;
+  color: #5a5348;
+  line-height: 1.5;
+  margin: 0 0 16px;
 }
 
 /* ── FITNESS ───────────────────────────────────── */
 .fitness-chart-card {
-  border: 2px solid #E7DFCE;
-  padding: 24px;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 18px;
   margin-bottom: 16px;
 }
 .fitness-chart-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   gap: 16px;
 }
 .fitness-chart-title {
-  font-size: 0.85rem;
-  font-weight: 900;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #000;
-  margin-bottom: 4px;
+  line-height: 0.9;
+  color: #16130F;
+  margin-bottom: 0;
 }
 .fitness-chart-sub {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 0.72rem;
-  color: #767676;
+  font-weight: 500;
+  color: #8a8a8a;
+  margin-top: 5px;
+  line-height: 1.4;
+  max-width: 200px;
 }
 .fitness-vo2-badge {
   text-align: right;
@@ -1292,17 +1310,20 @@ onUnmounted(() => {
 }
 .fitness-vo2-val {
   display: block;
-  font-size: 2rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2.6rem;
   font-weight: 900;
-  color: #0052FF;
-  line-height: 1;
+  color: #2A55F5;
+  line-height: 0.75;
 }
 .fitness-vo2-unit {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #767676;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 600;
+  color: #8a8a8a;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  margin-top: 3px;
 }
 .fitness-chart-wrap {
   height: 200px;
@@ -1394,7 +1415,7 @@ onUnmounted(() => {
 .heatmap-l0 { background: #F0F0F0; }
 .heatmap-l1 { background: #bbf7d0; }
 .heatmap-l2 { background: #4ade80; }
-.heatmap-l3 { background: #0052FF; }
+.heatmap-l3 { background: #2A55F5; }
 .heatmap-l4 { background: #064e3b; }
 .heatmap-lx { background: transparent; }
 .heatmap-legend {

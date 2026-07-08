@@ -3,7 +3,7 @@
   ─────────────────────────────────────
   Black. White. Electric Blue.
 
-  Signal color — #0052FF "Electric Blue"
+  Signal color — #2A55F5 "Electric Blue"
     → Performance, speed, technology
     → Lives in: primary buttons, active states, borders,
                 overlines, form focus, route lines, badges
@@ -29,40 +29,35 @@
   --rk-font-body:    'Hanken Grotesk', system-ui, sans-serif;
   --rk-font-mono-gr: 'Spline Sans Mono', ui-monospace, monospace;
 
-  /* ── RUNNIT Electric Palette ── */
-  --rk-void:    #000000;   /* pure black — nav, hero */
-  --rk-paper:   #ffffff;   /* pure white — page bg */
-  --rk-signal:  #0052FF;   /* electric blue — the brand color */
-  --rk-signal-light: #EBF0FF; /* tinted surface — cards, alternate sections */
-  --rk-carbon:  #111111;   /* dark surface */
-  --rk-ash:     #767676;   /* secondary text */
-  --rk-rule:    #E5E5E5;   /* borders */
-  --rk-smoke:   #F5F5F5;   /* alternate surface */
-
-  /* ── Legacy aliases — DO NOT USE in new code ── */
-  --r-black:       var(--rk-void);
-  --r-gray-mid:    var(--rk-ash);
-  --r-stone:       var(--rk-ash);
-  --r-offwhite:    var(--rk-paper);
+  /* ── Legacy compat aliases (do not use in new code) ── */
+  --rk-void:    #16130F;
+  --rk-signal:  #2A55F5;
+  --rk-signal-light: #EEF1FF;
+  --rk-ash:     #5A5348;
+  --rk-rule:    #E7DFCE;
+  --rk-smoke:   #F1EADC;
+  --r-black:       #16130F;
+  --r-gray-mid:    #5A5348;
+  --r-stone:       #5A5348;
+  --r-offwhite:    #FBF6EC;
   --r-white:       #FFFFFF;
-  --r-border:      var(--rk-rule);
+  --r-border:      #E7DFCE;
   --r-shadow-sm:   none;
   --r-shadow:      none;
   --r-shadow-lg:   none;
-  /* Olive/orange fully retired — mapped to system colors for backward compat only */
-  --r-olive:       var(--rk-void);
-  --r-olive-deep:  var(--rk-void);
-  --r-accent:      var(--rk-signal);
-  --r-warm-gray:   var(--rk-ash);
+  --r-olive:       #16130F;
+  --r-olive-deep:  #16130F;
+  --r-accent:      #2A55F5;
+  --r-warm-gray:   #5A5348;
 
-  /* ── Bootstrap overrides ── */
-  --bs-body-bg:           #ffffff;
-  --bs-body-color:        #000000;
-  --bs-primary:           var(--rk-signal);
-  --bs-primary-rgb:       0, 82, 255;
-  --bs-link-color:        var(--rk-signal);
-  --bs-link-hover-color:  #003ECC;
-  --bs-border-color:      var(--rk-rule);
+  /* ── Bootstrap overrides (GR system) ── */
+  --bs-body-bg:           #FBF6EC;
+  --bs-body-color:        #16130F;
+  --bs-primary:           #2A55F5;
+  --bs-primary-rgb:       42, 85, 245;
+  --bs-link-color:        #2A55F5;
+  --bs-link-hover-color:  #1E42D6;
+  --bs-border-color:      #E7DFCE;
   --bs-border-radius:     0;
   --bs-border-radius-sm:  0;
   --bs-border-radius-lg:  0;
@@ -76,10 +71,9 @@ html, body, #app {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  font-family: Futura, "Futura PT", "Futura Std", "Avenir Next", Avenir,
-    system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  background: #ffffff;
-  color: #000000;
+  font-family: 'Hanken Grotesk', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: #FBF6EC;
+  color: #16130F;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -134,8 +128,8 @@ a:hover { text-decoration: none; }
 .btn-primary {
   --bs-btn-bg:                 var(--rk-signal);
   --bs-btn-border-color:       var(--rk-signal);
-  --bs-btn-hover-bg:           #003ECC;
-  --bs-btn-hover-border-color: #003ECC;
+  --bs-btn-hover-bg:           #1E42D6;
+  --bs-btn-hover-border-color: #1E42D6;
   --bs-btn-color:              #fff;
   --bs-btn-active-bg:          #002EB8;
   border-radius: 0 !important;
@@ -162,7 +156,7 @@ a:hover { text-decoration: none; }
 
 /* ── Mono type helper ── */
 .rk-mono {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
 }
 
 /* ── Global keyframes (brand motion system) ── */

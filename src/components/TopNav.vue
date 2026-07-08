@@ -772,10 +772,10 @@ onUnmounted(() => {
   top: calc(100% + 8px);
   right: 0;
   width: 360px;
-  background: white;
+  background: #FBF6EC;
   border-radius: 0;
-  box-shadow: none;
-  border: 1px solid #E5E5E5;
+  box-shadow: 4px 4px 0 #16130F;
+  border: 2px solid #16130F;
   overflow: hidden;
   animation: dropIn 0.15s ease;
   z-index: 2000;
@@ -789,7 +789,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 .notif-title { font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: #000; }
 .notif-mark-all {
@@ -830,12 +830,12 @@ onUnmounted(() => {
   padding: 14px 20px;
   cursor: pointer;
   transition: background 0.1s;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
   position: relative;
 }
-.notif-item:hover { background: #f9f9f9; }
-.notif-item.unread { background: #fafafa; }
-.notif-item.unread:hover { background: #f5f5f5; }
+.notif-item:hover { background: rgba(42,85,245,0.04); }
+.notif-item.unread { background: rgba(42,85,245,0.06); }
+.notif-item.unread:hover { background: rgba(42,85,245,0.08); }
 .notif-icon-wrap {
   width: 32px;
   height: 32px;
@@ -852,7 +852,7 @@ onUnmounted(() => {
 .notif-icon-reaction { background: #fff0f0; color: #ef4444; }
 .notif-icon-comment { background: #f0f4ff; color: #3b82f6; }
 .notif-icon-club_invite { background: #f0f0f0; color: #000; }
-.notif-icon-challenge { background: #EBF0FF; color: #0052FF; }
+.notif-icon-challenge { background: #EBF0FF; color: #2A55F5; }
 .notif-body { flex: 1; min-width: 0; }
 .notif-msg {
   font-size: 0.83rem;
@@ -910,9 +910,9 @@ onUnmounted(() => {
   top: calc(100% + 10px);
   right: 0;
   width: 220px;
-  background: white;
-  border: 1px solid #E5E5E5;
-  box-shadow: none;
+  background: #FBF6EC;
+  border: 2px solid #16130F;
+  box-shadow: 4px 4px 0 #16130F;
   border-radius: 0;
   overflow: hidden;
   animation: dropIn 0.15s ease;
@@ -921,7 +921,7 @@ onUnmounted(() => {
 
 .avd-header {
   padding: 14px 16px;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 .avd-name {
   font-size: 0.85rem;
@@ -972,31 +972,31 @@ onUnmounted(() => {
 
 /* Primary nav CTA — blue mono button */
 .nav-link-primary {
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff !important;
-  border: 2px solid #0052FF;
+  border: 2px solid #2A55F5;
   padding: 9px 16px !important;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  border-bottom: 2px solid #0052FF !important;
+  border-bottom: 2px solid #2A55F5 !important;
   transition: background 0.15s, border-color 0.15s;
 }
 .nav-link-primary:hover {
-  background: #003ECC !important;
-  border-color: #003ECC !important;
+  background: #1E42D6 !important;
+  border-color: #1E42D6 !important;
   color: #fff !important;
 }
 .nav-link-primary.router-link-active {
-  border-bottom: 2px solid #0052FF !important;
+  border-bottom: 2px solid #2A55F5 !important;
 }
 
 /* Mobile Join button */
 .mobile-join-btn {
   display: none;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff !important;
   border: none;
   padding: 8px 14px;
@@ -1010,7 +1010,7 @@ onUnmounted(() => {
   transition: background 0.15s;
   flex-shrink: 0;
 }
-.mobile-join-btn:hover { background: #003ECC; text-decoration: none; }
+.mobile-join-btn:hover { background: #1E42D6; text-decoration: none; }
 
 /* Mobile toggle */
 .mobile-menu-toggle {

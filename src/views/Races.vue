@@ -9,6 +9,15 @@
 -->
 <template>
   <main class="events-page">
+
+    <!-- Ticker -->
+    <div class="ev-ticker-wrap" aria-hidden="true">
+      <div class="ev-ticker">
+        <span>&nbsp;★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED&nbsp;</span>
+        <span>&nbsp;★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED&nbsp;</span>
+      </div>
+    </div>
+
     <!-- HERO -->
     <section class="hero">
       <div class="container-xxl">
@@ -1139,11 +1148,33 @@ watch(zipcode, () => {
 </script>
 
 <style scoped>
+@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+/* Ticker */
+.ev-ticker-wrap {
+  overflow: hidden;
+  background: #16130F;
+  border-bottom: 3px solid #2A55F5;
+}
+.ev-ticker {
+  display: flex;
+  white-space: nowrap;
+  animation: rkMarq 26s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 246, 236, 0.6);
+  padding: 9px 0;
+}
+@media (prefers-reduced-motion: reduce) { .ev-ticker { animation: none; } }
+
 .events-page {
   min-height: 100vh;
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  padding-top: calc(var(--nav-h, 66px) + 20px);
+  padding-top: var(--nav-h, 66px);
   color: #16130F;
 }
 
@@ -1772,12 +1803,12 @@ watch(zipcode, () => {
 .rd-btn-outline:hover { border-color: #000; }
 .rd-btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 100%; height: 44px; background: #0052FF; color: #fff;
+  width: 100%; height: 44px; background: #2A55F5; color: #fff;
   border: none; font-size: 0.82rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
   font-family: inherit; transition: background 0.15s;
 }
-.rd-btn-primary:hover:not(:disabled) { background: #003ECC; }
+.rd-btn-primary:hover:not(:disabled) { background: #1E42D6; }
 .rd-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .rd-links { display: flex; gap: 10px; }

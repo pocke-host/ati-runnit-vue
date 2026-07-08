@@ -1,57 +1,74 @@
 <template>
   <footer class="rk-footer">
 
-    <!-- Top band: brand + tagline -->
-    <div class="rk-footer-top">
-      <div class="rk-footer-inner">
-        <div class="rk-footer-brand-col">
-          <span class="rk-footer-wordmark">RUNNIT<span class="rk-footer-dot">.</span></span>
-          <p class="rk-footer-tagline">Every mile, on the record.</p>
-          <div class="rk-footer-socials">
-            <a href="#" class="rk-footer-social" aria-label="Instagram">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-            </a>
-            <a href="#" class="rk-footer-social" aria-label="Twitter / X">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="rk-footer-social" aria-label="Strava">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
-            </a>
-          </div>
-        </div>
-
-        <nav class="rk-footer-nav">
-          <div class="rk-footer-col">
-            <div class="rk-footer-col-label">Product</div>
-            <router-link to="/features" class="rk-footer-link">Features</router-link>
-            <router-link to="/subscribe" class="rk-footer-link">Pricing</router-link>
-            <router-link to="/waitlist" class="rk-footer-link">Join Waitlist</router-link>
-            <router-link to="/dashboard" class="rk-footer-link">Dashboard</router-link>
-            <router-link to="/feed" class="rk-footer-link">Feed</router-link>
-          </div>
-          <div class="rk-footer-col">
-            <div class="rk-footer-col-label">Company</div>
-            <router-link to="/about" class="rk-footer-link">About</router-link>
-            <router-link to="/blog" class="rk-footer-link">Blog</router-link>
-            <router-link to="/careers" class="rk-footer-link">Careers</router-link>
-            <router-link to="/press" class="rk-footer-link">Press</router-link>
-            <router-link to="/support" class="rk-footer-link">Support</router-link>
-          </div>
-          <div class="rk-footer-col">
-            <div class="rk-footer-col-label">Legal</div>
-            <router-link to="/privacy" class="rk-footer-link">Privacy Policy</router-link>
-            <router-link to="/terms" class="rk-footer-link">Terms of Service</router-link>
-            <router-link to="/cookies" class="rk-footer-link">Cookie Policy</router-link>
-          </div>
-        </nav>
+    <!-- CTA cap -->
+    <div class="rk-footer-cta">
+      <div class="rk-footer-cta-headline">Lace Up.</div>
+      <div class="rk-footer-cta-sub">Claim your @handle and bring the friend who always flakes.</div>
+      <div class="rk-footer-cta-form">
+        <span class="rk-footer-cta-input">you@email.com</span>
+        <span class="rk-footer-cta-btn">Join →</span>
       </div>
     </div>
 
-    <!-- Bottom bar: copyright -->
+    <!-- Ticker seam -->
+    <div class="rk-footer-ticker-wrap">
+      <div class="rk-footer-ticker">
+        <span>&nbsp;★ MILES ARE BETTER SHARED ★ NO OFF-SEASON ★ DRAG YOUR CREW OUT AT 6AM ★ PROOF OR IT DIDN'T HAPPEN&nbsp;</span>
+        <span>&nbsp;★ MILES ARE BETTER SHARED ★ NO OFF-SEASON ★ DRAG YOUR CREW OUT AT 6AM ★ PROOF OR IT DIDN'T HAPPEN&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- Main columns -->
+    <div class="rk-footer-main">
+      <!-- Brand column -->
+      <div class="rk-footer-brand-col">
+        <span class="rk-footer-wordmark">RUNNIT<span class="rk-footer-dot">.</span></span>
+        <p class="rk-footer-tagline">Every mile, on the record.</p>
+        <div class="rk-footer-socials">
+          <a href="#" class="rk-footer-social" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="#" class="rk-footer-social" aria-label="Twitter / X">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M18.2 2H21l-6.6 7.5L22 22h-6.2l-4.3-6-4.9 6H2l7-8.5L2 2h6.3l3.9 5.5L18.2 2Zm-1 18h1.6L7.6 3.7H5.9L17.2 20Z"/></svg>
+          </a>
+          <a href="#" class="rk-footer-social" aria-label="Strava">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13.8 2 7.5 14h3.7l2.6-5 2.6 5h3.6L13.8 2ZM13.8 22l2.6-5h-1.9l-.7 1.4-.7-1.4H9.2l2.6 5h2Z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <nav class="rk-footer-nav">
+        <div class="rk-footer-col">
+          <div class="rk-footer-col-label">Product</div>
+          <router-link to="/features" class="rk-footer-link">Features</router-link>
+          <router-link to="/subscribe" class="rk-footer-link">Pricing</router-link>
+          <router-link to="/waitlist" class="rk-footer-link">Join Waitlist</router-link>
+          <router-link to="/dashboard" class="rk-footer-link">Dashboard</router-link>
+          <router-link to="/feed" class="rk-footer-link">Feed</router-link>
+        </div>
+        <div class="rk-footer-col">
+          <div class="rk-footer-col-label">Company</div>
+          <router-link to="/about" class="rk-footer-link">About</router-link>
+          <router-link to="/blog" class="rk-footer-link">Blog</router-link>
+          <router-link to="/careers" class="rk-footer-link">Careers</router-link>
+          <router-link to="/press" class="rk-footer-link">Press</router-link>
+          <router-link to="/support" class="rk-footer-link">Support</router-link>
+        </div>
+        <div class="rk-footer-col">
+          <div class="rk-footer-col-label">Legal</div>
+          <router-link to="/privacy" class="rk-footer-link">Privacy Policy</router-link>
+          <router-link to="/terms" class="rk-footer-link">Terms of Service</router-link>
+          <router-link to="/cookies" class="rk-footer-link">Cookie Policy</router-link>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Legal bar -->
     <div class="rk-footer-bottom">
-      <div class="rk-footer-inner">
+      <div class="rk-footer-bottom-inner">
         <span class="rk-footer-copy">&copy; {{ year }} Runnit, Inc. All rights reserved.</span>
-        <span class="rk-footer-made">Made by athletes, for athletes.</span>
+        <span class="rk-footer-made">Made by athletes, for athletes<span class="rk-footer-spark"> ✦</span></span>
       </div>
     </div>
 
@@ -67,144 +84,215 @@ const year = new Date().getFullYear()
   background: #16130F;
   color: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  border-top: 2px solid rgba(251, 246, 236, 0.12);
 }
 
-.rk-footer-inner {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 0 32px;
+/* ── CTA Cap ── */
+.rk-footer-cta {
+  background: #2A55F5;
+  color: #fff;
+  text-align: center;
+  padding: 46px 32px 42px;
+}
+.rk-footer-cta-headline {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  line-height: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.rk-footer-cta-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 14px 0 22px;
+}
+.rk-footer-cta-form {
+  display: inline-flex;
+  max-width: 520px;
+  width: 100%;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+}
+.rk-footer-cta-input {
+  flex: 1;
+  padding: 15px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #8a8a8a;
+  text-align: left;
+}
+.rk-footer-cta-btn {
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 15px 24px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-/* Top section */
-.rk-footer-top {
-  padding: 56px 0 48px;
-  border-bottom: 2px solid rgba(251, 246, 236, 0.1);
+/* ── Ticker Seam ── */
+.rk-footer-ticker-wrap {
+  background: #16130F;
+  overflow: hidden;
+  border-top: 3px solid #2A55F5;
+  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
 }
-.rk-footer-top .rk-footer-inner {
+.rk-footer-ticker {
   display: flex;
-  gap: 64px;
-  align-items: flex-start;
+  white-space: nowrap;
+  animation: rkMarq 26s linear infinite;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 246, 236, 0.55);
+  padding: 9px 0;
+}
+
+/* ── Main columns ── */
+.rk-footer-main {
+  background: #16130F;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
 }
 
 /* Brand column */
 .rk-footer-brand-col {
-  flex-shrink: 0;
-  min-width: 180px;
+  padding: 40px 32px;
+  border-right: 2px solid rgba(251, 246, 236, 0.12);
 }
 .rk-footer-wordmark {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
   font-style: italic;
-  font-size: 1.6rem;
-  letter-spacing: 0.02em;
+  font-size: 2.5rem;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   color: #FBF6EC;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 .rk-footer-dot { color: #2A55F5; }
-
 .rk-footer-tagline {
-  font-size: 0.88rem;
-  color: rgba(251, 246, 236, 0.55);
-  margin: 0 0 24px;
+  font-size: 0.82rem;
+  color: rgba(251, 246, 236, 0.6);
+  margin: 0 0 22px;
   line-height: 1.5;
 }
 
 /* Socials */
-.rk-footer-socials {
-  display: flex;
-  gap: 10px;
-}
+.rk-footer-socials { display: flex; gap: 10px; }
 .rk-footer-social {
-  width: 34px;
-  height: 34px;
-  border: 2px solid rgba(251, 246, 236, 0.2);
+  width: 42px;
+  height: 42px;
+  border: 2px solid rgba(251, 246, 236, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(251, 246, 236, 0.55);
+  color: #FBF6EC;
   text-decoration: none;
   transition: border-color 0.15s, color 0.15s;
 }
-.rk-footer-social:hover {
-  border-color: #2A55F5;
-  color: #2A55F5;
-}
+.rk-footer-social:hover { border-color: #2A55F5; color: #2A55F5; }
 
 /* Nav columns */
 .rk-footer-nav {
-  display: flex;
-  gap: 48px;
-  flex: 1;
-  flex-wrap: wrap;
+  display: contents;
 }
 .rk-footer-col {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 120px;
+  gap: 13px;
+  padding: 40px 28px;
+  border-right: 2px solid rgba(251, 246, 236, 0.12);
 }
+.rk-footer-col:last-child { border-right: none; }
 .rk-footer-col-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(251, 246, 236, 0.35);
-  margin-bottom: 4px;
+  color: #2A55F5;
+  margin-bottom: 5px;
 }
 .rk-footer-link {
-  font-size: 0.88rem;
-  color: rgba(251, 246, 236, 0.65);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(251, 246, 236, 0.8);
   text-decoration: none;
   transition: color 0.15s;
   line-height: 1;
 }
-.rk-footer-link:hover { color: #FBF6EC; }
+.rk-footer-link:hover { color: #2A55F5; }
 .rk-footer-link.router-link-active { color: #2A55F5; }
 
-/* Bottom bar */
+/* Legal bar */
 .rk-footer-bottom {
-  padding: 18px 0;
+  background: #16130F;
+  border-top: 2px solid rgba(251, 246, 236, 0.15);
 }
-.rk-footer-bottom .rk-footer-inner {
+.rk-footer-bottom-inner {
+  max-width: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 18px 32px;
   gap: 16px;
 }
-.rk-footer-copy,
-.rk-footer-made {
+.rk-footer-copy {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
-  font-weight: 500;
+  font-size: 0.66rem;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(251, 246, 236, 0.3);
+  color: rgba(251, 246, 236, 0.5);
 }
+.rk-footer-made {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #FBF6EC;
+}
+.rk-footer-spark { color: #2A55F5; }
 
 /* Mobile */
 @media (max-width: 768px) {
-  .rk-footer-top .rk-footer-inner {
-    flex-direction: column;
-    gap: 40px;
+  .rk-footer-cta { padding: 36px 20px 32px; }
+  .rk-footer-cta-headline { font-size: 3.5rem; }
+  .rk-footer-main {
+    grid-template-columns: 1fr;
   }
-  .rk-footer-nav { gap: 32px; }
-}
-@media (max-width: 640px) {
-  .rk-footer-inner { padding: 0 20px; }
-  .rk-footer-top { padding: 40px 0 36px; }
-  .rk-footer-nav {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 28px 20px;
+  .rk-footer-brand-col {
+    padding: 28px 20px 18px;
+    border-right: none;
+    border-bottom: 2px solid rgba(251, 246, 236, 0.12);
   }
-  .rk-footer-bottom .rk-footer-inner {
+  .rk-footer-nav { display: grid; grid-template-columns: 1fr 1fr; }
+  .rk-footer-col {
+    padding: 22px 20px;
+    border-right: none;
+    border-bottom: 2px solid rgba(251, 246, 236, 0.12);
+    gap: 11px;
+  }
+  .rk-footer-col:nth-child(odd) { border-right: 2px solid rgba(251, 246, 236, 0.12); }
+  .rk-footer-bottom-inner {
+    padding: 18px 20px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 5px;
   }
 }
 </style>
