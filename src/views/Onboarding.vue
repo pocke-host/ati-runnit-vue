@@ -11,9 +11,9 @@
       <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 06</span>
     </div>
     <!-- Header row for coach steps -->
-    <div class="onboard-header" v-if="isCoach && step >= 2 && step <= 3">
+    <div class="onboard-header" v-if="isCoach && step >= 2 && step <= 4">
       <button class="btn-back" @click="back">← Back</button>
-      <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 02</span>
+      <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 03</span>
     </div>
 
     <!-- ── Step 1: Welcome ── -->
@@ -63,11 +63,37 @@
           <span class="tile-label">{{ opt.label }}</span>
         </button>
       </div>
-      <button class="btn-cta mt-auto" :disabled="!coachSelections.athleteCount" @click="finishCoach">Continue</button>
+      <button class="btn-cta mt-auto" :disabled="!coachSelections.athleteCount" @click="step = 4">Continue</button>
+    </div>
+
+    <!-- ── Coach Step C3: Units ── -->
+    <div v-else-if="step === 4 && isCoach" class="step-container">
+      <h2 class="step-question">Which do<br>you prefer?</h2>
+      <div class="tile-grid tile-grid--2">
+        <button
+          class="tile tile--tall"
+          :class="{ selected: selections.units === 'imperial' }"
+          @click="selections.units = 'imperial'"
+        >
+          <span class="tile-emoji">🇺🇸</span>
+          <span class="tile-label">Miles &amp; feet</span>
+          <span class="tile-sub">mi, ft, min/mi</span>
+        </button>
+        <button
+          class="tile tile--tall"
+          :class="{ selected: selections.units === 'metric' }"
+          @click="selections.units = 'metric'"
+        >
+          <span class="tile-emoji">🌍</span>
+          <span class="tile-label">Kilometers &amp; meters</span>
+          <span class="tile-sub">km, m, min/km</span>
+        </button>
+      </div>
+      <button class="btn-cta mt-auto" @click="step = 5">Continue</button>
     </div>
 
     <!-- ── Coach Done ── -->
-    <div v-else-if="step === 4 && isCoach" class="step-container step-done">
+    <div v-else-if="step === 5 && isCoach" class="step-container step-done">
       <div class="done-sport-emoji">🏆</div>
       <h2 class="done-headline">You're set up.</h2>
       <div class="done-summary">
@@ -78,6 +104,10 @@
         <div class="summary-row">
           <span class="summary-label">Athletes</span>
           <span class="summary-value">{{ coachSelections.athleteCount }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Units</span>
+          <span class="summary-value">{{ selections.units === 'imperial' ? 'Miles & feet' : 'Kilometers & meters' }}</span>
         </div>
       </div>
       <div v-if="saveError" class="save-error">{{ saveError }}</div>
@@ -418,11 +448,11 @@ async function goToDashboard() {
 <style scoped>
 .onboard-page {
   min-height: 100vh;
-  background: #fff;
+  background: #FBF6EC;
   display: flex;
   flex-direction: column;
   position: relative;
-  font-family: "Futura PT", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 /* ── Progress bar ── */
@@ -432,13 +462,13 @@ async function goToDashboard() {
   left: 0;
   right: 0;
   height: 2px;
-  background: #E5E5E5;
+  background: #E7DFCE;
   z-index: 100;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: #000;
+  background: #2A55F5;
   transition: width 0.4s ease;
 }
 
@@ -457,14 +487,14 @@ async function goToDashboard() {
   padding: 0;
   font-size: 0.85rem;
   font-weight: 400;
-  color: #767676;
+  color: #5A5348;
   cursor: pointer;
   letter-spacing: 0.02em;
   transition: color 0.2s;
 }
 
 .btn-back:hover {
-  color: #000;
+  color: #16130F;
 }
 
 .btn-back.standalone {
@@ -475,8 +505,9 @@ async function goToDashboard() {
   font-size: 0.65rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #767676;
+  color: #5A5348;
   font-weight: 500;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
 }
 
 /* ── Step containers ── */
@@ -516,8 +547,8 @@ async function goToDashboard() {
 .brand-square {
   width: 36px;
   height: 36px;
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -529,21 +560,24 @@ async function goToDashboard() {
   font-size: 1rem;
   font-weight: 900;
   letter-spacing: 0.20em;
-  color: #000;
+  color: #16130F;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
 }
 
 .welcome-headline {
   font-size: clamp(2.2rem, 7vw, 4rem);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  color: #16130F;
   margin: 0 0 20px;
 }
 
 .welcome-sub {
   font-size: 1rem;
-  color: #767676;
+  color: #5A5348;
   font-weight: 400;
   margin: 0 0 48px;
   letter-spacing: 0.01em;
@@ -552,10 +586,12 @@ async function goToDashboard() {
 /* ── Question ── */
 .step-question {
   font-size: clamp(1.8rem, 5vw, 3rem);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  color: #16130F;
   margin: 0 0 40px;
 }
 
@@ -590,7 +626,7 @@ async function goToDashboard() {
   align-items: flex-start;
   gap: 8px;
   padding: 20px 24px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
   background: #fff;
   cursor: pointer;
@@ -599,13 +635,13 @@ async function goToDashboard() {
 }
 
 .tile:hover:not(.selected) {
-  border-color: #000;
+  border-color: #2A55F5;
 }
 
 .tile.selected {
-  background: #000;
-  border-color: #000;
-  color: #fff;
+  background: #16130F;
+  border-color: #16130F;
+  color: #FBF6EC;
 }
 
 .tile--compact {
@@ -625,8 +661,9 @@ async function goToDashboard() {
 
 .tile-label {
   font-size: 0.9rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.2;
 }
@@ -639,7 +676,7 @@ async function goToDashboard() {
 }
 
 .tile.selected .tile-sub {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(251, 246, 236, 0.7);
 }
 
 /* ── CTA button ── */
@@ -647,11 +684,13 @@ async function goToDashboard() {
   display: block;
   width: 100%;
   padding: 16px 24px;
-  background: #0052FF;
+  background: #2A55F5;
   color: #fff;
-  border: none;
-  border-radius: 0;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 #16130F;
   font-size: 0.85rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
@@ -660,7 +699,7 @@ async function goToDashboard() {
 }
 
 .btn-cta:hover:not(:disabled) {
-  background: #003ECC;
+  background: #1E42D6;
 }
 
 .btn-cta:disabled {
@@ -682,15 +721,18 @@ async function goToDashboard() {
 
 .done-headline {
   font-size: clamp(2rem, 6vw, 3.5rem);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  letter-spacing: -0.03em;
-  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  color: #16130F;
   margin: 0 0 40px;
 }
 
 .done-summary {
   width: 100%;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
   margin-bottom: 40px;
 }
 
@@ -699,21 +741,23 @@ async function goToDashboard() {
   justify-content: space-between;
   align-items: center;
   padding: 14px 0;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 
 .summary-label {
   font-size: 0.75rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #767676;
+  color: #5A5348;
   font-weight: 500;
 }
 
 .summary-value {
   font-size: 0.85rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  color: #000;
+  color: #16130F;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -722,18 +766,18 @@ async function goToDashboard() {
 .city-input {
   width: 100%;
   padding: 18px 20px;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
   font-size: 1rem;
   font-weight: 400;
-  color: #000;
+  color: #16130F;
   background: #fff;
   outline: none;
   margin-bottom: 32px;
   transition: border-color 0.15s;
 }
 .city-input:focus {
-  border-color: #000;
+  border-color: #2A55F5;
 }
 .city-input::placeholder {
   color: #C5C5C5;

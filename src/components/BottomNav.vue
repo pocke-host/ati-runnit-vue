@@ -1,6 +1,6 @@
 <template>
   <nav class="bottom-nav" v-if="isAuthenticated">
-    <!-- Coach tabs — 4 items max -->
+    <!-- Coach tabs — 5 items, Track centered -->
     <template v-if="role === 'coach'">
       <router-link to="/coach/dashboard" class="tab-item" active-class="tab-active">
         <i class="bi bi-grid-3x3-gap-fill tab-icon"></i>
@@ -10,10 +10,14 @@
         <i class="bi bi-people-fill tab-icon"></i>
         <span class="tab-label">Roster</span>
       </router-link>
-      <router-link to="/coach/library" class="tab-item tab-track">
+      <router-link to="/track" class="tab-item tab-track" active-class="tab-track--active" @click="hapticTrack">
         <div class="track-circle">
-          <i class="bi bi-collection-fill"></i>
+          <i class="bi bi-play-fill"></i>
         </div>
+        <span class="tab-label">Track</span>
+      </router-link>
+      <router-link to="/coach/library" class="tab-item" active-class="tab-active">
+        <i class="bi bi-collection-fill tab-icon"></i>
         <span class="tab-label">Library</span>
       </router-link>
       <router-link to="/calendar" class="tab-item" active-class="tab-active">
@@ -77,12 +81,12 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 900;
   background: #fff;
-  border-top: 1px solid #E5E5E5;
+  border-top: 2px solid #E7DFCE;
   box-shadow: none;
   align-items: center;
   justify-content: space-around;
   padding: 0 8px env(safe-area-inset-bottom, 0px);
-  font-family: Futura, "Avenir Next", system-ui, sans-serif;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
 }
 
 @media (max-width: 768px) {
@@ -120,7 +124,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
 }
 
 .tab-active {
-  color: #0052FF;
+  color: #2A55F5;
 }
 
 /* Track center tab */
@@ -133,7 +137,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #0052FF;
+  background: #2A55F5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,9 +158,9 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   transition: transform 0.08s ease;
 }
 
-/* Active state: highlight label blue like other tabs */
+/* Active state: highlight label cobalt like other tabs */
 .tab-track--active .tab-label {
-  color: #0052FF;
+  color: #2A55F5;
 }
 
 .tab-track .tab-label {

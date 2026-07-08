@@ -215,6 +215,17 @@
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
                 Athletes
               </router-link>
+              <div class="drawer-section-divider"></div>
+              <div class="drawer-track-wrap">
+                <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
+                  <span class="drawer-track-icon">▶</span>
+                  Track Activity
+                </router-link>
+              </div>
+              <router-link to="/create-moment" class="drawer-link" @click="mobileMenuOpen = false">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                Create Moment
+              </router-link>
             </template>
             <!-- Athlete drawer links -->
             <template v-else>
