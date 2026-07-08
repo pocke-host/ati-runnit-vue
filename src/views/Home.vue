@@ -9,7 +9,7 @@
           <div class="hero-copy">
             <span class="sticker sticker--yellow sticker--rot-neg">Early Access · Summer '26</span>
             <h1 class="hero-h1">Run it.<br>Log it.<br><span class="hero-accent">Brag a little.</span></h1>
-            <p class="hero-sub">The run tracker for people who'd rather be running — with the crew that drags them out at dawn. Track every mile, chase your people, and celebrate the wins that don't fit on a medal.</p>
+            <p class="hero-sub">The training app for athletes who'd rather be outside — with the crew that drags them out at dawn. Log every session, find your people, and celebrate the wins that don't fit on a medal.</p>
             <div class="hero-actions">
               <router-link to="/waitlist" class="btn-pill-primary">Get early access</router-link>
               <a href="#track" class="hero-link" @click.prevent="scrollTo('track')">Watch a run →</a>

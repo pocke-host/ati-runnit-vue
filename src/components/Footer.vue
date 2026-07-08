@@ -1,5 +1,5 @@
 <template>
-  <footer class="rk-footer">
+  <footer class="rk-footer" @click="scrollTop">
 
     <!-- CTA cap -->
     <div class="rk-footer-cta">
@@ -7,7 +7,7 @@
       <div class="rk-footer-cta-sub">Claim your @handle and bring the friend who always flakes.</div>
       <div class="rk-footer-cta-form">
         <span class="rk-footer-cta-input">you@email.com</span>
-        <span class="rk-footer-cta-btn">Join →</span>
+        <router-link to="/waitlist" class="rk-footer-cta-btn">Join →</router-link>
       </div>
     </div>
 
@@ -26,7 +26,7 @@
         <span class="rk-footer-wordmark">RUNNIT<span class="rk-footer-dot">.</span></span>
         <p class="rk-footer-tagline">Every mile, on the record.</p>
         <div class="rk-footer-socials">
-          <a href="#" class="rk-footer-social" aria-label="Instagram">
+          <a href="https://www.instagram.com/runnit.co" target="_blank" rel="noopener noreferrer" class="rk-footer-social" aria-label="Instagram">
             <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
           </a>
           <a href="#" class="rk-footer-social" aria-label="Twitter / X">
@@ -75,6 +75,14 @@
   </footer>
 </template>
 
+<script>
+export default {
+  methods: {
+    scrollTop() { window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  }
+}
+</script>
+
 <script setup>
 const year = new Date().getFullYear()
 </script>
@@ -84,6 +92,7 @@ const year = new Date().getFullYear()
   background: #16130F;
   color: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  cursor: default;
 }
 
 /* ── CTA Cap ── */
@@ -135,9 +144,11 @@ const year = new Date().getFullYear()
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: pointer;
+  text-decoration: none;
   flex-shrink: 0;
+  transition: opacity 0.15s;
 }
+.rk-footer-cta-btn:hover { opacity: 0.8; }
 
 /* ── Ticker Seam ── */
 .rk-footer-ticker-wrap {
@@ -157,6 +168,11 @@ const year = new Date().getFullYear()
   text-transform: uppercase;
   color: rgba(251, 246, 236, 0.55);
   padding: 9px 0;
+}
+
+@keyframes rkMarq {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 /* ── Main columns ── */
@@ -206,9 +222,7 @@ const year = new Date().getFullYear()
 .rk-footer-social:hover { border-color: #2A55F5; color: #2A55F5; }
 
 /* Nav columns */
-.rk-footer-nav {
-  display: contents;
-}
+.rk-footer-nav { display: contents; }
 .rk-footer-col {
   display: flex;
   flex-direction: column;
@@ -243,7 +257,6 @@ const year = new Date().getFullYear()
   border-top: 2px solid rgba(251, 246, 236, 0.15);
 }
 .rk-footer-bottom-inner {
-  max-width: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -272,9 +285,7 @@ const year = new Date().getFullYear()
 @media (max-width: 768px) {
   .rk-footer-cta { padding: 36px 20px 32px; }
   .rk-footer-cta-headline { font-size: 3.5rem; }
-  .rk-footer-main {
-    grid-template-columns: 1fr;
-  }
+  .rk-footer-main { grid-template-columns: 1fr; }
   .rk-footer-brand-col {
     padding: 28px 20px 18px;
     border-right: none;
