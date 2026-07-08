@@ -9,23 +9,36 @@
       </div>
       
       <form @submit.prevent="handleSubmit">
-        <!-- Photo Upload -->
+        <!-- Media Upload (photo or video) -->
         <div class="form-group">
-          <label class="form-label">Photo *</label>
+          <label class="form-label">Photo or Video *</label>
+
           <div v-if="!photoPreview" class="upload-area" @click="pickPhoto">
             <i class="bi bi-camera" style="font-size: 48px;"></i>
-            <p>Tap to take photo or upload</p>
+            <p>Tap to add a photo or video</p>
+            <span class="upload-hint">Max 50 MB · JPG, PNG, MP4, MOV</span>
           </div>
-          <div v-else class="photo-preview">
-            <img :src="photoPreview" alt="Preview" />
-            <button type="button" class="btn btn-sm btn-danger remove-btn" @click="removePhoto">
-              <i class="bi bi-x"></i> Remove
+
+          <!-- Video preview -->
+          <div v-else-if="photoPreview.startsWith('data:video')" class="media-preview media-preview--video">
+            <video :src="photoPreview" controls playsinline class="video-preview"></video>
+            <button type="button" class="remove-btn" @click="removePhoto">
+              <i class="bi bi-x"></i>
             </button>
           </div>
-          <input 
+
+          <!-- Image preview -->
+          <div v-else class="media-preview">
+            <img :src="photoPreview" alt="Preview" />
+            <button type="button" class="remove-btn" @click="removePhoto">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+
+          <input
             ref="fileInput"
-            type="file" 
-            accept="image/*" 
+            type="file"
+            accept="image/*,video/*"
             @change="handlePhotoSelect"
             style="display: none"
           />
@@ -99,13 +112,13 @@
         <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
         <!-- Submit Button -->
-        <button 
-          type="submit" 
-          class="btn btn-primary btn-full"
+        <button
+          type="submit"
+          class="btn-post"
           :disabled="uploading || !photoPreview"
         >
           <span v-if="uploading" class="spinner-border spinner-border-sm me-2"></span>
-          {{ uploading ? `Uploading ${uploadProgress}%` : 'Post Moment' }}
+          {{ uploading ? `Uploading... ${uploadProgress}%` : 'Post Moment' }}
         </button>
       </form>
     </div>
@@ -235,19 +248,18 @@ const handleSubmit = async () => {
 <style scoped>
 .create-moment-page {
   min-height: 100vh;
-  background: #fff;
-  padding: 40px 20px;
+  background: #FBF6EC;
+  padding-top: var(--nav-h, 66px);
+  padding-bottom: 80px;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .moment-card {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 32px auto 0;
   background: #fff;
-  border: 2px solid #E7DFCE;
-  border-radius: 0;
-  border: 2px solid rgba(22,19,15,0.12);
-  box-shadow: none;
+  border: 2px solid #16130F;
+  box-shadow: 6px 6px 0 #16130F;
   padding: 32px;
 }
 
@@ -256,129 +268,138 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #E7DFCE;
 }
 
 .moment-header h2 {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  font-size: 1.5rem;
-  color: rgba(15,18,16,0.92);
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  text-transform: uppercase;
+  line-height: 0.9;
+  color: #16130F;
   margin: 0;
 }
 
 .back-btn {
   width: 40px;
   height: 40px;
-  border-radius: 0;
-  border: 1px solid rgba(15,18,16,0.14);
+  border: 2px solid #16130F;
   background: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  color: #16130F;
+  transition: background 0.15s;
 }
+.back-btn:hover { background: #F1EADC; }
 
-.back-btn:hover {
-  background: #fff;
-  transform: translateX(-2px);
-}
-
-.form-group {
-  margin-bottom: 24px;
-}
+.form-group { margin-bottom: 24px; }
 
 .form-label {
   display: block;
-  font-weight: 900;
-  font-size: 0.95rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5A5348;
   margin-bottom: 10px;
-  color: rgba(15,18,16,0.80);
 }
 
 .optional {
   font-weight: 500;
   font-size: 0.85rem;
-  color: rgba(15,18,16,0.50);
+  color: #8A8A8A;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .upload-area {
-  border: 2px dashed rgba(15,18,16,0.20);
-  border-radius: 0;
-  padding: 60px 20px;
+  border: 2px dashed #16130F;
+  padding: 56px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s;
-  background: #f9f9f9;
+  background: #FBF6EC;
+  transition: background 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.upload-area:hover { background: #F1EADC; }
+.upload-area i { color: #5A5348; }
+.upload-area p { color: #16130F; font-weight: 700; margin: 0; font-size: 0.95rem; }
+.upload-hint {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8A8A8A;
 }
 
-.upload-area:hover {
-  border-color: #000;
-  background: rgba(0,0,0,0.04);
-}
-
-.upload-area i {
-  color: rgba(15,18,16,0.30);
-  margin-bottom: 12px;
-}
-
-.upload-area p {
-  color: rgba(15,18,16,0.60);
-  margin: 0;
-  font-weight: 600;
-}
-
-.photo-preview {
+.media-preview {
   position: relative;
-  border-radius: 0;
+  border: 2px solid #16130F;
   overflow: hidden;
-  border: 1px solid rgba(15,18,16,0.12);
 }
-
-.photo-preview img {
+.media-preview img {
   width: 100%;
   height: auto;
   display: block;
 }
+.media-preview--video { background: #16130F; }
+.video-preview {
+  width: 100%;
+  max-height: 400px;
+  display: block;
+  background: #000;
+}
 
 .remove-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: #16130F;
+  color: #FBF6EC;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
 }
+.remove-btn:hover { background: #C0392B; }
 
 .form-control {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid rgba(15,18,16,0.16);
-  border-radius: 0;
-  background: var(--rk-paper, #ffffff);
-  font-family: inherit;
+  border: 2px solid #16130F;
+  background: #fff;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 0.95rem;
-  transition: all 0.2s;
-  color: rgba(15,18,16,0.90);
+  color: #16130F;
+  transition: border-color 0.15s;
 }
-
 .form-control:focus {
   outline: none;
-  border-color: #000;
-  box-shadow: none;
-  background: #fff;
+  border-color: #2A55F5;
 }
-
-.form-control::placeholder {
-  color: rgba(15,18,16,0.40);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
+.form-control::placeholder { color: #8A8A8A; }
+.form-textarea { resize: vertical; min-height: 80px; }
 
 .char-count {
   text-align: right;
-  font-size: 0.78rem;
-  color: rgba(15,18,16,0.40);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8A8A8A;
   margin-top: 4px;
 }
 
@@ -387,116 +408,67 @@ const handleSubmit = async () => {
   border: 2px solid #E7DFCE;
   padding: 16px;
 }
-
 .song-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
   background: none;
   border: none;
-  font-family: inherit;
-  font-size: 0.88rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: rgba(15,18,16,0.65);
+  color: #5A5348;
   cursor: pointer;
   padding: 0;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.song-toggle:hover { color: #000; }
-
-.song-fields {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+.song-toggle:hover { color: #16130F; }
+.song-fields { margin-top: 16px; display: flex; flex-direction: column; gap: 0; }
 .song-fields .form-group { margin-bottom: 16px; }
 
-.alert {
-  padding: 14px 16px;
-  border-radius: 0;
-  margin-bottom: 20px;
-}
-
+.alert { padding: 14px 16px; margin-bottom: 20px; }
 .alert-danger {
-  background: rgba(239,68,68,0.12);
-  border: 1px solid rgba(239,68,68,0.30);
-  color: #991b1b;
+  background: rgba(192,57,43,0.08);
+  border: 2px solid #C0392B;
+  color: #C0392B;
   font-weight: 600;
 }
 
-.btn {
-  border: 1px solid rgba(15,18,16,0.14);
-  background: #FBF6EC;
-  color: rgba(15,18,16,0.78);
-  border-radius: 0;
-  height: 44px;
-  padding: 0 16px;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn:hover {
-  border-color: #16130F;
-  background: #F1EADC;
-}
-
-.btn-primary {
-  height: 52px;
-  background: #000;
-  border-color: rgba(15,18,16,0.12);
-  color: rgba(255,255,255,0.96);
-}
-
-.btn-primary:hover {
-  background: #333;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-full {
+.btn-post {
+  display: block;
   width: 100%;
+  padding: 16px 24px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
 }
+.btn-post:hover:not(:disabled) { background: #1E42D6; }
+.btn-post:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 
-.btn-sm {
-  height: 36px;
-  padding: 0 12px;
-  font-size: 0.85rem;
-}
-
-.btn-danger {
-  background: #dc3545;
-  border-color: #dc3545;
-  color: white;
-}
-
-.me-2 {
-  margin-right: 8px;
-}
+.me-2 { margin-right: 8px; }
 
 @media (max-width: 600px) {
   .create-moment-page {
-    padding: calc(var(--nav-h, 64px) + 12px) 12px 32px;
+    padding: calc(var(--nav-h, 66px) + 12px) 0 80px;
   }
   .moment-card {
+    margin: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
     padding: 20px 16px;
   }
-  .upload-area {
-    padding: 32px 16px;
-  }
-  .moment-header h2 {
-    font-size: 1.2rem;
-  }
+  .upload-area { padding: 32px 16px; }
+  .moment-header h2 { font-size: 1.2rem; }
 }
 </style>
