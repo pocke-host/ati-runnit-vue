@@ -233,16 +233,6 @@
       </div>
     </section>
 
-    <!-- FINAL CTA -->
-    <section class="final-cta">
-      <h2 class="cta-h2">Lace up.</h2>
-      <p class="cta-sub">Claim your @handle and bring the friend who always flakes.</p>
-      <div class="cta-form">
-        <span class="cta-form-placeholder">you@email.com</span>
-        <router-link to="/waitlist" class="cta-form-btn">Join →</router-link>
-      </div>
-    </section>
-
   </main>
 </template>
 
@@ -875,61 +865,6 @@ function scrollTo(id) {
 .stamp-lbl { font-size: 0.5rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.6); }
 .stamp-val { font-size: 0.95rem; font-weight: 600; color: #fff; }
 
-/* ── FINAL CTA ── */
-.final-cta {
-  background: #2A55F5;
-  color: #fff;
-  padding: 64px 32px;
-  text-align: center;
-}
-.cta-h2 {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-weight: 900;
-  font-size: clamp(72px, 10vw, 120px);
-  line-height: 0.82;
-  text-transform: uppercase;
-  margin: 0;
-}
-.cta-sub {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin: 18px 0 26px;
-  opacity: 0.92;
-}
-.cta-form {
-  display: inline-flex;
-  border: 2px solid #16130F;
-  background: #FBF6EC;
-  max-width: 440px;
-  width: 100%;
-  border-radius: 999px;
-  overflow: hidden;
-}
-.cta-form-placeholder {
-  flex: 1;
-  padding: 15px 20px;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.92rem;
-  color: #8a8a8a;
-  text-align: left;
-}
-.cta-form-btn {
-  background: #16130F;
-  color: #FBF6EC;
-  padding: 15px 24px;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: opacity 0.15s;
-}
-.cta-form-btn:hover { opacity: 0.8; text-decoration: none; color: #FBF6EC; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 860px) {
@@ -960,12 +895,7 @@ function scrollTo(id) {
   .two-col--photo-left .moment-photo { height: 200px; }
   .leaderboard .lb-name { font-size: 0.82rem; }
   .leaderboard .lb-dist { font-size: 0.82rem; }
-  .final-cta { padding: 48px 18px; }
-  .cta-h2 { font-size: clamp(56px, 15vw, 72px) !important; }
-  .cta-sub { font-size: 0.7rem; }
-  .cta-form { flex-direction: column; border-radius: 0; max-width: 100%; }
-  .cta-form-btn { text-align: center; border-radius: 0; }
-  .syncs-row { flex-wrap: wrap; gap: 6px 10px; }
+.syncs-row { flex-wrap: wrap; gap: 6px 10px; }
   .crews-header { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 </style>
