@@ -120,6 +120,9 @@ router.beforeEach((to, from, next) => {
   // Admin-only routes — redirect non-admins to their dashboard
   if (to.meta.requiresAdmin && userRole !== 'admin') return next(homeDash)
 
+  // Coaches cannot browse the athlete-facing coach discovery pages
+  if ((to.path === '/coaches' || to.path === '/my-coach') && userRole === 'coach') return next('/coach/dashboard')
+
   next()
 })
 
