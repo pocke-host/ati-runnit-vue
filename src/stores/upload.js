@@ -22,14 +22,25 @@ export const useUploadStore = defineStore('upload', () => {
         contentType: file.type
       })
       
-      // Step 2: Upload directly to S3
-      await axios.put(signData.uploadUrl, file, {
-        headers: {
-          'Content-Type': file.type
-        },
-        onUploadProgress: (progressEvent) => {
-          progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        }
+      // Step 2: Upload directly to S3.
+      // Must use XHR (not axios) — axios sends the global Authorization header,
+      // which causes S3 to reject the presigned URL with SignatureDoesNotMatch.
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            progress.value = Math.round((e.loaded / e.total) * 100)
+          }
+        })
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve()
+          else reject(new Error(`S3 upload failed: ${xhr.status} ${xhr.statusText}`))
+        })
+        xhr.addEventListener('error', () => reject(new Error('S3 upload network error')))
+        xhr.addEventListener('abort', () => reject(new Error('S3 upload cancelled')))
+        xhr.open('PUT', signData.uploadUrl)
+        xhr.setRequestHeader('Content-Type', file.type)
+        xhr.send(file)
       })
       
       // Return the public file URL
