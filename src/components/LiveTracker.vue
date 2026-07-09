@@ -1,88 +1,171 @@
 <!-- ========== LiveTracker.vue ========== -->
 <template>
-  <div class="live-tracker">
+  <div
+    class="lt-wrap"
+    :class="{
+      'lt--recording': isTracking,
+      'lt--paused': !isTracking && hasStarted,
+      'lt--ready': !hasStarted
+    }"
+  >
 
-    <!-- Header -->
-    <div class="tracker-header">
-      <div class="tracker-status">
-        <div :class="['status-dot', { active: isTracking }]"></div>
-        <span class="status-label">{{ isTracking ? 'Tracking' : hasStarted ? 'Paused' : 'Ready' }}</span>
+    <!-- ── RECORDING STATUS BAR (top, cobalt) ── -->
+    <div v-if="hasStarted" class="lt-status-bar" :class="{ 'lt-status-bar--paused': !isTracking }">
+      <div class="lt-status-left">
+        <span class="lt-rec-dot" :class="{ active: isTracking }"></span>
+        <span class="lt-status-text">{{ isTracking ? 'Recording' : 'Paused' }} · {{ selectedSport }}</span>
       </div>
-      <div class="tracker-time">{{ formatDurationClock(elapsedTime) }}</div>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="live-stat">
-        <div class="stat-label">Distance</div>
-        <div class="stat-value">{{ formatDistance(totalDistance) }}</div>
-      </div>
-      <div class="live-stat">
-        <div class="stat-label">Pace</div>
-        <div class="stat-value">{{ formatPace(currentPaceMinPerKm) }}</div>
-      </div>
-      <div class="live-stat">
-        <div class="stat-label">Avg Pace</div>
-        <div class="stat-value">{{ formatPace(avgPaceMinPerKm) }}</div>
-      </div>
-      <div class="live-stat">
-        <div class="stat-label">Elevation</div>
-        <div class="stat-value">{{ formatElevation(elevationGain) }}</div>
+      <div class="lt-gps-signal">
+        <span :style="{ opacity: 1 }">●</span>
+        <span :style="{ opacity: 0.6 }">●</span>
+        <span :style="{ opacity: 0.3 }">●</span>
       </div>
     </div>
 
-    <!-- Map -->
-    <div class="live-map-container">
+    <!-- ── TIMER ── -->
+    <div v-if="hasStarted" class="lt-timer-block" :class="{ 'lt-timer-block--dim': !isTracking }">
+      <div class="lt-timer">{{ formatDurationClock(elapsedTime) }}</div>
+    </div>
+
+    <!-- ── 3-UP STATS (recording/paused) ── -->
+    <div v-if="hasStarted" class="lt-stats-row">
+      <div class="lt-stat">
+        <div class="lt-stat-label">DIST</div>
+        <div class="lt-stat-val">{{ formatDistance(totalDistance) }}</div>
+      </div>
+      <div class="lt-stat lt-stat--pace">
+        <div class="lt-stat-label">PACE</div>
+        <div class="lt-stat-val">{{ formatPace(currentPaceMinPerKm) }}</div>
+      </div>
+      <div class="lt-stat">
+        <div class="lt-stat-label">ELEV</div>
+        <div class="lt-stat-val">{{ formatElevation(elevationGain) }}</div>
+      </div>
+    </div>
+
+    <!-- ── MAP ── -->
+    <div class="lt-map-wrap">
+      <!-- GPS locked chip shown in ready state -->
+      <div v-if="!hasStarted" class="lt-gps-chip">
+        <span class="lt-gps-dot"></span>GPS Locked
+      </div>
       <div ref="liveMapContainer" class="live-map"></div>
-      <div v-if="gpsError" class="gps-error-overlay">
+      <div v-if="gpsError" class="lt-gps-error">
         <i class="bi bi-geo-alt-fill"></i>
         <p>{{ gpsError }}</p>
       </div>
     </div>
 
-    <!-- Sport Selector (shown before first start) -->
-    <div v-if="!hasStarted" class="sport-selector">
-      <div class="sport-label">Select sport</div>
-      <div class="sport-options">
-        <button
-          v-for="sport in sports"
-          :key="sport.value"
-          :class="['sport-btn', { active: selectedSport === sport.value }]"
-          @click="selectedSport = sport.value"
-          type="button"
-        >
-          <span class="sport-emoji">{{ sport.emoji }}</span>
-          <span class="sport-name">{{ sport.label }}</span>
+    <!-- ── BOTTOM SHEET ── -->
+    <div class="lt-sheet">
+
+      <!-- Draft recovery banner (inside sheet) -->
+      <div v-if="showDraftBanner" class="lt-draft-banner">
+        <span>Unfinished session from {{ draftAge }}.</span>
+        <div class="lt-draft-actions">
+          <button class="lt-draft-resume" type="button" @click="resumeDraft">Resume</button>
+          <button class="lt-draft-discard" type="button" @click="discardDraft">Discard</button>
+        </div>
+      </div>
+
+      <!-- Save error -->
+      <div v-if="saveError" class="lt-save-error">{{ saveError }}</div>
+
+      <!-- READY: sport pills + start -->
+      <template v-if="!hasStarted">
+        <div class="lt-sport-label">Select sport</div>
+        <div class="lt-sport-scroll">
+          <button
+            v-for="sport in sports"
+            :key="sport.value"
+            :class="['lt-sport-pill', { 'lt-sport-pill--active': selectedSport === sport.value }]"
+            @click="selectedSport = sport.value"
+            type="button"
+          >{{ sport.label }}</button>
+        </div>
+        <div class="lt-start-row">
+          <div class="lt-side-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <button class="lt-start-btn" @click="startTracking" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <div class="lt-side-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          </div>
+        </div>
+      </template>
+
+      <!-- RECORDING: Lap / Stop / Pause -->
+      <template v-if="isTracking">
+        <div class="lt-rec-controls">
+          <button class="lt-ctrl-btn lt-ctrl-lap" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Lap</span>
+          </button>
+          <button
+            class="lt-ctrl-btn lt-ctrl-stop"
+            @click="showFinishConfirm = true"
+            :disabled="saving"
+            type="button"
+          >
+            <span v-if="saving" class="spinner-border spinner-border-sm"></span>
+            <svg v-else viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><rect x="3" y="3" width="18" height="18"/></svg>
+          </button>
+          <button class="lt-ctrl-btn lt-ctrl-pause" @click="pauseTracking" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <span>Pause</span>
+          </button>
+        </div>
+        <!-- Share live -->
+        <button v-if="!isSharing" class="lt-share-live-btn" @click="startSharing" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 6c0-1.7 3.1-3 7-3s7 1.3 7 3"/><path d="M1 6v4c0 1.7 3.1 3 7 3"/><ellipse cx="8" cy="6" rx="7" ry="3"/><path d="M22.5 12.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/><path d="M18 12h4.5"/><path d="M20.5 9.5l2 2.5-2 2.5"/></svg>
+          Share Live
         </button>
-      </div>
-    </div>
+      </template>
 
-    <!-- Draft Recovery Banner -->
-    <div v-if="showDraftBanner" class="draft-banner">
-      <div class="draft-banner-text">
-        <i class="bi bi-clock-history me-2"></i>
-        <span>You have an unfinished run from {{ draftAge }}. Resume it?</span>
-      </div>
-      <div class="draft-banner-actions">
-        <button class="draft-btn-resume" type="button" @click="resumeDraft">Resume</button>
-        <button class="draft-btn-discard" type="button" @click="discardDraft">Discard</button>
-      </div>
-    </div>
+      <!-- PAUSED: Resume / Finish -->
+      <template v-if="!isTracking && hasStarted">
+        <div class="lt-pause-controls">
+          <button class="lt-btn-resume" @click="resumeTracking" type="button">Resume</button>
+          <button
+            class="lt-btn-finish"
+            @click="showFinishConfirm = true"
+            :disabled="saving"
+            type="button"
+          >
+            <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
+            {{ saving ? 'Saving…' : 'Finish' }}
+          </button>
+        </div>
+        <button class="lt-btn-discard" @click="discardDraft" type="button">Discard Activity</button>
+        <!-- Share live (paused) -->
+        <button v-if="!isSharing" class="lt-share-live-btn" @click="startSharing" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 6c0-1.7 3.1-3 7-3s7 1.3 7 3"/><path d="M1 6v4c0 1.7 3.1 3 7 3"/><ellipse cx="8" cy="6" rx="7" ry="3"/><path d="M22.5 12.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/><path d="M18 12h4.5"/><path d="M20.5 9.5l2 2.5-2 2.5"/></svg>
+          Share Live
+        </button>
+      </template>
 
-    <!-- Save error -->
-    <div v-if="saveError" class="save-error">
-      <i class="bi bi-exclamation-circle me-2"></i>{{ saveError }}
+    </div><!-- /.lt-sheet -->
+
+    <!-- Broadcasting banner -->
+    <div v-if="isSharing" class="lt-share-banner">
+      <span class="lt-share-dot"></span>
+      <span class="lt-share-broadcasting">BROADCASTING</span>
+      <span class="lt-share-url" :title="shareUrl">{{ shareUrl.replace('https://', '').slice(0, 32) }}…</span>
+      <button class="lt-share-stop" @click="stopSharing" type="button">Stop</button>
     </div>
+    <div v-if="shareCopied" class="lt-share-toast">Link copied!</div>
 
     <!-- Post-workout Notes Overlay -->
-    <div v-if="showNotesStep" class="notes-overlay" :style="{ paddingBottom: keyboardOffset + 'px' }">
-      <div class="notes-overlay-inner">
-        <div class="notes-overlay-title">WORKOUT SAVED</div>
-        <p class="notes-overlay-sub">Add a note while it's fresh</p>
-        <div class="notes-input-wrap">
+    <div v-if="showNotesStep" class="lt-notes-overlay" :style="{ paddingBottom: keyboardOffset + 'px' }">
+      <div class="lt-notes-inner">
+        <div class="lt-notes-title">WORKOUT SAVED</div>
+        <p class="lt-notes-sub">Add a note while it's fresh</p>
+        <div class="lt-notes-input-wrap">
           <textarea
             v-model="postNotes"
-            class="notes-textarea"
+            class="lt-notes-textarea"
             rows="4"
             placeholder="How did it feel? Any pain? Weather?"
             autofocus
@@ -90,16 +173,15 @@
           <button
             v-if="micSupported"
             type="button"
-            :class="['mic-btn', { 'mic-btn--active': micListening }]"
+            :class="['lt-mic-btn', { 'lt-mic-btn--active': micListening }]"
             @click="toggleListening(t => postNotes = (postNotes ? postNotes + ' ' : '') + t)"
-            :title="micListening ? 'Stop recording' : 'Dictate note'"
           >
             <i :class="micListening ? 'bi bi-stop-fill' : 'bi bi-mic-fill'"></i>
           </button>
         </div>
-        <div class="notes-overlay-actions">
-          <button class="notes-btn-skip" type="button" @click="skipNotes">Skip</button>
-          <button class="notes-btn-done" type="button" @click="finishWithNotes" :disabled="notesSubmitting">
+        <div class="lt-notes-actions">
+          <button class="lt-notes-skip" type="button" @click="skipNotes">Skip</button>
+          <button class="lt-notes-done" type="button" @click="finishWithNotes" :disabled="notesSubmitting">
             <span v-if="notesSubmitting" class="spinner-border spinner-border-sm me-1"></span>
             Done
           </button>
@@ -107,62 +189,7 @@
       </div>
     </div>
 
-    <!-- Controls -->
-    <div class="tracker-controls">
-      <button
-        v-if="!isTracking && !hasStarted"
-        class="control-btn control-btn-start"
-        @click="startTracking"
-      >
-        <i class="bi bi-play-fill"></i> Start
-      </button>
-
-      <button
-        v-if="isTracking"
-        class="control-btn control-btn-pause"
-        @click="pauseTracking"
-      >
-        <i class="bi bi-pause-fill"></i> Pause
-      </button>
-
-      <button
-        v-if="!isTracking && hasStarted"
-        class="control-btn control-btn-start"
-        @click="resumeTracking"
-      >
-        <i class="bi bi-play-fill"></i> Resume
-      </button>
-
-      <button
-        v-if="hasStarted"
-        class="control-btn control-btn-finish"
-        @click="showFinishConfirm = true"
-        :disabled="saving"
-      >
-        <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
-        <i v-else class="bi bi-stop-fill"></i>
-        {{ saving ? 'Saving…' : 'Finish' }}
-      </button>
-
-      <!-- Share Live button -->
-      <button
-        v-if="hasStarted && !isSharing"
-        class="control-btn control-btn-share"
-        @click="startSharing"
-      >
-        <i class="bi bi-broadcast"></i> Share Live
-      </button>
-    </div>
-
-    <!-- Broadcasting banner -->
-    <div v-if="isSharing" class="share-banner">
-      <span class="share-live-dot"></span>
-      <span class="share-broadcasting">BROADCASTING</span>
-      <span class="share-url" :title="shareUrl">{{ shareUrl.replace('https://', '').slice(0, 32) }}…</span>
-      <button class="share-stop-btn" @click="stopSharing">Stop Sharing</button>
-    </div>
-    <div v-if="shareCopied" class="share-copied-toast">Link copied to clipboard!</div>
-
+    <!-- Confirm Finish Modal -->
     <ConfirmModal
       v-model="showFinishConfirm"
       title="Finish Activity?"
@@ -172,31 +199,25 @@
     />
 
     <!-- SOS Button -->
-    <button v-if="isTracking" class="sos-btn" @click="showSosModal = true">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i>SOS
-    </button>
+    <button v-if="isTracking" class="lt-sos-btn" @click="showSosModal = true" type="button">SOS</button>
 
     <!-- SOS Modal -->
-    <div v-if="showSosModal" class="sos-overlay">
-      <div class="sos-modal">
-        <div class="sos-modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>SEND SOS ALERT</div>
-        <p class="sos-modal-sub">
-          This will sound an alert and send an email to your emergency contacts with your current location.
-        </p>
-        <div v-if="sosContacts.length === 0" class="sos-no-contacts">
+    <div v-if="showSosModal" class="lt-sos-overlay">
+      <div class="lt-sos-modal">
+        <div class="lt-sos-title">SEND SOS ALERT</div>
+        <p class="lt-sos-sub">This will sound an alert and share your location with emergency contacts.</p>
+        <div v-if="sosContacts.length === 0" class="lt-sos-no-contacts">
           No emergency contacts found. Add contacts in Settings → Safety.
         </div>
-        <div v-else class="sos-contacts-list">
-          <div v-for="c in sosContacts" :key="c.id" class="sos-contact">
-            <span class="sos-contact-name">{{ c.name }}</span>
-            <span v-if="c.email" class="sos-contact-email">{{ c.email }}</span>
+        <div v-else class="lt-sos-list">
+          <div v-for="c in sosContacts" :key="c.id" class="lt-sos-contact">
+            <span class="lt-sos-contact-name">{{ c.name }}</span>
+            <span v-if="c.email" class="lt-sos-contact-email">{{ c.email }}</span>
           </div>
         </div>
-        <div class="sos-modal-actions">
-          <button class="sos-cancel-btn" @click="showSosModal = false">Cancel</button>
-          <button class="sos-confirm-btn" @click="sendSos">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>Send SOS
-          </button>
+        <div class="lt-sos-actions">
+          <button class="lt-sos-cancel" type="button" @click="showSosModal = false">Cancel</button>
+          <button class="lt-sos-confirm" type="button" @click="sendSos">Send SOS</button>
         </div>
       </div>
     </div>
@@ -806,491 +827,741 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.live-tracker {
-  position: relative;
+/* ── WRAP ─────────────────────────────────────────────────────────── */
+.lt-wrap {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  max-width: 600px;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: #16130F;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #FBF6EC;
+  position: relative;
 }
 
-/* ── Header ── */
-.tracker-header {
+/* ── STATUS BAR ─────────────────────────────────────────────────────── */
+.lt-status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border: 1px solid #E5E5E5;
-  padding: 14px 20px;
-}
-
-.tracker-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #CCCCCC;
+  background: #2A55F5;
+  padding: 10px 20px;
   flex-shrink: 0;
 }
-
-.status-dot.active {
-  background: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
-  animation: pulse 2s infinite;
+.lt-status-bar--paused {
+  background: #FFC53D;
 }
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+.lt-status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-
-.status-label {
-  font-size: 0.75rem;
+.lt-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(251,246,236,0.5);
+  flex-shrink: 0;
+}
+.lt-rec-dot.active {
+  background: #FBF6EC;
+  animation: ltBlink 0.9s ease-in-out infinite;
+}
+.lt-status-bar--paused .lt-rec-dot { background: #16130F; }
+.lt-status-text {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
   font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  color: #767676;
+  color: #FBF6EC;
+}
+.lt-status-bar--paused .lt-status-text { color: #16130F; }
+.lt-gps-signal {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(251,246,236,0.9);
+  display: flex;
+  gap: 2px;
 }
 
-.tracker-time {
-  font-size: 2rem;
+/* ── TIMER ──────────────────────────────────────────────────────────── */
+.lt-timer-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px 12px;
+  flex-shrink: 0;
+}
+.lt-timer-block--dim .lt-timer {
+  opacity: 0.45;
+}
+.lt-timer {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  color: #000;
-  letter-spacing: -0.02em;
+  font-size: clamp(64px, 18vw, 96px);
+  line-height: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
+  color: #FBF6EC;
 }
 
-/* ── Stats ── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: #E5E5E5;
-  border: 1px solid #E5E5E5;
+/* ── 3-UP STATS ─────────────────────────────────────────────────────── */
+.lt-stats-row {
+  display: flex;
+  border-top: 2px solid rgba(251,246,236,0.12);
+  border-bottom: 2px solid rgba(251,246,236,0.12);
+  flex-shrink: 0;
 }
-
-.live-stat {
-  background: #fff;
-  padding: 16px;
+.lt-stat {
+  flex: 1;
+  padding: 14px 12px;
   text-align: center;
+  border-right: 2px solid rgba(251,246,236,0.12);
 }
-
-.stat-label {
-  font-size: 0.65rem;
+.lt-stat:last-child { border-right: none; }
+.lt-stat-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
   font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  color: #767676;
-  margin-bottom: 6px;
+  color: rgba(251,246,236,0.5);
+  margin-bottom: 4px;
 }
-
-.stat-value {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: #000;
-  letter-spacing: -0.01em;
+.lt-stat-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(24px, 6vw, 32px);
+  line-height: 0.9;
   font-variant-numeric: tabular-nums;
+  color: #FBF6EC;
+}
+.lt-stat--pace .lt-stat-val {
+  color: #FFC53D;
 }
 
-/* ── Map ── */
-.live-map-container {
+/* ── MAP ────────────────────────────────────────────────────────────── */
+.lt-map-wrap {
   position: relative;
-  border: 1px solid #E5E5E5;
+  flex: 1;
+  min-height: 180px;
 }
-
 .live-map {
   width: 100%;
-  height: 420px;
+  height: 100%;
+  min-height: 180px;
 }
 
-.gps-error-overlay {
+/* GPS locked chip (ready state) */
+.lt-gps-chip {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 2px solid #2A55F5;
+  background: rgba(22,19,15,0.85);
+  color: #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  white-space: nowrap;
+}
+.lt-gps-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #2A55F5;
+  flex-shrink: 0;
+  animation: ltBlink 1.2s ease-in-out infinite;
+}
+.lt-gps-error {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(22,19,15,0.88);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 0.85rem;
+  color: #C0392B;
+  font-size: 0.88rem;
   font-weight: 600;
-  color: #dc2626;
   text-align: center;
   padding: 20px;
 }
+.lt-gps-error i { font-size: 1.8rem; }
+.lt-gps-error p { margin: 0; }
 
-.gps-error-overlay i {
-  font-size: 2rem;
+/* ── BOTTOM SHEET ───────────────────────────────────────────────────── */
+.lt-sheet {
+  background: #FBF6EC;
+  border-top: 3px solid #2A55F5;
+  padding: 20px 20px 28px;
+  color: #16130F;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-/* ── Sport selector ── */
-.sport-selector {
-  background: #fff;
-  border: 1px solid #E5E5E5;
-  padding: 16px;
+/* Draft banner */
+.lt-draft-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #FFF3D6;
+  border: 2px solid #16130F;
+  padding: 10px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #16130F;
 }
-
-.sport-label {
-  font-size: 0.65rem;
+.lt-draft-actions { display: flex; gap: 8px; }
+.lt-draft-resume {
+  padding: 6px 14px;
+  background: #16130F;
+  color: #FBF6EC;
+  border: 2px solid #16130F;
+  font-family: inherit;
+  font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  color: #767676;
-  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.lt-draft-discard {
+  padding: 6px 14px;
+  background: transparent;
+  color: #5A5348;
+  border: 2px solid #E7DFCE;
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
 }
 
-.sport-options {
+/* Save error */
+.lt-save-error {
+  background: #FEF2F2;
+  border: 2px solid #C0392B;
+  padding: 10px 14px;
+  color: #C0392B;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ── SPORT SELECTOR ─────────────────────────────────────────────────── */
+.lt-sport-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5A5348;
+}
+.lt-sport-scroll {
   display: flex;
   gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.lt-sport-scroll::-webkit-scrollbar { display: none; }
+.lt-sport-pill {
+  flex-shrink: 0;
+  padding: 9px 18px;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  background: transparent;
+  color: #16130F;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  min-height: 44px;
+}
+.lt-sport-pill:hover { background: rgba(22,19,15,0.06); }
+.lt-sport-pill--active {
+  background: #2A55F5;
+  border-color: #2A55F5;
+  color: #fff;
+  box-shadow: 3px 3px 0 #16130F;
 }
 
-.sport-btn {
+/* ── START ROW ──────────────────────────────────────────────────────── */
+.lt-start-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.lt-side-tile {
+  width: 52px;
+  height: 52px;
+  border: 2px solid #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5A5348;
+  cursor: pointer;
+}
+.lt-start-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  border: 3px solid #16130F;
+  background: #2A55F5;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #16130F;
+  transition: background 0.15s, box-shadow 0.1s;
+  min-height: 72px;
+}
+.lt-start-btn:hover { background: #1E42D6; }
+.lt-start-btn:active { box-shadow: 2px 2px 0 #16130F; transform: translate(2px, 2px); }
+
+/* ── RECORDING CONTROLS ─────────────────────────────────────────────── */
+.lt-rec-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.lt-ctrl-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  border: 3px solid #16130F;
+  background: #FBF6EC;
+  color: #16130F;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 12px;
-  border: 1px solid #E5E5E5;
-  background: #fff;
+  justify-content: center;
+  gap: 3px;
   cursor: pointer;
-  flex: 1;
-  transition: border-color 0.15s, background 0.15s;
+  box-shadow: 3px 3px 0 #16130F;
+  transition: opacity 0.15s;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  min-height: 60px;
 }
-
-.sport-btn:hover {
-  border-color: #000;
-}
-
-.sport-btn.active {
-  background: #000;
-  border-color: #000;
+.lt-ctrl-btn:hover { opacity: 0.85; }
+.lt-ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.lt-ctrl-stop {
+  width: 76px;
+  height: 76px;
+  background: #C0392B;
+  border-color: #16130F;
   color: #fff;
+  box-shadow: 4px 4px 0 #16130F;
 }
+.lt-ctrl-pause { background: #16130F; color: #FBF6EC; }
 
-.sport-emoji { font-size: 1.4rem; line-height: 1; }
-
-.sport-name {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-/* ── Controls ── */
-.tracker-controls {
-  display: flex;
-  gap: 8px;
-}
-
-.control-btn {
-  flex: 1;
-  height: 52px;
-  border: none;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
+/* Share live */
+.lt-share-live-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  height: 40px;
+  border: 2px solid #16130F;
+  background: transparent;
+  color: #5A5348;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.15s;
+  min-height: 40px;
 }
+.lt-share-live-btn:hover { background: rgba(22,19,15,0.06); color: #16130F; }
 
-.control-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.control-btn-start  { background: #2A55F5; color: #fff; }
-.control-btn-start:hover:not(:disabled)  { background: #1E42D6; }
-.control-btn-pause  { background: #555; color: #fff; }
-.control-btn-pause:hover  { background: #333; }
-.control-btn-finish { background: #dc2626; color: #fff; }
-.control-btn-finish:hover:not(:disabled) { background: #b91c1c; }
-
-/* ── Draft recovery banner ── */
-.draft-banner {
-  background: #fffbeb;
-  border: 1px solid #fbbf24;
-  padding: 12px 16px;
+/* ── PAUSED CONTROLS ────────────────────────────────────────────────── */
+.lt-pause-controls {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
 }
-
-.draft-banner-text {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #92400e;
-  display: flex;
-  align-items: center;
-}
-
-.draft-banner-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.draft-btn-resume {
-  padding: 6px 14px;
-  background: #000;
+.lt-btn-resume {
+  flex: 1;
+  height: 52px;
+  border-radius: 999px;
+  border: 2px solid #16130F;
+  background: #2A55F5;
   color: #fff;
-  border: none;
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
   cursor: pointer;
+  box-shadow: 3px 3px 0 #16130F;
+  transition: background 0.15s;
+  min-height: 52px;
 }
-
-.draft-btn-discard {
-  padding: 6px 14px;
-  background: #fff;
-  color: #767676;
-  border: 1px solid #E5E5E5;
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.lt-btn-resume:hover { background: #1E42D6; }
+.lt-btn-finish {
+  flex: 1;
+  height: 52px;
+  border-radius: 999px;
+  border: 2px solid #16130F;
+  background: #16130F;
+  color: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
   cursor: pointer;
-}
-
-/* ── Save error ── */
-.save-error {
-  background: #FEF2F2;
-  border: 1px solid #FCA5A5;
-  padding: 12px 16px;
-  color: #dc2626;
-  font-size: 0.85rem;
-  font-weight: 600;
+  box-shadow: 3px 3px 0 #5A5348;
   display: flex;
   align-items: center;
+  justify-content: center;
+  min-height: 52px;
+}
+.lt-btn-finish:disabled { opacity: 0.5; cursor: not-allowed; }
+.lt-btn-discard {
+  background: none;
+  border: none;
+  color: #C0392B;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: center;
+  padding: 4px;
 }
 
-/* ── Mapbox control overrides ── */
-:deep(.mapboxgl-ctrl-geolocate) {
-  border-radius: 0 !important;
+/* ── BROADCASTING BANNER ────────────────────────────────────────────── */
+.lt-share-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: #FBF6EC;
+  border-top: 2px solid #2A55F5;
+  font-size: 0.7rem;
+  color: #16130F;
 }
-:deep(.mapboxgl-ctrl-zoom-in),
-:deep(.mapboxgl-ctrl-zoom-out),
-:deep(.mapboxgl-ctrl-compass) {
-  border-radius: 0 !important;
+.lt-share-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #2A55F5;
+  flex-shrink: 0;
+  animation: ltBlink 1.4s infinite;
 }
-:deep(.mapboxgl-ctrl-group) {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  border: 1px solid #E5E5E5 !important;
+.lt-share-broadcasting {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2A55F5;
+}
+.lt-share-url {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  color: #5A5348;
+  flex: 1;
+}
+.lt-share-stop {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #C0392B;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
 }
 
-.me-2 { margin-right: 8px; }
-
-@media (max-width: 480px) {
-  .live-map { height: 320px; }
-  .tracker-time { font-size: 1.6rem; }
-  .stat-value { font-size: 1.1rem; }
+.lt-share-toast {
+  position: fixed;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 8px 20px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  z-index: 9999;
 }
 
-/* ── Post-workout Notes Overlay ── */
-.notes-overlay {
+/* ── NOTES OVERLAY ──────────────────────────────────────────────────── */
+.lt-notes-overlay {
   position: fixed;
   inset: 0;
-  background: #fff;
+  background: #FBF6EC;
   z-index: 100;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 48px 24px 24px;
+  padding: 56px 24px 24px;
   overflow-y: auto;
+  color: #16130F;
 }
-.notes-overlay-inner {
+.lt-notes-inner {
   width: 100%;
   max-width: 480px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
-.notes-overlay-title {
-  font-size: 1.4rem;
+.lt-notes-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  letter-spacing: 0.10em;
-  color: #000;
+  font-size: 2rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: #16130F;
 }
-.notes-overlay-sub {
-  font-size: 0.85rem;
-  color: #767676;
+.lt-notes-sub {
+  font-size: 0.88rem;
+  color: #5A5348;
   margin: 0;
 }
-.notes-input-wrap {
-  position: relative;
-}
-.notes-textarea {
+.lt-notes-input-wrap { position: relative; }
+.lt-notes-textarea {
   width: 100%;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
   border-radius: 0;
-  padding: 10px 12px 36px 12px;
-  font-family: inherit;
+  padding: 12px 12px 40px 12px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 0.9rem;
   resize: vertical;
-  min-height: 100px;
+  min-height: 110px;
+  background: #fff;
   outline: none;
+  color: #16130F;
 }
-.notes-textarea:focus { border-color: #000; }
-.mic-btn {
+.lt-notes-textarea:focus { border-color: #2A55F5; }
+.lt-mic-btn {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #000;
-  color: #fff;
+  bottom: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  background: #16130F;
+  color: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   transition: background 0.2s;
 }
-.mic-btn:hover { background: #333; }
-.mic-btn--active {
-  background: #ef4444;
-  animation: mic-pulse 1s ease-in-out infinite;
+.lt-mic-btn:hover { background: #2A55F5; border-color: #2A55F5; }
+.lt-mic-btn--active {
+  background: #C0392B;
+  border-color: #C0392B;
+  animation: ltMicPulse 1s ease-in-out infinite;
 }
-@keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  50%       { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+@keyframes ltMicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(192,57,43,0); }
 }
-.notes-overlay-actions {
+.lt-notes-actions {
   display: flex;
   gap: 12px;
-  margin-top: 8px;
 }
-.notes-btn-skip {
+.lt-notes-skip {
   flex: 1;
-  padding: 12px;
-  border: 1px solid #E5E5E5;
-  background: #fff;
-  color: #767676;
+  height: 48px;
+  border: 2px solid #E7DFCE;
+  background: #FBF6EC;
+  color: #5A5348;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.1em;
   cursor: pointer;
 }
-.notes-btn-done {
+.lt-notes-done {
   flex: 2;
-  padding: 12px;
-  border: none;
-  background: #000;
+  height: 48px;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  background: #2A55F5;
   color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.88rem;
   cursor: pointer;
-}
-.notes-btn-done:disabled { opacity: 0.6; cursor: not-allowed; }
-
-/* ── Live sharing ──────────────────────────────────────────── */
-.control-btn-share {
-  background: #4f46e5; color: #fff; font-size: 0.8rem; padding: 10px 14px;
-}
-.control-btn-share:hover { background: #4338ca; }
-
-.share-banner {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  padding: 8px 16px; background: #ecfdf5; border-top: 2px solid #22c55e;
-  font-size: 12px;
-}
-.share-live-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
-  animation: live-pulse-dot 1.5s infinite;
-  flex-shrink: 0;
-}
-@keyframes live-pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.share-broadcasting { font-weight: 800; letter-spacing: 0.10em; color: #166534; text-transform: uppercase; }
-.share-url { font-size: 11px; color: #555; font-family: monospace; }
-.share-stop-btn {
-  margin-left: auto; background: none; border: none; color: #dc2626;
-  font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; font-family: inherit;
-  text-decoration: underline;
-}
-
-.share-copied-toast {
-  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-  background: #000; color: #fff; padding: 8px 20px;
-  font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
-  z-index: 9999;
-}
-
-/* ── SOS ── */
-.sos-btn {
-  width: 100%; height: 52px;
-  background: #dc2626; color: #fff; border: none;
-  font-family: inherit; font-size: 0.9rem; font-weight: 900;
-  text-transform: uppercase; letter-spacing: 0.14em;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background 0.15s;
-}
-.sos-btn:hover { background: #b91c1c; }
-
-.sos-overlay {
-  position: absolute; inset: 0; background: rgba(0,0,0,0.65);
-  z-index: 200; display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-}
-.sos-modal {
-  background: #fff; width: 100%; max-width: 420px;
-  padding: 24px; display: flex; flex-direction: column; gap: 14px;
-}
-.sos-modal-title {
-  font-size: 1rem; font-weight: 900; color: #dc2626;
-  text-transform: uppercase; letter-spacing: 0.10em;
-}
-.sos-modal-sub { font-size: 0.85rem; color: #767676; margin: 0; }
-.sos-no-contacts {
-  font-size: 0.82rem; color: #767676;
-  background: #fafafa; border: 1px solid #E5E5E5; padding: 12px;
-}
-.sos-contacts-list { display: flex; flex-direction: column; gap: 6px; }
-.sos-contact {
-  display: flex; gap: 10px; align-items: center;
-  padding: 8px 12px; border: 1px solid #E5E5E5; background: #fafafa;
-}
-.sos-contact-name { font-weight: 700; font-size: 0.88rem; color: #000; }
-.sos-contact-email { font-size: 0.78rem; color: #767676; }
-.sos-modal-actions { display: flex; gap: 10px; margin-top: 4px; }
-.sos-cancel-btn {
-  flex: 1; height: 44px; border: 1px solid #E5E5E5; background: #fff;
-  color: #767676; font-family: inherit; font-weight: 700; font-size: 0.82rem;
-  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
-}
-.sos-cancel-btn:hover { background: #f5f5f5; color: #000; }
-.sos-confirm-btn {
-  flex: 2; height: 44px; background: #dc2626; color: #fff; border: none;
-  font-family: inherit; font-weight: 900; font-size: 0.88rem;
-  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  box-shadow: 3px 3px 0 #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background 0.15s;
 }
-.sos-confirm-btn:hover { background: #b91c1c; }
+.lt-notes-done:hover { background: #1E42D6; }
+.lt-notes-done:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── SOS ────────────────────────────────────────────────────────────── */
+.lt-sos-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 18px;
+  width: 52px;
+  height: 52px;
+  border: 3px solid #FBF6EC;
+  border-radius: 999px;
+  background: #C0392B;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  z-index: 50;
+  transition: background 0.15s;
+}
+.lt-sos-btn:hover { background: #a93226; }
+.lt-sos-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22,19,15,0.72);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.lt-sos-modal {
+  background: #FBF6EC;
+  width: 100%;
+  max-width: 400px;
+  border: 2px solid #16130F;
+  box-shadow: 6px 6px 0 #16130F;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #16130F;
+}
+.lt-sos-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  color: #C0392B;
+  letter-spacing: 0.02em;
+}
+.lt-sos-sub { font-size: 0.84rem; color: #5A5348; margin: 0; }
+.lt-sos-no-contacts {
+  font-size: 0.8rem;
+  color: #5A5348;
+  border: 2px solid #E7DFCE;
+  padding: 12px;
+  background: #fff;
+}
+.lt-sos-list { display: flex; flex-direction: column; gap: 6px; }
+.lt-sos-contact {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 2px solid #E7DFCE;
+  background: #fff;
+}
+.lt-sos-contact-name { font-weight: 800; font-size: 0.88rem; }
+.lt-sos-contact-email { font-size: 0.76rem; color: #5A5348; }
+.lt-sos-actions { display: flex; gap: 10px; }
+.lt-sos-cancel {
+  flex: 1;
+  height: 44px;
+  border: 2px solid #E7DFCE;
+  background: #FBF6EC;
+  color: #5A5348;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.lt-sos-cancel:hover { border-color: #16130F; color: #16130F; }
+.lt-sos-confirm {
+  flex: 2;
+  height: 44px;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  background: #C0392B;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.lt-sos-confirm:hover { background: #a93226; }
+
+/* ── MAPBOX OVERRIDES ────────────────────────────────────────────────── */
+:deep(.mapboxgl-ctrl-geolocate) { border-radius: 0 !important; }
+:deep(.mapboxgl-ctrl-zoom-in),
+:deep(.mapboxgl-ctrl-zoom-out),
+:deep(.mapboxgl-ctrl-compass) { border-radius: 0 !important; }
+:deep(.mapboxgl-ctrl-group) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 2px solid rgba(251,246,236,0.25) !important;
+}
+
+/* ── ANIMATIONS ─────────────────────────────────────────────────────── */
+@keyframes ltBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+/* ── UTILS ──────────────────────────────────────────────────────────── */
+.me-2 { margin-right: 8px; }
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(251,246,236,0.3);
+  border-top-color: #FBF6EC;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  display: inline-block;
+}
+.spinner-border-sm { width: 0.85rem; height: 0.85rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

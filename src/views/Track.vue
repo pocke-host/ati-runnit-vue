@@ -74,56 +74,56 @@
   
   <style scoped>
   .tracker-page {
-    background: #fff;
+    background: #16130F;
   }
-  
+
   .page-container {
     min-height: 100vh;
-    padding: calc(var(--nav-h, 64px) + 24px) 20px 40px;
-    max-width: 1200px;
+    padding: var(--nav-h, 66px) 0 0;
+    max-width: 600px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
   }
-  
+
   .page-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 32px;
+    gap: 14px;
+    padding: 14px 20px;
+    background: #16130F;
+    border-bottom: 1px solid rgba(251,246,236,0.1);
+    flex-shrink: 0;
   }
-  
+
   .btn-back {
-    width: 44px;
-    height: 44px;
-    border-radius: 0;
-    border: 1px solid rgba(15,18,16,0.14);
-    background: #f5f5f5;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(251,246,236,0.25);
+    background: transparent;
+    color: #FBF6EC;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    transition: border-color 0.15s;
+    flex-shrink: 0;
   }
-  
-  .btn-back:hover {
-    background: #eee;
-  }
-  
+  .btn-back:hover { border-color: #FBF6EC; }
+
   .page-header h1 {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
     font-weight: 900;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
     margin: 0;
+    color: #FBF6EC;
+    line-height: 1;
   }
 
   @media (max-width: 600px) {
-    .page-container {
-      padding: calc(var(--nav-h, 64px) + 12px) 16px 32px;
-    }
-    .page-header h1 {
-      font-size: 1.4rem;
-    }
-    .page-header {
-      margin-bottom: 20px;
-    }
+    .page-header h1 { font-size: 1.2rem; }
   }
   </style>
