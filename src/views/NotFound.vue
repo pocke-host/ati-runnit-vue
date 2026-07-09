@@ -12,7 +12,7 @@
     <div class="notfound-inner">
       <div class="notfound-code">404</div>
       <h1 class="notfound-title">You went off route.</h1>
-      <p class="notfound-sub">This page isn't on the map. Head back and keep moving.</p>
+      <p class="notfound-sub">This page isn't on the map. Double-check the link or head back to the start line.</p>
       <router-link to="/" class="notfound-btn">Back to Home</router-link>
     </div>
   </main>
@@ -33,7 +33,7 @@
 .notfound-ticker-wrap {
   background: #16130F;
   overflow: hidden;
-  border-bottom: 3px solid #2A55F5;
+  border-top: 3px solid #2A55F5;
 }
 .notfound-ticker {
   display: flex;
