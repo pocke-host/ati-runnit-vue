@@ -92,9 +92,19 @@ import { ref } from 'vue'
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Pricing — Runnit',
+  title: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/pricing' }],
   meta: [
-    { name: 'description', content: 'Pick your pace. Start free. Upgrade when your training does.' },
+    { name: 'description', content: 'Start free and log unlimited sessions. Upgrade to Pro for adaptive training plans, advanced analytics, coaching tools, and priority support. Pick your pace.' },
+    { property: 'og:title', content: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes' },
+    { property: 'og:description', content: 'Start free. Upgrade to Pro for adaptive training plans, advanced analytics, and coaching tools.' },
+    { property: 'og:url', content: 'https://runnit.live/pricing' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes' },
+    { name: 'twitter:description', content: 'Start free. Upgrade to Pro for adaptive training plans, advanced analytics, and coaching tools.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

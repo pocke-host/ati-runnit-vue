@@ -4,12 +4,17 @@ Allow: /
 # Public marketing pages
 Allow: /features
 Allow: /about
+Allow: /pricing
 Allow: /blog
+Allow: /races
 Allow: /privacy
 Allow: /terms
 Allow: /support
 Allow: /join-us
 Allow: /signup
+Allow: /waitlist
+Allow: /careers
+Allow: /press
 
 # Block authenticated app routes
 Disallow: /dashboard
@@ -26,5 +31,6 @@ Disallow: /settings
 Disallow: /calendar
 Disallow: /activities
 Disallow: /onboard
+Disallow: /coach
 
 Sitemap: https://runnit.live/sitemap.xml
