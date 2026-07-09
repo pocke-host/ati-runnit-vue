@@ -59,7 +59,6 @@
             :class="{ active: selectedSport === s.value }"
             @click="setActiveSport(s.value)"
           >
-            <span class="sport-emoji">{{ s.emoji }}</span>
             {{ s.label }}
           </button>
         </div>
@@ -146,7 +145,7 @@
             <article v-for="event in pagedEvents" :key="event.id" class="event-card" style="cursor:pointer" @click="openRaceDrawer(event)">
               <div class="event-img" :style="getCardStyle(event)">
                 <span class="date-badge">{{ formatDateShort(event.date) }}</span>
-                <span class="sport-badge">{{ event.sportEmoji }} {{ event.sportLabel }}</span>
+                <span class="sport-badge">{{ event.sportLabel }}</span>
                 <span v-if="event.isPast" class="past-badge">Past</span>
                 <button
                   class="bookmark-btn"
@@ -160,24 +159,16 @@
               <div class="event-body">
                 <h3 class="event-name">{{ event.name }}</h3>
                 <p class="event-location">
-                  <i class="bi bi-geo-alt"></i>
+                  <svg viewBox="0 0 16 20" width="12" height="14" fill="none" stroke="#5A5348" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 12 5 12s5-8.25 5-12c0-2.76-2.24-5-5-5z"/><circle cx="8" cy="6" r="1.5"/></svg>
                   {{ event.city }}<span v-if="event.state">, {{ event.state }}</span>
                 </p>
                 <div class="event-distances">
                   <span v-for="d in event.distances" :key="d" class="dist-pill">{{ d }}</span>
                 </div>
                 <p class="event-desc">{{ event.summary }}</p>
-                <div class="event-footer">
-                  <span class="event-date-full">
-                    <i class="bi bi-calendar-event"></i>
-                    {{ formatDateLong(event.date) }}
-                  </span>
-                  <div class="event-actions">
-                    <a v-if="event.url" :href="event.url" target="_blank" rel="noopener" class="btn-details" @click.stop>Details</a>
-                    <a v-if="event.registerUrl" :href="event.registerUrl" target="_blank" rel="noopener" class="btn-register" @click.stop>Register</a>
-                  </div>
-                </div>
               </div>
+              <a v-if="event.registerUrl" :href="event.registerUrl" target="_blank" rel="noopener" class="btn-register-full" @click.stop>Register →</a>
+              <div v-else class="btn-register-full btn-register-full--disabled">Register</div>
             </article>
           </div>
 
@@ -1306,7 +1297,6 @@ watch(zipcode, () => {
 }
 .sport-tab:hover { color: #16130F; }
 .sport-tab.active { color: #16130F; border-bottom-color: #2A55F5; }
-.sport-emoji { font-size: 1rem; }
 
 /* FILTERS */
 .filters {
@@ -1476,7 +1466,7 @@ watch(zipcode, () => {
 .event-img {
   position: relative;
   height: 140px;
-  background: #111;
+  background: #EDE5D5;
   flex-shrink: 0;
 }
 
@@ -1545,17 +1535,21 @@ watch(zipcode, () => {
 .event-name {
   font-size: 1rem;
   font-weight: 900;
-  color: #000;
+  color: #16130F;
   margin: 0 0 6px;
   line-height: 1.3;
 }
 .event-location {
-  font-size: 0.80rem;
-  color: #767676;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5A5348;
   margin: 0 0 10px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 .event-distances {
   display: flex;
@@ -1564,17 +1558,18 @@ watch(zipcode, () => {
   margin-bottom: 10px;
 }
 .dist-pill {
-  font-size: 0.68rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
   font-weight: 700;
-  padding: 2px 8px;
-  border: 1px solid #E5E5E5;
-  color: rgba(15,18,16,0.55);
+  padding: 3px 8px;
+  border: 1px solid #E7DFCE;
+  color: #5A5348;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 .event-desc {
   font-size: 0.82rem;
-  color: rgba(15,18,16,0.60);
+  color: #5A5348;
   line-height: 1.55;
   margin: 0 0 auto;
   display: -webkit-box;
@@ -1583,59 +1578,26 @@ watch(zipcode, () => {
   overflow: hidden;
   padding-bottom: 14px;
 }
-.event-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 12px;
-  border-top: 2px solid #E7DFCE;
-  margin-top: auto;
-}
-.event-date-full {
-  font-size: 0.76rem;
-  color: #767676;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.event-actions { display: flex; gap: 8px; }
-
-.btn-details {
-  height: 34px;
-  padding: 0 14px;
-  border: 2px solid #16130F;
-  background: #FBF6EC;
-  color: #16130F;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  transition: background 0.15s;
-}
-.btn-details:hover { background: #E7DFCE; }
-
-.btn-register {
-  height: 34px;
-  padding: 0 16px;
-  border: 2px solid #16130F;
+.btn-register-full {
+  display: block;
   background: #2A55F5;
   color: #fff;
+  border: 2px solid #16130F;
+  border-top: none;
+  padding: 13px;
+  text-align: center;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
+  box-shadow: 3px 3px 0 #16130F;
   transition: background 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
 }
-.btn-register:hover { background: #1E42D6; box-shadow: 2px 2px 0 #16130F; }
+.btn-register-full:hover { background: #1E42D6; box-shadow: 4px 4px 0 #16130F; color: #fff; text-decoration: none; }
+.btn-register-full--disabled { background: #E7DFCE; color: #8A8A8A; box-shadow: none; cursor: default; }
 
 /* Error */
 .events-error {
