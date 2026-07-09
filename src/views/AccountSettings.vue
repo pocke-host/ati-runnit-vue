@@ -4,6 +4,7 @@
 
     <!-- Title bar -->
     <div class="st-title-bar">
+      <div class="st-page-eyebrow">Your Account</div>
       <h1 class="st-page-title">Settings</h1>
     </div>
 
@@ -68,6 +69,13 @@
               <div class="field-readonly">{{ user?.email }}</div>
             </div>
 
+            <!-- Bio (display only — edit via Profile Edit) -->
+            <div class="field-group">
+              <label class="field-label">Bio</label>
+              <div class="field-readonly field-readonly--bio">{{ user?.bio || 'No bio yet — add one in Edit Profile.' }}</div>
+              <div class="field-counter">{{ (user?.bio || '').length }} / 300</div>
+            </div>
+
             <div v-if="profileStatus" :class="['field-status', profileStatusType]">
               <i :class="profileStatusType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'"></i>
               {{ profileStatus }}
@@ -85,7 +93,7 @@
               :class="['unit-card', { active: unitSystem === 'imperial' }]"
               @click="selectUnit('imperial')"
             >
-              <div class="unit-flag">🇺🇸</div>
+              <div class="unit-tag">US</div>
               <div class="unit-name">Imperial</div>
               <div class="unit-examples">
                 <span class="unit-example">mi</span>
@@ -101,7 +109,7 @@
               :class="['unit-card', { active: unitSystem === 'metric' }]"
               @click="selectUnit('metric')"
             >
-              <div class="unit-flag">📏</div>
+              <div class="unit-tag">INT</div>
               <div class="unit-name">Metric</div>
               <div class="unit-examples">
                 <span class="unit-example">km</span>
@@ -146,6 +154,39 @@
               <button class="btn btn-sm" @click="router.push('/profile/edit')">
                 <i class="bi bi-pencil me-1"></i>Edit in Profile
               </button>
+            </div>
+          </div>
+
+          <!-- Toggles card -->
+          <div class="settings-card settings-card--toggles">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="field-label">Public Profile</div>
+                <div class="field-hint">Anyone can view your profile and activity history.</div>
+              </div>
+              <div class="st-toggle st-toggle--on">
+                <div class="st-toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="field-label">Show Activity Map</div>
+                <div class="field-hint">Display your route map on activity posts.</div>
+              </div>
+              <div class="st-toggle st-toggle--on">
+                <div class="st-toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="field-label">Email Notifications</div>
+                <div class="field-hint">Get notified about kudos, crew activity, and challenges.</div>
+              </div>
+              <div class="st-toggle">
+                <div class="st-toggle-knob"></div>
+              </div>
             </div>
           </div>
         </section>
@@ -485,6 +526,15 @@ onMounted(() => {
   padding: 28px 28px 20px;
   border-bottom: 2px solid #16130F;
 }
+.st-page-eyebrow {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #2A55F5;
+  margin-bottom: 8px;
+}
 .st-page-title {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
@@ -523,14 +573,14 @@ onMounted(() => {
   cursor: pointer;
   transition: color 0.15s;
 }
-.st-sidebar-item:hover { color: #16130F; }
+.st-sidebar-item:hover { color: #16130F; background: #F1EADC; }
 .st-sidebar-item--active {
   background: #2A55F5;
   color: #fff;
-  border-left: 4px solid #16130F;
-  padding-left: 18px;
+  border-left: 3px solid #16130F;
+  padding-left: 19px;
 }
-.st-sidebar-item--active:hover { color: #fff; }
+.st-sidebar-item--active:hover { color: #fff; background: #1E42D6; }
 
 /* ── Panel ── */
 .st-panel {
@@ -577,8 +627,8 @@ onMounted(() => {
   gap: 16px;
 }
 .profile-avatar {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
   background: #2A55F5;
   border: 2px solid #16130F;
@@ -587,7 +637,7 @@ onMounted(() => {
   justify-content: center;
   font-weight: 800;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   flex-shrink: 0;
 }
 .profile-avatar-info { flex: 1; }
@@ -648,6 +698,14 @@ onMounted(() => {
   margin-top: 2px;
   line-height: 1.4;
 }
+.field-counter {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #8a8a8a;
+  letter-spacing: 0.08em;
+  margin-top: -2px;
+}
 .field-input-wrap {
   display: flex;
   gap: 10px;
@@ -683,6 +741,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   box-sizing: border-box;
+}
+.field-readonly--bio {
+  height: auto;
+  min-height: 60px;
+  padding: 12px 14px;
+  align-items: flex-start;
+  line-height: 1.5;
 }
 .field-status {
   display: flex;
@@ -764,7 +829,22 @@ onMounted(() => {
   color: #FBF6EC;
   box-shadow: 3px 3px 0 #2A55F5;
 }
-.unit-flag { font-size: 2rem; }
+.unit-tag {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: #F1EADC;
+  color: #5a5348;
+  padding: 4px 10px;
+  border: 2px solid #E7DFCE;
+}
+.unit-card.active .unit-tag {
+  background: rgba(251,246,236,0.12);
+  color: rgba(251,246,236,0.7);
+  border-color: rgba(251,246,236,0.2);
+}
 .unit-name {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 800;
@@ -846,6 +926,47 @@ onMounted(() => {
   margin-top: 5px;
 }
 
+/* ── Privacy Toggles ── */
+.settings-card--toggles {
+  gap: 0;
+  padding: 0;
+}
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 22px;
+}
+.toggle-info { flex: 1; }
+.toggle-divider { height: 1px; background: #E7DFCE; margin: 0 22px; }
+
+/* Toggle switch */
+.st-toggle {
+  width: 44px;
+  height: 24px;
+  background: #EDE5D5;
+  border: 2px solid #16130F;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.st-toggle--on { background: #2A55F5; }
+.st-toggle-knob {
+  width: 16px;
+  height: 16px;
+  background: #16130F;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.2s, background 0.2s;
+}
+.st-toggle--on .st-toggle-knob {
+  left: 22px;
+  background: #fff;
+}
+
 /* ── Emergency Contacts ── */
 .contact-empty {
   font-size: 0.88rem;
@@ -908,7 +1029,8 @@ onMounted(() => {
   .st-layout { grid-template-columns: 1fr; }
   .st-sidebar { display: flex; overflow-x: auto; border-right: none; border-bottom: 2px solid #16130F; padding: 0; position: static; }
   .st-sidebar-item { white-space: nowrap; padding: 12px 18px; }
-  .st-sidebar-item--active { padding-left: 14px; }
+  .st-sidebar-item--active { padding-left: 14px; border-left: none; border-bottom: 3px solid #2A55F5; background: transparent; color: #2A55F5; }
+  .st-sidebar-item--active:hover { background: transparent; }
   .st-panel { padding: 20px 16px; }
   .unit-cards { grid-template-columns: 1fr 1fr; }
   .contact-form-row { grid-template-columns: 1fr 1fr; }
@@ -919,5 +1041,6 @@ onMounted(() => {
   .unit-preview-row { grid-template-columns: repeat(2, 1fr); }
   .unit-cards { grid-template-columns: 1fr; }
   .contact-form-row { grid-template-columns: 1fr 1fr; }
+  .toggle-row { gap: 12px; }
 }
 </style>
