@@ -70,9 +70,19 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'About — Runnit',
+  title: 'About — Runnit | Built by Athletes, for Athletes',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/about' }],
   meta: [
-    { name: 'description', content: 'We built the app we wanted to use. Runnit is built by runners, for runners.' },
+    { name: 'description', content: 'We built the app we wanted to use. Runnit is built by endurance athletes, for endurance athletes — no VC hype, no ads, just the tools that make training better.' },
+    { property: 'og:title', content: 'About — Runnit | Built by Athletes, for Athletes' },
+    { property: 'og:description', content: 'Runnit is built by endurance athletes, for endurance athletes. No ads, no hype — just the training tools that actually matter.' },
+    { property: 'og:url', content: 'https://runnit.live/about' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'About — Runnit | Built by Athletes, for Athletes' },
+    { name: 'twitter:description', content: 'Runnit is built by endurance athletes, for endurance athletes. No ads, no hype.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

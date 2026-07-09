@@ -281,16 +281,20 @@ import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Runnit — Every Run Goes on the Record',
+  title: 'Runnit — The Training App for Endurance Athletes',
   link: [{ rel: 'canonical', href: 'https://runnit.live' }],
   meta: [
-    { name: 'description', content: 'Runnit is the social training app for distance athletes. GPS tracking, clubs, training plans, and Moments — one photo, auto-stamped with your data.' },
-    { property: 'og:title', content: 'Runnit — Every Run Goes on the Record' },
-    { property: 'og:description', content: 'GPS tracking, clubs, AI training plans, and Moments — one photo, auto-stamped with your data.' },
+    { name: 'description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing, and race challenges for runners, cyclists, and triathletes — all in one app.' },
+    { property: 'og:title', content: 'Runnit — The Training App for Endurance Athletes' },
+    { property: 'og:description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing, and race challenges — all in one app.' },
     { property: 'og:url', content: 'https://runnit.live' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:site', content: '@runnitapp' },
+    { name: 'twitter:title', content: 'Runnit — The Training App for Endurance Athletes' },
+    { name: 'twitter:description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

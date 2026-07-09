@@ -55,6 +55,7 @@ const routes = [
   { path: '/explore',             name: 'Explore',        component: () => import('@/views/Explore.vue'),          meta: { requiresAuth: true } },
   { path: '/multisport-events/:id', name: 'MultisportEventDetail', component: () => import('@/views/MultisportEventDetail.vue'), meta: { requiresAuth: true } },
   { path: '/calendar',            name: 'Calendar',       component: () => import('@/views/Calendar.vue'),         meta: { requiresAuth: true } },
+  { path: '/calendar/sync',       name: 'GoogleCalendarSync', component: () => import('@/views/GoogleCalendarIntegration.vue'), meta: { requiresAuth: true } },
   { path: '/notifications',       name: 'Notifications',  component: () => import('@/views/Notifications.vue'),    meta: { requiresAuth: true } },
   { path: '/onboard',             name: 'Onboard',        component: () => import('@/views/Onboarding.vue'),       meta: { requiresAuth: true } },
 
