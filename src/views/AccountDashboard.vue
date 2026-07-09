@@ -2883,7 +2883,8 @@ textarea.form-control{resize:vertical;min-height:72px}
 
 @media (max-width: 768px) {
 
-  /* hide all existing desktop dashboard sections */
+  /* hide desktop bento + all legacy desktop sections on mobile */
+  .db2-desktop,
   .dash-hero,
   .week-strip,
   .today-workout-strip,
