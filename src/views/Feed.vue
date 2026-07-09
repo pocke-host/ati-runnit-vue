@@ -127,7 +127,7 @@
                     <div class="gr-user-name">{{ item.user?.displayName }}</div>
                     <div class="gr-user-handle">@{{ item.user?.handle || (item.user?.displayName||'').toLowerCase().replace(/\s+/g,'') }}</div>
                   </div>
-                  <span class="gr-sport-tag" :class="(item.sportType === 'RUN' || item.sportType === 'BIKE') ? 'gr-sport-tag--cobalt' : 'gr-sport-tag--outline'">{{ item.sportType === 'RUN' ? 'Run' : item.sportType === 'BIKE' ? 'Bike' : item.sportType === 'WALK' ? 'Walk' : item.sportType === 'SWIM' ? 'Swim' : item.sportType || 'Activity' }}</span>
+                  <span class="gr-sport-tag" :class="item.isPR ? 'gr-sport-tag--pr' : (['RUN','BIKE','WALK'].includes(item.sportType)) ? 'gr-sport-tag--cobalt' : 'gr-sport-tag--outline'">{{ item.isPR ? 'PR' : item.sportType === 'RUN' ? 'Run' : item.sportType === 'BIKE' ? 'Bike' : item.sportType === 'WALK' ? 'Walk' : item.sportType === 'SWIM' ? 'Swim' : item.sportType || 'Activity' }}</span>
                   <div class="gr-timestamp">{{ formatTime(item.createdAt) }}</div>
                 </div>
 
@@ -172,11 +172,11 @@
               <!-- Reaction bar -->
               <div class="gr-reaction-bar" @click.stop>
                 <button
-                  v-for="rxn in [{type:'LIKE',label:'♥ Like'},{type:'FIRE',label:'Fire'},{type:'CLAP',label:'Clap'}]"
+                  v-for="rxn in [{type:'LIKE',label:'Like'},{type:'FIRE',label:'Fire'},{type:'CLAP',label:'Clap'}]"
                   :key="rxn.type"
                   :class="['gr-rxn-btn', { 'gr-rxn-btn--active': getActivityReaction(item.id) === rxn.type }]"
                   @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
-                >{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)"> {{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
+                >{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)">&nbsp;{{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
               </div>
 
             </router-link>
@@ -1006,6 +1006,7 @@ onUnmounted(() => {
   width: 38px;
   height: 38px;
   border-radius: 999px;
+  border: 2px solid #16130F;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -1056,11 +1057,13 @@ onUnmounted(() => {
   color: #16130F;
 }
 .gr-stat-lbl {
-  font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: #8a8a8a;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .gr-pace-lbl {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
@@ -1074,7 +1077,7 @@ onUnmounted(() => {
 /* Route map card */
 .gr-route-card {
   width: 100%;
-  aspect-ratio: 16/7;
+  height: 190px;
   background: #EDE5D5;
   border-top: 2px solid #16130F;
   position: relative;
@@ -1103,6 +1106,7 @@ onUnmounted(() => {
 }
 .gr-sport-tag--cobalt { background: #EEF1FF; color: #2A55F5; border-color: #2A55F5; }
 .gr-sport-tag--outline { background: #FBF6EC; color: #5a5348; border-color: #16130F; }
+.gr-sport-tag--pr { background: #FFF3D6; color: #16130F; border-color: #16130F; }
 
 /* Route name chip */
 .gr-route-name-chip {
