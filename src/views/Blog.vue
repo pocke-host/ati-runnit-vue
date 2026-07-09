@@ -163,14 +163,15 @@ const posts = [
 
 <style scoped>
 .editorial-page {
-  padding-top: var(--page-top);
+  padding-top: var(--nav-h, 66px);
   min-height: 100vh;
-  background: #fff;
+  background: #FBF6EC;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 
 .ep-hero {
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
   padding: 80px 24px 72px;
 }
 .ep-hero-inner {
@@ -178,23 +179,26 @@ const posts = [
   margin: 0 auto;
 }
 .ep-kicker {
-  font-size: 0.70rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.20em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.50);
+  color: rgba(251,246,236,0.55);
   margin-bottom: 24px;
 }
 .ep-headline {
-  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(2.4rem, 7vw, 5rem);
   font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.88;
   margin: 0 0 24px;
 }
 .ep-sub {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.70);
+  font-size: 1.05rem;
+  color: rgba(251,246,236,0.72);
   max-width: 540px;
   line-height: 1.6;
   margin: 0;
@@ -209,28 +213,33 @@ const posts = [
   grid-template-columns: 1fr 280px;
   gap: 40px;
   align-items: center;
-  border: 1px solid #E5E5E5;
+  border: 2px solid #16130F;
+  box-shadow: 4px 4px 0 #16130F;
   padding: 32px;
   margin-bottom: 32px;
+  background: #fff;
 }
 .post-category {
-  font-size: 0.70rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(15,18,16,0.40);
+  color: #8A8A8A;
   margin-bottom: 12px;
 }
 .post-featured-title {
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  text-transform: uppercase;
+  line-height: 0.92;
   margin: 0 0 14px;
+  color: #16130F;
 }
 .post-excerpt {
   font-size: 0.95rem;
-  color: rgba(15,18,16,0.68);
+  color: #5A5348;
   line-height: 1.65;
   margin: 0 0 16px;
 }
@@ -238,30 +247,31 @@ const posts = [
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.80rem;
-  color: rgba(15,18,16,0.45);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: #8A8A8A;
 }
-.post-author { font-weight: 700; color: rgba(15,18,16,0.65); }
-.post-dot { color: rgba(15,18,16,0.25); }
+.post-author { font-weight: 700; color: #5A5348; }
+.post-dot { color: #E7DFCE; }
 
 .post-featured-img {
   height: 200px;
-  background: #F5F5F5;
+  background: #F1EADC;
+  border: 2px solid #E7DFCE;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.img-placeholder {
-  font-size: 4rem;
-}
+.img-placeholder { font-size: 4rem; }
 
 /* Post grid */
 .post-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: #E5E5E5;
-  border: 1px solid #E5E5E5;
+  gap: 2px;
+  background: #E7DFCE;
+  border: 2px solid #16130F;
   margin-bottom: 40px;
 }
 .post-card {
@@ -271,24 +281,26 @@ const posts = [
 }
 .post-card-img {
   height: 120px;
-  background: #F5F5F5;
+  background: #F1EADC;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 2px solid #E7DFCE;
 }
 .img-placeholder-sm { font-size: 2.5rem; }
 .post-card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
 .post-title {
-  font-size: 0.95rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.05rem;
   font-weight: 900;
-  line-height: 1.3;
+  text-transform: uppercase;
+  line-height: 0.92;
   margin: 0 0 8px;
-  letter-spacing: -0.01em;
+  color: #16130F;
 }
 .post-excerpt-sm {
   font-size: 0.83rem;
-  color: rgba(15,18,16,0.60);
+  color: #5A5348;
   line-height: 1.55;
   margin: 0 0 auto;
   padding-bottom: 14px;
@@ -296,8 +308,10 @@ const posts = [
 
 /* Newsletter */
 .newsletter-cta {
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
+  border: 2px solid #16130F;
+  box-shadow: 4px 4px 0 #2A55F5;
   padding: 40px;
   display: flex;
   align-items: center;
@@ -305,52 +319,57 @@ const posts = [
   gap: 32px;
 }
 .newsletter-text h3 {
-  font-size: 1.2rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
   font-weight: 900;
-  margin: 0 0 6px;
+  text-transform: uppercase;
+  line-height: 0.9;
+  margin: 0 0 10px;
 }
 .newsletter-text p {
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.60);
+  color: rgba(251,246,236,0.65);
   margin: 0;
 }
 .newsletter-form {
   display: flex;
   gap: 0;
   flex-shrink: 0;
+  border: 2px solid rgba(251,246,236,0.3);
 }
 .newsletter-input {
   padding: 12px 16px;
   border: none;
-  font-family: inherit;
-  font-size: 0.9rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
   width: 240px;
-  background: rgba(255,255,255,0.12);
-  color: #fff;
+  background: rgba(251,246,236,0.10);
+  color: #FBF6EC;
   outline: none;
 }
-.newsletter-input::placeholder { color: rgba(255,255,255,0.40); }
+.newsletter-input::placeholder { color: rgba(251,246,236,0.35); }
 .newsletter-btn {
-  background: #fff;
-  color: #000;
+  background: #2A55F5;
+  color: #fff;
   border: none;
   padding: 12px 20px;
-  font-family: inherit;
-  font-size: 0.78rem;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
-.newsletter-btn:hover { opacity: 0.85; }
+.newsletter-btn:hover { background: #1E42D6; }
 
 @media (max-width: 768px) {
   .post-featured { grid-template-columns: 1fr; }
   .post-featured-img { display: none; }
   .post-grid { grid-template-columns: 1fr; }
   .newsletter-cta { flex-direction: column; align-items: flex-start; }
-  .newsletter-form { width: 100%; }
+  .newsletter-form { width: 100%; border: 2px solid rgba(251,246,236,0.3); }
   .newsletter-input { flex: 1; width: auto; }
 }
 </style>

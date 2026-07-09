@@ -196,29 +196,33 @@ const sections = [
 <style scoped>
 .cookie-page {
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  background: #fff;
+  background: #FBF6EC;
   min-height: 100vh;
-  padding-top: var(--nav-h, 64px);
+  padding-top: var(--nav-h, 66px);
 }
 
 /* ===== HERO ===== */
 .hero {
-  background: #000;
-  color: #fff;
+  background: #16130F;
+  color: #FBF6EC;
   padding: 80px 0 60px;
 }
 
 .hero h1 {
-  color: #fff;
+  color: #FBF6EC;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
 }
 
 .hero .lead {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
+  color: rgba(251,246,236,0.55);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
 }
 
@@ -241,11 +245,12 @@ const sections = [
 }
 
 .toc-label {
-  font-size: 11px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #767676;
+  letter-spacing: 0.14em;
+  color: #8A8A8A;
   margin-bottom: 12px;
 }
 
@@ -263,29 +268,30 @@ const sections = [
   padding: 7px 12px;
   border-radius: 0;
   font-size: 13px;
-  color: #767676;
+  color: #5A5348;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.15s, background 0.15s;
 }
 
 .toc-link:hover {
-  background: #FBF6EC;
-  color: #000;
+  background: #F1EADC;
+  color: #16130F;
 }
 
 /* ===== COOKIE BODY ===== */
 .cookie-body {
   background: #fff;
   border-radius: 0;
-  border: 2px solid #E7DFCE;
+  border: 2px solid #16130F;
+  box-shadow: 4px 4px 0 #E7DFCE;
   padding: 48px;
 }
 
 .cookie-section {
   padding-bottom: 40px;
   margin-bottom: 40px;
-  border-bottom: 2px solid #E7DFCE;
+  border-bottom: 1px solid #E7DFCE;
 }
 
 .cookie-section:last-of-type {
@@ -295,27 +301,29 @@ const sections = [
 }
 
 .section-title {
-  font-size: 20px;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 22px;
   font-weight: 900;
-  color: #000;
+  color: #16130F;
   margin-bottom: 20px;
-  letter-spacing: -0.01em;
   text-transform: uppercase;
+  line-height: 0.92;
 }
 
 .block-heading {
-  font-size: 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 11px;
   font-weight: 700;
-  color: #000;
+  color: #16130F;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   margin-top: 20px;
   margin-bottom: 8px;
 }
 
 .block-text {
   font-size: 15px;
-  color: #555;
+  color: #5A5348;
   line-height: 1.7;
   margin-bottom: 12px;
 }
@@ -331,7 +339,7 @@ const sections = [
 
 .block-list li {
   font-size: 15px;
-  color: #555;
+  color: #5A5348;
   line-height: 1.6;
   padding-left: 20px;
   position: relative;
@@ -341,7 +349,7 @@ const sections = [
   content: "–";
   position: absolute;
   left: 0;
-  color: #000;
+  color: #16130F;
   font-weight: 700;
 }
 
@@ -360,25 +368,26 @@ const sections = [
 }
 
 .cookie-table thead {
-  background: #FBF6EC;
+  background: #F1EADC;
 }
 
 .cookie-table th {
   padding: 12px 16px;
   text-align: left;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  color: #000;
-  font-size: 11px;
+  color: #16130F;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
   border-bottom: 2px solid #E7DFCE;
   white-space: nowrap;
 }
 
 .cookie-table td {
   padding: 12px 16px;
-  color: #555;
-  border-bottom: 2px solid #E7DFCE;
+  color: #5A5348;
+  border-bottom: 1px solid #E7DFCE;
   vertical-align: top;
 }
 
@@ -387,51 +396,56 @@ const sections = [
 }
 
 .cookie-table tbody tr:hover td {
-  background: #fafafa;
+  background: #FBF6EC;
 }
 
 /* ===== CONTACT BOX ===== */
 .contact-box {
   margin-top: 48px;
   padding: 40px 32px;
-  background: #000;
+  background: #16130F;
   border-radius: 0;
   text-align: center;
 }
 
 .contact-title {
-  font-size: 20px;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 22px;
   font-weight: 900;
-  color: #fff;
+  color: #FBF6EC;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+  line-height: 0.92;
+  margin-bottom: 14px;
 }
 
 .contact-text {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.60);
+  color: rgba(251,246,236,0.62);
   margin-bottom: 28px;
   line-height: 1.6;
 }
 
 .btn-contact {
   display: inline-block;
-  padding: 14px 36px;
-  background: #fff;
-  color: #000;
+  padding: 13px 32px;
+  background: #2A55F5;
+  color: #fff;
   text-decoration: none;
-  border-radius: 0;
+  border-radius: 999px;
+  border: 2px solid #2A55F5;
+  box-shadow: 2px 2px 0 rgba(251,246,236,0.25);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.12em;
+  transition: background 0.15s;
 }
 
 .btn-contact:hover {
-  background: #e5e5e5;
-  color: #000;
+  background: #1E42D6;
+  border-color: #1E42D6;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -449,10 +463,6 @@ const sections = [
 @media (max-width: 768px) {
   .hero {
     padding: 60px 0 40px;
-  }
-
-  .hero h1 {
-    font-size: 32px;
   }
 
   .cookie-body {
