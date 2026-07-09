@@ -871,7 +871,7 @@ onMounted(init)
 <style scoped>
 .detail-page {
   min-height: 100vh;
-  padding-top: var(--page-top);
+  padding-top: var(--nav-h, 66px);
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
@@ -1306,7 +1306,7 @@ onMounted(init)
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: rgba(0,0,0,0.38);
+  color: #8A8A8A;
   text-transform: uppercase;
 }
 .elev-meta-gain {
@@ -1409,7 +1409,7 @@ onMounted(init)
   display: flex;
   gap: 10px;
   padding: 14px 0;
-  border-bottom: 1px solid #E7DFCE;
+  border-bottom: 1.5px solid #E7DFCE;
 }
 .comment:last-child { border-bottom: none; }
 .gr-comment-avatar {
@@ -1646,11 +1646,11 @@ onMounted(init)
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
+  background: rgba(255,197,61,0.15);
+  border: 2px solid #FFC53D;
   margin-bottom: 16px;
-  font-size: 0.88rem;
-  color: #92400e;
+  font-size: 0.82rem;
+  color: #16130F;
 }
 .course-table-wrap { overflow-x: auto; }
 .course-table {
