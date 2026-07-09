@@ -87,8 +87,8 @@
           </div>
           <div class="kit-cell">
             <div class="kit-num">10</div>
-            <div class="kit-name">TrainingPeaks</div>
-            <div class="kit-desc">Import & export structured plans seamlessly</div>
+            <div class="kit-name">Structured Plans</div>
+            <div class="kit-desc">Create structured plans seamlessly and sync with your calendar</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">11</div>
@@ -130,8 +130,8 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Start training.</h2>
-      <p class="cta-sub">Join the waitlist — first in when we open your city.</p>
-      <router-link to="/waitlist" class="btn-pill-paper">Join the Waitlist</router-link>
+      <p class="cta-sub">Sign up free and start logging every session, every split, every moment.</p>
+      <router-link to="/signup" class="btn-pill-paper">Join Us</router-link>
     </section>
 
   </main>
