@@ -596,129 +596,101 @@
     </div>
 
     <!-- LOG ACTIVITY MODAL -->
-    <div v-if="showActivityModal" class="modal-overlay" @click="closeActivityModal">
-      <div class="modal-card modal-large" @click.stop>
-        <div class="modal-header">
-          <h3>Log Activity</h3>
-          <button class="modal-close" @click="closeActivityModal">
+    <div v-if="showActivityModal" class="la-overlay" @click="closeActivityModal">
+      <div class="la-sheet" @click.stop>
+
+        <div class="la-head">
+          <span class="la-title">Log Activity</span>
+          <button class="la-close" @click="closeActivityModal" aria-label="Close">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
 
-        <form @submit.prevent="handleActivitySubmit" class="modal-body">
+        <form @submit.prevent="handleActivitySubmit" class="la-form">
 
-          <!-- Row 1: Sport + Workout Type -->
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Sport *</label>
-              <select v-model="activityForm.sportType" class="form-control" required>
-                <option value="">Choose sport…</option>
-                <option value="RUN">🏃 Run</option>
-                <option value="BIKE">🚴 Bike</option>
-                <option value="SWIM">🏊 Swim</option>
-                <option value="HIKE">🥾 Hike</option>
-                <option value="WALK">🚶 Walk</option>
-                <option value="OTHER">🏋️ Other</option>
-              </select>
+          <!-- Sport pill grid -->
+          <div class="la-group">
+            <div class="la-lbl">SPORT</div>
+            <div class="la-sport-grid">
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'RUN' }]">
+                <input type="radio" v-model="activityForm.sportType" value="RUN" hidden required />Run
+              </label>
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'BIKE' }]">
+                <input type="radio" v-model="activityForm.sportType" value="BIKE" hidden />Bike
+              </label>
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'SWIM' }]">
+                <input type="radio" v-model="activityForm.sportType" value="SWIM" hidden />Swim
+              </label>
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'HIKE' }]">
+                <input type="radio" v-model="activityForm.sportType" value="HIKE" hidden />Hike
+              </label>
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'WALK' }]">
+                <input type="radio" v-model="activityForm.sportType" value="WALK" hidden />Walk
+              </label>
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'OTHER' }]">
+                <input type="radio" v-model="activityForm.sportType" value="OTHER" hidden />Other
+              </label>
             </div>
-            <div class="form-group">
-              <label class="form-label">Workout Type <span class="optional">(optional)</span></label>
-              <select v-model="activityForm.workoutType" class="form-control" :disabled="!activityForm.sportType">
-                <option value="">Select type…</option>
-                <option v-for="wt in workoutTypeOptions" :key="wt" :value="wt">{{ wt }}</option>
-              </select>
+          </div>
+
+          <!-- Duration -->
+          <div class="la-group">
+            <div class="la-lbl">DURATION</div>
+            <div class="la-dur-row">
+              <div class="la-dur-field">
+                <input v-model.number="activityForm.durationMinutes" type="number" class="la-input la-input--dur" placeholder="00" min="0" required />
+                <span class="la-unit">MIN</span>
+              </div>
+              <span class="la-dur-sep">:</span>
+              <div class="la-dur-field">
+                <input v-model.number="activityForm.durationSeconds" type="number" class="la-input la-input--dur" placeholder="00" min="0" max="59" />
+                <span class="la-unit">SEC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Distance -->
+          <div class="la-group">
+            <div class="la-lbl">DISTANCE <span class="la-optional">— OPTIONAL</span></div>
+            <div class="la-dist-row">
+              <input v-model.number="activityForm.distance" type="number" class="la-input" :placeholder="isImperial ? '0.0' : '0.0'" step="0.01" min="0" />
+              <span class="la-unit">{{ distanceLabel }}</span>
             </div>
           </div>
 
           <!-- Title -->
-          <div class="form-group">
-            <label class="form-label">Title <span class="optional">(optional)</span></label>
-            <input v-model="activityForm.title" type="text" class="form-control" placeholder="e.g., Morning Workout" />
-          </div>
-
-          <!-- Row 2: Duration -->
-          <div class="form-group">
-            <label class="form-label">Duration *</label>
-            <div class="duration-inputs">
-              <div class="duration-field">
-                <input v-model.number="activityForm.durationMinutes" type="number" class="form-control" placeholder="0" min="0" required />
-                <span class="duration-unit">min</span>
-              </div>
-              <div class="duration-field">
-                <input v-model.number="activityForm.durationSeconds" type="number" class="form-control" placeholder="0" min="0" max="59" />
-                <span class="duration-unit">sec</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Row 3: Distance + Elevation -->
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Distance <span class="optional">({{ distanceLabel }})</span></label>
-              <input v-model.number="activityForm.distance" type="number" class="form-control" :placeholder="isImperial ? 'e.g., 3.1' : 'e.g., 5.0'" step="0.01" min="0" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Elevation Gain <span class="optional">({{ elevationLabel }})</span></label>
-              <input v-model.number="activityForm.elevationGain" type="number" class="form-control" :placeholder="isImperial ? 'e.g., 250' : 'e.g., 76'" min="0" />
-            </div>
-          </div>
-
-          <!-- Row 4: HR + Cadence + Calories -->
-          <div class="form-row-3">
-            <div class="form-group">
-              <label class="form-label">Avg HR <span class="optional">(bpm)</span></label>
-              <input v-model.number="activityForm.avgHeartRate" type="number" class="form-control" placeholder="e.g., 152" min="40" max="220" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Max HR <span class="optional">(bpm)</span></label>
-              <input v-model.number="activityForm.maxHeartRate" type="number" class="form-control" placeholder="e.g., 178" min="40" max="220" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Cadence <span class="optional">(spm)</span></label>
-              <input v-model.number="activityForm.cadence" type="number" class="form-control" placeholder="e.g., 172" min="0" />
-            </div>
-          </div>
-
-          <!-- Calories -->
-          <div class="form-group">
-            <label class="form-label">Calories <span class="optional">(kcal, optional)</span></label>
-            <input v-model.number="activityForm.calories" type="number" class="form-control" placeholder="e.g., 420" min="0" />
-          </div>
-
-          <!-- Gear -->
-          <div class="form-group">
-            <label class="form-label">Gear <span class="optional">(optional)</span></label>
-            <input v-model="activityForm.gear" type="text" class="form-control" :placeholder="gearPlaceholder" />
+          <div class="la-group">
+            <div class="la-lbl">TITLE <span class="la-optional">— OPTIONAL</span></div>
+            <input v-model="activityForm.title" type="text" class="la-input" placeholder="Morning run, track session…" />
           </div>
 
           <!-- Notes -->
-          <div class="form-group">
-            <label class="form-label">Notes <span class="optional">(optional)</span></label>
-            <div class="notes-input-wrap">
-              <textarea v-model="activityForm.notes" class="form-control" rows="2" placeholder="How did it feel?"></textarea>
+          <div class="la-group">
+            <div class="la-lbl">HOW'D IT GO? <span class="la-optional">— OPTIONAL</span></div>
+            <div class="la-notes-wrap">
+              <textarea v-model="activityForm.notes" class="la-input la-input--area" rows="3" placeholder="Legs felt good, pushed the last mile…"></textarea>
               <button
                 v-if="micSupported"
                 type="button"
-                :class="['mic-btn', { 'mic-btn--active': micListening }]"
+                :class="['la-mic', { 'la-mic--on': micListening }]"
                 @click="toggleListening(t => activityForm.notes = (activityForm.notes ? activityForm.notes + ' ' : '') + t)"
-                :title="micListening ? 'Stop recording' : 'Dictate note'"
+                :title="micListening ? 'Stop' : 'Dictate'"
               >
                 <i :class="micListening ? 'bi bi-stop-fill' : 'bi bi-mic-fill'"></i>
               </button>
             </div>
           </div>
 
-          <div v-if="activityError" class="alert alert-danger">
-            {{ activityError }}
-          </div>
+          <div v-if="activityError" class="la-error">{{ activityError }}</div>
 
-          <div class="modal-actions">
-            <button type="button" class="btn btn-outline" @click="closeActivityModal">Cancel</button>
-            <button type="submit" class="btn btn-primary" :disabled="activityLoading">
-              <span v-if="activityLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <div class="la-actions">
+            <button type="button" class="la-btn-cancel" @click="closeActivityModal">Cancel</button>
+            <button type="submit" class="la-btn-save" :disabled="activityLoading">
+              <span v-if="activityLoading" class="spinner-border spinner-border-sm"></span>
               {{ activityLoading ? 'Saving…' : 'Save Activity' }}
             </button>
           </div>
+
         </form>
       </div>
     </div>
@@ -2330,4 +2302,50 @@ textarea.form-control{resize:vertical;min-height:72px}
 .nudge-item { font-size: 0.78rem; color: #5a5348; padding: 2px 0; display: flex; align-items: center; }
 .nudge-cta { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: #2A55F5; text-decoration: none; }
 .nudge-cta:hover { text-decoration: underline; }
+
+/* ── LOG ACTIVITY MODAL ── */
+.la-overlay{position:fixed;inset:0;background:rgba(22,19,15,0.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;animation:fadeIn 0.2s ease}
+.la-sheet{background:#FBF6EC;border:2px solid #16130F;box-shadow:6px 6px 0 #16130F;max-width:460px;width:100%;max-height:90vh;overflow-y:auto;animation:slideUp 0.25s ease}
+.la-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:2px solid #16130F;background:#16130F}
+.la-title{font-family:'Big Shoulders Display',system-ui,sans-serif;font-weight:900;font-size:1.5rem;text-transform:uppercase;letter-spacing:0.02em;color:#FBF6EC}
+.la-close{width:34px;height:34px;border:2px solid rgba(251,246,236,0.4);background:transparent;color:#FBF6EC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.85rem;transition:border-color 0.15s}
+.la-close:hover{border-color:#FBF6EC}
+.la-form{padding:22px;display:flex;flex-direction:column;gap:20px}
+.la-group{display:flex;flex-direction:column;gap:7px}
+.la-lbl{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#5A5348}
+.la-optional{color:#8A8A8A;font-weight:500;letter-spacing:0.1em}
+/* sport pills */
+.la-sport-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.la-sport{display:flex;align-items:center;justify-content:center;height:42px;border:2px solid #E7DFCE;background:#fff;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5A5348;cursor:pointer;transition:all 0.15s;user-select:none}
+.la-sport:hover{border-color:#16130F;color:#16130F}
+.la-sport--on{background:#16130F;border-color:#16130F;color:#FBF6EC;box-shadow:3px 3px 0 #2A55F5}
+/* inputs */
+.la-input{background:#fff;border:2px solid #E7DFCE;border-radius:0;padding:11px 13px;font-family:'Hanken Grotesk',system-ui,sans-serif;font-size:1rem;font-weight:600;color:#16130F;transition:border-color 0.15s;width:100%;box-sizing:border-box}
+.la-input:focus{outline:none;border-color:#16130F}
+.la-input::placeholder{color:#8A8A8A;font-weight:400}
+.la-input--dur{text-align:center;font-size:1.5rem;font-weight:800;font-family:'Spline Sans Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;padding:10px 6px}
+.la-input--area{resize:none;padding-right:46px}
+/* duration */
+.la-dur-row{display:flex;align-items:center;gap:10px}
+.la-dur-field{display:flex;align-items:center;gap:7px;flex:1}
+.la-dur-sep{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:1.5rem;font-weight:700;color:#C7BEB0}
+.la-unit{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;color:#8A8A8A;text-transform:uppercase;white-space:nowrap}
+/* distance */
+.la-dist-row{display:flex;align-items:center;gap:10px}
+.la-dist-row .la-input{flex:1}
+/* notes */
+.la-notes-wrap{position:relative}
+.la-mic{position:absolute;right:10px;top:10px;width:30px;height:30px;border:2px solid #E7DFCE;background:#FBF6EC;color:#5A5348;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;transition:all 0.15s}
+.la-mic:hover{border-color:#16130F;color:#16130F}
+.la-mic--on{background:#16130F;border-color:#16130F;color:#FBF6EC}
+/* error */
+.la-error{background:rgba(220,38,38,0.08);border:2px solid rgba(220,38,38,0.3);color:#991b1b;padding:11px 13px;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.72rem;font-weight:600}
+/* actions */
+.la-actions{display:flex;gap:10px}
+.la-btn-cancel{flex:1;height:48px;background:transparent;border:2px solid #E7DFCE;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5A5348;cursor:pointer;transition:border-color 0.15s,color 0.15s}
+.la-btn-cancel:hover{border-color:#16130F;color:#16130F}
+.la-btn-save{flex:2;height:48px;background:#2A55F5;border:2px solid #16130F;border-radius:999px;box-shadow:3px 3px 0 #16130F;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;cursor:pointer;transition:background 0.15s,box-shadow 0.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.la-btn-save:hover:not(:disabled){background:#1E42D6;box-shadow:5px 5px 0 #16130F}
+.la-btn-save:disabled{opacity:0.6;cursor:not-allowed;box-shadow:none}
+@media(max-width:480px){.la-form{padding:18px 14px}.la-sport-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
