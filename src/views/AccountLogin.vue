@@ -59,7 +59,10 @@
         </div>
 
         <div class="lp-field">
-          <label class="lp-label" for="password">Password</label>
+          <div class="lp-label-row">
+            <label class="lp-label" for="password">Password</label>
+            <router-link to="/forgot-password" class="lp-forgot">Forgot?</router-link>
+          </div>
           <div class="lp-password-wrap">
             <input
               :type="showPwd ? 'text' : 'password'"
@@ -86,7 +89,6 @@
             <input type="checkbox" v-model="remember" />
             <span>Remember me</span>
           </label>
-          <router-link to="/forgot-password" class="lp-forgot">Forgot password?</router-link>
         </div>
 
         <div v-if="error" class="lp-error" role="alert">{{ error }}</div>
@@ -392,15 +394,21 @@ const handleAppleSignIn = () => {}
 
 /* Fields */
 .lp-field { margin-bottom: 18px; }
+.lp-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
 .lp-label {
-  display: block;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #5a5348;
-  margin-bottom: 7px;
+  margin-bottom: 0;
+  display: block;
 }
 .lp-input {
   width: 100%;
@@ -463,10 +471,10 @@ const handleAppleSignIn = () => {}
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #5a5348;
+  color: #2A55F5;
   text-decoration: none;
 }
-.lp-forgot:hover { color: #2A55F5; }
+.lp-forgot:hover { color: #1E42D6; }
 
 /* Error / lockout */
 .lp-error {
