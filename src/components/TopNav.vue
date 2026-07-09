@@ -18,6 +18,7 @@
         <router-link to="/feed" class="nav-link-auth">Feed</router-link>
         <router-link to="/explore" class="nav-link-auth">Explore</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
+        <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
         <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
       </div>
 
