@@ -253,7 +253,7 @@ const submit = async () => {
   text-decoration: none;
   margin-bottom: 28px;
 }
-.rp-back:hover { color: #16130F; }
+.rp-back:hover { color: #2A55F5; }
 
 .rp-headline {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;

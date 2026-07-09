@@ -166,7 +166,7 @@ const submit = async () => {
   text-decoration: none;
   margin-bottom: 28px;
 }
-.fp-back:hover { color: #16130F; }
+.fp-back:hover { color: #2A55F5; }
 
 .fp-headline {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
