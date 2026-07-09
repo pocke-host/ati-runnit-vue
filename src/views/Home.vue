@@ -58,6 +58,32 @@
             <div class="rk-eyebrow">Track</div>
             <h2 class="section-h2">Every step,<br>on the record.</h2>
             <p class="section-body">Watch, phone, or a shoelace and a dream — it all lands in one place. Splits, route, elevation, heart rate. Then your crew piles on the kudos.</p>
+            <!-- Animated flow steps -->
+            <div class="track-steps">
+              <div class="track-step">
+                <div class="ts-dot ts-dot--done"></div>
+                <div class="ts-body">
+                  <div class="ts-num">01 — GPS locks in</div>
+                  <div class="ts-desc">Position confirmed. You're on the clock.</div>
+                </div>
+              </div>
+              <div class="ts-connector"></div>
+              <div class="track-step">
+                <div class="ts-dot ts-dot--active"></div>
+                <div class="ts-body">
+                  <div class="ts-num">02 — Route records</div>
+                  <div class="ts-desc">Every turn, split, and elevation change logged.</div>
+                </div>
+              </div>
+              <div class="ts-connector"></div>
+              <div class="track-step">
+                <div class="ts-dot"></div>
+                <div class="ts-body">
+                  <div class="ts-num">03 — Crew reacts</div>
+                  <div class="ts-desc">Post the moment. Kudos flood in.</div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="activity-card">
             <div class="ac-header">
@@ -66,21 +92,35 @@
                 <div class="ac-name">Morning Long Run</div>
                 <div class="ac-meta">@maya.k · 06:12</div>
               </div>
-              <div class="ac-ago">2H AGO</div>
+              <div class="ac-rec-badge">
+                <span class="ac-rec-dot"></span>REC
+              </div>
             </div>
             <div class="ac-map">
+              <!-- Phase 1: GPS chip fades in first -->
+              <div class="ac-gps-chip">
+                <span class="ac-gps-dot"></span>GPS Locked
+              </div>
+              <!-- Phase 2: live pace appears as route draws -->
+              <div class="ac-live-pace">4:38 /KM LIVE</div>
               <svg viewBox="0 0 600 200" preserveAspectRatio="none" class="ac-route-svg">
+                <!-- start dot -->
+                <circle cx="30" cy="160" r="6" fill="#FBF6EC" stroke="#2A55F5" stroke-width="2" class="route-start-dot"></circle>
+                <!-- route draws after GPS lock -->
                 <path d="M30,160 C120,90 150,150 240,110 C330,70 380,130 470,70 C520,40 560,80 580,55"
                   fill="none" stroke="#2A55F5" stroke-width="3"
                   stroke-dasharray="1000" stroke-dashoffset="1000" class="route-draw"></path>
-                <circle cx="580" cy="55" r="5" fill="#2A55F5"></circle>
+                <!-- end dot pulses after route finishes -->
+                <circle cx="580" cy="55" r="5" fill="#2A55F5" class="route-end-dot"></circle>
+                <circle cx="580" cy="55" r="5" fill="none" stroke="#2A55F5" stroke-width="3" class="route-end-ping"></circle>
               </svg>
             </div>
+            <!-- Phase 3: stats and reactions stagger in -->
             <div class="ac-stats">
-              <div class="ac-stat"><div class="ac-stat-label">DIST</div><div class="ac-stat-val">21.1</div></div>
-              <div class="ac-stat"><div class="ac-stat-label">PACE</div><div class="ac-stat-val">4:38</div></div>
-              <div class="ac-stat"><div class="ac-stat-label">TIME</div><div class="ac-stat-val">1:37</div></div>
-              <div class="ac-reactions">
+              <div class="ac-stat ac-stat--s1"><div class="ac-stat-label">DIST</div><div class="ac-stat-val">21.1</div></div>
+              <div class="ac-stat ac-stat--s2"><div class="ac-stat-label">PACE</div><div class="ac-stat-val">4:38</div></div>
+              <div class="ac-stat ac-stat--s3"><div class="ac-stat-label">TIME</div><div class="ac-stat-val">1:37</div></div>
+              <div class="ac-reactions ac-reactions--pop">
                 <span class="reaction-pill reaction-pill--cobalt">↑ 41</span>
                 <span class="reaction-pill reaction-pill--yellow">👏 12</span>
               </div>
@@ -605,8 +645,182 @@ function scrollTo(id) {
   height: 100%;
 }
 .route-draw {
-  animation: rkDraw 2.6s ease-out 0.2s forwards;
+  animation: rkDraw 2.4s ease-out 0.9s forwards;
 }
+/* start dot fades in before route draws */
+.route-start-dot {
+  opacity: 0;
+  animation: rkFadeUp 0.4s ease-out 0.5s forwards;
+}
+/* end dot appears after route finishes, then pulses */
+.route-end-dot {
+  opacity: 0;
+  animation: rkFadeUp 0.3s ease-out 3.3s forwards;
+}
+.route-end-ping {
+  opacity: 0;
+  animation: rkEndPing 1.4s ease-out 3.4s infinite;
+}
+
+/* GPS chip — phase 1 */
+.ac-gps-chip {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(22,19,15,0.82);
+  color: #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  border: 1px solid rgba(251,246,236,0.25);
+  opacity: 0;
+  animation: rkFadeUp 0.4s ease-out 0.1s forwards;
+}
+.ac-gps-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #2A55F5;
+  display: inline-block;
+  flex-shrink: 0;
+  animation: rkBlink 1.2s ease-in-out 0.1s infinite;
+}
+
+/* Live pace chip — phase 2 (appears as route draws) */
+.ac-live-pace {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  background: #2A55F5;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 11px;
+  border: 1px solid #16130F;
+  opacity: 0;
+  animation: rkFadeUp 0.4s ease-out 1.4s forwards;
+}
+
+/* Recording badge in header */
+.ac-rec-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #C0392B;
+  margin-left: auto;
+}
+.ac-rec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #C0392B;
+  display: inline-block;
+  flex-shrink: 0;
+  animation: rkBlink 0.9s ease-in-out infinite;
+}
+
+/* Phase 3: stats stagger in after route finishes */
+.ac-stat--s1 {
+  opacity: 0;
+  animation: rkStepIn 0.35s ease-out 3.4s forwards;
+}
+.ac-stat--s2 {
+  opacity: 0;
+  animation: rkStepIn 0.35s ease-out 3.6s forwards;
+}
+.ac-stat--s3 {
+  opacity: 0;
+  animation: rkStepIn 0.35s ease-out 3.8s forwards;
+}
+/* Phase 3: reactions pop in last */
+.ac-reactions--pop {
+  opacity: 0;
+  animation: rkPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 4.2s forwards;
+}
+
+/* Track flow steps (left copy) */
+.track-steps {
+  display: flex;
+  flex-direction: column;
+  margin-top: 28px;
+  gap: 0;
+}
+.track-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.ts-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 2px solid #E7DFCE;
+  background: transparent;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.ts-dot--done {
+  background: #2A55F5;
+  border-color: #2A55F5;
+}
+.ts-dot--active {
+  border-color: #2A55F5;
+  background: transparent;
+  box-shadow: 0 0 0 3px rgba(42,85,245,0.2);
+  animation: rkBlink 1.4s ease-in-out infinite;
+}
+.ts-connector {
+  width: 2px;
+  height: 24px;
+  background: #E7DFCE;
+  margin-left: 4px;
+}
+.ts-body { padding-bottom: 0; }
+.ts-num {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #16130F;
+}
+.ts-desc {
+  font-size: 0.82rem;
+  color: #5A5348;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+@keyframes rkFadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rkStepIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rkPopIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes rkEndPing {
+  0%   { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(3); }
+}
+
 .ac-stats {
   display: flex;
   align-items: center;
@@ -895,12 +1109,8 @@ function scrollTo(id) {
   .two-col--photo-left .moment-photo { height: 200px; }
   .leaderboard .lb-name { font-size: 0.82rem; }
   .leaderboard .lb-dist { font-size: 0.82rem; }
-  .final-cta { padding: 48px 18px; }
-  .cta-h2 { font-size: clamp(56px, 15vw, 72px) !important; }
-  .cta-sub { font-size: 0.7rem; }
-  .cta-form { flex-direction: column; border-radius: 0; max-width: 100%; }
-  .cta-form-btn { text-align: center; border-radius: 0; }
   .syncs-row { flex-wrap: wrap; gap: 6px 10px; }
   .crews-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .track-steps { display: none; }
 }
 </style>
