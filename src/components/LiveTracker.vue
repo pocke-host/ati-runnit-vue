@@ -1,88 +1,89 @@
 <!-- ========== LiveTracker.vue ========== -->
 <template>
-  <div class="live-tracker">
+  <div
+    class="lt"
+    :class="{
+      'lt--recording': isTracking,
+      'lt--paused': !isTracking && hasStarted,
+      'lt--ready': !hasStarted
+    }"
+  >
 
-    <!-- Header -->
-    <div class="tracker-header">
-      <div class="tracker-status">
-        <div :class="['status-dot', { active: isTracking }]"></div>
-        <span class="status-label">{{ isTracking ? 'Tracking' : hasStarted ? 'Paused' : 'Ready' }}</span>
+    <!-- Status bar — cobalt when recording, yellow-tinted when paused -->
+    <div v-if="hasStarted" class="lt-status-bar" :class="{ 'lt-status-bar--paused': !isTracking }">
+      <div class="lt-status-left">
+        <span class="lt-rec-dot" :class="{ 'lt-rec-dot--active': isTracking }"></span>
+        <span class="lt-status-text">{{ isTracking ? 'Recording' : 'Paused' }} · {{ selectedSport.charAt(0) + selectedSport.slice(1).toLowerCase() }}</span>
       </div>
-      <div class="tracker-time">{{ formatDurationClock(elapsedTime) }}</div>
+      <div class="lt-gps-dots">
+        <span class="lt-gps-d" style="opacity:1">●</span>
+        <span class="lt-gps-d" style="opacity:0.5">●</span>
+        <span class="lt-gps-d" style="opacity:0.22">●</span>
+      </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="live-stat">
-        <div class="stat-label">Distance</div>
-        <div class="stat-value">{{ formatDistance(totalDistance) }}</div>
+    <!-- Big timer (recording / paused) -->
+    <div v-if="hasStarted" class="lt-timer-block" :class="{ 'lt-timer-block--dim': !isTracking }">
+      <div class="lt-timer">{{ formatDurationClock(elapsedTime) }}</div>
+    </div>
+
+    <!-- 3-up stat row (recording / paused) -->
+    <div v-if="hasStarted" class="lt-stats-row" :class="{ 'lt-stats-row--dim': !isTracking }">
+      <div class="lt-stat">
+        <div class="lt-stat-label">DIST</div>
+        <div class="lt-stat-val">{{ formatDistance(totalDistance) }}</div>
       </div>
-      <div class="live-stat">
-        <div class="stat-label">Pace</div>
-        <div class="stat-value">{{ formatPace(currentPaceMinPerKm) }}</div>
+      <div class="lt-stat-div"></div>
+      <div class="lt-stat">
+        <div class="lt-stat-label">PACE</div>
+        <div class="lt-stat-val lt-stat-val--pace">{{ formatPace(currentPaceMinPerKm) }}</div>
       </div>
-      <div class="live-stat">
-        <div class="stat-label">Avg Pace</div>
-        <div class="stat-value">{{ formatPace(avgPaceMinPerKm) }}</div>
-      </div>
-      <div class="live-stat">
-        <div class="stat-label">Elevation</div>
-        <div class="stat-value">{{ formatElevation(elevationGain) }}</div>
+      <div class="lt-stat-div"></div>
+      <div class="lt-stat">
+        <div class="lt-stat-label">ELEV</div>
+        <div class="lt-stat-val">{{ formatElevation(elevationGain) }}</div>
       </div>
     </div>
 
     <!-- Map -->
-    <div class="live-map-container">
-      <div ref="liveMapContainer" class="live-map"></div>
-      <div v-if="gpsError" class="gps-error-overlay">
+    <div class="lt-map-wrap" :class="{ 'lt-map-wrap--dim': !isTracking && hasStarted }">
+      <div ref="liveMapContainer" class="lt-map"></div>
+      <!-- GPS ready chip (ready state only) -->
+      <div v-if="!hasStarted" class="lt-gps-chip">
+        <span class="lt-gps-chip-dot"></span>GPS Ready
+      </div>
+      <div v-if="gpsError" class="lt-gps-error">
         <i class="bi bi-geo-alt-fill"></i>
         <p>{{ gpsError }}</p>
       </div>
     </div>
 
-    <!-- Sport Selector (shown before first start) -->
-    <div v-if="!hasStarted" class="sport-selector">
-      <div class="sport-label">Select sport</div>
-      <div class="sport-options">
-        <button
-          v-for="sport in sports"
-          :key="sport.value"
-          :class="['sport-btn', { active: selectedSport === sport.value }]"
-          @click="selectedSport = sport.value"
-          type="button"
-        >
-          <span class="sport-emoji">{{ sport.emoji }}</span>
-          <span class="sport-name">{{ sport.label }}</span>
-        </button>
-      </div>
-    </div>
-
     <!-- Draft Recovery Banner -->
-    <div v-if="showDraftBanner" class="draft-banner">
-      <div class="draft-banner-text">
-        <i class="bi bi-clock-history me-2"></i>
-        <span>You have an unfinished run from {{ draftAge }}. Resume it?</span>
+    <div v-if="showDraftBanner" class="lt-draft-banner">
+      <div class="lt-draft-text">
+        <i class="bi bi-clock-history"></i>
+        Unfinished session from {{ draftAge }} — resume it?
       </div>
-      <div class="draft-banner-actions">
-        <button class="draft-btn-resume" type="button" @click="resumeDraft">Resume</button>
-        <button class="draft-btn-discard" type="button" @click="discardDraft">Discard</button>
+      <div class="lt-draft-actions">
+        <button class="lt-draft-btn lt-draft-btn--resume" type="button" @click="resumeDraft">Resume</button>
+        <button class="lt-draft-btn lt-draft-btn--discard" type="button" @click="discardDraft">Discard</button>
       </div>
     </div>
 
     <!-- Save error -->
-    <div v-if="saveError" class="save-error">
-      <i class="bi bi-exclamation-circle me-2"></i>{{ saveError }}
+    <div v-if="saveError" class="lt-save-error">
+      <i class="bi bi-exclamation-circle"></i> {{ saveError }}
     </div>
 
     <!-- Post-workout Notes Overlay -->
-    <div v-if="showNotesStep" class="notes-overlay" :style="{ paddingBottom: keyboardOffset + 'px' }">
-      <div class="notes-overlay-inner">
-        <div class="notes-overlay-title">WORKOUT SAVED</div>
-        <p class="notes-overlay-sub">Add a note while it's fresh</p>
-        <div class="notes-input-wrap">
+    <div v-if="showNotesStep" class="lt-notes-overlay" :style="{ paddingBottom: keyboardOffset + 'px' }">
+      <div class="lt-notes-inner">
+        <div class="lt-notes-title">WORKOUT SAVED</div>
+        <p class="lt-notes-sub">Add a note while it's fresh</p>
+        <div class="lt-notes-input-wrap">
           <textarea
             v-model="postNotes"
-            class="notes-textarea"
+            class="lt-notes-textarea"
             rows="4"
             placeholder="How did it feel? Any pain? Weather?"
             autofocus
@@ -90,16 +91,16 @@
           <button
             v-if="micSupported"
             type="button"
-            :class="['mic-btn', { 'mic-btn--active': micListening }]"
+            :class="['lt-mic-btn', { 'lt-mic-btn--active': micListening }]"
             @click="toggleListening(t => postNotes = (postNotes ? postNotes + ' ' : '') + t)"
             :title="micListening ? 'Stop recording' : 'Dictate note'"
           >
             <i :class="micListening ? 'bi bi-stop-fill' : 'bi bi-mic-fill'"></i>
           </button>
         </div>
-        <div class="notes-overlay-actions">
-          <button class="notes-btn-skip" type="button" @click="skipNotes">Skip</button>
-          <button class="notes-btn-done" type="button" @click="finishWithNotes" :disabled="notesSubmitting">
+        <div class="lt-notes-actions">
+          <button class="lt-notes-skip" type="button" @click="skipNotes">Skip</button>
+          <button class="lt-notes-done" type="button" @click="finishWithNotes" :disabled="notesSubmitting">
             <span v-if="notesSubmitting" class="spinner-border spinner-border-sm me-1"></span>
             Done
           </button>
@@ -107,61 +108,92 @@
       </div>
     </div>
 
-    <!-- Controls -->
-    <div class="tracker-controls">
-      <button
-        v-if="!isTracking && !hasStarted"
-        class="control-btn control-btn-start"
-        @click="startTracking"
-      >
-        <i class="bi bi-play-fill"></i> Start
-      </button>
+    <!-- Bottom cream sheet -->
+    <div class="lt-sheet">
 
-      <button
-        v-if="isTracking"
-        class="control-btn control-btn-pause"
-        @click="pauseTracking"
-      >
-        <i class="bi bi-pause-fill"></i> Pause
-      </button>
+      <!-- READY: sport selector + round Start button -->
+      <template v-if="!hasStarted">
+        <div class="lt-sport-row">
+          <div class="lt-sport-label">SPORT</div>
+          <div class="lt-sport-options">
+            <button
+              v-for="sport in sports"
+              :key="sport.value"
+              :class="['lt-sport-btn', { 'lt-sport-btn--active': selectedSport === sport.value }]"
+              @click="selectedSport = sport.value"
+              type="button"
+            >
+              <span class="lt-sport-icon">{{ sport.value.charAt(0) }}</span>
+              <span class="lt-sport-name">{{ sport.label }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="lt-ready-row">
+          <div class="lt-flanker">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+          </div>
+          <button class="lt-start-btn" @click="startTracking" type="button" aria-label="Start tracking">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div class="lt-flanker">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </div>
+        </div>
+      </template>
 
-      <button
-        v-if="!isTracking && hasStarted"
-        class="control-btn control-btn-start"
-        @click="resumeTracking"
-      >
-        <i class="bi bi-play-fill"></i> Resume
-      </button>
+      <!-- RECORDING: Lap / Stop / Pause round buttons -->
+      <template v-if="isTracking">
+        <div class="lt-ctrl-row">
+          <div class="lt-ctrl-col">
+            <button class="lt-ctrl lt-ctrl--lap" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </button>
+            <span class="lt-ctrl-lbl">LAP</span>
+          </div>
+          <div class="lt-ctrl-col">
+            <button class="lt-ctrl lt-ctrl--stop" @click="showFinishConfirm = true" :disabled="saving" type="button">
+              <span v-if="saving" class="spinner-border spinner-border-sm"></span>
+              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+            </button>
+            <span class="lt-ctrl-lbl">STOP</span>
+          </div>
+          <div class="lt-ctrl-col">
+            <button class="lt-ctrl lt-ctrl--pause" @click="pauseTracking" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
+            <span class="lt-ctrl-lbl">PAUSE</span>
+          </div>
+        </div>
+        <button v-if="!isSharing" class="lt-share-btn" @click="startSharing" type="button">
+          <i class="bi bi-broadcast"></i> Share Live
+        </button>
+      </template>
 
-      <button
-        v-if="hasStarted"
-        class="control-btn control-btn-finish"
-        @click="showFinishConfirm = true"
-        :disabled="saving"
-      >
-        <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
-        <i v-else class="bi bi-stop-fill"></i>
-        {{ saving ? 'Saving…' : 'Finish' }}
-      </button>
+      <!-- PAUSED: Resume + Finish + Discard -->
+      <template v-if="!isTracking && hasStarted">
+        <div class="lt-paused-row">
+          <button class="lt-resume-btn" @click="resumeTracking" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Resume
+          </button>
+          <button class="lt-finish-btn" @click="showFinishConfirm = true" :disabled="saving" type="button">
+            <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ saving ? 'Saving…' : 'Finish' }}
+          </button>
+        </div>
+        <button class="lt-discard-link" @click="showFinishConfirm = true" type="button">Discard Activity</button>
+      </template>
 
-      <!-- Share Live button -->
-      <button
-        v-if="hasStarted && !isSharing"
-        class="control-btn control-btn-share"
-        @click="startSharing"
-      >
-        <i class="bi bi-broadcast"></i> Share Live
-      </button>
     </div>
 
     <!-- Broadcasting banner -->
-    <div v-if="isSharing" class="share-banner">
-      <span class="share-live-dot"></span>
-      <span class="share-broadcasting">BROADCASTING</span>
-      <span class="share-url" :title="shareUrl">{{ shareUrl.replace('https://', '').slice(0, 32) }}…</span>
-      <button class="share-stop-btn" @click="stopSharing">Stop Sharing</button>
+    <div v-if="isSharing" class="lt-share-banner">
+      <span class="lt-share-dot"></span>
+      <span class="lt-share-label">BROADCASTING</span>
+      <span class="lt-share-url">{{ shareUrl.replace('https://', '').slice(0, 32) }}…</span>
+      <button class="lt-share-stop" @click="stopSharing">Stop Sharing</button>
     </div>
-    <div v-if="shareCopied" class="share-copied-toast">Link copied to clipboard!</div>
+    <div v-if="shareCopied" class="lt-share-toast">Link copied!</div>
 
     <ConfirmModal
       v-model="showFinishConfirm"
@@ -172,30 +204,28 @@
     />
 
     <!-- SOS Button -->
-    <button v-if="isTracking" class="sos-btn" @click="showSosModal = true">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i>SOS
+    <button v-if="isTracking" class="lt-sos-btn" @click="showSosModal = true" type="button">
+      <i class="bi bi-exclamation-triangle-fill"></i> SOS
     </button>
 
     <!-- SOS Modal -->
-    <div v-if="showSosModal" class="sos-overlay">
-      <div class="sos-modal">
-        <div class="sos-modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>SEND SOS ALERT</div>
-        <p class="sos-modal-sub">
-          This will sound an alert and send an email to your emergency contacts with your current location.
-        </p>
-        <div v-if="sosContacts.length === 0" class="sos-no-contacts">
+    <div v-if="showSosModal" class="lt-sos-overlay">
+      <div class="lt-sos-modal">
+        <div class="lt-sos-title"><i class="bi bi-exclamation-triangle-fill"></i> SEND SOS ALERT</div>
+        <p class="lt-sos-sub">This will sound an alert and send an email to your emergency contacts with your current location.</p>
+        <div v-if="sosContacts.length === 0" class="lt-sos-no-contacts">
           No emergency contacts found. Add contacts in Settings → Safety.
         </div>
-        <div v-else class="sos-contacts-list">
-          <div v-for="c in sosContacts" :key="c.id" class="sos-contact">
-            <span class="sos-contact-name">{{ c.name }}</span>
-            <span v-if="c.email" class="sos-contact-email">{{ c.email }}</span>
+        <div v-else class="lt-sos-contacts">
+          <div v-for="c in sosContacts" :key="c.id" class="lt-sos-contact">
+            <span class="lt-sos-name">{{ c.name }}</span>
+            <span v-if="c.email" class="lt-sos-email">{{ c.email }}</span>
           </div>
         </div>
-        <div class="sos-modal-actions">
-          <button class="sos-cancel-btn" @click="showSosModal = false">Cancel</button>
-          <button class="sos-confirm-btn" @click="sendSos">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>Send SOS
+        <div class="lt-sos-actions">
+          <button class="lt-sos-cancel" @click="showSosModal = false">Cancel</button>
+          <button class="lt-sos-confirm" @click="sendSos">
+            <i class="bi bi-exclamation-triangle-fill"></i> Send SOS
           </button>
         </div>
       </div>
@@ -806,127 +836,176 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.live-tracker {
+/* ── Outer wrapper — always full-bleed ink ── */
+.lt {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  max-width: 600px;
-  margin: 0 auto;
+  min-height: calc(100vh - var(--nav-h, 66px));
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  background: #FBF6EC;
+  background: #16130F;
+  color: #FBF6EC;
 }
 
-/* ── Header ── */
-.tracker-header {
+/* ── Status bar ── */
+.lt-status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #16130F;
-  border-bottom: 2px solid #16130F;
-  padding: 14px 20px;
+  height: 44px;
+  padding: 0 20px;
+  background: #2A55F5;
+  flex-shrink: 0;
 }
-
-.tracker-status {
+.lt-status-bar--paused {
+  background: rgba(22,19,15,0.9);
+  border-bottom: 2px solid #FFC53D;
+}
+.lt-status-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
-.status-dot {
+.lt-rec-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #5A5348;
+  background: rgba(251,246,236,0.4);
   flex-shrink: 0;
 }
-
-.status-dot.active {
-  background: #2A55F5;
-  box-shadow: 0 0 0 3px rgba(42, 85, 245, 0.28);
-  animation: pulse 2s infinite;
+.lt-rec-dot--active {
+  background: #ff3b30;
+  animation: ltBlink 1.1s ease-in-out infinite;
 }
-
-@keyframes pulse {
+@keyframes ltBlink {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  50% { opacity: 0.2; }
 }
-
-.status-label {
+.lt-status-text {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: rgba(251,246,236,0.7);
+  color: #fff;
+}
+.lt-gps-dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.lt-gps-d {
+  font-size: 0.48rem;
+  color: #fff;
 }
 
-.tracker-time {
+/* ── Big timer ── */
+.lt-timer-block {
+  padding: 20px 20px 0;
+  text-align: center;
+  flex-shrink: 0;
+  transition: opacity 0.3s;
+}
+.lt-timer-block--dim { opacity: 0.5; }
+.lt-timer {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-size: 2.4rem;
+  font-size: clamp(72px, 18vw, 112px);
   font-weight: 900;
   color: #FBF6EC;
   letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
-  line-height: 1;
+  line-height: 0.85;
+  text-transform: uppercase;
 }
 
-/* ── Stats ── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  border-left: 2px solid #16130F;
-  border-right: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
+/* ── 3-up stats row ── */
+.lt-stats-row {
+  display: flex;
+  align-items: stretch;
+  margin: 16px 20px 0;
+  border: 2px solid rgba(251,246,236,0.18);
+  flex-shrink: 0;
+  transition: opacity 0.3s;
 }
-
-.live-stat {
-  background: #FBF6EC;
-  padding: 16px;
+.lt-stats-row--dim { opacity: 0.5; }
+.lt-stat {
+  flex: 1;
+  padding: 10px 12px;
   text-align: center;
-  border-right: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
 }
-.live-stat:nth-child(2n) { border-right: none; }
-.live-stat:nth-last-child(-n+2) { border-bottom: none; }
-
-.stat-label {
+.lt-stat-div {
+  width: 2px;
+  background: rgba(251,246,236,0.18);
+  flex-shrink: 0;
+}
+.lt-stat-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #5A5348;
-  margin-bottom: 6px;
+  letter-spacing: 0.14em;
+  color: rgba(251,246,236,0.5);
+  margin-bottom: 4px;
 }
-
-.stat-value {
+.lt-stat-val {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 900;
-  color: #16130F;
-  letter-spacing: 0.01em;
+  color: #FBF6EC;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
+.lt-stat-val--pace { color: #FFC53D; }
 
 /* ── Map ── */
-.live-map-container {
+.lt-map-wrap {
   position: relative;
-  border-left: 2px solid #16130F;
-  border-right: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
+  flex: 1;
+  min-height: 180px;
+  transition: opacity 0.3s;
 }
-
-.live-map {
+.lt-map-wrap--dim { opacity: 0.55; }
+.lt-map {
   width: 100%;
-  height: 420px;
+  height: 100%;
+  min-height: 180px;
 }
 
-.gps-error-overlay {
+/* GPS ready chip */
+.lt-gps-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(22,19,15,0.75);
+  border: 1.5px solid #2A55F5;
+  padding: 6px 12px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FBF6EC;
+}
+.lt-gps-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2A55F5;
+  animation: ltPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes ltPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(42,85,245,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(42,85,245,0); }
+}
+
+.lt-gps-error {
   position: absolute;
   inset: 0;
-  background: rgba(251,246,236,0.94);
+  background: rgba(22,19,15,0.88);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -938,212 +1017,481 @@ onUnmounted(() => {
   text-align: center;
   padding: 20px;
 }
+.lt-gps-error i { font-size: 1.8rem; }
 
-.gps-error-overlay i {
-  font-size: 2rem;
+/* ── Draft banner ── */
+.lt-draft-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #FFC53D;
+  border-top: 2px solid #16130F;
+  flex-shrink: 0;
+}
+.lt-draft-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #16130F;
+}
+.lt-draft-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.lt-draft-btn {
+  padding: 7px 14px;
+  border: 2px solid #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+}
+.lt-draft-btn--resume { background: #16130F; color: #FBF6EC; }
+.lt-draft-btn--discard { background: transparent; color: #16130F; }
+
+/* ── Save error ── */
+.lt-save-error {
+  padding: 12px 16px;
+  background: rgba(192,57,43,0.12);
+  border-top: 2px solid #C0392B;
+  color: #C0392B;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-/* ── Sport selector ── */
-.sport-selector {
+/* ── Bottom cream sheet ── */
+.lt-sheet {
   background: #FBF6EC;
-  border-left: 2px solid #16130F;
-  border-right: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
-  padding: 16px;
+  border-top: 3px solid #2A55F5;
+  padding: 20px 20px 28px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.sport-label {
+/* READY state */
+.lt-sport-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: #5A5348;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
-
-.sport-options {
+.lt-sport-options {
   display: flex;
   gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
-
-.sport-btn {
+.lt-sport-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 8px;
+  gap: 5px;
+  padding: 10px 10px 8px;
   border: 2px solid #16130F;
   background: #FBF6EC;
   cursor: pointer;
   flex: 1;
+  min-width: 52px;
   transition: background 0.12s;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  color: #16130F;
 }
-
-.sport-btn:hover {
-  background: #E7DFCE;
-}
-
-.sport-btn.active {
+.lt-sport-btn:hover { background: #E7DFCE; }
+.lt-sport-btn--active {
   background: #2A55F5;
   border-color: #16130F;
   color: #fff;
   box-shadow: 2px 2px 0 #16130F;
 }
-
-.sport-emoji { display: none; }
-
-.sport-name {
+.lt-sport-icon {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+.lt-sport-name {
+  font-size: 0.58rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-/* ── Controls ── */
-.tracker-controls {
+.lt-ready-row {
   display: flex;
-  gap: 0;
-  border-left: 2px solid #16130F;
-  border-right: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.lt-flanker {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #16130F;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5A5348;
+  cursor: pointer;
+}
+.lt-start-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #2A55F5;
+  border: 3px solid #16130F;
+  box-shadow: 4px 4px 0 #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.lt-start-btn:hover { background: #1E42D6; }
+.lt-start-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #16130F; }
+
+/* RECORDING state */
+.lt-ctrl-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 28px;
+}
+.lt-ctrl-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.lt-ctrl-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5A5348;
+}
+.lt-ctrl {
+  border-radius: 50%;
+  border: 3px solid #16130F;
+  box-shadow: 3px 3px 0 #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.lt-ctrl:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 #16130F; }
+.lt-ctrl:disabled { opacity: 0.4; cursor: not-allowed; }
+.lt-ctrl--lap {
+  width: 56px;
+  height: 56px;
+  background: #fff;
+  color: #16130F;
+}
+.lt-ctrl--stop {
+  width: 72px;
+  height: 72px;
+  background: #C0392B;
+  color: #fff;
+}
+.lt-ctrl--pause {
+  width: 64px;
+  height: 64px;
+  background: #16130F;
+  color: #FBF6EC;
 }
 
-.control-btn {
+.lt-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 44px;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.lt-share-btn:hover { background: #E7DFCE; }
+
+/* PAUSED state */
+.lt-paused-row {
+  display: flex;
+  gap: 12px;
+}
+.lt-resume-btn {
   flex: 1;
-  height: 56px;
-  border: none;
+  height: 52px;
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 #16130F;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.10em;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
   transition: background 0.15s;
-  border-right: 2px solid #16130F;
 }
-.control-btn:last-child { border-right: none; }
-
-.control-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.control-btn-start  {
-  background: #2A55F5;
-  color: #fff;
-  border-radius: 0;
-  flex: 2;
-}
-.control-btn-start:hover:not(:disabled)  { background: #1E42D6; }
-.control-btn-pause  { background: #FFC53D; color: #16130F; }
-.control-btn-pause:hover  { background: #f0b730; }
-.control-btn-finish { background: #C0392B; color: #fff; }
-.control-btn-finish:hover:not(:disabled) { background: #a93226; }
-
-/* ── Draft recovery banner ── */
-.draft-banner {
-  background: #FFC53D;
-  border: 2px solid #16130F;
-  border-bottom: none;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.draft-banner-text {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #16130F;
-  display: flex;
-  align-items: center;
-}
-
-.draft-banner-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.draft-btn-resume {
-  padding: 7px 16px;
+.lt-resume-btn:hover { background: #1E42D6; }
+.lt-finish-btn {
+  flex: 1;
+  height: 52px;
   background: #16130F;
   color: #FBF6EC;
   border: 2px solid #16130F;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
-  cursor: pointer;
-}
-
-.draft-btn-discard {
-  padding: 7px 16px;
-  background: transparent;
-  color: #16130F;
-  border: 2px solid #16130F;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
-  cursor: pointer;
-}
-
-/* ── Save error ── */
-.save-error {
-  background: #FBF6EC;
-  border: 2px solid #C0392B;
-  border-bottom: none;
-  padding: 12px 16px;
-  color: #C0392B;
+  border-radius: 999px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.10em;
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.lt-finish-btn:hover:not(:disabled) { opacity: 0.82; }
+.lt-finish-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.lt-discard-link {
+  background: none;
+  border: none;
+  color: #C0392B;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: center;
+  padding: 0;
+}
+.lt-discard-link:hover { opacity: 0.75; }
+
+/* ── Sharing banner ── */
+.lt-share-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: #16130F;
+  border-top: 3px solid #2A55F5;
+  flex-shrink: 0;
+}
+.lt-share-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2A55F5;
+  flex-shrink: 0;
+  animation: ltBlink 1.5s ease-in-out infinite;
+}
+.lt-share-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #2A55F5;
+  text-transform: uppercase;
+}
+.lt-share-url {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  color: rgba(251,246,236,0.55);
+}
+.lt-share-stop {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  text-decoration: underline;
+}
+.lt-share-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 10px 22px;
+  border: 2px solid rgba(251,246,236,0.3);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  z-index: 9999;
 }
 
-/* ── Mapbox control overrides ── */
-:deep(.mapboxgl-ctrl-geolocate) {
-  border-radius: 0 !important;
+/* ── SOS ── */
+.lt-sos-btn {
+  width: 100%;
+  height: 48px;
+  background: #C0392B;
+  color: #fff;
+  border: none;
+  border-top: 2px solid rgba(192,57,43,0.4);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
-:deep(.mapboxgl-ctrl-zoom-in),
-:deep(.mapboxgl-ctrl-zoom-out),
-:deep(.mapboxgl-ctrl-compass) {
-  border-radius: 0 !important;
-}
-:deep(.mapboxgl-ctrl-group) {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  border: 2px solid #16130F !important;
-}
+.lt-sos-btn:hover { background: #a93226; }
 
-.me-2 { margin-right: 8px; }
-
-@media (max-width: 480px) {
-  .live-map { height: 300px; }
-  .tracker-time { font-size: 2rem; }
-  .stat-value { font-size: 1.4rem; }
+.lt-sos-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(22,19,15,0.72);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
+.lt-sos-modal {
+  background: #FBF6EC;
+  border: 2px solid #16130F;
+  box-shadow: 5px 5px 0 #16130F;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #16130F;
+}
+.lt-sos-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #C0392B;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lt-sos-sub { font-size: 0.85rem; color: #5A5348; margin: 0; }
+.lt-sos-no-contacts {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: #5A5348;
+  font-weight: 600;
+  background: #E7DFCE;
+  border: 2px solid #16130F;
+  padding: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.lt-sos-contacts { display: flex; flex-direction: column; border: 2px solid #16130F; }
+.lt-sos-contact {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 2px solid #16130F;
+  background: #fff;
+}
+.lt-sos-contact:last-child { border-bottom: none; }
+.lt-sos-name { font-weight: 700; font-size: 0.9rem; }
+.lt-sos-email { font-size: 0.75rem; color: #5A5348; }
+.lt-sos-actions { display: flex; border: 2px solid #16130F; margin-top: 4px; }
+.lt-sos-cancel {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-right: 2px solid #16130F;
+  background: #FBF6EC;
+  color: #5A5348;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.lt-sos-cancel:hover { background: #E7DFCE; color: #16130F; }
+.lt-sos-confirm {
+  flex: 2;
+  height: 48px;
+  background: #C0392B;
+  color: #fff;
+  border: none;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 900;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s;
+}
+.lt-sos-confirm:hover { background: #a93226; }
 
-/* ── Post-workout Notes Overlay ── */
-.notes-overlay {
+/* ── Notes overlay ── */
+.lt-notes-overlay {
   position: fixed;
   inset: 0;
   background: #FBF6EC;
@@ -1154,14 +1502,15 @@ onUnmounted(() => {
   padding: 48px 24px 24px;
   overflow-y: auto;
 }
-.notes-overlay-inner {
+.lt-notes-inner {
   width: 100%;
   max-width: 480px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  color: #16130F;
 }
-.notes-overlay-title {
+.lt-notes-title {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: 2rem;
   font-weight: 900;
@@ -1170,20 +1519,14 @@ onUnmounted(() => {
   color: #16130F;
   line-height: 0.9;
 }
-.notes-overlay-sub {
-  font-size: 0.9rem;
-  color: #5A5348;
-  margin: 0;
-}
-.notes-input-wrap {
-  position: relative;
-}
-.notes-textarea {
+.lt-notes-sub { font-size: 0.9rem; color: #5A5348; margin: 0; }
+.lt-notes-input-wrap { position: relative; }
+.lt-notes-textarea {
   width: 100%;
   border: 2px solid #16130F;
   border-radius: 0;
   background: #fff;
-  padding: 12px 12px 40px 12px;
+  padding: 12px 12px 40px;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-size: 0.9rem;
   resize: vertical;
@@ -1191,8 +1534,8 @@ onUnmounted(() => {
   outline: none;
   color: #16130F;
 }
-.notes-textarea:focus { border-color: #2A55F5; }
-.mic-btn {
+.lt-notes-textarea:focus { border-color: #2A55F5; }
+.lt-mic-btn {
   position: absolute;
   bottom: 10px;
   right: 10px;
@@ -1209,23 +1552,22 @@ onUnmounted(() => {
   font-size: 0.75rem;
   transition: background 0.15s;
 }
-.mic-btn:hover { background: #2A55F5; }
-.mic-btn--active {
+.lt-mic-btn:hover { background: #2A55F5; }
+.lt-mic-btn--active {
   background: #C0392B;
   border-color: #C0392B;
-  animation: mic-pulse 1s ease-in-out infinite;
+  animation: ltMicPulse 1s ease-in-out infinite;
 }
-@keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.4); }
-  50%       { box-shadow: 0 0 0 6px rgba(192, 57, 43, 0); }
+@keyframes ltMicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(192,57,43,0); }
 }
-.notes-overlay-actions {
+.lt-notes-actions {
   display: flex;
-  gap: 0;
   border: 2px solid #16130F;
   margin-top: 4px;
 }
-.notes-btn-skip {
+.lt-notes-skip {
   flex: 1;
   padding: 14px;
   border: none;
@@ -1234,14 +1576,14 @@ onUnmounted(() => {
   color: #5A5348;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   cursor: pointer;
   transition: background 0.12s;
 }
-.notes-btn-skip:hover { background: #E7DFCE; }
-.notes-btn-done {
+.lt-notes-skip:hover { background: #E7DFCE; }
+.lt-notes-done {
   flex: 2;
   padding: 14px;
   border: none;
@@ -1249,128 +1591,37 @@ onUnmounted(() => {
   color: #fff;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   cursor: pointer;
   transition: background 0.15s;
 }
-.notes-btn-done:hover:not(:disabled) { background: #1E42D6; }
-.notes-btn-done:disabled { opacity: 0.5; cursor: not-allowed; }
+.lt-notes-done:hover:not(:disabled) { background: #1E42D6; }
+.lt-notes-done:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Live sharing ──────────────────────────────────────────── */
-.control-btn-share {
-  background: #FBF6EC;
-  color: #16130F;
-  border: 2px solid #16130F;
-  font-size: 0.68rem;
-  padding: 0 14px;
-  flex: 1;
-}
-.control-btn-share:hover { background: #E7DFCE; }
-
-.share-banner {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  padding: 10px 16px;
-  background: #16130F;
-  border-top: 3px solid #2A55F5;
-  font-size: 12px;
-}
-.share-live-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #2A55F5;
-  animation: live-pulse-dot 1.5s infinite;
-  flex-shrink: 0;
-}
-@keyframes live-pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.share-broadcasting {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-weight: 700; letter-spacing: 0.12em; color: #2A55F5; text-transform: uppercase;
-  font-size: 0.68rem;
-}
-.share-url { font-size: 11px; color: rgba(251,246,236,0.6); font-family: 'Spline Sans Mono', monospace; }
-.share-stop-btn {
-  margin-left: auto; background: none; border: none; color: #FBF6EC;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.65rem; font-weight: 700; cursor: pointer; padding: 0;
-  text-transform: uppercase; letter-spacing: 0.10em;
-  text-decoration: underline;
+/* ── Mapbox control overrides ── */
+:deep(.mapboxgl-ctrl-geolocate),
+:deep(.mapboxgl-ctrl-zoom-in),
+:deep(.mapboxgl-ctrl-zoom-out),
+:deep(.mapboxgl-ctrl-compass) { border-radius: 0 !important; }
+:deep(.mapboxgl-ctrl-group) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 2px solid rgba(251,246,236,0.25) !important;
 }
 
-.share-copied-toast {
-  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-  background: #16130F; color: #FBF6EC; padding: 10px 22px;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.10em;
-  text-transform: uppercase;
-  border: 2px solid #16130F;
-  z-index: 9999;
-}
+.me-1 { margin-right: 4px; }
+.me-2 { margin-right: 8px; }
 
-/* ── SOS ── */
-.sos-btn {
-  width: 100%; height: 52px;
-  background: #C0392B; color: #fff;
-  border: 2px solid #16130F;
-  border-top: none;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.8rem; font-weight: 900;
-  text-transform: uppercase; letter-spacing: 0.14em;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background 0.15s;
+@media (max-width: 640px) {
+  .lt-timer { font-size: clamp(60px, 16vw, 88px); }
+  .lt-stats-row { margin: 12px 14px 0; }
+  .lt-sheet { padding: 16px 16px 24px; }
+  .lt-start-btn { width: 72px; height: 72px; }
+  .lt-ctrl--stop { width: 64px; height: 64px; }
+  .lt-ctrl--pause { width: 56px; height: 56px; }
+  .lt-ctrl--lap { width: 48px; height: 48px; }
+  .lt-ctrl-row { gap: 20px; }
 }
-.sos-btn:hover { background: #a93226; }
-
-.sos-overlay {
-  position: absolute; inset: 0; background: rgba(22,19,15,0.72);
-  z-index: 200; display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-}
-.sos-modal {
-  background: #FBF6EC;
-  border: 2px solid #16130F;
-  box-shadow: 5px 5px 0 #16130F;
-  width: 100%; max-width: 420px;
-  padding: 24px; display: flex; flex-direction: column; gap: 14px;
-}
-.sos-modal-title {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-size: 1.6rem; font-weight: 900; color: #C0392B;
-  text-transform: uppercase; letter-spacing: 0.04em; line-height: 0.9;
-}
-.sos-modal-sub { font-size: 0.85rem; color: #5A5348; margin: 0; }
-.sos-no-contacts {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.72rem; color: #5A5348; font-weight: 600;
-  background: #E7DFCE; border: 2px solid #16130F; padding: 12px;
-  text-transform: uppercase; letter-spacing: 0.06em;
-}
-.sos-contacts-list { display: flex; flex-direction: column; gap: 0; border: 2px solid #16130F; }
-.sos-contact {
-  display: flex; gap: 10px; align-items: center;
-  padding: 10px 14px; border-bottom: 2px solid #16130F; background: #fff;
-}
-.sos-contact:last-child { border-bottom: none; }
-.sos-contact-name { font-weight: 700; font-size: 0.9rem; color: #16130F; }
-.sos-contact-email { font-size: 0.75rem; color: #5A5348; }
-.sos-modal-actions { display: flex; gap: 0; border: 2px solid #16130F; margin-top: 4px; }
-.sos-cancel-btn {
-  flex: 1; height: 48px; border: none; border-right: 2px solid #16130F; background: #FBF6EC;
-  color: #5A5348; font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-weight: 700; font-size: 0.72rem;
-  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
-  transition: background 0.12s;
-}
-.sos-cancel-btn:hover { background: #E7DFCE; color: #16130F; }
-.sos-confirm-btn {
-  flex: 2; height: 48px; background: #C0392B; color: #fff; border: none;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-weight: 900; font-size: 0.78rem;
-  text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
-.sos-confirm-btn:hover { background: #a93226; }
 </style>
