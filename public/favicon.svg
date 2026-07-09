@@ -1,7 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" fill="#000000"/>
-  <!-- Stylised forward-slash R mark -->
-  <text x="8" y="50" font-family="Arial Black, sans-serif" font-size="52" font-weight="900" fill="#0052FF" letter-spacing="-2">R</text>
-  <!-- Electric underline accent -->
-  <rect x="8" y="55" width="48" height="4" fill="#0052FF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Ink background -->
+  <rect width="64" height="64" fill="#16130F"/>
+
+  <!-- Bold italic R in cream — matches the logo mark -->
+  <text
+    x="8" y="48"
+    font-family="'Arial Black', 'Impact', 'Haettenschweiler', sans-serif"
+    font-size="46"
+    font-weight="900"
+    font-style="italic"
+    fill="#FBF6EC"
+    letter-spacing="-1"
+  >R</text>
+
+  <!-- Cobalt square period — the GR signature motif -->
+  <rect x="38" y="43" width="11" height="8" fill="#2A55F5"/>
+
+  <!-- Cobalt bottom stripe -->
+  <rect x="0" y="61" width="64" height="3" fill="#2A55F5"/>
 </svg>
