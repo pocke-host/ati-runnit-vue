@@ -10,8 +10,8 @@
 
         <!-- 7-day activity dots -->
         <div class="hero-dots" v-if="!loading && hasActivities">
-          <div v-for="dot in thisWeek.dots" :key="dot.label" class="hero-dot-col">
-            <div :class="['hero-dot', { 'hero-dot-active': dot.active }]"></div>
+          <div v-for="(dot, di) in thisWeek.dots" :key="dot.label" class="hero-dot-col">
+            <div :class="['hero-dot', dot.active ? 'hero-dot-active' : (di < thisWeek.dots.length - 1 ? 'hero-dot-past' : '')]"></div>
             <span class="hero-dot-label">{{ dot.label }}</span>
           </div>
         </div>
@@ -61,10 +61,6 @@
           { id: 'races',    label: 'Predictions' },
           { id: 'fitness',  label: 'Fitness'     },
           { id: 'load',     label: 'Load'        },
-          { id: 'log',      label: 'Log'         },
-          { id: 'style',    label: 'Style'       },
-          { id: 'journey',  label: 'Journey'     },
-          { id: 'totals',   label: 'All-Time'    },
         ]" :key="s.id"
           :class="['jumpnav-btn', { active: activeSection === s.id }]"
           @click="jumpTo(s.id)"
@@ -220,11 +216,11 @@
             <div class="insight-val" :style="{ color: acwrInfo.color }">{{ acwrScore }}</div>
             <div class="insight-sub">{{ acwrInfo.desc }}</div>
             <div class="acwr-gauge">
-              <div class="acwr-zone" style="width:40%; background:#E5E5E5"></div>
-              <div class="acwr-zone" style="width:10%; background:#EBF0FF"></div>
+              <div class="acwr-zone" style="width:40%; background:#EDE5D5"></div>
+              <div class="acwr-zone" style="width:10%; background:#c3d0fb"></div>
               <div class="acwr-zone" style="width:15%; background:#2A55F5"></div>
-              <div class="acwr-zone" style="width:10%; background:#111111"></div>
-              <div class="acwr-zone" style="width:25%; background:#ef4444"></div>
+              <div class="acwr-zone" style="width:10%; background:#16130F"></div>
+              <div class="acwr-zone" style="width:25%; background:#C0392B"></div>
               <div class="acwr-needle" :style="{ left: Math.min(98, (acwrScore / 2) * 100) + '%' }"></div>
             </div>
             <div class="acwr-ticks">
@@ -1000,7 +996,7 @@ onUnmounted(() => {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.22em;
-  color: rgba(251,246,236,0.5);
+  color: #2A55F5;
   text-transform: uppercase;
   margin-bottom: 12px;
 }
@@ -1014,11 +1010,11 @@ onUnmounted(() => {
   color: #FBF6EC;
 }
 
-/* 7-day dots */
+/* 7-day week strip */
 .hero-dots {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 28px;
 }
 .hero-dot-col {
@@ -1028,16 +1024,20 @@ onUnmounted(() => {
   gap: 6px;
 }
 .hero-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(251,246,236,0.08);
-  border: 2px solid rgba(251,246,236,0.3);
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: transparent;
+  border: 2px dashed #E7DFCE;
   transition: background 0.2s;
 }
 .hero-dot-active {
   background: #2A55F5;
-  border-color: #2A55F5;
+  border: 2px solid #2A55F5;
+}
+.hero-dot-past {
+  background: #16130F;
+  border: 2px solid #16130F;
 }
 .hero-dot-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
@@ -1046,27 +1046,31 @@ onUnmounted(() => {
   letter-spacing: 0.06em;
   color: rgba(251,246,236,0.5);
   text-transform: uppercase;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
-/* Chips */
+/* Chips — 2×2 bordered grid */
 .hero-chips {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 2px solid rgba(251,246,236,0.3);
+  max-width: 480px;
+  margin: 0 auto;
 }
 .hero-chip {
-  background: rgba(251,246,236,0.08);
-  border: 2px solid rgba(251,246,236,0.28);
+  background: rgba(251,246,236,0.06);
+  border-right: 2px solid rgba(251,246,236,0.3);
+  border-bottom: 2px solid rgba(251,246,236,0.3);
   border-radius: 0;
-  padding: 14px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
-  min-width: 120px;
 }
+.hero-chip:nth-child(2n) { border-right: none; }
+.hero-chip:nth-last-child(-n+2) { border-bottom: none; }
 .chip-val {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: 2rem;
@@ -1278,6 +1282,7 @@ onUnmounted(() => {
   background: #fff;
   padding: 18px;
   margin-bottom: 16px;
+  box-shadow: 4px 4px 0 #16130F;
 }
 .fitness-chart-header {
   display: flex;
@@ -1346,11 +1351,12 @@ onUnmounted(() => {
   gap: 16px;
 }
 .fitness-metric-card {
-  border: 2px solid #E7DFCE;
+  border: 2px solid #16130F;
   padding: 20px 18px 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: #fff;
 }
 .fm-label {
   font-size: 0.70rem;
@@ -1360,10 +1366,12 @@ onUnmounted(() => {
   color: rgba(15,18,16,0.45);
 }
 .fm-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-size: 2rem;
   font-weight: 900;
-  color: #000;
-  line-height: 1.1;
+  color: #16130F;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
 }
 .fm-unit {
   font-size: 1.1rem;
@@ -1412,11 +1420,11 @@ onUnmounted(() => {
 .heatmap-grid   { display: flex; gap: 2px; min-width: max-content; }
 .heatmap-week   { display: flex; flex-direction: column; gap: 2px; }
 .heatmap-cell   { width: 12px; height: 12px; border-radius: 0; flex-shrink: 0; }
-.heatmap-l0 { background: #F0F0F0; }
-.heatmap-l1 { background: #bbf7d0; }
-.heatmap-l2 { background: #4ade80; }
+.heatmap-l0 { background: #EDE5D5; }
+.heatmap-l1 { background: rgba(42,85,245,0.25); }
+.heatmap-l2 { background: rgba(42,85,245,0.55); }
 .heatmap-l3 { background: #2A55F5; }
-.heatmap-l4 { background: #064e3b; }
+.heatmap-l4 { background: #16130F; }
 .heatmap-lx { background: transparent; }
 .heatmap-legend {
   display: flex;
@@ -1447,7 +1455,7 @@ onUnmounted(() => {
 }
 .insight-card {
   background: white;
-  border: 2px solid #E7DFCE;
+  border: 2px solid #16130F;
   padding: 20px 18px 18px;
   display: flex;
   flex-direction: column;
@@ -1475,7 +1483,7 @@ onUnmounted(() => {
   padding: 2px 8px;
   border-radius: 0;
 }
-.insight-val  { font-size: 2rem; font-weight: 900; color: #000; line-height: 1; }
+.insight-val  { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 2.4rem; font-weight: 900; color: #16130F; line-height: 0.85; font-variant-numeric: tabular-nums; }
 .insight-unit { font-size: 1rem; font-weight: 700; color: rgba(15,18,16,0.50); }
 .insight-sub  { font-size: 0.75rem; color: rgba(15,18,16,0.55); font-weight: 600; line-height: 1.4; margin-top: 2px; }
 .insight-tip  {
@@ -1576,7 +1584,7 @@ onUnmounted(() => {
 /* ── CHART CARDS ───────────────────────────────── */
 .chart-card {
   background: white;
-  border: 2px solid #E7DFCE;
+  border: 2px solid #16130F;
   border-radius: 0;
   padding: 24px;
   height: 280px;
