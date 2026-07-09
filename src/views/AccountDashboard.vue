@@ -22,10 +22,316 @@
         <router-link to="/track" class="streak-banner-cta">Track Now</router-link>
       </div>
 
-      <!-- INK HERO -->
+      <!-- ════ DESKTOP V2 BENTO ════ -->
+      <div class="db2-desktop">
+
+        <!-- HERO (ink) -->
+        <div class="db2-hero">
+          <div class="db2-hero-top">
+            <div class="db2-hero-left">
+              <div class="db2-dateline">{{ todayLine }}</div>
+              <h1 class="db2-greeting">{{ greeting }},<br><span class="db2-name">{{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}.</span></h1>
+            </div>
+            <div class="db2-hero-right">
+              <span class="db2-phase-badge">{{ trainingBlock.label }} PHASE</span>
+              <button class="db2-btn-ghost" type="button" @click="openActivityModal">＋ Log</button>
+              <button class="db2-btn-cobalt" type="button" @click="openMomentModal">◉ Moment</button>
+            </div>
+          </div>
+          <div class="db2-stats-grid">
+            <div class="db2-stat db2-stat--br">
+              <div class="db2-stat-lbl">Total Distance</div>
+              <div class="db2-stat-num">{{ formatDistance(totalStats.distance) }}</div>
+            </div>
+            <div class="db2-stat db2-stat--br">
+              <div class="db2-stat-lbl">Total Time</div>
+              <div class="db2-stat-num">{{ totalStats.duration }}<span class="db2-stat-unit">hrs</span></div>
+            </div>
+            <div class="db2-stat db2-stat--br">
+              <div class="db2-stat-lbl">Day Streak</div>
+              <div class="db2-stat-num db2-stat-num--streak">{{ totalStats.streak }}<span class="db2-stat-unit">{{ totalStats.streak !== 1 ? 'days' : 'day' }}</span></div>
+            </div>
+            <div class="db2-stat">
+              <div class="db2-stat-lbl">Following</div>
+              <div class="db2-stat-num">{{ friendsCount }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WEEK RAIL -->
+        <div class="db2-week-rail">
+          <div class="db2-week-label">This Week</div>
+          <div class="db2-week-days">
+            <div v-for="day in weekCalendar" :key="day.date" class="db2-week-day">
+              <div :class="['db2-day-circle', {
+                'db2-day-circle--today': day.isToday,
+                'db2-day-circle--done': !day.isToday && day.activities.length > 0
+              }]">{{ day.dayNum }}</div>
+              <div class="db2-day-letter">{{ day.letter }}</div>
+            </div>
+          </div>
+          <div class="db2-week-totals">
+            <span class="db2-wt-num">{{ weekActivities }}</span><span class="db2-wt-meta"> workout{{ weekActivities !== 1 ? 's' : '' }}</span>
+            <span class="db2-wt-sep">·</span>
+            <span class="db2-wt-num">{{ formatDistance(weekDistance) }}</span>
+          </div>
+        </div>
+
+        <!-- BENTO GRID -->
+        <div class="db2-bento">
+
+          <!-- FEATURED LAST ACTIVITY (col-span 2) -->
+          <div class="db2-card db2-featured">
+            <template v-if="activities && activities.length">
+              <div class="db2-feat-head">
+                <span class="db2-latest-badge">Latest</span>
+                <div class="db2-feat-title">{{ getActivityName(activities[0]) }}</div>
+                <div class="db2-feat-date">{{ formatDateShort(activities[0].createdAt) }}</div>
+              </div>
+              <div class="db2-feat-map">
+                <svg viewBox="0 0 900 210" preserveAspectRatio="none" class="db2-route-svg">
+                  <g stroke="rgba(251,246,236,0.07)" stroke-width="1" fill="none">
+                    <path d="M0,52 H900"/><path d="M0,105 H900"/><path d="M0,158 H900"/>
+                    <path d="M225,0 V210"/><path d="M450,0 V210"/><path d="M675,0 V210"/>
+                  </g>
+                  <path d="M40,170 C160,120 150,60 260,80 C420,108 380,44 520,72 C660,100 640,150 780,116 C830,102 850,132 870,116"
+                    fill="none" stroke="#2A55F5" stroke-width="5" stroke-dasharray="1500" stroke-dashoffset="1500" class="db2-route-path"/>
+                  <circle cx="40" cy="170" r="6" fill="#FBF6EC"/>
+                  <circle cx="870" cy="116" r="7" fill="#2A55F5" stroke="#FBF6EC" stroke-width="2"/>
+                </svg>
+                <router-link v-if="activities[0].id" :to="`/activities/${activities[0].id}`" class="db2-feat-chip">
+                  {{ activities[0].title || activities[0].sportType || 'View' }}
+                </router-link>
+              </div>
+              <div class="db2-feat-stats">
+                <div class="db2-fstat db2-fstat--br">
+                  <div class="db2-fstat-lbl">Dist</div>
+                  <div class="db2-fstat-num">{{ formatDistance(activities[0].distanceMeters) }}</div>
+                </div>
+                <div class="db2-fstat db2-fstat--br">
+                  <div class="db2-fstat-lbl">Pace</div>
+                  <div class="db2-fstat-num db2-fstat-num--yellow">{{ formatPace(activities[0]) }}</div>
+                </div>
+                <div class="db2-fstat db2-fstat--br">
+                  <div class="db2-fstat-lbl">Time</div>
+                  <div class="db2-fstat-num">{{ formatDuration(activities[0].durationSeconds) }}</div>
+                </div>
+                <div class="db2-fstat">
+                  <div class="db2-fstat-lbl">Elev</div>
+                  <div class="db2-fstat-num">{{ activities[0].elevationGain ? formatElevation(activities[0].elevationGain) : '—' }}</div>
+                </div>
+              </div>
+            </template>
+            <div v-else class="db2-feat-empty">
+              <button class="db2-feat-log-btn" @click="openActivityModal">+ Log your first activity</button>
+            </div>
+          </div>
+
+          <!-- NEXT UP -->
+          <div class="db2-card db2-next-up">
+            <div class="db2-card-head">
+              <div class="db2-eyebrow">Next Up</div>
+              <span class="db2-head-sub">Tomorrow</span>
+            </div>
+            <div class="db2-next-body">
+              <template v-if="todayWorkout">
+                <div class="db2-next-title">{{ todayWorkout.name || todayWorkout.type }}</div>
+                <div class="db2-next-desc">{{ todayWorkout.description || '' }}</div>
+                <div class="db2-next-boxes">
+                  <div class="db2-next-box">
+                    <div class="db2-next-box-lbl">Target</div>
+                    <div class="db2-next-box-val">{{ todayWorkout.distance ? formatDistance(todayWorkout.distance * (isImperial ? 1609.34 : 1000)) : '—' }}</div>
+                  </div>
+                  <div class="db2-next-box">
+                    <div class="db2-next-box-lbl">Duration</div>
+                    <div class="db2-next-box-val">{{ todayWorkout.duration ? todayWorkout.duration + 'min' : '—' }}</div>
+                  </div>
+                </div>
+                <router-link :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="db2-next-cta">View Plan →</router-link>
+              </template>
+              <div v-else class="db2-next-empty">
+                <div class="db2-next-empty-txt">No active plan</div>
+                <router-link to="/plans" class="db2-next-cta">Browse Plans →</router-link>
+              </div>
+            </div>
+          </div>
+
+          <!-- WEEKLY BARS (col-span 2) -->
+          <div class="db2-card db2-weekly-bars">
+            <div class="db2-card-head">
+              <div class="db2-card-title">Weekly Activity</div>
+              <div class="db2-view-toggle">
+                <button :class="['db2-toggle-btn', { 'db2-toggle-btn--on': chartView === 'distance' }]" @click="chartView = 'distance'">Distance</button>
+                <button :class="['db2-toggle-btn', { 'db2-toggle-btn--on': chartView === 'duration' }]" @click="chartView = 'duration'">Duration</button>
+              </div>
+            </div>
+            <div class="db2-bars-body">
+              <div class="db2-bars-chart">
+                <div v-for="(day, i) in weekCalendar" :key="day.date" class="db2-bar-col">
+                  <div class="db2-bar" :style="{
+                    height: weekDistance > 0
+                      ? Math.max(day.activities.length > 0 ? 14 : 8, Math.round(day.activities.reduce((s, a) => s + (a.distanceMeters || 0), 0) / weekDistance * 120)) + 'px'
+                      : (day.activities.length > 0 ? '14px' : '8px'),
+                    background: day.isToday && day.activities.length > 0 ? '#FFC53D' : day.activities.length > 0 ? '#2A55F5' : '#EDE5D5'
+                  }"></div>
+                  <div class="db2-bar-lbl">{{ ['MON','TUE','WED','THU','FRI','SAT','SUN'][i] }}</div>
+                </div>
+              </div>
+              <div class="db2-bars-totals">
+                <div><span class="db2-bars-big">{{ formatDistance(weekDistance) }}</span><span class="db2-bars-meta"> this wk</span></div>
+                <div><span class="db2-bars-big">{{ weekActivities }}</span><span class="db2-bars-meta"> workouts</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MONTHLY GOAL RING -->
+          <div class="db2-card db2-goal-ring">
+            <div class="db2-eyebrow">Monthly Goal</div>
+            <div class="db2-ring-wrap">
+              <svg viewBox="0 0 42 42" class="db2-ring-svg">
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EDE5D5" stroke-width="5"/>
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2A55F5" stroke-width="5"
+                  :stroke-dasharray="`${monthlyGoalProgress} ${100 - monthlyGoalProgress}`"/>
+              </svg>
+              <div class="db2-ring-pct">{{ monthlyGoalProgress }}<span class="db2-ring-sym">%</span></div>
+            </div>
+            <div class="db2-ring-sub">{{ formatDistance(monthlyDistanceMeters) }} this month</div>
+          </div>
+
+          <!-- TRAINING INSIGHTS -->
+          <div class="db2-card db2-insights">
+            <div class="db2-card-head db2-card-head--ink">
+              <div class="db2-eyebrow db2-eyebrow--cobalt">Training Insights</div>
+            </div>
+            <template v-if="dashInsights">
+              <div class="db2-insights-grid">
+                <div class="db2-insight-cell db2-insight-cell--br">
+                  <div class="db2-insight-lbl">Fitness</div>
+                  <div class="db2-insight-val">{{ dashInsights.fitnessScore }}</div>
+                </div>
+                <div class="db2-insight-cell db2-insight-cell--br">
+                  <div class="db2-insight-lbl">Form</div>
+                  <div class="db2-insight-val" :style="{ color: dashInsights.formScore > 0 ? '#FFC53D' : '#FBF6EC' }">
+                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
+                  </div>
+                </div>
+                <div class="db2-insight-cell">
+                  <div class="db2-insight-lbl">ACWR</div>
+                  <div class="db2-insight-val">{{ dashInsights.acwr ?? '—' }}</div>
+                </div>
+              </div>
+            </template>
+            <div v-else class="db2-insights-empty">Log 3+ activities to unlock</div>
+            <div class="db2-insights-foot">
+              <router-link to="/stats" class="db2-insights-link">Full analysis →</router-link>
+            </div>
+          </div>
+
+          <!-- RECENT ACTIVITIES (grid-row span 2) -->
+          <div class="db2-card db2-recent">
+            <div class="db2-card-head">
+              <div class="db2-card-title">Recent</div>
+              <router-link to="/feed" class="db2-all-link">All →</router-link>
+            </div>
+            <div class="db2-recent-list">
+              <router-link
+                v-for="act in (activities || []).slice(0, 4)"
+                :key="act.id"
+                :to="`/activities/${act.id}`"
+                class="db2-recent-row"
+              >
+                <div class="db2-recent-icon-wrap">{{ getSportIcon(act.sportType) }}</div>
+                <div class="db2-recent-info">
+                  <div class="db2-recent-name">{{ getActivityName(act) }}</div>
+                  <div class="db2-recent-meta">{{ formatDuration(act.durationSeconds) }} · {{ formatDistance(act.distanceMeters) }}</div>
+                </div>
+                <div class="db2-recent-date">{{ formatDateShort(act.createdAt) }}</div>
+              </router-link>
+              <div v-if="!activities || !activities.length" class="db2-recent-empty">No activities yet — log your first!</div>
+            </div>
+            <div class="db2-recent-foot">
+              <div class="db2-disc-lbl">Discipline Score</div>
+              <div class="db2-disc-row">
+                <span class="db2-disc-num">{{ disciplineData.score }}</span>
+                <span class="db2-disc-level">{{ disciplineData.level }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMPLETE PROFILE -->
+          <div v-if="profileCompletion.pct < 100" class="db2-card db2-profile-card">
+            <div class="db2-profile-top">
+              <div class="db2-eyebrow">Complete Profile</div>
+              <span class="db2-profile-pct-num">{{ profileCompletion.pct }}%</span>
+            </div>
+            <div class="db2-profile-bar-bg">
+              <div class="db2-profile-bar-fill" :style="{ width: profileCompletion.pct + '%' }"></div>
+            </div>
+            <div class="db2-profile-list">
+              <div class="db2-profile-item db2-profile-item--done">
+                <span class="db2-profile-check db2-profile-check--done">✓</span>Verify email
+              </div>
+              <div v-for="item in profileCompletion.missing.slice(0, 2)" :key="item.key" class="db2-profile-item">
+                <span class="db2-profile-check"></span>{{ item.label }}
+              </div>
+            </div>
+          </div>
+          <div v-else class="db2-card db2-profile-card">
+            <div class="db2-eyebrow">Profile Complete</div>
+            <div class="db2-profile-done-msg">You're all set!</div>
+          </div>
+
+          <!-- ACTIVITY BREAKDOWN DONUT -->
+          <div class="db2-card db2-breakdown">
+            <div class="db2-breakdown-inner">
+              <div class="db2-breakdown-ring">
+                <svg viewBox="0 0 42 42" class="db2-breakdown-svg">
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EDE5D5" stroke-width="7"/>
+                  <circle v-if="sportBreakdown && sportBreakdown[0]" cx="21" cy="21" r="15.9" fill="none"
+                    :stroke="sportBreakdown[0].color" stroke-width="7"
+                    :stroke-dasharray="`${Math.round(sportBreakdown[0].count / Math.max(1, activities?.length || 1) * 100)} ${100 - Math.round(sportBreakdown[0].count / Math.max(1, activities?.length || 1) * 100)}`"/>
+                  <circle v-if="sportBreakdown && sportBreakdown[1]" cx="21" cy="21" r="15.9" fill="none"
+                    :stroke="sportBreakdown[1].color" stroke-width="7"
+                    :stroke-dasharray="`${Math.round(sportBreakdown[1].count / Math.max(1, activities?.length || 1) * 100)} ${100 - Math.round(sportBreakdown[1].count / Math.max(1, activities?.length || 1) * 100)}`"
+                    :stroke-dashoffset="`${-Math.round((sportBreakdown[0]?.count || 0) / Math.max(1, activities?.length || 1) * 100)}`"/>
+                </svg>
+                <div class="db2-breakdown-count">{{ activities?.length || 0 }}</div>
+              </div>
+              <div class="db2-breakdown-legend">
+                <div v-for="s in (sportBreakdown || []).slice(0, 3)" :key="s.type" class="db2-bd-item">
+                  <span class="db2-bd-dot" :style="{ background: s.color }"></span>
+                  <span class="db2-bd-name">{{ s.type }}</span>
+                  <span class="db2-bd-cnt">{{ s.count }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UPGRADE (col-span 2) or MANAGE SUB -->
+          <div v-if="subscriptionTier === 'free'" class="db2-card db2-upgrade">
+            <div class="db2-upgrade-content">
+              <div class="db2-upgrade-eyebrow">Upgrade to Pro</div>
+              <div class="db2-upgrade-title">Route planning. Goal tracking. Pace insights.</div>
+              <div class="db2-upgrade-sub">Everything you need to train like you mean it.</div>
+            </div>
+            <router-link to="/subscribe" class="db2-upgrade-cta">See Plans →</router-link>
+          </div>
+          <div v-else class="db2-card db2-manage-sub">
+            <div class="db2-upgrade-content">
+              <div class="db2-upgrade-eyebrow">Premium Active</div>
+              <div class="db2-upgrade-title">You have full access.</div>
+            </div>
+            <router-link to="/billing" class="db2-upgrade-cta db2-upgrade-cta--manage">Manage Subscription →</router-link>
+          </div>
+
+        </div><!-- /.db2-bento -->
+      </div><!-- /.db2-desktop -->
+
+      <!-- v1 FALLBACK (mobile only until mobile-v2 PR merges) -->
+      <div class="db2-v1-mobile">
+      <!-- EDITORIAL GREETING (v1) -->
       <section class="dash-hero">
         <div class="dash-hero-inner">
-          <!-- EDITORIAL GREETING -->
           <header class="dash-greeting">
             <div class="greeting-left">
               <div class="greeting-dateline">{{ todayLine }}</div>
@@ -430,6 +736,8 @@
         </div>
       </section>
 
+      </div><!-- /.db2-v1-mobile -->
+
       <!-- ── MOBILE V2 DASHBOARD ── -->
       <div class="dash-mobile">
 
@@ -641,7 +949,6 @@
 
         </div><!-- /.dm-body -->
       </div><!-- /.dash-mobile -->
-
     </div>
 
     <!-- FIND FRIENDS MODAL -->
@@ -3270,4 +3577,733 @@ textarea.form-control{resize:vertical;min-height:72px}
   .dm-upgrade-cta:hover { opacity: 0.85; text-decoration: none; color: #16130F; }
 
 } /* end @media (max-width: 768px) */
+/* ════════════════════════════════════
+   DESKTOP V2 BENTO DASHBOARD
+   ════════════════════════════════════ */
+.db2-desktop { display: block; }
+.db2-v1-mobile { display: none !important; }
+
+/* ── HERO ── */
+.db2-hero {
+  background: #16130F;
+  color: #FBF6EC;
+  padding: 30px 30px 26px;
+}
+.db2-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.db2-dateline {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.55);
+}
+.db2-greeting {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 0.82;
+  text-transform: uppercase;
+  margin: 10px 0 0;
+}
+.db2-name { color: #2A55F5; }
+.db2-hero-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+.db2-phase-badge {
+  display: inline-block;
+  background: #FFC53D;
+  color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 13px;
+  border: 2px solid #16130F;
+  transform: rotate(-2deg);
+}
+.db2-btn-ghost {
+  background: transparent;
+  color: #FBF6EC;
+  border: 2px solid rgba(251,246,236,0.4);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.db2-btn-ghost:hover { border-color: rgba(251,246,236,0.7); }
+.db2-btn-cobalt {
+  background: #2A55F5;
+  color: #fff;
+  border: 2px solid #2A55F5;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.db2-btn-cobalt:hover { background: #1E42D6; }
+.db2-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 2px solid rgba(251,246,236,0.28);
+  margin-top: 24px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.db2-stat { padding: 18px 20px; }
+.db2-stat--br { border-right: 2px solid rgba(251,246,236,0.28); }
+.db2-stat-lbl {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.55);
+}
+.db2-stat-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 0.85;
+  margin-top: 6px;
+}
+.db2-stat-num--streak { color: #FFC53D; }
+.db2-stat-unit {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(251,246,236,0.55);
+  margin-left: 5px;
+}
+
+/* ── WEEK RAIL ── */
+.db2-week-rail {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 30px;
+  border-bottom: 2px solid #16130F;
+  background: #F1EADC;
+}
+.db2-week-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5A5348;
+  white-space: nowrap;
+}
+.db2-week-days { display: flex; gap: 10px; flex: 1; }
+.db2-week-day { text-align: center; }
+.db2-day-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 2px dashed #C9BFA9;
+  color: #A89E88;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+.db2-day-circle--today {
+  border: 2px solid #2A55F5;
+  background: #2A55F5;
+  color: #fff;
+}
+.db2-day-circle--done {
+  border: 2px solid #16130F;
+  background: #16130F;
+  color: #FBF6EC;
+}
+.db2-day-letter {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.54rem;
+  font-weight: 600;
+  color: #A89E88;
+  margin-top: 5px;
+}
+.db2-week-totals {
+  text-align: right;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.db2-wt-num { font-weight: 700; font-size: 0.9rem; }
+.db2-wt-meta { font-size: 0.64rem; color: #8A8A8A; }
+.db2-wt-sep { color: #C9BFA9; margin: 0 8px; }
+
+/* ── BENTO GRID ── */
+.db2-bento {
+  padding: 24px 30px 34px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.db2-card {
+  border: 2px solid #16130F;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* ── FEATURED ACTIVITY ── */
+.db2-featured {
+  grid-column: span 2;
+  background: #16130F;
+  color: #FBF6EC;
+  box-shadow: 5px 5px 0 #2A55F5;
+  display: flex;
+  flex-direction: column;
+}
+.db2-feat-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 16px 20px;
+  border-bottom: 2px solid rgba(251,246,236,0.15);
+}
+.db2-latest-badge {
+  background: #2A55F5;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+}
+.db2-feat-title {
+  flex: 1;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+.db2-feat-date {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.55);
+}
+.db2-feat-map {
+  position: relative;
+  height: 200px;
+  background: #0F0D0B;
+  overflow: hidden;
+  border-bottom: 2px solid rgba(251,246,236,0.15);
+}
+.db2-route-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+@keyframes rkDraw { to { stroke-dashoffset: 0; } }
+.db2-route-path { animation: rkDraw 3s ease-out 0.2s forwards; }
+.db2-feat-chip {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  background: #16130F;
+  border: 2px solid rgba(251,246,236,0.3);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  color: #FBF6EC;
+  text-decoration: none;
+}
+.db2-feat-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.db2-fstat { padding: 16px 18px; }
+.db2-fstat--br { border-right: 2px solid rgba(251,246,236,0.15); }
+.db2-fstat-lbl {
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.5);
+}
+.db2-fstat-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 0.85;
+  margin-top: 4px;
+}
+.db2-fstat-num--yellow { color: #FFC53D; }
+.db2-feat-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  flex: 1;
+}
+.db2-feat-log-btn {
+  background: transparent;
+  border: 2px solid rgba(251,246,236,0.3);
+  color: #FBF6EC;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ── NEXT UP ── */
+.db2-next-up { display: flex; flex-direction: column; }
+.db2-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 2px solid #16130F;
+}
+.db2-card-head--ink { background: #16130F; }
+.db2-eyebrow {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #2A55F5;
+}
+.db2-eyebrow--cobalt { color: #2A55F5; }
+.db2-head-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: #8A8A8A;
+}
+.db2-card-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
+}
+.db2-all-link {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  text-decoration: none;
+}
+.db2-all-link:hover { color: #2A55F5; }
+.db2-next-body {
+  padding: 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.db2-next-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+.db2-next-desc { font-size: 0.8rem; color: #5A5348; margin: 10px 0 16px; line-height: 1.4; }
+.db2-next-boxes { display: flex; gap: 8px; }
+.db2-next-box { flex: 1; border: 2px solid #16130F; padding: 10px; }
+.db2-next-box-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+}
+.db2-next-box-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 0.85;
+  margin-top: 4px;
+}
+.db2-next-cta {
+  display: block;
+  text-align: center;
+  background: #16130F;
+  color: #FBF6EC;
+  border: 2px solid #16130F;
+  padding: 12px 0;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 16px;
+  text-decoration: none;
+}
+.db2-next-cta:hover { background: #2A55F5; border-color: #2A55F5; color: #fff; }
+.db2-next-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.db2-next-empty-txt { font-size: 0.86rem; color: #5A5348; margin-bottom: 12px; }
+
+/* ── WEEKLY BARS ── */
+.db2-weekly-bars { grid-column: span 2; }
+.db2-view-toggle {
+  display: flex;
+  border: 2px solid #16130F;
+  overflow: hidden;
+}
+.db2-toggle-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: #5A5348;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.db2-toggle-btn + .db2-toggle-btn { border-left: 2px solid #16130F; }
+.db2-toggle-btn--on { background: #2A55F5; color: #fff; }
+.db2-bars-body { padding: 20px; }
+.db2-bars-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 140px;
+}
+.db2-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+@keyframes rkGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.db2-bar {
+  width: 100%;
+  border: 2px solid #16130F;
+  transform-origin: bottom;
+  animation: rkGrow 0.5s ease-out both;
+}
+.db2-bar-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.54rem;
+  font-weight: 600;
+  color: #8A8A8A;
+}
+.db2-bars-totals {
+  display: flex;
+  gap: 20px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 2px solid #E7DFCE;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.db2-bars-big {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.db2-bars-meta {
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  margin-left: 6px;
+}
+
+/* ── GOAL RING ── */
+.db2-goal-ring { padding: 18px; display: flex; flex-direction: column; align-items: center; }
+.db2-ring-wrap { position: relative; width: 120px; height: 120px; margin: 10px 0 6px; }
+.db2-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.db2-ring-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 0.75;
+}
+.db2-ring-sym { font-size: 1rem; }
+.db2-ring-sub {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.7rem;
+  color: #5A5348;
+}
+
+/* ── TRAINING INSIGHTS ── */
+.db2-insights { background: #16130F; color: #FBF6EC; display: flex; flex-direction: column; }
+.db2-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.db2-insight-cell { padding: 16px 8px; }
+.db2-insight-cell--br { border-right: 2px solid rgba(251,246,236,0.15); }
+.db2-insight-lbl {
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.5);
+}
+.db2-insight-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 0.85;
+  margin-top: 5px;
+}
+.db2-insights-empty {
+  padding: 24px 18px;
+  font-size: 0.78rem;
+  color: rgba(251,246,236,0.5);
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.db2-insights-foot {
+  padding: 12px 18px;
+  border-top: 2px solid rgba(251,246,236,0.15);
+  margin-top: auto;
+}
+.db2-insights-link {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2A55F5;
+  text-decoration: none;
+}
+.db2-insights-link:hover { color: #FBF6EC; }
+.db2-card-head--ink .db2-eyebrow { color: #2A55F5; }
+
+/* ── RECENT ACTIVITIES ── */
+.db2-recent { grid-row: span 2; display: flex; flex-direction: column; }
+.db2-recent-list { display: flex; flex-direction: column; flex: 1; }
+.db2-recent-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 18px;
+  border-bottom: 2px solid #E7DFCE;
+  text-decoration: none;
+  color: #16130F;
+}
+.db2-recent-row:hover { background: #FBF6EC; }
+.db2-recent-row:last-child { border-bottom: none; }
+.db2-recent-icon-wrap {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 999px;
+  background: #16130F;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.db2-recent-info { flex: 1; min-width: 0; }
+.db2-recent-name { font-weight: 800; font-size: 0.86rem; }
+.db2-recent-meta { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.6rem; color: #8A8A8A; }
+.db2-recent-date { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.58rem; color: #8A8A8A; flex-shrink: 0; }
+.db2-recent-empty { padding: 24px 18px; font-size: 0.86rem; color: #8A8A8A; }
+.db2-recent-foot {
+  margin-top: auto;
+  border-top: 2px solid #16130F;
+  padding: 14px 18px;
+  background: #F1EADC;
+}
+.db2-disc-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5A5348;
+  margin-bottom: 4px;
+}
+.db2-disc-row { display: flex; align-items: baseline; gap: 8px; }
+.db2-disc-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 0.8;
+}
+.db2-disc-level {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2A55F5;
+}
+
+/* ── COMPLETE PROFILE ── */
+.db2-profile-card { padding: 18px; }
+.db2-profile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.db2-profile-pct-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #2A55F5;
+  line-height: 0.7;
+}
+.db2-profile-bar-bg {
+  height: 9px;
+  background: #EDE5D5;
+  border: 2px solid #16130F;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.db2-profile-bar-fill {
+  height: 100%;
+  background: #2A55F5;
+  transition: width 0.4s ease;
+}
+.db2-profile-list { display: flex; flex-direction: column; gap: 9px; font-size: 0.82rem; font-weight: 600; }
+.db2-profile-item { display: flex; align-items: center; gap: 9px; color: #5A5348; }
+.db2-profile-item--done { color: #16130F; }
+.db2-profile-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  flex-shrink: 0;
+}
+.db2-profile-check--done { background: #2A55F5; color: #fff; border-color: #2A55F5; }
+.db2-profile-done-msg {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: 8px;
+  color: #2A55F5;
+}
+
+/* ── ACTIVITY BREAKDOWN ── */
+.db2-breakdown { padding: 18px; }
+.db2-breakdown-inner { display: flex; align-items: center; gap: 18px; }
+.db2-breakdown-ring { position: relative; width: 96px; height: 96px; flex: none; }
+.db2-breakdown-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.db2-breakdown-count {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+.db2-breakdown-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.db2-bd-item { display: flex; align-items: center; gap: 9px; }
+.db2-bd-dot { width: 11px; height: 11px; border: 1.5px solid #16130F; flex-shrink: 0; }
+.db2-bd-name { flex: 1; font-weight: 800; font-size: 0.8rem; }
+.db2-bd-cnt { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.74rem; color: #5A5348; }
+
+/* ── UPGRADE / MANAGE SUB ── */
+.db2-upgrade {
+  grid-column: span 2;
+  background: #2A55F5;
+  color: #fff;
+  box-shadow: 5px 5px 0 #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+}
+.db2-manage-sub {
+  grid-column: span 2;
+  background: #16130F;
+  color: #FBF6EC;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+}
+.db2-upgrade-eyebrow {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+}
+.db2-manage-sub .db2-upgrade-eyebrow { color: rgba(251,246,236,0.6); }
+.db2-upgrade-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 34px;
+  line-height: 0.85;
+  text-transform: uppercase;
+  margin: 8px 0 4px;
+}
+.db2-upgrade-sub { font-size: 0.86rem; opacity: 0.9; }
+.db2-upgrade-cta {
+  flex: none;
+  background: #FBF6EC;
+  color: #16130F;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  padding: 14px 26px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #16130F;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.db2-upgrade-cta:hover { background: #fff; }
+.db2-upgrade-cta--manage {
+  background: transparent;
+  border-color: rgba(251,246,236,0.4);
+  color: #FBF6EC;
+  box-shadow: 4px 4px 0 rgba(251,246,236,0.15);
+}
+.db2-upgrade-cta--manage:hover { background: rgba(251,246,236,0.08); color: #FBF6EC; }
 </style>
