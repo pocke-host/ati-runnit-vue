@@ -40,10 +40,65 @@
         <div class="gr-eyebrow">The whole kit</div>
         <h2 class="section-h2">Everything included.</h2>
         <div class="kit-grid">
-          <div v-for="item in kitItems" :key="item.num" class="kit-cell">
-            <div class="kit-num">{{ item.num }}</div>
-            <div class="kit-name">{{ item.name }}</div>
-            <div class="kit-desc">{{ item.desc }}</div>
+          <div class="kit-cell">
+            <div class="kit-num">01</div>
+            <div class="kit-name">GPS Tracking</div>
+            <div class="kit-desc">Wrist or phone, mile-accurate every time</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">02</div>
+            <div class="kit-name">Crews</div>
+            <div class="kit-desc">Clubs that train at your pace</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">03</div>
+            <div class="kit-name">Segments</div>
+            <div class="kit-desc">Chase course records block by block</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">04</div>
+            <div class="kit-name">Adaptive Plans</div>
+            <div class="kit-desc">12-week blocks that adjust to your load</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">05</div>
+            <div class="kit-name">Live Share</div>
+            <div class="kit-desc">Your crew tracks you in real time</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">06</div>
+            <div class="kit-name">Personal Records</div>
+            <div class="kit-desc">Every benchmark, automatically tracked</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">07</div>
+            <div class="kit-name">Challenges</div>
+            <div class="kit-desc">Monthly distance & time races</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">08</div>
+            <div class="kit-name">Coaching</div>
+            <div class="kit-desc">Assign plans, track athlete load & progress</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">09</div>
+            <div class="kit-name">Workout Library</div>
+            <div class="kit-desc">Build custom sessions, drills & interval sets</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">10</div>
+            <div class="kit-name">TrainingPeaks</div>
+            <div class="kit-desc">Import & export structured plans seamlessly</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">11</div>
+            <div class="kit-name">Recovery</div>
+            <div class="kit-desc">HRV, rest days & training load in one view</div>
+          </div>
+          <div class="kit-cell">
+            <div class="kit-num">12</div>
+            <div class="kit-name">Sync</div>
+            <div class="kit-desc">Strava, Garmin, Apple Health, Wahoo</div>
           </div>
         </div>
       </div>
@@ -110,6 +165,7 @@ const kitItems = [
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
+  padding-top: var(--nav-h, 66px);
 }
 .page-inner {
   max-width: 1040px;
@@ -275,7 +331,7 @@ const kitItems = [
   border-bottom: 2px solid #16130F;
 }
 .kit-cell:nth-child(4n) { border-right: none; }
-.kit-cell:nth-child(n+5) { border-bottom: none; }
+.kit-cell:nth-child(n+9) { border-bottom: none; }
 .kit-num {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.9rem;
@@ -350,7 +406,7 @@ const kitItems = [
   .moments-text-col { padding: 36px 24px; }
   .kit-grid { grid-template-columns: repeat(2, 1fr); }
   .kit-cell:nth-child(2n) { border-right: none; }
-  .kit-cell:nth-child(n+7) { border-bottom: none; }
+  .kit-cell:nth-child(n+11) { border-bottom: none; }
   .leave-grid { grid-template-columns: 1fr; }
   .leave-cell { border-right: none; border-bottom: 2px solid #16130F; }
   .leave-cell--last { border-bottom: none; }
