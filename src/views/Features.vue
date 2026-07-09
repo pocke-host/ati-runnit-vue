@@ -6,7 +6,7 @@
       <div class="page-inner">
         <span class="gr-eyebrow-badge">What's inside</span>
         <h1 class="hero-h1">Everything a session<br>should remember.</h1>
-        <p class="hero-sub">Track, share, compete, train. The whole kit that used to take five apps — in one, built by people who'd rather be running.</p>
+        <p class="hero-sub">Track, share, compete, train. The whole kit that used to take five apps — in one. Built by athletes who'd rather be outside than switching tabs.</p>
       </div>
     </section>
 
@@ -121,7 +121,7 @@ const kitItems = [
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 80px 0 64px;
+  padding: 60px 0 56px;
   border-bottom: 2px solid #16130F;
 }
 .gr-eyebrow-badge {
@@ -357,7 +357,7 @@ const kitItems = [
 }
 @media (max-width: 640px) {
   .page-inner { padding: 0 22px; }
-  .hero { padding: 60px 0 44px; }
+  .hero { padding: 44px 0 40px; }
   .kit-section, .leave-out-section { padding: 40px 0; }
   .kit-grid { grid-template-columns: 1fr 1fr; }
   .final-cta { padding: 48px 22px; }
