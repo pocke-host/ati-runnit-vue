@@ -109,13 +109,19 @@ import { ref, reactive } from 'vue'
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Join the Waitlist — Runnit',
+  title: 'Join the Waitlist — Runnit Early Access',
   link: [{ rel: 'canonical', href: 'https://runnit.live/waitlist' }],
   meta: [
-    { name: 'description', content: 'Claim your handle before someone else does. Join the Runnit waitlist and get early access when we open your city.' },
-    { property: 'og:title', content: 'Claim Your Handle — Runnit Waitlist' },
+    { name: 'description', content: 'Claim your handle before someone else does. Join the Runnit waitlist and get early access to the training app built for endurance athletes.' },
+    { property: 'og:title', content: 'Join the Waitlist — Runnit Early Access' },
+    { property: 'og:description', content: 'Claim your handle before someone else does. Get early access to the training app built for endurance athletes.' },
     { property: 'og:url', content: 'https://runnit.live/waitlist' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Join the Waitlist — Runnit Early Access' },
+    { name: 'twitter:description', content: 'Claim your handle before someone else does. Get early access to Runnit.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 

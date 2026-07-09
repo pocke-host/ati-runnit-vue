@@ -141,9 +141,19 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Features — Runnit',
+  title: 'Features — Runnit | GPS Tracking, Run Clubs & Live Sharing',
+  link: [{ rel: 'canonical', href: 'https://runnit.live/features' }],
   meta: [
-    { name: 'description', content: 'Everything a run should remember. GPS tracking, Moments, clubs, live sharing — every feature earns its place.' },
+    { name: 'description', content: 'Everything a session should remember. GPS tracking, run clubs, live sharing, race challenges, training plans, and personal records — every feature earns its place.' },
+    { property: 'og:title', content: 'Features — Runnit | GPS Tracking, Run Clubs & Live Sharing' },
+    { property: 'og:description', content: 'GPS tracking, run clubs, live sharing, race challenges, and structured training plans — all in one endurance training app.' },
+    { property: 'og:url', content: 'https://runnit.live/features' },
+    { property: 'og:image', content: 'https://runnit.live/og-image.png' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Features — Runnit | GPS Tracking, Run Clubs & Live Sharing' },
+    { name: 'twitter:description', content: 'GPS tracking, run clubs, live sharing, race challenges — every feature earns its place.' },
+    { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 
