@@ -432,7 +432,8 @@ const onSocial = (provider) => {
   color: #fff;
 }
 .gr-tos-check--checked { background: #2A55F5; border-color: #2A55F5; }
-.gr-tos-link { font-weight: 800; color: #16130F; border-bottom: 1.5px solid #2A55F5; text-decoration: none; }
+.gr-tos-link { font-weight: 800; color: #2A55F5; text-decoration: none; }
+.gr-tos-link:hover { color: #1E42D6; }
 
 /* Role selector */
 .gr-role-label-text {
@@ -495,7 +496,8 @@ const onSocial = (provider) => {
 
 /* Sign-in link */
 .gr-signin-link { text-align: center; font-size: 0.88rem; color: #5a5348; margin-top: 18px; margin-bottom: 0; }
-.gr-signin-link-a { font-weight: 800; color: #16130F; border-bottom: 2px solid #2A55F5; text-decoration: none; }
+.gr-signin-link-a { font-weight: 800; color: #2A55F5; text-decoration: none; }
+.gr-signin-link-a:hover { color: #1E42D6; }
 
 /* Spinner */
 .gr-spinner {
