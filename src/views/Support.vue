@@ -168,6 +168,7 @@ const faqs = [
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 6px 12px;
+  border: 2px solid rgba(251,246,236,0.4);
   transform: rotate(-2deg);
   margin-bottom: 20px;
 }
@@ -189,22 +190,26 @@ const faqs = [
   display: flex;
   max-width: 560px;
   margin: 0 auto;
-  border: 2px solid #FBF6EC;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #FBF6EC;
+  box-shadow: 4px 4px 0 #16130F;
 }
 .sp-search-placeholder {
   flex: 1;
-  padding: 15px 18px;
+  padding: 15px 22px;
   font-size: 0.95rem;
   color: #8a8a8a;
   text-align: left;
   background: #FBF6EC;
-  color: #8a8a8a;
 }
 .sp-search-btn {
   background: #2A55F5;
   color: #fff;
   border: none;
-  padding: 15px 24px;
+  border-left: 2px solid #16130F;
+  padding: 15px 28px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 700;
@@ -212,12 +217,13 @@ const faqs = [
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.15s;
+  border-radius: 0 999px 999px 0;
 }
 .sp-search-btn:hover { background: #1E42D6; }
 
 /* SECTIONS */
-.sp-section { padding: 40px 24px; }
-.sp-section--faq { padding-top: 20px; }
+.sp-section { padding: 52px 24px; border-bottom: 2px solid #16130F; }
+.sp-section--faq { border-top: none; }
 .sp-content { max-width: 1060px; margin: 0 auto; }
 .sp-eyebrow {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
@@ -333,7 +339,7 @@ const faqs = [
 .sp-contact-btn {
   display: block;
   text-align: center;
-  padding: 14px 0;
+  padding: 14px 24px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 700;
@@ -341,12 +347,13 @@ const faqs = [
   text-transform: uppercase;
   text-decoration: none;
   border: 2px solid;
+  border-radius: 999px;
   cursor: pointer;
   transition: opacity 0.15s;
 }
-.sp-contact-btn:hover { opacity: 0.85; }
-.sp-contact-btn--primary { background: #FBF6EC; color: #16130F; border-color: #16130F; }
-.sp-contact-btn--outline { background: transparent; color: #fff; border-color: #fff; }
+.sp-contact-btn:hover { opacity: 0.85; text-decoration: none; }
+.sp-contact-btn--primary { background: #FBF6EC; color: #16130F; border-color: #16130F; box-shadow: 3px 3px 0 #16130F; }
+.sp-contact-btn--outline { background: transparent; color: #fff; border-color: rgba(251,246,236,0.6); }
 
 @media (max-width: 768px) {
   .sp-categories-grid { grid-template-columns: 1fr 1fr; }
