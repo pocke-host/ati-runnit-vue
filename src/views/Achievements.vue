@@ -4,11 +4,13 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">Achievements</h1>
+        <div class="hero-eyebrow">Achievements</div>
+        <h1 class="hero-title">Chase every badge.</h1>
         <p class="hero-sub">
-          <template v-if="achievementStore.loading">Loading badges…</template>
+          <template v-if="achievementStore.loading">Loading…</template>
           <template v-else>
-            <span class="earned-count">{{ achievementStore.earnedCount }}</span> of {{ total }} badges earned
+            <span class="earned-count">{{ achievementStore.earnedCount }}</span>
+            <span class="earned-denom"> / {{ total }} Earned</span>
           </template>
         </p>
         <div class="hero-progress-bar">
@@ -35,8 +37,8 @@
     <!-- BADGE GRID -->
     <div class="grid-section">
       <div v-if="achievementStore.loading" class="loading-state">
-        <div class="spinner-border" role="status"></div>
-        <p>Loading achievements…</p>
+        <div class="gr-spinner" role="status"></div>
+        <p class="loading-text">Loading achievements…</p>
       </div>
 
       <div v-else class="badge-grid">
@@ -49,15 +51,15 @@
             <span class="badge-icon">{{ badge.icon }}</span>
           </div>
           <div class="badge-name">{{ badge.name }}</div>
-          <div class="badge-tier-pill" :class="`tier-pill-${badge.tier}`">{{ badge.tier }}</div>
+          <div class="badge-tier-chip" :class="`tier-chip-${badge.tier}`">{{ badge.tier }}</div>
 
           <template v-if="badge.earned">
-            <div class="badge-status earned-label">Earned</div>
+            <div class="badge-status earned-label">✓ Earned</div>
             <div v-if="badge.earnedAt" class="badge-date">{{ formatDate(badge.earnedAt) }}</div>
           </template>
 
           <template v-else>
-            <div class="badge-status locked-label">🔒 Locked</div>
+            <div class="badge-status locked-label">Locked</div>
             <div class="badge-desc">{{ badge.description }}</div>
             <template v-if="getProgress(badge.id)">
               <div class="badge-progress-bar">
@@ -75,8 +77,8 @@
       </div>
 
       <div v-if="!achievementStore.loading && filteredBadges.length === 0" class="empty-state">
-        <span style="font-size: 3rem;">🔍</span>
-        <p>No badges in this category yet.</p>
+        <div class="empty-icon">—</div>
+        <p class="empty-text">No badges in this category yet.</p>
       </div>
     </div>
   </div>
@@ -152,119 +154,153 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+@keyframes spin { to { transform: rotate(360deg) } }
+
 .achievements-page {
-  --bronze: #CD7F32;
-  --silver: #A8A9AD;
-  --gold: #FFD700;
-  --special: #2A55F5;
   min-height: 100vh;
-  padding-top: var(--page-top);
-  background: #fff;
+  padding-top: var(--nav-h, 66px);
+  background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  color: #16130F;
 }
 
 /* HERO */
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 56px 24px 48px;
+  padding: 52px 32px 44px;
+  border-bottom: 2px solid #16130F;
 }
 .hero-inner {
-  max-width: 860px;
+  max-width: 1100px;
   margin: 0 auto;
-  text-align: center;
+}
+.hero-eyebrow {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2A55F5;
+  margin-bottom: 12px;
 }
 .hero-title {
-  font-size: 2.8rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 900;
-  margin: 0 0 12px;
-  line-height: 1.1;
+  font-size: clamp(2.8rem, 7vw, 4.8rem);
+  line-height: 0.85;
+  text-transform: uppercase;
+  margin: 0 0 20px;
+  color: #FBF6EC;
 }
 .hero-sub {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.80);
-  margin: 0 0 24px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.6);
+  margin: 0 0 20px;
 }
 .earned-count {
-  font-size: 1.4rem;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.8rem;
   font-weight: 900;
-  color: var(--gold);
+  color: #FFC53D;
+  line-height: 1;
+  vertical-align: middle;
 }
+.earned-denom { color: rgba(251,246,236,0.6); }
 .hero-progress-bar {
-  height: 8px;
-  background: rgba(255,255,255,0.20);
-  border-radius: 0;
+  height: 6px;
+  background: rgba(251,246,236,0.12);
+  border: 1px solid rgba(251,246,236,0.2);
   max-width: 400px;
-  margin: 0 auto;
   overflow: hidden;
 }
 .hero-progress-fill {
   height: 100%;
-  background: rgba(255,255,255,0.85);
-  border-radius: 0;
+  background: #2A55F5;
   transition: width 0.5s ease;
 }
 
 /* TABS */
 .tabs-bar {
-  background: white;
-  border-bottom: 1px solid rgba(15,18,16,0.10);
+  background: #FBF6EC;
+  border-bottom: 2px solid #16130F;
   position: sticky;
-  top: var(--nav-h, 64px);
+  top: var(--nav-h, 66px);
   z-index: 50;
 }
 .tabs-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
   display: flex;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
-.tabs-inner::-webkit-scrollbar {
-  display: none;
-}
+.tabs-inner::-webkit-scrollbar { display: none; }
 .tab-btn {
-  padding: 16px 22px;
+  padding: 14px 20px;
   border: none;
   background: transparent;
-  font-weight: 900;
-  font-size: 0.9rem;
-  color: rgba(15,18,16,0.55);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5A5348;
   cursor: pointer;
-  transition: all 0.2s;
   border-bottom: 3px solid transparent;
-  margin-bottom: -1px;
+  margin-bottom: -2px;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
+  transition: color 0.15s;
 }
-.tab-btn:hover { color: rgba(15,18,16,0.80); }
+.tab-btn:hover { color: #16130F; }
 .tab-btn.active { color: #16130F; border-bottom-color: #2A55F5; }
 .tab-count {
-  background: rgba(22,19,15,0.08);
-  border-radius: 0;
-  padding: 2px 8px;
-  font-size: 0.75rem;
+  background: #E7DFCE;
+  border: 1px solid #16130F;
+  padding: 2px 7px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
-.tab-btn.active .tab-count { background: #F1EADC; color: #5A5348; }
+.tab-btn.active .tab-count { background: #16130F; color: #FBF6EC; }
 
 /* GRID */
 .grid-section {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 36px 24px 64px;
+  padding: 36px 32px 64px;
 }
 .loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   padding: 80px 20px;
-  color: rgba(15,18,16,0.55);
+}
+.gr-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(22,19,15,0.15);
+  border-top-color: #2A55F5;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.loading-text {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5A5348;
 }
 .badge-grid {
   display: grid;
@@ -275,111 +311,155 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   padding: 80px 20px;
-  color: rgba(15,18,16,0.45);
+  text-align: center;
+}
+.empty-icon {
+  width: 52px;
+  height: 52px;
+  background: #FBF6EC;
+  border: 2px solid #16130F;
+  box-shadow: 3px 3px 0 #16130F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #16130F;
+}
+.empty-text {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.65rem;
   font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5A5348;
 }
 
 /* BADGE CARD */
 .badge-card {
-  background: white;
-  border-radius: 0;
-  border: 1.5px solid rgba(15,18,16,0.09);
+  background: #fff;
+  border: 2px solid #16130F;
   padding: 24px 18px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 8px;
-  transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
-  overflow: hidden;
 }
 .badge-card.locked {
-  filter: grayscale(0.85);
-  opacity: 0.75;
+  opacity: 0.55;
+  background: #F5F0E8;
 }
 .badge-card.earned {
-  box-shadow: 3px 3px 0 #16130F;
-  border-color: #16130F;
+  box-shadow: 4px 4px 0 #16130F;
 }
-.badge-card.earned.tier-bronze { border-color: #16130F; }
-.badge-card.earned.tier-silver { border-color: #16130F; }
-.badge-card.earned.tier-gold { border-color: #16130F; }
-.badge-card.earned.tier-special { border-color: #2A55F5; }
-.badge-card:hover { transform: none; }
-.badge-card.locked:hover { transform: none; }
+.badge-card.earned.tier-special { box-shadow: 4px 4px 0 #2A55F5; border-color: #2A55F5; }
 
 .badge-icon-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(15,18,16,0.05);
+  width: 56px;
+  height: 56px;
+  border: 2px solid #16130F;
+  background: #FBF6EC;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 4px;
 }
-.badge-icon { font-size: 2rem; line-height: 1; }
-.badge-name { font-weight: 900; font-size: 0.95rem; color: rgba(15,18,16,0.90); line-height: 1.2; }
-.badge-desc { font-size: 0.75rem; color: rgba(15,18,16,0.55); font-weight: 600; }
+.badge-card.earned .badge-icon-wrap { background: #16130F; }
+.badge-card.earned.tier-gold .badge-icon-wrap { background: #FFC53D; }
+.badge-card.earned.tier-special .badge-icon-wrap { background: #2A55F5; border-color: #2A55F5; }
+.badge-icon { font-size: 1.6rem; line-height: 1; }
 
-/* Tier pill */
-.badge-tier-pill {
-  padding: 3px 10px;
-  border-radius: 0;
-  font-size: 0.68rem;
-  font-weight: 900;
+.badge-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #16130F;
+}
+.badge-desc {
+  font-size: 0.73rem;
+  color: #5A5348;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Tier chip */
+.badge-tier-chip {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid #16130F;
+}
+.tier-chip-bronze { background: rgba(205,127,50,0.12); color: #7D4A10; }
+.tier-chip-silver { background: #F1EADC; color: #5A5348; }
+.tier-chip-gold { background: #FFC53D; color: #16130F; }
+.tier-chip-special { background: #2A55F5; color: #fff; border-color: #2A55F5; }
+
+/* Status labels */
+.badge-status {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.60rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.earned-label { color: #2A55F5; }
+.locked-label { color: #5A5348; }
+.badge-date {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  color: #8A8A8A;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.tier-pill-bronze { background: rgba(205,127,50,0.15); color: var(--bronze); }
-.tier-pill-silver { background: rgba(168,169,173,0.18); color: #808285; }
-.tier-pill-gold { background: rgba(255,215,0,0.18); color: #b8930a; }
-.tier-pill-special { background: #EEF1FF; color: var(--special); }
-
-/* Status labels */
-.badge-status { font-size: 0.78rem; font-weight: 700; }
-.earned-label { color: #2A55F5; }
-.locked-label { color: rgba(15,18,16,0.45); }
-.badge-date { font-size: 0.72rem; color: rgba(15,18,16,0.50); }
 
 /* Progress */
 .badge-progress-bar {
   width: 100%;
-  height: 5px;
-  background: rgba(15,18,16,0.10);
-  border-radius: 0;
+  height: 4px;
+  background: #E7DFCE;
+  border: 1px solid rgba(22,19,15,0.2);
   overflow: hidden;
   margin-top: 4px;
 }
 .badge-progress-fill {
   height: 100%;
   background: #2A55F5;
-  border-radius: 0;
   transition: width 0.4s ease;
 }
 .badge-progress-text {
-  font-size: 0.70rem;
-  color: rgba(15,18,16,0.50);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  color: #5A5348;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Responsive */
 @media (max-width: 900px) {
   .badge-grid { grid-template-columns: repeat(3, 1fr); }
 }
-@media (max-width: 600px) {
-  .hero-title { font-size: 2rem; }
-  .badge-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .badge-card { padding: 18px 12px 16px; }
-  .badge-icon { font-size: 1.7rem; }
-  .badge-name { font-size: 0.85rem; }
+@media (max-width: 640px) {
+  .hero { padding: 36px 20px 32px; }
+  .tabs-bar { top: 56px; }
+  .tabs-inner { padding: 0 20px; }
+  .grid-section { padding: 24px 20px 48px; }
+  .badge-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .badge-card { padding: 16px 12px 14px; }
+  .badge-icon { font-size: 1.4rem; }
 }
 @media (max-width: 400px) {
   .badge-grid { grid-template-columns: 1fr; }
-  .hero-title { font-size: 1.6rem; }
-  .badge-card { padding: 14px; }
 }
 </style>
