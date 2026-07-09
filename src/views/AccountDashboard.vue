@@ -429,6 +429,219 @@
           </div>
         </div>
       </section>
+
+      <!-- ── MOBILE V2 DASHBOARD ── -->
+      <div class="dash-mobile">
+
+        <!-- HERO -->
+        <div class="dm-hero">
+          <div class="dm-hero-dateline">{{ todayLine }}</div>
+          <h1 class="dm-hero-h1">{{ greeting }},<br><span class="dm-hero-name">{{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}.</span></h1>
+          <div class="dm-hero-actions">
+            <span class="dm-phase-badge" :style="{ borderColor: trainingBlock.color, color: trainingBlock.color }">{{ trainingBlock.label }} PHASE</span>
+            <button class="dm-btn-ghost" type="button" @click="openActivityModal">＋ Log</button>
+            <button class="dm-btn-cobalt" type="button" @click="openMomentModal">◉ Moment</button>
+          </div>
+          <div class="dm-stats-grid">
+            <div class="dm-stat-cell dm-stat-cell--br dm-stat-cell--bb">
+              <div class="dm-stat-lbl">Total Distance</div>
+              <div class="dm-stat-num">{{ formatDistance(totalStats.distance) }}</div>
+            </div>
+            <div class="dm-stat-cell dm-stat-cell--bb">
+              <div class="dm-stat-lbl">Total Time</div>
+              <div class="dm-stat-num">{{ totalStats.duration }}<span class="dm-stat-unit">hrs</span></div>
+            </div>
+            <div class="dm-stat-cell dm-stat-cell--br">
+              <div class="dm-stat-lbl">Day Streak</div>
+              <div class="dm-stat-num dm-stat-num--yellow">{{ totalStats.streak }}</div>
+            </div>
+            <div class="dm-stat-cell">
+              <div class="dm-stat-lbl">Following</div>
+              <div class="dm-stat-num">{{ friendsCount }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WEEK RAIL -->
+        <div class="dm-week-rail">
+          <div class="dm-week-label">THIS WEEK · {{ weekActivities }} workout{{ weekActivities !== 1 ? 's' : '' }} · {{ formatDistance(weekDistance) }}</div>
+          <div class="dm-week-days">
+            <div v-for="day in weekCalendar" :key="day.date" class="dm-week-day">
+              <div :class="['dm-day-circle', { 'dm-day-circle--today': day.isToday, 'dm-day-circle--done': !day.isToday && day.activities.length > 0 }]">
+                {{ day.dayNum }}
+              </div>
+              <div class="dm-day-letter">{{ day.letter }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BODY STACK -->
+        <div class="dm-body">
+
+          <!-- FEATURED ACTIVITY -->
+          <div v-if="activities && activities.length" class="dm-featured">
+            <div class="dm-featured-head">
+              <span class="dm-latest-badge">Latest</span>
+              <div class="dm-featured-title">{{ getActivityName(activities[0]) }}</div>
+              <div class="dm-featured-date">{{ formatDateShort(activities[0].createdAt) }}</div>
+            </div>
+            <div class="dm-featured-map">
+              <svg viewBox="0 0 360 150" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+                <g stroke="rgba(251,246,236,0.07)" stroke-width="1" fill="none">
+                  <path d="M0,50 H360"/><path d="M0,100 H360"/>
+                  <path d="M120,0 V150"/><path d="M240,0 V150"/>
+                </g>
+                <path d="M24,120 C90,80 84,44 150,60 C230,80 210,40 290,58 C324,66 340,96 348,84" fill="none" stroke="#2A55F5" stroke-width="4" stroke-dasharray="700" stroke-dashoffset="700" style="animation:rkDashDraw 2.6s ease-out .2s forwards"/>
+                <circle cx="24" cy="120" r="5" fill="#FBF6EC"/>
+                <circle cx="348" cy="84" r="6" fill="#2A55F5" stroke="#FBF6EC" stroke-width="2"/>
+              </svg>
+              <router-link v-if="activities[0].id" :to="`/activities/${activities[0].id}`" class="dm-map-chip">{{ activities[0].title || activities[0].sportType || 'View Activity' }}</router-link>
+            </div>
+            <div class="dm-featured-stats">
+              <div class="dm-fstat dm-fstat--br">
+                <div class="dm-fstat-lbl">Dist</div>
+                <div class="dm-fstat-num">{{ formatDistance(activities[0].distanceMeters) }}</div>
+              </div>
+              <div class="dm-fstat dm-fstat--br">
+                <div class="dm-fstat-lbl">Time</div>
+                <div class="dm-fstat-num">{{ formatDuration(activities[0].durationSeconds) }}</div>
+              </div>
+              <div class="dm-fstat">
+                <div class="dm-fstat-lbl">Type</div>
+                <div class="dm-fstat-num">{{ getSportIcon(activities[0].sportType) }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEXT UP -->
+          <div v-if="todayWorkout" class="dm-next-up">
+            <div class="dm-next-head">
+              <div class="dm-next-eyebrow">Next Up</div>
+              <span class="dm-next-when">Tomorrow</span>
+            </div>
+            <div class="dm-next-body">
+              <div class="dm-next-title">{{ todayWorkout.name || todayWorkout.type }}</div>
+              <div class="dm-next-meta-boxes">
+                <div v-if="todayWorkout.distance" class="dm-meta-box">
+                  <div class="dm-meta-box-lbl">{{ isImperial ? 'MI' : 'KM' }}</div>
+                  <div class="dm-meta-box-val">{{ todayWorkout.distance }}</div>
+                </div>
+                <div v-if="todayWorkout.duration" class="dm-meta-box">
+                  <div class="dm-meta-box-lbl">Min</div>
+                  <div class="dm-meta-box-val">{{ todayWorkout.duration }}</div>
+                </div>
+              </div>
+              <p v-if="todayWorkout.description" class="dm-next-desc">{{ todayWorkout.description }}</p>
+              <router-link :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="dm-next-cta">View Plan →</router-link>
+            </div>
+          </div>
+
+          <!-- GOAL RING + INSIGHTS -->
+          <div class="dm-two-col">
+            <!-- Goal Ring -->
+            <div class="dm-goal-ring-card">
+              <div class="dm-card-eyebrow">Monthly Goal</div>
+              <div class="dm-ring-wrap">
+                <svg viewBox="0 0 42 42" style="width:100%;height:100%;transform:rotate(-90deg)">
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EDE5D5" stroke-width="5"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2A55F5" stroke-width="5"
+                    :stroke-dasharray="`${monthlyGoalProgress} ${100 - monthlyGoalProgress}`"/>
+                </svg>
+                <div class="dm-ring-pct">{{ monthlyGoalProgress }}<span class="dm-ring-pct-sym">%</span></div>
+              </div>
+              <div class="dm-ring-sub">{{ formatDistance(monthlyDistanceMeters) }} this month</div>
+            </div>
+            <!-- Insights -->
+            <div v-if="dashInsights" class="dm-insights-card">
+              <div class="dm-insights-eyebrow">Insights</div>
+              <div class="dm-insights-rows">
+                <div class="dm-insight-row">
+                  <span class="dm-insight-key">Fitness</span>
+                  <span class="dm-insight-val">{{ dashInsights.fitnessScore }}</span>
+                </div>
+                <div class="dm-insight-row">
+                  <span class="dm-insight-key">Form</span>
+                  <span class="dm-insight-val" :style="{ color: dashInsights.formScore > 0 ? '#FFC53D' : '#FBF6EC' }">
+                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
+                  </span>
+                </div>
+                <div v-if="dashInsights.acwr !== null" class="dm-insight-row">
+                  <span class="dm-insight-key">ACWR</span>
+                  <span class="dm-insight-val">{{ dashInsights.acwr }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WEEKLY BARS -->
+          <div class="dm-bars-card">
+            <div class="dm-bars-head">
+              <div class="dm-bars-title">Weekly Activity</div>
+            </div>
+            <div class="dm-bars-chart">
+              <div v-for="(day, i) in weekCalendar" :key="day.date" class="dm-bar-col">
+                <div class="dm-bar"
+                  :style="{
+                    height: weeklyChartData[i] > 0 ? Math.max(Math.round(weeklyChartData[i] / Math.max.apply(null, weeklyChartData) * 88), 14) + 'px' : '8px',
+                    background: day.isToday && weeklyChartData[i] > 0 ? '#FFC53D' : weeklyChartData[i] > 0 ? '#2A55F5' : '#EDE5D5'
+                  }"
+                ></div>
+                <div class="dm-bar-lbl">{{ day.letter }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT ACTIVITIES -->
+          <div class="dm-recent-card">
+            <div class="dm-recent-head">
+              <div class="dm-recent-title">Recent</div>
+              <router-link to="/feed" class="dm-recent-all">All →</router-link>
+            </div>
+            <div v-if="activities && activities.length">
+              <router-link
+                v-for="act in activities.slice(0, 3)"
+                :key="act.id"
+                :to="`/activities/${act.id}`"
+                class="dm-activity-row"
+              >
+                <div class="dm-act-icon">{{ getSportIcon(act.sportType) }}</div>
+                <div class="dm-act-info">
+                  <div class="dm-act-name">{{ getActivityName(act) }}</div>
+                  <div class="dm-act-meta">{{ formatDuration(act.durationSeconds) }} · {{ formatDistance(act.distanceMeters) }}</div>
+                </div>
+                <div class="dm-act-date">{{ formatDateShort(act.createdAt) }}</div>
+              </router-link>
+            </div>
+            <div v-else class="dm-recent-empty">No activities yet — log your first one!</div>
+          </div>
+
+          <!-- COMPLETE PROFILE -->
+          <div v-if="profileCompletion.pct < 100" class="dm-profile-card">
+            <div class="dm-profile-head">
+              <div class="dm-card-eyebrow">Complete Profile</div>
+              <span class="dm-profile-pct">{{ profileCompletion.pct }}%</span>
+            </div>
+            <div class="dm-profile-bar">
+              <div class="dm-profile-fill" :style="{ width: profileCompletion.pct + '%' }"></div>
+            </div>
+            <div class="dm-profile-items">
+              <div v-for="item in profileCompletion.missing.slice(0, 3)" :key="item.key" class="dm-profile-item">
+                <span class="dm-profile-check dm-profile-check--empty"></span>
+                {{ item.label }}
+              </div>
+            </div>
+          </div>
+
+          <!-- UPGRADE TO PRO -->
+          <div v-if="subscriptionTier === 'free'" class="dm-upgrade-card">
+            <div class="dm-upgrade-eyebrow">Upgrade to Pro</div>
+            <div class="dm-upgrade-headline">Route planning. Goal tracking. Pace insights.</div>
+            <router-link to="/subscribe" class="dm-upgrade-cta">See Plans →</router-link>
+          </div>
+
+        </div><!-- /.dm-body -->
+      </div><!-- /.dash-mobile -->
+
     </div>
 
     <!-- FIND FRIENDS MODAL -->
@@ -2348,4 +2561,713 @@ textarea.form-control{resize:vertical;min-height:72px}
 .la-btn-save:hover:not(:disabled){background:#1E42D6;box-shadow:5px 5px 0 #16130F}
 .la-btn-save:disabled{opacity:0.6;cursor:not-allowed;box-shadow:none}
 @media(max-width:480px){.la-form{padding:18px 14px}.la-sport-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ─────────────────────────────────────────────
+   MOBILE V2 DASHBOARD  (.dm-*)
+   Shown ONLY on ≤768px; desktop sections hidden on ≤768px
+───────────────────────────────────────────── */
+
+/* dash-mobile wrapper — hidden on desktop */
+.dash-mobile { display: none; }
+
+@keyframes rkDashDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 768px) {
+
+  /* hide all existing desktop dashboard sections */
+  .dash-hero,
+  .week-strip,
+  .today-workout-strip,
+  .dashboard-grid { display: none !important; }
+
+  /* show mobile layout */
+  .dash-mobile {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #FBF6EC;
+    padding-bottom: 80px;
+  }
+
+  /* ── HERO ── */
+  .dm-hero {
+    background: #16130F;
+    color: #FBF6EC;
+    padding: 28px 20px 24px;
+    border-bottom: 2px solid #16130F;
+  }
+  .dm-hero-dateline {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(251,246,236,0.5);
+    margin-bottom: 10px;
+  }
+  .dm-hero-h1 {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: clamp(44px, 11vw, 64px);
+    line-height: 0.85;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+    color: rgba(251,246,236,0.55);
+  }
+  .dm-hero-name { color: #FBF6EC; }
+
+  .dm-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .dm-phase-badge {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1.5px solid;
+    padding: 4px 9px;
+    transform: rotate(-2deg);
+    white-space: nowrap;
+  }
+  .dm-btn-ghost {
+    flex: 1;
+    height: 42px;
+    background: transparent;
+    border: 2px solid rgba(251,246,236,0.35);
+    border-radius: 999px;
+    color: #FBF6EC;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    white-space: nowrap;
+  }
+  .dm-btn-ghost:hover { border-color: #FBF6EC; }
+  .dm-btn-cobalt {
+    flex: 1.5;
+    height: 42px;
+    background: #2A55F5;
+    border: 2px solid #2A55F5;
+    border-radius: 999px;
+    color: #fff;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 rgba(251,246,236,0.25);
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .dm-btn-cobalt:hover { background: #1E42D6; }
+
+  /* stats 2×2 */
+  .dm-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 2px solid rgba(251,246,236,0.15);
+    margin-top: 4px;
+  }
+  .dm-stat-cell {
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dm-stat-cell--br { border-right: 2px solid rgba(251,246,236,0.15); }
+  .dm-stat-cell--bb { border-bottom: 2px solid rgba(251,246,236,0.15); }
+  .dm-stat-lbl {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(251,246,236,0.45);
+  }
+  .dm-stat-num {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 2rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .dm-stat-num--yellow { color: #FFC53D; }
+  .dm-stat-unit {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(251,246,236,0.45);
+    margin-left: 3px;
+  }
+
+  /* ── WEEK RAIL ── */
+  .dm-week-rail {
+    background: #F1EADC;
+    padding: 16px 20px;
+    border-bottom: 2px solid #16130F;
+  }
+  .dm-week-label {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5A5348;
+    margin-bottom: 14px;
+  }
+  .dm-week-days {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .dm-week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+  .dm-day-circle {
+    width: 36px;
+    height: 36px;
+    border: 2px dashed #C7BEB0;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #8A8A8A;
+  }
+  .dm-day-circle--today {
+    background: #2A55F5;
+    border: 2px solid #16130F;
+    color: #fff;
+  }
+  .dm-day-circle--done {
+    background: rgba(42,85,245,0.12);
+    border: 2px solid #2A55F5;
+    color: #2A55F5;
+  }
+  .dm-day-letter {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8A8A8A;
+  }
+
+  /* ── BODY STACK ── */
+  .dm-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── FEATURED ACTIVITY ── */
+  .dm-featured {
+    background: #16130F;
+    color: #FBF6EC;
+    border-bottom: 4px solid #2A55F5;
+    margin-bottom: 4px;
+  }
+  .dm-featured-head { padding: 18px 20px 14px; }
+  .dm-latest-badge {
+    display: inline-block;
+    background: #2A55F5;
+    color: #fff;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border: 2px solid rgba(251,246,236,0.2);
+    transform: rotate(-2deg);
+    margin-bottom: 10px;
+  }
+  .dm-featured-title {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    line-height: 0.9;
+    margin-top: 8px;
+  }
+  .dm-featured-date {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: rgba(251,246,236,0.45);
+    margin-top: 6px;
+  }
+  .dm-featured-map {
+    position: relative;
+    height: 150px;
+    background: #0F0D0A;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .dm-map-chip {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: #2A55F5;
+    color: #fff;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    text-decoration: none;
+    border: 2px solid rgba(251,246,236,0.2);
+  }
+  .dm-map-chip:hover { text-decoration: none; color: #fff; opacity: 0.85; }
+  .dm-featured-stats {
+    display: flex;
+    border-top: 1px solid rgba(251,246,236,0.12);
+  }
+  .dm-fstat {
+    flex: 1;
+    padding: 14px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dm-fstat--br { border-right: 1px solid rgba(251,246,236,0.12); }
+  .dm-fstat-lbl {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(251,246,236,0.4);
+  }
+  .dm-fstat-num {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── NEXT UP ── */
+  .dm-next-up {
+    background: #fff;
+    border-bottom: 2px solid #16130F;
+    padding: 18px 20px;
+    margin-bottom: 4px;
+  }
+  .dm-next-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .dm-next-eyebrow {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2A55F5;
+  }
+  .dm-next-when {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 600;
+    color: #8A8A8A;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .dm-next-title {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    line-height: 0.9;
+    margin-bottom: 12px;
+  }
+  .dm-next-meta-boxes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .dm-meta-box {
+    border: 2px solid #16130F;
+    padding: 7px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 60px;
+  }
+  .dm-meta-box-lbl {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5A5348;
+  }
+  .dm-meta-box-val {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .dm-next-desc {
+    font-size: 0.85rem;
+    color: #5A5348;
+    line-height: 1.5;
+    margin: 0 0 14px;
+  }
+  .dm-next-cta {
+    display: inline-block;
+    background: #16130F;
+    color: #FBF6EC;
+    border: 2px solid #16130F;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 3px 3px 0 #2A55F5;
+    transition: opacity 0.15s;
+  }
+  .dm-next-cta:hover { opacity: 0.85; text-decoration: none; color: #FBF6EC; }
+
+  /* ── GOAL RING + INSIGHTS 2-col ── */
+  .dm-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 2px solid #16130F;
+    margin-bottom: 4px;
+  }
+  .dm-goal-ring-card {
+    background: #fff;
+    border-right: 2px solid #16130F;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .dm-card-eyebrow {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2A55F5;
+    align-self: flex-start;
+  }
+  .dm-ring-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dm-ring-pct {
+    position: absolute;
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .dm-ring-pct-sym { font-size: 0.8rem; font-weight: 700; }
+  .dm-ring-sub {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 600;
+    color: #8A8A8A;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .dm-insights-card {
+    background: #16130F;
+    color: #FBF6EC;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .dm-insights-eyebrow {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(251,246,236,0.45);
+  }
+  .dm-insights-rows { display: flex; flex-direction: column; gap: 10px; }
+  .dm-insight-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(251,246,236,0.1);
+    padding-bottom: 8px;
+  }
+  .dm-insight-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .dm-insight-key {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(251,246,236,0.5);
+  }
+  .dm-insight-val {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  /* ── WEEKLY BARS ── */
+  .dm-bars-card {
+    background: #fff;
+    border-bottom: 2px solid #16130F;
+    padding: 18px 20px;
+    margin-bottom: 4px;
+  }
+  .dm-bars-head { margin-bottom: 16px; }
+  .dm-bars-title {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2A55F5;
+  }
+  .dm-bars-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 6px;
+    height: 104px;
+  }
+  .dm-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    height: 100%;
+  }
+  .dm-bar {
+    width: 100%;
+    min-height: 8px;
+    transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .dm-bar-lbl {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8A8A8A;
+  }
+
+  /* ── RECENT ACTIVITIES ── */
+  .dm-recent-card {
+    background: #fff;
+    border-bottom: 2px solid #16130F;
+    padding: 18px 20px;
+    margin-bottom: 4px;
+  }
+  .dm-recent-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .dm-recent-title {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2A55F5;
+  }
+  .dm-recent-all {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #16130F;
+    text-decoration: none;
+  }
+  .dm-recent-all:hover { color: #2A55F5; text-decoration: none; }
+  .dm-activity-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #E7DFCE;
+    text-decoration: none;
+    color: #16130F;
+  }
+  .dm-activity-row:last-child { border-bottom: none; }
+  .dm-activity-row:hover { text-decoration: none; color: #2A55F5; }
+  .dm-act-icon {
+    width: 38px;
+    height: 38px;
+    background: #F1EADC;
+    border: 2px solid #16130F;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .dm-act-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .dm-act-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dm-act-meta {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: #8A8A8A;
+    font-variant-numeric: tabular-nums;
+  }
+  .dm-act-date {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.58rem;
+    font-weight: 600;
+    color: #8A8A8A;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .dm-recent-empty {
+    font-size: 0.88rem;
+    color: #8A8A8A;
+    text-align: center;
+    padding: 20px 0;
+    font-style: italic;
+  }
+
+  /* ── COMPLETE PROFILE ── */
+  .dm-profile-card {
+    background: #fff;
+    border-bottom: 2px solid #16130F;
+    padding: 18px 20px;
+    margin-bottom: 4px;
+  }
+  .dm-profile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .dm-profile-pct {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: #2A55F5;
+  }
+  .dm-profile-bar {
+    height: 6px;
+    background: #EDE5D5;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .dm-profile-fill {
+    height: 100%;
+    background: #2A55F5;
+    transition: width 0.6s ease;
+  }
+  .dm-profile-items { display: flex; flex-direction: column; gap: 8px; }
+  .dm-profile-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: #16130F;
+  }
+  .dm-profile-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .dm-profile-check--empty { border: 2px solid #E7DFCE; background: transparent; }
+
+  /* ── UPGRADE TO PRO ── */
+  .dm-upgrade-card {
+    background: #2A55F5;
+    color: #fff;
+    border-bottom: 2px solid #16130F;
+    box-shadow: 0 4px 0 #16130F;
+    padding: 24px 20px;
+    margin-bottom: 4px;
+  }
+  .dm-upgrade-eyebrow {
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 8px;
+  }
+  .dm-upgrade-headline {
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    line-height: 0.88;
+    margin-bottom: 18px;
+  }
+  .dm-upgrade-cta {
+    display: inline-block;
+    background: #FBF6EC;
+    color: #16130F;
+    border: 2px solid #16130F;
+    border-radius: 999px;
+    padding: 11px 22px;
+    font-family: 'Spline Sans Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 3px 3px 0 #16130F;
+    transition: opacity 0.15s;
+  }
+  .dm-upgrade-cta:hover { opacity: 0.85; text-decoration: none; color: #16130F; }
+
+} /* end @media (max-width: 768px) */
 </style>
