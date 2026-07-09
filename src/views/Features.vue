@@ -226,6 +226,9 @@ const kitItems = [
   position: absolute;
   inset: 0;
   background: #D5C9B5;
+  background-image: url('https://images.unsplash.com/photo-1486218119243-13301bc199c2?w=600&fit=crop&q=80');
+  background-size: cover;
+  background-position: center;
 }
 .photo-overlay {
   position: absolute;

@@ -376,6 +376,14 @@ function scrollTo(id) {
   position: absolute;
   inset: 0;
   background: #D5C9B5;
+  background-size: cover;
+  background-position: center;
+}
+.hero-card--back .hero-card-placeholder {
+  background-image: url('https://images.unsplash.com/photo-1571019613914-85f342c6a11e?w=600&fit=crop&q=80');
+}
+.hero-card--front .hero-card-placeholder {
+  background-image: url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=440&fit=crop&q=80');
 }
 .hero-card-overlay {
   position: absolute;
@@ -852,6 +860,9 @@ function scrollTo(id) {
   position: absolute;
   inset: 0;
   background: #D5C9B5;
+  background-image: url('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&fit=crop&q=80');
+  background-size: cover;
+  background-position: center top;
 }
 .moment-overlay {
   position: absolute;

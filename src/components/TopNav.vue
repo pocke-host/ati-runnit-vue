@@ -272,20 +272,16 @@
           </nav>
 
           <div class="drawer-footer">
-            <router-link to="/settings" class="drawer-link drawer-link-settings" @click="mobileMenuOpen = false">Settings</router-link>
+            <div class="drawer-footer-row">
+              <router-link to="/settings" class="drawer-link drawer-link-settings" @click="mobileMenuOpen = false">Settings</router-link>
+              <button class="drawer-link drawer-link-signout" @click="handleLogout">Sign Out</button>
+            </div>
             <router-link
-              v-if="subscriptionTier !== 'free'"
-              to="/billing"
-              class="drawer-link drawer-link-settings"
-              @click="mobileMenuOpen = false"
-            >Billing</router-link>
-            <router-link
-              v-else
+              v-if="subscriptionTier === 'free'"
               to="/subscribe"
-              class="drawer-link drawer-link-settings"
+              class="drawer-upgrade-pill"
               @click="mobileMenuOpen = false"
-            >Upgrade</router-link>
-            <button class="drawer-link drawer-link-signout" @click="handleLogout">Sign Out</button>
+            >Upgrade to Pro →</router-link>
           </div>
         </template>
 
@@ -1215,14 +1211,35 @@ onUnmounted(() => {
   flex-direction: column;
 }
 .drawer-footer {
-  padding: 14px 20px;
+  padding: 12px 20px;
   border-top: 2px solid rgba(251, 246, 236, 0.15);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 8px;
+}
+.drawer-footer-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-shrink: 0;
-  gap: 12px;
 }
+.drawer-upgrade-pill {
+  display: block;
+  background: transparent;
+  border: 1px solid rgba(42,85,245,0.5);
+  color: #2A55F5;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  padding: 9px 16px;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+}
+.drawer-upgrade-pill:hover { background: #2A55F5; color: #fff; }
 .drawer-link {
   position: relative;
   display: flex;
@@ -1270,7 +1287,7 @@ onUnmounted(() => {
   border-radius: 999px;
   padding: 12px 16px;
   justify-content: center;
-  box-shadow: 3px 3px 0 rgba(251, 246, 236, 0.25);
+  box-shadow: 3px 3px 0 rgba(251, 246, 236, 0.5);
   width: 100%;
   letter-spacing: 0.1em;
 }
