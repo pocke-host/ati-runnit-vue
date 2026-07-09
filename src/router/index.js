@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { nextTick } from 'vue'
 
 // Legal pages (stay in components)
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
@@ -93,7 +94,7 @@ const router = createRouter({
 })
 
 router.afterEach(() => {
-  window.scrollTo(0, 0)
+  nextTick(() => window.scrollTo({ top: 0, behavior: 'instant' }))
 })
 
 router.beforeEach((to, from, next) => {
