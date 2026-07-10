@@ -228,47 +228,50 @@
                 Create Moment
               </router-link>
             </template>
-            <!-- Athlete drawer links -->
+            <!-- Athlete tile nav v2 -->
             <template v-else>
-              <router-link to="/dashboard" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                Dashboard
-              </router-link>
-              <router-link to="/feed" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18"/></svg>
-                Feed
-              </router-link>
-              <div class="drawer-section-divider"></div>
-              <div class="drawer-track-wrap">
-                <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
-                  <span class="drawer-track-icon">▶</span>
-                  Track Activity
-                </router-link>
+              <div class="drawer-tile-section">
+                <div class="drawer-group-label">Train</div>
+                <div class="drawer-tile-grid">
+                  <router-link to="/dashboard" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                  </router-link>
+                  <router-link to="/feed" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18"/></svg>
+                    <span>Feed</span>
+                  </router-link>
+                  <router-link to="/calendar" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 2v4M16 2v4M4 10h16"/></svg>
+                    <span>Calendar</span>
+                  </router-link>
+                  <router-link to="/stats" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+                    <span>Stats</span>
+                  </router-link>
+                </div>
               </div>
-              <router-link to="/stats" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
-                Stats
-              </router-link>
-              <router-link to="/achievements" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9a6 6 0 0 0 12 0V3H6Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 21h6M12 15v6"/></svg>
-                Achievements
-              </router-link>
-              <router-link to="/clubs" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
-                Clubs
-              </router-link>
-              <router-link to="/challenges" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>
-                Challenges
-              </router-link>
-              <router-link to="/plans" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="1"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
-                Training Plans
-              </router-link>
-              <router-link to="/devices" class="drawer-link" @click="mobileMenuOpen = false">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="7" y="4" width="10" height="16" rx="2.5"/><path d="M11 4h2"/></svg>
-                Devices
-              </router-link>
+              <div class="drawer-tile-section">
+                <div class="drawer-group-label">Compete &amp; Connect</div>
+                <div class="drawer-tile-grid">
+                  <router-link to="/achievements" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9a6 6 0 0 0 12 0V3H6Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 21h6M12 15v6"/></svg>
+                    <span>Achievements</span>
+                  </router-link>
+                  <router-link to="/clubs" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
+                    <span>Clubs</span>
+                  </router-link>
+                  <router-link to="/challenges" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>
+                    <span>Challenges</span>
+                  </router-link>
+                  <router-link to="/devices" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="7" y="4" width="10" height="16" rx="2.5"/><path d="M11 4h2"/></svg>
+                    <span>Devices</span>
+                  </router-link>
+                </div>
+              </div>
             </template>
           </nav>
 
@@ -1206,7 +1209,7 @@ onUnmounted(() => {
 /* Nav links */
 .drawer-nav {
   flex: 1;
-  padding: 8px 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
 }
@@ -1384,6 +1387,61 @@ onUnmounted(() => {
   padding: 0 4px;
   border-radius: 999px;
 }
+
+/* Nav tile groups (v2) */
+.drawer-tile-section {
+  padding: 16px 16px 0;
+}
+.drawer-tile-section + .drawer-tile-section {
+  padding-top: 12px;
+}
+.drawer-group-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(251, 246, 236, 0.45);
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+.drawer-tile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.drawer-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 14px 10px;
+  border: 1.5px solid rgba(251, 246, 236, 0.18);
+  border-radius: 2px;
+  text-decoration: none;
+  color: rgba(251, 246, 236, 0.75);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  cursor: pointer;
+}
+.drawer-tile svg { flex-shrink: 0; stroke: currentColor; }
+.drawer-tile:hover {
+  color: #FBF6EC;
+  background: rgba(251, 246, 236, 0.06);
+  border-color: rgba(251, 246, 236, 0.35);
+}
+.drawer-tile--active {
+  background: rgba(42, 85, 245, 0.16);
+  border-color: #2A55F5;
+  color: #2A55F5;
+}
+.drawer-tile--active svg { stroke: #2A55F5; }
 
 /* Transitions */
 .drawer-fade-enter-active, .drawer-fade-leave-active { transition: opacity 0.20s ease; }
