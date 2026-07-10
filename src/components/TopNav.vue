@@ -504,7 +504,6 @@ onUnmounted(() => {
   align-items: center;
   gap: 16px;
   padding-left: 20px;
-  border-left: 2px solid #E7DFCE;
 }
 
 .brand-text {
