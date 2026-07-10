@@ -58,6 +58,54 @@
       </div>
     </div>
 
+    <!-- Content zone — visible in ready state only; fills dead ink space above the sheet -->
+    <div v-if="!hasStarted" class="lt-content-zone">
+
+      <!-- Elevation teaser -->
+      <div class="lt-cz-card">
+        <div class="lt-cz-eyebrow">ELEVATION PROFILE</div>
+        <svg class="lt-cz-elev-svg" viewBox="0 0 280 52" preserveAspectRatio="none" aria-hidden="true">
+          <polyline
+            points="0,48 40,36 80,42 130,14 175,24 210,8 250,20 280,26"
+            fill="none" stroke="#2A55F5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+          />
+          <polyline
+            points="0,48 40,36 80,42 130,14 175,24 210,8 250,20 280,26 280,52 0,52"
+            fill="rgba(42,85,245,0.14)" stroke="none"
+          />
+        </svg>
+        <div class="lt-cz-elev-note">Elevation loads once you start tracking</div>
+      </div>
+
+      <!-- Today's plan -->
+      <div class="lt-cz-card lt-cz-card--plan">
+        <div class="lt-cz-eyebrow">TODAY'S PLAN</div>
+        <div class="lt-cz-plan-row">
+          <span class="lt-cz-plan-name">Tempo Intervals</span>
+          <router-link to="/plans" class="lt-cz-plan-link">View →</router-link>
+        </div>
+      </div>
+
+      <!-- 3-up mini stats -->
+      <div class="lt-cz-stats">
+        <div class="lt-cz-ms">
+          <div class="lt-cz-ms-label">LAST RUN</div>
+          <div class="lt-cz-ms-val">—</div>
+        </div>
+        <div class="lt-cz-ms-div"></div>
+        <div class="lt-cz-ms">
+          <div class="lt-cz-ms-label">WK TOTAL</div>
+          <div class="lt-cz-ms-val">—</div>
+        </div>
+        <div class="lt-cz-ms-div"></div>
+        <div class="lt-cz-ms">
+          <div class="lt-cz-ms-label">STREAK</div>
+          <div class="lt-cz-ms-val lt-cz-ms-val--streak">0 days</div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- Draft Recovery Banner -->
     <div v-if="showDraftBanner" class="lt-draft-banner">
       <div class="lt-draft-text">
@@ -1623,5 +1671,121 @@ onUnmounted(() => {
   .lt-ctrl--pause { width: 56px; height: 56px; }
   .lt-ctrl--lap { width: 48px; height: 48px; }
   .lt-ctrl-row { gap: 20px; }
+}
+
+/* ── Content zone (ready state) ── */
+.lt-content-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #16130F;
+  border-top: 2px solid rgba(251,246,236,0.12);
+  flex-shrink: 0;
+}
+
+.lt-cz-card {
+  padding: 14px 20px;
+  border-bottom: 2px solid rgba(251,246,236,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lt-cz-eyebrow {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.4);
+}
+
+/* Elevation card */
+.lt-cz-elev-svg {
+  width: 100%;
+  height: 52px;
+  display: block;
+}
+
+.lt-cz-elev-note {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.72rem;
+  color: rgba(251,246,236,0.35);
+}
+
+/* Plan card */
+.lt-cz-card--plan { padding-top: 12px; padding-bottom: 12px; }
+
+.lt-cz-plan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lt-cz-plan-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #FBF6EC;
+  line-height: 0.95;
+}
+
+.lt-cz-plan-link {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #2A55F5;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.lt-cz-plan-link:hover { color: #FBF6EC; }
+
+/* 3-up mini stats */
+.lt-cz-stats {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 2px solid rgba(251,246,236,0.1);
+}
+
+.lt-cz-ms {
+  flex: 1;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.lt-cz-ms-div {
+  width: 2px;
+  background: rgba(251,246,236,0.1);
+  flex-shrink: 0;
+}
+
+.lt-cz-ms-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(251,246,236,0.4);
+}
+
+.lt-cz-ms-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #FBF6EC;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.lt-cz-ms-val--streak {
+  color: #FFC53D;
 }
 </style>
