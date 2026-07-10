@@ -250,6 +250,41 @@
       </div>
     </section>
 
+    <!-- DATA TRANSPARENCY -->
+    <section class="content-section content-section--cream-border">
+      <div class="home-inner">
+        <div class="data-section">
+          <div class="data-header">
+            <div class="rk-eyebrow">Your Data</div>
+            <h2 class="section-h2">What we ask for.<br>Why we ask for it.</h2>
+          </div>
+          <div class="data-grid">
+            <div class="data-card">
+              <div class="data-card-icon">@</div>
+              <div class="data-card-label">Email address</div>
+              <div class="data-card-why">Used to create and manage your Runnit account. We send transactional emails only — no marketing spam.</div>
+            </div>
+            <div class="data-card">
+              <div class="data-card-icon">◎</div>
+              <div class="data-card-label">Name &amp; profile photo</div>
+              <div class="data-card-why">Used to set up your public athlete profile. You can change or remove these at any time from Settings.</div>
+            </div>
+            <div class="data-card">
+              <div class="data-card-icon">⊞</div>
+              <div class="data-card-label">Activity &amp; GPS data</div>
+              <div class="data-card-why">Used to track your training, display stats, and build your personalized training plan. Never shared without your permission.</div>
+            </div>
+            <div class="data-card data-card--pledge">
+              <div class="pledge-line">We do not sell your data.</div>
+              <div class="pledge-line">We do not serve you third-party ads.</div>
+              <div class="pledge-line">You can delete your account and all data at any time.</div>
+              <router-link to="/privacy" class="pledge-link">Read the full Privacy Policy →</router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- MOMENTS -->
     <section class="content-section">
       <div class="home-inner">
@@ -1055,6 +1090,81 @@ function scrollTo(id) {
   display: inline-block;
   animation: rkBlink 1.4s infinite;
   flex-shrink: 0;
+}
+
+/* ── DATA TRANSPARENCY ── */
+.data-section {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.data-header { max-width: 520px; }
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.data-card {
+  border: 2px solid #16130F;
+  padding: 22px 18px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.data-card-icon {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2A55F5;
+  line-height: 1;
+}
+.data-card-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #16130F;
+}
+.data-card-why {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #5A5348;
+}
+.data-card--pledge {
+  background: #16130F;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+.pledge-line {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FBF6EC;
+  line-height: 1.4;
+}
+.pledge-link {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2A55F5;
+  text-decoration: none;
+  margin-top: 6px;
+}
+.pledge-link:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .data-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .data-grid { grid-template-columns: 1fr; }
 }
 
 /* ── MOMENTS ── */
