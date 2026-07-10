@@ -1886,9 +1886,34 @@ onUnmounted(() => {
   }
 }
 
+@media (max-width: 640px) {
+  /* Hide the date — no room, subline covers context */
+  .feed-date-text { display: none; }
+
+  /* Stack controls: tabs row, then chips row below */
+  .feed-controls-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .feed-time-chips {
+    width: 100%;
+    border-top: 1px solid #E7DFCE;
+    padding: 8px 0;
+    gap: 6px;
+  }
+  /* Tighten chip text so all 3 fit on one line */
+  .time-chip {
+    padding: 6px 10px;
+    font-size: 0.58rem;
+  }
+
+  /* Extra top padding since header is now taller (two rows) */
+  .feed-container { padding-top: 220px; }
+}
+
 @media (max-width: 375px) {
   .feed-header-inner { padding: 0 8px; }
-  .feed-container { padding: 8px; padding-top: 168px; }
+  .feed-container { padding: 8px; padding-top: 228px; }
 }
 
 .create-event-btn {
