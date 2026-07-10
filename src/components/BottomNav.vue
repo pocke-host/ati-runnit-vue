@@ -42,9 +42,9 @@
         </div>
         <span class="tab-label">Track</span>
       </router-link>
-      <router-link to="/plans" class="tab-item" active-class="tab-active">
-        <i class="bi bi-calendar-week-fill tab-icon"></i>
-        <span class="tab-label">Plans</span>
+      <router-link to="/calendar" class="tab-item" active-class="tab-active">
+        <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M10 14h1M10 17h1M14 14h1"/></svg>
+        <span class="tab-label">Calendar</span>
       </router-link>
       <router-link v-if="userId" :to="`/profile/${userId}`" class="tab-item" active-class="tab-active">
         <i class="bi bi-person-fill tab-icon"></i>
@@ -80,8 +80,8 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   height: auto;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 900;
-  background: #fff;
-  border-top: 2px solid #E7DFCE;
+  background: #FBF6EC;
+  border-top: 2px solid #16130F;
   box-shadow: none;
   align-items: center;
   justify-content: space-around;
@@ -134,8 +134,8 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
 }
 
 .track-circle {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: #2A55F5;
   display: flex;
@@ -143,8 +143,9 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   justify-content: center;
   color: #fff;
   font-size: 1.3rem;
-  margin-top: -16px; /* rises above bar */
-  box-shadow: none;
+  margin-top: -22px;
+  border: 3px solid #FBF6EC;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.25);
   transition: transform 0.15s;
   flex-shrink: 0;
 }
