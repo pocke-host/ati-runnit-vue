@@ -13,19 +13,19 @@
 
       <!-- Sidebar nav -->
       <nav class="st-sidebar">
-        <div class="st-sidebar-item st-sidebar-item--active">Account</div>
-        <div class="st-sidebar-item">Units &amp; Display</div>
-        <div class="st-sidebar-item">Privacy</div>
-        <div class="st-sidebar-item">Connected Apps</div>
-        <div class="st-sidebar-item">Notifications</div>
-        <div class="st-sidebar-item">Billing</div>
+        <a href="#section-account" class="st-sidebar-item st-sidebar-item--active">Account</a>
+        <a href="#section-units" class="st-sidebar-item">Units &amp; Display</a>
+        <a href="#section-privacy" class="st-sidebar-item">Privacy</a>
+        <router-link to="/devices" class="st-sidebar-item">Connected Apps</router-link>
+        <router-link to="/notifications" class="st-sidebar-item">Notifications</router-link>
+        <router-link to="/billing" class="st-sidebar-item">Billing</router-link>
       </nav>
 
       <!-- Right panel -->
       <div class="st-panel">
 
         <!-- ── PROFILE ─────────────────────────────── -->
-        <section class="settings-section">
+        <section class="settings-section" id="section-account">
           <div class="section-label">Account</div>
 
           <div class="settings-card">
@@ -84,7 +84,7 @@
         </section>
 
         <!-- ── UNITS ──────────────────────────────── -->
-        <section class="settings-section">
+        <section class="settings-section" id="section-units">
           <div class="section-label">Units</div>
           <div class="section-sublabel">Choose how distances, elevation, and pace are displayed.</div>
 
@@ -143,7 +143,7 @@
         </section>
 
         <!-- ── PRIVACY ────────────────────────────── -->
-        <section class="settings-section">
+        <section class="settings-section" id="section-privacy">
           <div class="section-label">Privacy</div>
           <div class="settings-card">
             <div class="field-row">
@@ -563,6 +563,7 @@ onMounted(() => {
   align-self: start;
 }
 .st-sidebar-item {
+  display: block;
   padding: 12px 22px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.7rem;
@@ -572,6 +573,7 @@ onMounted(() => {
   color: #5a5348;
   cursor: pointer;
   transition: color 0.15s;
+  text-decoration: none;
 }
 .st-sidebar-item:hover { color: #16130F; background: #F1EADC; }
 .st-sidebar-item--active {
@@ -591,7 +593,12 @@ onMounted(() => {
 }
 
 /* ── Sections ── */
-.settings-section { display: flex; flex-direction: column; gap: 12px; }
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-margin-top: calc(var(--nav-h, 66px) + 16px);
+}
 
 .section-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
