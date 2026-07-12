@@ -38,6 +38,46 @@
                   <li v-for="(item, j) in block.list" :key="j">{{ item }}</li>
                 </ul>
               </div>
+
+              <!-- Google Sign-In section — injected here for OAuth consent screen compliance -->
+              <template v-if="section.id === 'third-party-integrations'">
+                <h3 class="block-heading">Google Sign-In</h3>
+                <p class="block-text">
+                  RUNNIT offers "Sign in with Google" as an authentication option. When you sign in with Google,
+                  we receive the following information from your Google account via Google's OAuth 2.0 service:
+                </p>
+                <ul class="block-list">
+                  <li><strong>Email address</strong> — used to create or identify your RUNNIT account</li>
+                  <li><strong>Name</strong> — used to populate your athlete profile display name</li>
+                  <li><strong>Profile photo</strong> — used as your profile avatar (you can remove it at any time from Settings)</li>
+                  <li><strong>Google account ID</strong> — a unique identifier used to link your Google account to your RUNNIT profile and authenticate future sign-ins</li>
+                </ul>
+                <h3 class="block-heading">How Google Sign-In Data is Used</h3>
+                <p class="block-text">
+                  Data received via Google Sign-In is used solely to create and maintain your RUNNIT account, authenticate your session,
+                  and pre-populate your athlete profile. We do not request access to your Google Drive, Gmail, Calendar, contacts,
+                  or any other Google service beyond basic profile information.
+                </p>
+                <h3 class="block-heading">How Google Sign-In Data is Stored</h3>
+                <p class="block-text">
+                  Your email, name, and avatar URL are stored in our database and associated with your RUNNIT account.
+                  Your Google account ID is stored only to enable future sign-ins and account linking — it is never exposed
+                  to other users or shared with third parties.
+                </p>
+                <h3 class="block-heading">Disconnecting Google Sign-In</h3>
+                <p class="block-text">
+                  You can disconnect your Google account from RUNNIT at any time through Settings. You may also revoke
+                  RUNNIT's access to your Google account directly at
+                  <a href="https://myaccount.google.com/permissions" class="contact-email" target="_blank" rel="noopener noreferrer">myaccount.google.com/permissions</a>.
+                  To permanently delete your account and all associated data, contact us at
+                  <a href="mailto:privacy@runnit.live" class="contact-email">privacy@runnit.live</a>.
+                </p>
+                <p class="block-text">
+                  RUNNIT's use of information received from Google APIs will adhere to the
+                  <a href="https://developers.google.com/terms/api-services-user-data-policy" class="contact-email" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>,
+                  including the Limited Use requirements.
+                </p>
+              </template>
             </section>
 
             <!-- Contact box -->
