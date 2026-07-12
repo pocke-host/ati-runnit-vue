@@ -243,13 +243,16 @@ const onSubmit = async (e) => {
     clearFailures()
     router.push(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
   } catch (err) {
-    recordFailure()
+    const isCredentialError = err?.response?.status === 401
+    if (isCredentialError) recordFailure()
     if (isLocked.value) {
       error.value = `Too many failed attempts. Try again in ${lockCountdown.value}s.`
-    } else {
+    } else if (isCredentialError) {
       const remaining = MAX_ATTEMPTS - failCount.value
-      error.value = (err?.response?.data?.message || 'Incorrect email or password.') +
+      error.value = 'Incorrect email or password.' +
         (remaining > 0 ? ` ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` : '')
+    } else {
+      error.value = 'Something went wrong — please try again.'
     }
   } finally {
     loading.value = false
