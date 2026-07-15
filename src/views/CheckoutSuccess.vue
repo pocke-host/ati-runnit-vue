@@ -1,12 +1,11 @@
 <template>
   <main class="success-page">
-
     <div class="success-card">
 
       <!-- Check icon -->
       <div class="check-wrap">
         <div class="check-circle">
-          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#FBF6EC" stroke-width="3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FBF6EC" stroke-width="3">
             <path d="M4 13l5 5L20 6"/>
           </svg>
         </div>
@@ -35,12 +34,13 @@
         </div>
       </div>
 
-      <!-- CTA -->
-      <router-link to="/dashboard" class="btn-dashboard">Go to Dashboard →</router-link>
-      <router-link to="/billing" class="btn-receipt">View Receipt</router-link>
+      <!-- CTAs -->
+      <div class="cta-row">
+        <router-link to="/dashboard" class="btn-dashboard">Go to Dashboard →</router-link>
+        <router-link to="/billing" class="btn-receipt">View Receipt</router-link>
+      </div>
 
     </div>
-
   </main>
 </template>
 
@@ -59,8 +59,8 @@ onMounted(async () => {
   try { await authStore.fetchCurrentUser() } catch { /* proceed regardless */ }
 })
 
-const tierLabel = computed(() => subscriptionTier.value === 'duo' ? 'Elite' : 'Premium')
-const planName  = computed(() => subscriptionTier.value === 'duo' ? 'Runnit Elite' : 'Runnit Pro')
+const tierLabel     = computed(() => subscriptionTier.value === 'duo' ? 'Elite' : 'Premium')
+const planName      = computed(() => subscriptionTier.value === 'duo' ? 'Runnit Elite' : 'Runnit Pro')
 const billingAmount = computed(() => subscriptionTier.value === 'duo' ? '$19.00 / mo' : '$9.00 / mo')
 
 const nextChargeDate = computed(() => {
@@ -113,6 +113,7 @@ const nextChargeDate = computed(() => {
   justify-content: center;
   box-shadow: 5px 5px 0 rgba(251,246,236,0.15);
 }
+.check-circle svg { width: 40px; height: 40px; }
 
 /* ── Headline ── */
 .headline-block {
@@ -171,16 +172,22 @@ const nextChargeDate = computed(() => {
   text-transform: uppercase;
   color: rgba(251,246,236,0.55);
 }
-.plan-value {
-  font-weight: 800;
-  font-size: 0.9rem;
-}
+.plan-value { font-weight: 800; font-size: 0.9rem; }
 .plan-value--mono {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-weight: 600;
 }
 
 /* ── CTAs ── */
+.cta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  width: 100%;
+  animation: rkRise 0.5s ease-out 0.3s both;
+}
 .btn-dashboard {
   display: block;
   width: 100%;
@@ -196,15 +203,12 @@ const nextChargeDate = computed(() => {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  margin-top: 28px;
   box-shadow: 4px 4px 0 rgba(251,246,236,0.25);
-  animation: rkRise 0.5s ease-out 0.3s both;
   transition: background 0.15s;
 }
 .btn-dashboard:hover { background: #1E42D6; color: #fff; text-decoration: none; }
 
 .btn-receipt {
-  display: block;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.66rem;
   font-weight: 700;
@@ -212,9 +216,54 @@ const nextChargeDate = computed(() => {
   text-transform: uppercase;
   color: rgba(251,246,236,0.55);
   text-decoration: none;
-  margin-top: 16px;
-  animation: rkRise 0.5s ease-out 0.35s both;
   transition: color 0.15s;
 }
 .btn-receipt:hover { color: #FBF6EC; text-decoration: none; }
+
+/* ── Desktop ── */
+@media (min-width: 768px) {
+  .success-page { padding: 80px 28px; }
+
+  .success-card { max-width: 480px; }
+
+  .check-circle {
+    width: 104px;
+    height: 104px;
+    box-shadow: 6px 6px 0 rgba(251,246,236,0.15);
+  }
+  .check-circle svg { width: 48px; height: 48px; }
+
+  .headline-block { margin-top: 30px; }
+  .badge-sticker { font-size: 0.72rem; padding: 7px 15px; }
+
+  .success-h1 { font-size: 88px; margin-top: 22px; }
+
+  .success-sub {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    max-width: 480px;
+    margin-top: 18px;
+  }
+
+  .plan-card { max-width: 420px; margin-top: 32px; }
+  .plan-row { padding: 14px 20px; }
+  .plan-value { font-size: 0.95rem; }
+  .plan-value--mono { font-size: 0.95rem; }
+
+  .cta-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 30px;
+  }
+  .btn-dashboard {
+    width: auto;
+    padding: 16px 32px;
+    font-size: 0.8rem;
+  }
+  .btn-receipt {
+    font-size: 0.72rem;
+  }
+}
 </style>
