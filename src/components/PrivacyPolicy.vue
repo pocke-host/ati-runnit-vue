@@ -105,7 +105,7 @@ import { useHead } from '@unhead/vue'
 useHead({
   title: 'Privacy Policy — Runnit',
   meta: [
-    { name: 'description', content: 'Read the Runnit Privacy Policy. Understand how we collect, use, and protect your data, including GPS activity data, Garmin and Strava integrations.' },
+    { name: 'description', content: 'Read the Runnit Privacy Policy. Understand how we collect, use, and protect your data, including GPS activity data, Garmin, COROS, and Apple Health integrations.' },
     { property: 'og:title', content: 'Privacy Policy — Runnit' },
     { property: 'og:url', content: 'https://runnit.live/privacy' },
   ]
@@ -213,10 +213,6 @@ const sections = [
       {
         heading: 'Disconnecting Garmin',
         text: 'You may disconnect your Garmin account at any time from your device settings within the RUNNIT app. Upon disconnection, we revoke our OAuth access token. You may also request deletion of all Garmin-sourced data by contacting privacy@runnit.live.'
-      },
-      {
-        heading: 'Strava',
-        text: 'RUNNIT integrates with the Strava API to import activities from your Strava account. The same data principles apply: Strava data is used only to display and analyze your training within RUNNIT and is never sold or shared with third parties.'
       },
       {
         text: 'RUNNIT\'s use of data from third-party integrations is limited to providing and improving the core features of the platform as requested by the user.'
