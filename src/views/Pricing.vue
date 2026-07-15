@@ -52,7 +52,9 @@
               <li><b class="check">✓</b>&nbsp; Garmin sync</li>
               <li><b class="check">✓</b>&nbsp; PR tracking</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--cobalt">Start Pro</router-link>
+            <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
+              {{ checkoutLoading === 'premium' ? 'Loading…' : 'Start Pro' }}
+            </button>
           </div>
 
           <!-- Elite -->
@@ -70,7 +72,9 @@
               <li><b class="check">✓</b>&nbsp; Priority live share</li>
               <li><b class="check">✓</b>&nbsp; Early features</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--outline">Go Elite</router-link>
+            <button class="btn-plan btn-plan--outline" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
+              {{ checkoutLoading === 'duo' ? 'Loading…' : 'Go Elite' }}
+            </button>
           </div>
 
         </div>
@@ -90,6 +94,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useHead } from '@unhead/vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/auth'
+import { useStripe } from '@/composables/useStripe'
 
 useHead({
   title: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes',
@@ -109,6 +117,25 @@ useHead({
 })
 
 const annual = ref(false)
+const checkoutLoading = ref(null)
+
+const router = useRouter()
+const { isAuthenticated } = storeToRefs(useAuthStore())
+const { redirectToCheckout } = useStripe()
+
+const handlePlanClick = async (tier) => {
+  const period = annual.value ? 'annual' : 'monthly'
+  if (isAuthenticated.value) {
+    checkoutLoading.value = tier
+    try {
+      await redirectToCheckout(tier, period)
+    } finally {
+      checkoutLoading.value = null
+    }
+  } else {
+    router.push({ path: '/signup', query: { plan: tier, period } })
+  }
+}
 </script>
 
 <style scoped>
@@ -272,8 +299,11 @@ const annual = ref(false)
   padding: 13px 0;
   font-weight: 800;
   font-size: 0.9rem;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   text-decoration: none;
+  cursor: pointer;
   transition: opacity 0.15s;
+  width: 100%;
 }
 .btn-plan--outline {
   background: #fff;
@@ -285,7 +315,8 @@ const annual = ref(false)
   color: #fff;
   border: 2px solid #16130F;
 }
-.btn-plan:hover { opacity: 0.8; }
+.btn-plan:hover:not(:disabled) { opacity: 0.8; }
+.btn-plan:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── CTA ── */
 .final-cta {
