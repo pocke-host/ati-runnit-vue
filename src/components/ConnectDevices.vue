@@ -86,14 +86,36 @@
         </div>
       </div>
 
-      <!-- COROS (Coming Soon) -->
-      <div class="device-card device-coming-soon">
+      <!-- COROS -->
+      <div class="device-card">
         <div class="device-icon-circle">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
         </div>
         <h3>COROS</h3>
-        <p>Sync workouts from COROS watches</p>
-        <div class="coming-soon-badge">COMING SOON</div>
+        <p>Sync runs, rides, and swims from your COROS watch</p>
+
+        <template v-if="!corosConnected">
+          <button class="btn btn-primary" @click="connectCoros" :disabled="loading">
+            Connect COROS
+          </button>
+        </template>
+        <template v-else>
+          <div class="connected-state">
+            <div class="connected-chip">
+              <span class="green-dot"></span>
+              CONNECTED
+            </div>
+            <div class="last-sync-label">
+              Last synced: {{ relativeTime(corosLastSync) }}
+            </div>
+            <div v-if="syncCounts.coros" class="sync-count">{{ syncCounts.coros }} activities synced</div>
+            <button class="btn btn-primary" @click="syncCoros" :disabled="syncing">
+              <span v-if="syncing" class="spinner"></span>
+              {{ syncing ? 'Syncing…' : 'Sync Now' }}
+            </button>
+            <button class="btn-disconnect" @click="disconnectCoros">Disconnect</button>
+          </div>
+        </template>
       </div>
 
       <!-- Wahoo -->
@@ -157,6 +179,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const garminConnected = ref(false)
 const garminLastSync = ref(null)
+const corosConnected = ref(false)
+const corosLastSync = ref(null)
 const zwiftConnected = ref(false)
 const wahooConnected = ref(false)
 const wahooLastSync = ref(null)
@@ -165,15 +189,15 @@ const syncing = ref(false)
 const gpxImporting = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
-const syncCounts = ref({ garmin: 0, wahoo: 0 })
+const syncCounts = ref({ garmin: 0, coros: 0, wahoo: 0 })
 
 
 
 const { showToast } = useToast()
 const showDisconnectConfirm = ref(false)
-const pendingDisconnect = ref(null) // 'garmin' | 'zwift' | 'wahoo'
+const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'zwift' | 'wahoo'
 
-const disconnectLabels = { garmin: 'Garmin', zwift: 'Zwift', wahoo: 'Wahoo' }
+const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', zwift: 'Zwift', wahoo: 'Wahoo' }
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -200,8 +224,9 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, zwiftRes, wahooRes, countsRes] = await Promise.all([
+  const [garminRes, corosRes, zwiftRes, wahooRes, countsRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
+    safeFetch(`${API_URL}/integrations/coros/status`),
     safeFetch(`${API_URL}/integrations/zwift/status`),
     safeFetch(`${API_URL}/integrations/wahoo/status`),
     safeFetch(`${API_URL}/integrations/sync-counts`),
@@ -209,6 +234,10 @@ const checkConnectionStatus = async () => {
   if (garminRes) {
     garminConnected.value = garminRes.data.connected
     garminLastSync.value = garminRes.data.lastSync || null
+  }
+  if (corosRes) {
+    corosConnected.value = corosRes.data.connected
+    corosLastSync.value = corosRes.data.lastSync || null
   }
   if (zwiftRes) {
     zwiftConnected.value = zwiftRes.data.connected
@@ -235,6 +264,7 @@ const connectGarmin = async () => {
 }
 
 const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconnectConfirm.value = true }
+const disconnectCoros  = () => { pendingDisconnect.value = 'coros';  showDisconnectConfirm.value = true }
 const disconnectZwift  = () => { pendingDisconnect.value = 'zwift';  showDisconnectConfirm.value = true }
 const disconnectWahoo  = () => { pendingDisconnect.value = 'wahoo';  showDisconnectConfirm.value = true }
 
@@ -244,6 +274,7 @@ const doDisconnect = async () => {
   try {
     await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
     if (service === 'garmin') { garminConnected.value = false; garminLastSync.value = null }
+    if (service === 'coros')  { corosConnected.value  = false; corosLastSync.value  = null }
     if (service === 'zwift')  { zwiftConnected.value  = false }
     if (service === 'wahoo')  { wahooConnected.value  = false; wahooLastSync.value  = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
@@ -257,6 +288,31 @@ const syncNow = async () => {
   try {
     await axios.post(`${API_URL}/integrations/garmin/sync`, {}, { headers: getAuthHeaders() })
     showStatus('Sync triggered — activities will appear shortly.')
+    await checkConnectionStatus()
+  } catch {
+    showStatus('Sync failed. Please try again.', 'error')
+  } finally {
+    syncing.value = false
+  }
+}
+
+const connectCoros = async () => {
+  loading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/coros/connect`, { headers: getAuthHeaders() })
+    window.location.href = data.url
+  } catch {
+    showStatus('Failed to connect COROS. Please try again.', 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+const syncCoros = async () => {
+  syncing.value = true
+  try {
+    await axios.post(`${API_URL}/integrations/coros/sync`, {}, { headers: getAuthHeaders() })
+    showStatus('COROS sync triggered — activities will appear shortly.')
     await checkConnectionStatus()
   } catch {
     showStatus('Sync failed. Please try again.', 'error')
@@ -330,6 +386,9 @@ onMounted(() => {
   if (params.get('garmin') === 'connected') {
     garminConnected.value = true
     showStatus('Garmin connected successfully!')
+  } else if (params.get('coros') === 'connected') {
+    corosConnected.value = true
+    showStatus('COROS connected! Your workouts will sync automatically.')
   } else if (params.get('zwift') === 'connected') {
     zwiftConnected.value = true
     showStatus('Zwift connected successfully!')
@@ -340,7 +399,7 @@ onMounted(() => {
     showStatus('Connection failed. Please try again.', 'error')
   }
 
-  if (params.has('garmin') || params.has('zwift') || params.has('wahoo') || params.has('error')) {
+  if (params.has('garmin') || params.has('coros') || params.has('zwift') || params.has('wahoo') || params.has('error')) {
     history.replaceState({}, '', window.location.pathname)
   }
 })
