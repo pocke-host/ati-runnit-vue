@@ -49,7 +49,7 @@
               </div>
             </div>
             <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
-              {{ checkoutLoading === 'premium' ? 'Loading…' : 'Start Pro' }}
+              {{ checkoutLoading === 'premium' ? 'Loading…' : planLabel('premium') }}
             </button>
           </div>
 
@@ -67,7 +67,7 @@
               </div>
             </div>
             <button class="btn-plan btn-plan--ghost" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
-              {{ checkoutLoading === 'duo' ? 'Loading…' : 'Go Elite' }}
+              {{ checkoutLoading === 'duo' ? 'Loading…' : planLabel('duo') }}
             </button>
           </div>
 
@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
@@ -101,10 +101,19 @@ useHead({
 })
 
 const router = useRouter()
-const { isAuthenticated } = storeToRefs(useAuthStore())
-const { redirectToCheckout } = useStripe()
+const { isAuthenticated, subscriptionTier } = storeToRefs(useAuthStore())
+const { redirectToCheckout, openBillingPortal } = useStripe()
 const billing = ref('monthly')
 const checkoutLoading = ref(null)
+
+const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
+
+const planLabel = (tier) => {
+  if (!isAuthenticated.value) return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (subscriptionTier.value === tier) return 'Manage Plan'
+  if (hasActiveSub.value) return tier === 'premium' ? 'Switch to Pro' : 'Switch to Elite'
+  return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+}
 
 const freeFeatures  = ['Activity tracking', 'Up to 3 crews', 'Basic stats', 'Strava sync']
 const proFeatures   = ['Everything in Free', 'Adaptive plans', 'Unlimited crews', 'Moments', 'Garmin sync', 'PR tracking']
@@ -112,15 +121,19 @@ const eliteFeatures = ['Everything in Pro', 'Coached plan reviews', 'Advanced an
 
 const handlePlanClick = async (tier) => {
   const period = billing.value
-  if (isAuthenticated.value) {
-    checkoutLoading.value = tier
-    try {
-      await redirectToCheckout(tier, period)
-    } finally {
-      checkoutLoading.value = null
-    }
-  } else {
+  if (!isAuthenticated.value) {
     router.push({ path: '/signup', query: { plan: tier, period } })
+    return
+  }
+  checkoutLoading.value = tier
+  try {
+    if (hasActiveSub.value) {
+      await openBillingPortal()
+    } else {
+      await redirectToCheckout(tier, period)
+    }
+  } finally {
+    checkoutLoading.value = null
   }
 }
 </script>

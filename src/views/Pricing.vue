@@ -53,7 +53,7 @@
               <li><b class="check">✓</b>&nbsp; PR tracking</li>
             </ul>
             <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
-              {{ checkoutLoading === 'premium' ? 'Loading…' : 'Start Pro' }}
+              {{ checkoutLoading === 'premium' ? 'Loading…' : planLabel('premium') }}
             </button>
           </div>
 
@@ -73,7 +73,7 @@
               <li><b class="check">✓</b>&nbsp; Early features</li>
             </ul>
             <button class="btn-plan btn-plan--outline" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
-              {{ checkoutLoading === 'duo' ? 'Loading…' : 'Go Elite' }}
+              {{ checkoutLoading === 'duo' ? 'Loading…' : planLabel('duo') }}
             </button>
           </div>
 
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -120,20 +120,33 @@ const annual = ref(false)
 const checkoutLoading = ref(null)
 
 const router = useRouter()
-const { isAuthenticated } = storeToRefs(useAuthStore())
-const { redirectToCheckout } = useStripe()
+const { isAuthenticated, subscriptionTier } = storeToRefs(useAuthStore())
+const { redirectToCheckout, openBillingPortal } = useStripe()
+
+const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
+
+const planLabel = (tier) => {
+  if (!isAuthenticated.value) return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (subscriptionTier.value === tier) return 'Manage Plan'
+  if (hasActiveSub.value) return tier === 'premium' ? 'Switch to Pro' : 'Switch to Elite'
+  return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+}
 
 const handlePlanClick = async (tier) => {
   const period = annual.value ? 'annual' : 'monthly'
-  if (isAuthenticated.value) {
-    checkoutLoading.value = tier
-    try {
-      await redirectToCheckout(tier, period)
-    } finally {
-      checkoutLoading.value = null
-    }
-  } else {
+  if (!isAuthenticated.value) {
     router.push({ path: '/signup', query: { plan: tier, period } })
+    return
+  }
+  checkoutLoading.value = tier
+  try {
+    if (hasActiveSub.value) {
+      await openBillingPortal()
+    } else {
+      await redirectToCheckout(tier, period)
+    }
+  } finally {
+    checkoutLoading.value = null
   }
 }
 </script>
