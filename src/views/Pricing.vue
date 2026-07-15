@@ -52,7 +52,9 @@
               <li><b class="check">✓</b>&nbsp; Garmin sync</li>
               <li><b class="check">✓</b>&nbsp; PR tracking</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--cobalt">Start Pro</router-link>
+            <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
+              {{ checkoutLoading === 'premium' ? 'Loading…' : planLabel('premium') }}
+            </button>
           </div>
 
           <!-- Elite -->
@@ -70,7 +72,9 @@
               <li><b class="check">✓</b>&nbsp; Priority live share</li>
               <li><b class="check">✓</b>&nbsp; Early features</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--outline">Go Elite</router-link>
+            <button class="btn-plan btn-plan--outline" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
+              {{ checkoutLoading === 'duo' ? 'Loading…' : planLabel('duo') }}
+            </button>
           </div>
 
         </div>
@@ -88,8 +92,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/auth'
+import { useStripe } from '@/composables/useStripe'
 
 useHead({
   title: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes',
@@ -109,6 +117,38 @@ useHead({
 })
 
 const annual = ref(false)
+const checkoutLoading = ref(null)
+
+const router = useRouter()
+const { isAuthenticated, subscriptionTier } = storeToRefs(useAuthStore())
+const { redirectToCheckout, openBillingPortal } = useStripe()
+
+const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
+
+const planLabel = (tier) => {
+  if (!isAuthenticated.value) return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (subscriptionTier.value === tier) return 'Manage Plan'
+  if (hasActiveSub.value) return tier === 'premium' ? 'Switch to Pro' : 'Switch to Elite'
+  return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+}
+
+const handlePlanClick = async (tier) => {
+  const period = annual.value ? 'annual' : 'monthly'
+  if (!isAuthenticated.value) {
+    router.push({ path: '/signup', query: { plan: tier, period } })
+    return
+  }
+  checkoutLoading.value = tier
+  try {
+    if (hasActiveSub.value) {
+      await openBillingPortal()
+    } else {
+      await redirectToCheckout(tier, period)
+    }
+  } finally {
+    checkoutLoading.value = null
+  }
+}
 </script>
 
 <style scoped>
@@ -272,8 +312,11 @@ const annual = ref(false)
   padding: 13px 0;
   font-weight: 800;
   font-size: 0.9rem;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   text-decoration: none;
+  cursor: pointer;
   transition: opacity 0.15s;
+  width: 100%;
 }
 .btn-plan--outline {
   background: #fff;
@@ -285,7 +328,8 @@ const annual = ref(false)
   color: #fff;
   border: 2px solid #16130F;
 }
-.btn-plan:hover { opacity: 0.8; }
+.btn-plan:hover:not(:disabled) { opacity: 0.8; }
+.btn-plan:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── CTA ── */
 .final-cta {

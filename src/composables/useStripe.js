@@ -1,4 +1,3 @@
-import { loadStripe } from '@stripe/stripe-js'
 import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -16,14 +15,13 @@ const PRICE_IDS = {
 
 export const useStripe = () => {
   const redirectToCheckout = async (tier, period = 'monthly') => {
-    const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
     const priceId = PRICE_IDS[`${tier}_${period}`]
     const { data } = await axios.post(
       `${API_URL}/billing/checkout-session`,
       { priceId, tier },
       { headers: getHeaders() }
     )
-    await stripe.redirectToCheckout({ sessionId: data.sessionId })
+    window.location.href = data.url
   }
 
   const openBillingPortal = async () => {

@@ -48,8 +48,9 @@
                 <span class="plan-check">✓</span>{{ f }}
               </div>
             </div>
-            <router-link v-if="!isAuthenticated" to="/waitlist" class="btn-plan btn-plan--cobalt">Start Pro</router-link>
-            <button v-else class="btn-plan btn-plan--cobalt" @click="handleUpgrade">Start Pro</button>
+            <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
+              {{ checkoutLoading === 'premium' ? 'Loading…' : planLabel('premium') }}
+            </button>
           </div>
 
           <!-- Elite -->
@@ -65,7 +66,9 @@
                 <span class="plan-check">✓</span>{{ f }}
               </div>
             </div>
-            <router-link to="/waitlist" class="btn-plan btn-plan--ghost">Go Elite</router-link>
+            <button class="btn-plan btn-plan--ghost" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
+              {{ checkoutLoading === 'duo' ? 'Loading…' : planLabel('duo') }}
+            </button>
           </div>
 
         </div>
@@ -83,11 +86,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { useStripe } from '@/composables/useStripe'
 
 useHead({
   title: 'Pricing — Runnit',
@@ -97,15 +101,40 @@ useHead({
 })
 
 const router = useRouter()
-const { isAuthenticated } = storeToRefs(useAuthStore())
+const { isAuthenticated, subscriptionTier } = storeToRefs(useAuthStore())
+const { redirectToCheckout, openBillingPortal } = useStripe()
 const billing = ref('monthly')
+const checkoutLoading = ref(null)
+
+const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
+
+const planLabel = (tier) => {
+  if (!isAuthenticated.value) return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (subscriptionTier.value === tier) return 'Manage Plan'
+  if (hasActiveSub.value) return tier === 'premium' ? 'Switch to Pro' : 'Switch to Elite'
+  return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+}
 
 const freeFeatures  = ['Activity tracking', 'Up to 3 crews', 'Basic stats', 'Strava sync']
 const proFeatures   = ['Everything in Free', 'Adaptive plans', 'Unlimited crews', 'Moments', 'Garmin sync', 'PR tracking']
 const eliteFeatures = ['Everything in Pro', 'Coached plan reviews', 'Advanced analytics', 'Priority live share', 'Early features']
 
-function handleUpgrade() {
-  router.push('/billing')
+const handlePlanClick = async (tier) => {
+  const period = billing.value
+  if (!isAuthenticated.value) {
+    router.push({ path: '/signup', query: { plan: tier, period } })
+    return
+  }
+  checkoutLoading.value = tier
+  try {
+    if (hasActiveSub.value) {
+      await openBillingPortal()
+    } else {
+      await redirectToCheckout(tier, period)
+    }
+  } finally {
+    checkoutLoading.value = null
+  }
 }
 </script>
 
@@ -250,13 +279,16 @@ function handleUpgrade() {
   padding: 13px 0;
   font-weight: 800;
   font-size: 0.9rem;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   text-decoration: none;
   cursor: pointer;
   border: 2px solid #16130F;
   transition: opacity 0.15s;
   margin-top: auto;
+  width: 100%;
 }
-.btn-plan:hover { opacity: 0.85; text-decoration: none; }
+.btn-plan:hover:not(:disabled) { opacity: 0.85; text-decoration: none; }
+.btn-plan:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-plan--ghost { background: #fff; color: #16130F; }
 .btn-plan--cobalt { background: #2A55F5; color: #fff; }
 
