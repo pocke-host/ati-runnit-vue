@@ -32,9 +32,6 @@
           <a href="#" class="rk-footer-social" aria-label="Twitter / X">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M18.2 2H21l-6.6 7.5L22 22h-6.2l-4.3-6-4.9 6H2l7-8.5L2 2h6.3l3.9 5.5L18.2 2Zm-1 18h1.6L7.6 3.7H5.9L17.2 20Z"/></svg>
           </a>
-          <a href="#" class="rk-footer-social" aria-label="Strava">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13.8 2 7.5 14h3.7l2.6-5 2.6 5h3.6L13.8 2ZM13.8 22l2.6-5h-1.9l-.7 1.4-.7-1.4H9.2l2.6 5h2Z"/></svg>
-          </a>
         </div>
       </div>
 

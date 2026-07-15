@@ -16,11 +16,11 @@
             </div>
             <div class="syncs-row">
               <span class="syncs-label">Syncs</span>
-              <span class="syncs-app">Strava</span>
-              <span class="syncs-slash">/</span>
               <span class="syncs-app">Garmin</span>
               <span class="syncs-slash">/</span>
               <span class="syncs-app">Apple&nbsp;Health</span>
+              <span class="syncs-slash">/</span>
+              <span class="syncs-app">COROS</span>
             </div>
           </div>
           <!-- RIGHT: tilted photo stack -->

@@ -30,7 +30,7 @@
               <li><b class="check">✓</b>&nbsp; Activity tracking</li>
               <li><b class="check">✓</b>&nbsp; Up to 3 crews</li>
               <li><b class="check">✓</b>&nbsp; Basic stats</li>
-              <li><b class="check">✓</b>&nbsp; Strava sync</li>
+              <li><b class="check">✓</b>&nbsp; Apple Health sync</li>
             </ul>
             <router-link to="/waitlist" class="btn-plan btn-plan--outline">Get Started</router-link>
           </div>

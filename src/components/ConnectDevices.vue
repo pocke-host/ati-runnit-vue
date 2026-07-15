@@ -40,34 +40,6 @@
         </template>
       </div>
 
-      <!-- Strava -->
-      <div class="device-card">
-        <div class="device-strava-logo">STRAVA</div>
-        <h3>Strava</h3>
-        <p>Automatically import every run, ride, and swim you log on Strava</p>
-
-        <template v-if="!stravaConnected">
-          <button class="btn btn-primary" @click="connectStrava" :disabled="loading">
-            Connect Strava
-          </button>
-        </template>
-        <template v-else>
-          <div class="connected-state">
-            <div class="connected-chip">
-              <span class="green-dot"></span>
-              CONNECTED
-            </div>
-            <div class="last-sync-label">Last synced: {{ relativeTime(stravaLastSync) }}</div>
-            <div v-if="syncCounts.strava" class="sync-count">{{ syncCounts.strava }} activities synced</div>
-            <button class="btn btn-primary" @click="syncStrava" :disabled="syncing">
-              <span v-if="syncing" class="spinner"></span>
-              {{ syncing ? 'Syncing…' : 'Sync Now' }}
-            </button>
-            <button class="btn-disconnect" @click="disconnectStrava">Disconnect</button>
-          </div>
-        </template>
-      </div>
-
       <!-- Zwift -->
       <div class="device-card">
         <div class="device-icon-circle">
@@ -185,8 +157,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const garminConnected = ref(false)
 const garminLastSync = ref(null)
-const stravaConnected = ref(false)
-const stravaLastSync = ref(null)
 const zwiftConnected = ref(false)
 const wahooConnected = ref(false)
 const wahooLastSync = ref(null)
@@ -195,15 +165,15 @@ const syncing = ref(false)
 const gpxImporting = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
-const syncCounts = ref({ garmin: 0, strava: 0, wahoo: 0 })
+const syncCounts = ref({ garmin: 0, wahoo: 0 })
 
 
 
 const { showToast } = useToast()
 const showDisconnectConfirm = ref(false)
-const pendingDisconnect = ref(null) // 'garmin' | 'strava' | 'zwift' | 'wahoo'
+const pendingDisconnect = ref(null) // 'garmin' | 'zwift' | 'wahoo'
 
-const disconnectLabels = { garmin: 'Garmin', strava: 'Strava', zwift: 'Zwift', wahoo: 'Wahoo' }
+const disconnectLabels = { garmin: 'Garmin', zwift: 'Zwift', wahoo: 'Wahoo' }
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -230,9 +200,8 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, stravaRes, zwiftRes, wahooRes, countsRes] = await Promise.all([
+  const [garminRes, zwiftRes, wahooRes, countsRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
-    safeFetch(`${API_URL}/integrations/strava/status`),
     safeFetch(`${API_URL}/integrations/zwift/status`),
     safeFetch(`${API_URL}/integrations/wahoo/status`),
     safeFetch(`${API_URL}/integrations/sync-counts`),
@@ -240,10 +209,6 @@ const checkConnectionStatus = async () => {
   if (garminRes) {
     garminConnected.value = garminRes.data.connected
     garminLastSync.value = garminRes.data.lastSync || null
-  }
-  if (stravaRes) {
-    stravaConnected.value = stravaRes.data.connected
-    stravaLastSync.value = stravaRes.data.lastSync || null
   }
   if (zwiftRes) {
     zwiftConnected.value = zwiftRes.data.connected
@@ -270,7 +235,6 @@ const connectGarmin = async () => {
 }
 
 const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconnectConfirm.value = true }
-const disconnectStrava = () => { pendingDisconnect.value = 'strava'; showDisconnectConfirm.value = true }
 const disconnectZwift  = () => { pendingDisconnect.value = 'zwift';  showDisconnectConfirm.value = true }
 const disconnectWahoo  = () => { pendingDisconnect.value = 'wahoo';  showDisconnectConfirm.value = true }
 
@@ -280,7 +244,6 @@ const doDisconnect = async () => {
   try {
     await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
     if (service === 'garmin') { garminConnected.value = false; garminLastSync.value = null }
-    if (service === 'strava') { stravaConnected.value = false; stravaLastSync.value = null }
     if (service === 'zwift')  { zwiftConnected.value  = false }
     if (service === 'wahoo')  { wahooConnected.value  = false; wahooLastSync.value  = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
@@ -294,29 +257,6 @@ const syncNow = async () => {
   try {
     await axios.post(`${API_URL}/integrations/garmin/sync`, {}, { headers: getAuthHeaders() })
     showStatus('Sync triggered — activities will appear shortly.')
-    await checkConnectionStatus()
-  } catch {
-    showStatus('Sync failed. Please try again.', 'error')
-  } finally {
-    syncing.value = false
-  }
-}
-
-const connectStrava = async () => {
-  try {
-    const { data } = await axios.get(`${API_URL}/integrations/strava/connect`, { headers: getAuthHeaders() })
-    window.location.href = data.url
-  } catch {
-    showStatus('Failed to connect Strava. Please try again.', 'error')
-  }
-}
-
-
-const syncStrava = async () => {
-  syncing.value = true
-  try {
-    await axios.post(`${API_URL}/integrations/strava/sync`, {}, { headers: getAuthHeaders() })
-    showStatus('Strava sync triggered — activities will appear shortly.')
     await checkConnectionStatus()
   } catch {
     showStatus('Sync failed. Please try again.', 'error')
@@ -390,9 +330,6 @@ onMounted(() => {
   if (params.get('garmin') === 'connected') {
     garminConnected.value = true
     showStatus('Garmin connected successfully!')
-  } else if (params.get('strava') === 'connected') {
-    stravaConnected.value = true
-    showStatus('Strava connected! Your activities will sync automatically.')
   } else if (params.get('zwift') === 'connected') {
     zwiftConnected.value = true
     showStatus('Zwift connected successfully!')
@@ -403,7 +340,7 @@ onMounted(() => {
     showStatus('Connection failed. Please try again.', 'error')
   }
 
-  if (params.has('garmin') || params.has('strava') || params.has('zwift') || params.has('wahoo') || params.has('error')) {
+  if (params.has('garmin') || params.has('zwift') || params.has('wahoo') || params.has('error')) {
     history.replaceState({}, '', window.location.pathname)
   }
 })
@@ -470,16 +407,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-}
-
-.device-strava-logo {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-weight: 900;
-  font-size: 1.3rem;
-  letter-spacing: 0.02em;
-  color: #FC4C02;
-  margin-bottom: 8px;
-  line-height: 1;
 }
 
 .device-card h3 {

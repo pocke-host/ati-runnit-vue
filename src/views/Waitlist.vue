@@ -78,9 +78,9 @@
         <div class="syncs-col">
           <div class="syncs-label">Syncs with</div>
           <div class="sync-list">
-            <div class="sync-item">Strava</div>
             <div class="sync-item">Garmin</div>
             <div class="sync-item">Apple Health</div>
+            <div class="sync-item">COROS</div>
           </div>
           <div class="proof-strip">
             <div class="proof-cell">

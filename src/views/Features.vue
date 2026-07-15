@@ -98,7 +98,7 @@
           <div class="kit-cell">
             <div class="kit-num">12</div>
             <div class="kit-name">Sync</div>
-            <div class="kit-desc">Strava, Garmin, Apple Health, Wahoo</div>
+            <div class="kit-desc">Garmin, Apple Health, COROS</div>
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ const kitItems = [
   { num: '05', name: 'Live Share',    desc: 'Friends watch in real time' },
   { num: '06', name: 'PRs',          desc: 'Every record, tracked' },
   { num: '07', name: 'Challenges',    desc: 'Monthly distance races' },
-  { num: '08', name: 'Sync',         desc: 'Strava, Garmin, Apple Health' },
+  { num: '08', name: 'Sync',         desc: 'Garmin, Apple Health, COROS' },
 ]
 </script>
 

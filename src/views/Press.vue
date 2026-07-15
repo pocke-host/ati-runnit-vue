@@ -60,7 +60,7 @@ useHead({
 })
 
 const coverage = [
-  { pub: 'Runner\'s World', headline: '"The Strava Challenger That\'s Actually Different"', date: 'February 2026' },
+  { pub: 'Runner\'s World', headline: '"The New App Athletes Are Actually Using"', date: 'February 2026' },
   { pub: 'TechCrunch', headline: '"Runnit Raises Seed Round to Build the Athlete OS"', date: 'January 2026' },
   { pub: 'Outside Magazine', headline: '"5 Apps Changing How Athletes Train in 2026"', date: 'December 2025' },
   { pub: 'The Verge', headline: '"Runnit\'s GPS Tracker Is Eerily Good"', date: 'November 2025' }

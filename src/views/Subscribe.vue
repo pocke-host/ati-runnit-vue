@@ -115,7 +115,7 @@ const planLabel = (tier) => {
   return tier === 'premium' ? 'Start Pro' : 'Go Elite'
 }
 
-const freeFeatures  = ['Activity tracking', 'Up to 3 crews', 'Basic stats', 'Strava sync']
+const freeFeatures  = ['Activity tracking', 'Up to 3 crews', 'Basic stats', 'Apple Health sync']
 const proFeatures   = ['Everything in Free', 'Adaptive plans', 'Unlimited crews', 'Moments', 'Garmin sync', 'PR tracking']
 const eliteFeatures = ['Everything in Pro', 'Coached plan reviews', 'Advanced analytics', 'Priority live share', 'Early features']
 

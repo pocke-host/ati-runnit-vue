@@ -101,14 +101,14 @@ const openFaq = ref(0)
 const categories = [
   { title: 'Getting Started', desc: 'Create an account, log your first run, set up your profile.' },
   { title: 'Tracking & GPS', desc: 'Recording activities, routes, splits, and accuracy.' },
-  { title: 'Syncing Apps', desc: 'Strava, Garmin, and Apple Health connections.' },
+  { title: 'Syncing Apps', desc: 'Garmin, Apple Health, and COROS connections.' },
   { title: 'Training Plans', desc: 'Adaptive plans, workouts, and rescheduling.' },
   { title: 'Crews & Social', desc: 'Clubs, following, kudos, and privacy.' },
   { title: 'Account & Billing', desc: 'Plans, upgrades, and managing your subscription.' },
 ]
 
 const faqs = [
-  { q: 'How do I connect Garmin or Strava?', a: 'Head to Profile → Connected Apps and tap Connect next to your service. You\'ll authorize once, and activities sync automatically from then on — usually within a minute of finishing a run.' },
+  { q: 'How do I connect Garmin or COROS?', a: 'Head to Profile → Connected Apps and tap Connect next to your device. You\'ll authorize once, and activities sync automatically from then on — usually within a minute of finishing a session.' },
   { q: 'Why is my GPS distance slightly off?', a: 'GPS accuracy depends on signal quality, tree cover, and device hardware. For best results, calibrate your device before heading out and give it 30–60 seconds to lock signal.' },
   { q: 'Can I reschedule a workout in my plan?', a: 'Yes — open the workout in your Training Plans tab, tap the three-dot menu, and choose Reschedule. The plan adapts automatically around your new date.' },
   { q: 'How do I join or start a crew?', a: 'Go to Clubs in the main nav, browse or search for your crew, and tap Join. To create one, tap the + button and set your privacy and invite settings.' },
