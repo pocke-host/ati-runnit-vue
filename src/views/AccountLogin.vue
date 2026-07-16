@@ -20,6 +20,9 @@
       <h1 class="lp-headline">Welcome back.</h1>
       <p class="lp-sub">Pick up where your legs left off.</p>
 
+      <!-- Hidden Google button container — renderButton targets this, we click it programmatically -->
+      <div ref="googleBtnContainer" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;" aria-hidden="true"></div>
+
       <!-- Social Buttons -->
       <div class="lp-socials">
         <button type="button" class="lp-social-btn" @click="handleGoogleSignIn" :disabled="googleLoading">
@@ -124,15 +127,18 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { role, isAuthenticated } = storeToRefs(authStore)
 
-// ── Google Sign-In (GIS) ──────────────────────────────────────────────────────
+// ── Google Sign-In (GIS popup — avoids One Tap / third-party cookie issues) ──
 const googleLoading = ref(false)
 const googleError = ref('')
+const googleBtnContainer = ref(null)
+let popupTimer = null
 
 const initGoogleSignIn = () => {
   if (!window.google?.accounts?.id) { setTimeout(initGoogleSignIn, 300); return }
   window.google.accounts.id.initialize({
     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
     callback: async ({ credential }) => {
+      clearTimeout(popupTimer)
       googleLoading.value = true
       googleError.value = ''
       try {
@@ -145,8 +151,15 @@ const initGoogleSignIn = () => {
       }
     },
     ux_mode: 'popup',
-    cancel_on_tap_outside: false
+    cancel_on_tap_outside: true
   })
+  // Render Google's own button into a hidden div so it uses the popup flow,
+  // not One Tap (which is blocked when third-party cookies are off).
+  if (googleBtnContainer.value) {
+    window.google.accounts.id.renderButton(googleBtnContainer.value, {
+      type: 'standard', theme: 'outline', size: 'large', text: 'signin_with'
+    })
+  }
 }
 
 const handleGoogleSignIn = () => {
@@ -154,16 +167,26 @@ const handleGoogleSignIn = () => {
     googleError.value = 'Google Sign-In is loading, please try again.'
     return
   }
-  googleLoading.value = true
-  window.google.accounts.id.prompt((notification) => {
-    if (notification.isNotDisplayed()) {
-      googleLoading.value = false
-      googleError.value = 'Google Sign-In unavailable. Please use email or try again.'
-    }
-    if (notification.isDismissedMoment() && notification.getDismissedReason() !== 'credential_returned') {
-      googleLoading.value = false
-    }
-  })
+  googleError.value = ''
+  // Click the hidden Google-rendered button to trigger the popup OAuth flow
+  const gBtn = googleBtnContainer.value?.querySelector('div[role="button"]')
+  if (gBtn) {
+    googleLoading.value = true
+    gBtn.click()
+    // If the popup is closed without completing sign-in, reset loading after 2 min
+    popupTimer = setTimeout(() => { googleLoading.value = false }, 120_000)
+  } else {
+    // renderButton not ready — fall back to One Tap
+    googleLoading.value = true
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || (notification.isDismissedMoment() && notification.getDismissedReason() !== 'credential_returned')) {
+        googleLoading.value = false
+        if (notification.isNotDisplayed()) {
+          googleError.value = 'Google Sign-In unavailable. Please use email or try again.'
+        }
+      }
+    })
+  }
 }
 
 onMounted(() => {
@@ -256,7 +279,10 @@ const onSubmit = async (e) => {
   }
 }
 
-onUnmounted(() => clearInterval(lockTimer))
+onUnmounted(() => {
+  clearInterval(lockTimer)
+  clearTimeout(popupTimer)
+})
 
 // Apple Sign-In — placeholder until Apple Developer credentials are configured
 const handleAppleSignIn = () => {}
