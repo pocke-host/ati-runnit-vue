@@ -4,6 +4,7 @@ import { createHead } from '@unhead/vue/legacy'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
+import { injectSpeedInsights } from '@vercel/speed-insights'
 
 // Import Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -40,5 +41,7 @@ axios.interceptors.response.use(
     return Promise.reject(err)
   }
 )
+
+injectSpeedInsights()
 
 app.mount('#app')

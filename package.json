@@ -28,6 +28,7 @@
     "@stripe/stripe-js": "^8.9.0",
     "@unhead/vue": "^2.1.12",
     "@vercel/analytics": "^1.6.1",
+    "@vercel/speed-insights": "^2.0.0",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
