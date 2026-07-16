@@ -30,7 +30,7 @@
         <div class="rp-state-icon">✓</div>
         <h1 class="rp-headline">You're all set.</h1>
         <p class="rp-sub">Your password has been updated. Sign in with your new credentials.</p>
-        <router-link to="/join-us" class="rp-btn rp-btn--full">Sign In →</router-link>
+        <router-link to="/signin" class="rp-btn rp-btn--full">Sign In →</router-link>
       </div>
 
       <!-- Form state -->

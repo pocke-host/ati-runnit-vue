@@ -35,7 +35,7 @@ const expireSession = (notify = true) => {
   if (!isAuthenticated.value) return
   authStore.logout()
   if (notify) showToast('Session expired — please sign in again.', 'error')
-  router.push('/join-us')
+  router.push('/signin')
 }
 
 // ── Inactivity timer ─────────────────────────────────────────────────────────

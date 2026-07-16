@@ -25,12 +25,12 @@
           If <strong>{{ submittedEmail }}</strong> is registered, a reset link is on its way.
           Check your spam folder if you don't see it within a minute.
         </p>
-        <router-link to="/join-us" class="fp-btn fp-btn--full">Back to sign in →</router-link>
+        <router-link to="/signin" class="fp-btn fp-btn--full">Back to sign in →</router-link>
       </div>
 
       <!-- Form state -->
       <template v-else>
-        <router-link to="/join-us" class="fp-back">← Back to sign in</router-link>
+        <router-link to="/signin" class="fp-back">← Back to sign in</router-link>
         <h1 class="fp-headline">Reset your password.</h1>
         <p class="fp-sub">Enter your email and we'll send a reset link your way.</p>
 
