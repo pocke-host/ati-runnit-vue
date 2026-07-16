@@ -5,7 +5,7 @@
 
       <div v-if="error" class="callback-error">
         <p class="error-text">{{ error }}</p>
-        <a href="/signin" class="btn-back">Back to sign in</a>
+        <a href="/join-us" class="btn-back">Back to sign in</a>
       </div>
 
       <div v-else class="callback-loading">
