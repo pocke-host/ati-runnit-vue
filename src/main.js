@@ -35,7 +35,7 @@ axios.interceptors.response.use(
       import('@/stores/auth').then(({ useAuthStore }) => {
         try { useAuthStore().logout() } catch { /* store may not be ready on very first load */ }
       })
-      if (wasLoggedIn) router.push('/join-us')
+      if (wasLoggedIn) router.push('/signin')
     }
     return Promise.reject(err)
   }

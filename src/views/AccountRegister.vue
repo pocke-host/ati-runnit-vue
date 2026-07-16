@@ -108,7 +108,7 @@
           </button>
         </form>
 
-        <p class="gr-signin-link">Already have an account? <router-link to="/join-us" class="gr-signin-link-a">Sign in</router-link></p>
+        <p class="gr-signin-link">Already have an account? <router-link to="/signin" class="gr-signin-link-a">Sign in</router-link></p>
       </div>
     </section>
 

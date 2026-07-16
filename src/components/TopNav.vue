@@ -297,7 +297,7 @@
             <router-link to="/pricing" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
           </nav>
           <div class="drawer-footer">
-            <router-link to="/join-us" class="drawer-link" @click="mobileMenuOpen = false">Login</router-link>
+            <router-link to="/signin" class="drawer-link" @click="mobileMenuOpen = false">Login</router-link>
             <router-link to="/waitlist" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">Join Waitlist</router-link>
           </div>
         </template>

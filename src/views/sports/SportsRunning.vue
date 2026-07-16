@@ -13,7 +13,7 @@
             </p>
 
             <div class="d-flex gap-3 flex-wrap">
-              <router-link to="/join-us" class="btn btn-primary btn-lg">Start your loop</router-link>
+              <router-link to="/signin" class="btn btn-primary btn-lg">Start your loop</router-link>
               <router-link to="/features" class="btn btn-outline-dark btn-lg">See tools</router-link>
             </div>
 

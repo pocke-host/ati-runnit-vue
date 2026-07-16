@@ -9,7 +9,7 @@ import CookiePolicy from '@/components/CookiePolicy.vue'
 const routes = [
   // Public pages
   { path: '/',               name: 'Home',          component: () => import('@/views/Home.vue') },
-  { path: '/join-us',        name: 'Login',         component: () => import('@/views/AccountLogin.vue') },
+  { path: '/signin',        name: 'Login',         component: () => import('@/views/AccountLogin.vue') },
   { path: '/signup',         name: 'Signup',        component: () => import('@/views/AccountRegister.vue') },
   { path: '/features',       name: 'Features',      component: () => import('@/views/Features.vue') },
   { path: '/about',          name: 'About',         component: () => import('@/views/About.vue') },
@@ -106,7 +106,7 @@ router.beforeEach((to, from, next) => {
   const userRole = storedUser?.role || localStorage.getItem('userRole') || 'athlete'
   const homeDash = userRole === 'coach' ? '/coach/dashboard' : '/dashboard'
 
-  if (to.meta.requiresAuth && !isAuthenticated) return next('/join-us')
+  if (to.meta.requiresAuth && !isAuthenticated) return next('/signin')
 
   // Already-onboarded users must not be able to revisit /onboard
   if (to.path === '/onboard' && isAuthenticated && !needsOnboarding) return next(homeDash)
