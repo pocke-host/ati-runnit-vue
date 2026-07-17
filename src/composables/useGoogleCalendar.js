@@ -29,6 +29,8 @@ export function useGoogleCalendar() {
   const syncing = ref(false)
   const error = ref(null)
   const lastSync = ref(localStorage.getItem(GCAL_LAST_SYNC_KEY) || null)
+  const importedEvents = ref([])
+  const hasLoadedEvents = ref(false)
 
   async function connect() {
     error.value = null
@@ -148,5 +150,52 @@ export function useGoogleCalendar() {
     }
   }
 
-  return { connected, syncing, error, lastSync, connect, disconnect, pushEvent, syncAll }
+  async function listEvents(daysAhead = 30) {
+    const token = localStorage.getItem(GCAL_TOKEN_KEY)
+    if (!token) throw new Error('Not connected to Google Calendar')
+
+    const params = new URLSearchParams({
+      timeMin: new Date().toISOString(),
+      timeMax: new Date(Date.now() + daysAhead * 86400000).toISOString(),
+      singleEvents: 'true',
+      orderBy: 'startTime',
+      maxResults: '50',
+    })
+
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem(GCAL_TOKEN_KEY)
+        localStorage.removeItem(GCAL_CONNECTED_KEY)
+        connected.value = false
+      }
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body?.error?.message || `Google Calendar error: ${res.status}`)
+    }
+
+    const data = await res.json()
+    return data.items || []
+  }
+
+  async function readAll(daysAhead = 30) {
+    syncing.value = true
+    error.value = null
+    try {
+      importedEvents.value = await listEvents(daysAhead)
+      hasLoadedEvents.value = true
+    } catch (err) {
+      error.value = err.message || 'Failed to load Google Calendar events'
+    } finally {
+      syncing.value = false
+    }
+  }
+
+  return {
+    connected, syncing, error, lastSync, importedEvents, hasLoadedEvents,
+    connect, disconnect, pushEvent, syncAll, listEvents, readAll,
+  }
 }
