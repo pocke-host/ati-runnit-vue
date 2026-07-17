@@ -13,6 +13,7 @@
           </div>
           <div class="cal-hero-actions">
             <button class="hero-btn-ghost" @click="goToday">Today</button>
+            <router-link to="/calendar/sync" class="hero-btn-ghost"><i class="bi bi-google me-1"></i>Google Calendar</router-link>
             <button class="hero-btn-ai" @click="openWeekPlan">
               <i class="bi bi-stars me-1"></i>AI Plan Week
             </button>

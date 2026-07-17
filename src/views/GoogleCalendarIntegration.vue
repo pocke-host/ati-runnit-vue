@@ -42,7 +42,10 @@
       </div>
 
       <!-- The sync card -->
-      <GoogleCalendarSync :workouts="[]" />
+      <GoogleCalendarSync :workouts="workouts" />
+      <p v-if="workouts.length" class="gcal-ready-note">
+        {{ workouts.length }} upcoming workout{{ workouts.length === 1 ? '' : 's' }} ready to sync.
+      </p>
 
       <!-- Sport color legend -->
       <div class="gcal-legend">
@@ -55,18 +58,81 @@
         </div>
       </div>
 
+      <!-- Read: what's already on your Google Calendar -->
+      <div class="gcal-read" v-if="connected">
+        <div class="gcal-how-label">YOUR GOOGLE CALENDAR — NEXT 30 DAYS</div>
+        <button class="gcal-load-btn" @click="loadGoogleEvents" :disabled="syncing">
+          {{ syncing ? 'Loading…' : 'Load my events' }}
+        </button>
+
+        <div v-if="importedEvents.length" class="gcal-read-list">
+          <div v-for="ev in importedEvents" :key="ev.id" class="gcal-read-item">
+            <span class="gcal-read-time">{{ formatEventTime(ev) }}</span>
+            <span class="gcal-read-title">{{ ev.summary || '(No title)' }}</span>
+          </div>
+        </div>
+        <p v-else-if="hasLoadedEvents" class="gcal-explainer-body">No events found in the next 30 days.</p>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useHead } from '@unhead/vue'
+import axios from 'axios'
 import GoogleCalendarSync from '@/components/GoogleCalendarSync.vue'
+import { useGoogleCalendar } from '@/composables/useGoogleCalendar'
 
 useHead({
   title: 'Google Calendar — Runnit',
   meta: [{ name: 'description', content: 'Sync your Runnit training plan to Google Calendar.' }],
 })
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+const workouts = ref([])
+
+async function loadUpcomingWorkouts() {
+  const start = new Date().toISOString().slice(0, 10)
+  const end = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10)
+  try {
+    const { data } = await axios.get(`${API}/workout-events`, {
+      params: { start, end },
+      headers: getAuthHeaders(),
+    })
+    workouts.value = (data || []).map(ev => ({
+      date: ev.plannedDate,
+      title: ev.title || ev.workoutType?.replace('_', ' ') || 'Workout',
+      description: ev.description || '',
+      sport: ev.workoutType,
+      durationMinutes: ev.durationMinutes,
+    }))
+  } catch {
+    workouts.value = []
+  }
+}
+
+onMounted(loadUpcomingWorkouts)
+
+const { connected, syncing, importedEvents, hasLoadedEvents, readAll } = useGoogleCalendar()
+
+function loadGoogleEvents() {
+  readAll(30)
+}
+
+function formatEventTime(ev) {
+  const raw = ev.start?.dateTime || ev.start?.date
+  if (!raw) return ''
+  const d = new Date(raw)
+  if (ev.start?.date && !ev.start?.dateTime) return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+}
 </script>
 
 <style scoped>
@@ -243,6 +309,69 @@ useHead({
 .dot--ride     { background: #0f9d58; }
 .dot--swim     { background: #9e69af; }
 .dot--strength { background: #f4b400; }
+
+.gcal-ready-note {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: #2A55F5;
+  margin: 10px 2px 0;
+}
+
+/* Read section */
+.gcal-read {
+  margin-top: 24px;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 20px;
+}
+
+.gcal-load-btn {
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  background: #2A55F5;
+  color: #fff;
+  box-shadow: 3px 3px 0 #16130F;
+  padding: 8px 18px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: background 0.15s;
+}
+.gcal-load-btn:hover:not(:disabled) { background: #1E42D6; }
+.gcal-load-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+.gcal-read-list {
+  border-top: 2px solid #E7DFCE;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gcal-read-item {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 0.88rem;
+}
+
+.gcal-read-time {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #5A5348;
+  flex-shrink: 0;
+  min-width: 92px;
+}
+
+.gcal-read-title {
+  color: #16130F;
+  font-weight: 600;
+}
 
 @media (max-width: 640px) {
   .gcal-wrap { padding: 28px 18px 80px; }
