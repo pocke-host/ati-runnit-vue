@@ -123,7 +123,7 @@ onMounted(loadUpcomingWorkouts)
 const { connected, syncing, importedEvents, hasLoadedEvents, readAll } = useGoogleCalendar()
 
 function loadGoogleEvents() {
-  readAll(30)
+  readAll()
 }
 
 function formatEventTime(ev) {

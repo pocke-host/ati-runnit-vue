@@ -150,16 +150,16 @@ export function useGoogleCalendar() {
     }
   }
 
-  async function listEvents(daysAhead = 30) {
+  async function listEvents({ timeMin, timeMax } = {}) {
     const token = localStorage.getItem(GCAL_TOKEN_KEY)
     if (!token) throw new Error('Not connected to Google Calendar')
 
     const params = new URLSearchParams({
-      timeMin: new Date().toISOString(),
-      timeMax: new Date(Date.now() + daysAhead * 86400000).toISOString(),
+      timeMin: timeMin || new Date().toISOString(),
+      timeMax: timeMax || new Date(Date.now() + 30 * 86400000).toISOString(),
       singleEvents: 'true',
       orderBy: 'startTime',
-      maxResults: '50',
+      maxResults: '100',
     })
 
     const res = await fetch(
@@ -181,11 +181,11 @@ export function useGoogleCalendar() {
     return data.items || []
   }
 
-  async function readAll(daysAhead = 30) {
+  async function readAll(range) {
     syncing.value = true
     error.value = null
     try {
-      importedEvents.value = await listEvents(daysAhead)
+      importedEvents.value = await listEvents(range)
       hasLoadedEvents.value = true
     } catch (err) {
       error.value = err.message || 'Failed to load Google Calendar events'

@@ -95,6 +95,13 @@
               :title="`${day.groupEvents.length} group event${day.groupEvents.length > 1 ? 's' : ''}`"
             ></i>
 
+            <!-- Google Calendar events indicator -->
+            <i
+              v-if="day.googleEvents?.length"
+              class="bi bi-google cal-gcal-icon"
+              :title="`${day.googleEvents.length} Google Calendar event${day.googleEvents.length > 1 ? 's' : ''}`"
+            ></i>
+
             <button
               class="cal-plus"
               @click.stop="quickAdd(day.fullDate)"
@@ -120,6 +127,15 @@
           >
             <span class="weather-warn-icon">{{ selectedDay.weather.icon }}</span>
             <span class="weather-warn-label">{{ selectedDay.weather.label }}</span>
+          </div>
+
+          <!-- Google Calendar events -->
+          <div class="drawer-section" v-if="selectedGoogleEvents.length">
+            <div class="drawer-section-label"><i class="bi bi-google me-1"></i>GOOGLE CALENDAR</div>
+            <div v-for="ev in selectedGoogleEvents" :key="'gc' + ev.id" class="drawer-gcal-event">
+              <span class="dge-time">{{ googleEventTimeLabel(ev) }}</span>
+              <span class="dge-title">{{ ev.summary || '(No title)' }}</span>
+            </div>
           </div>
 
           <!-- Group Events -->
@@ -425,6 +441,7 @@ import { useUnits } from '@/composables/useUnits'
 import { useAiWorkout } from '@/composables/useAiWorkout'
 import { useToast } from '@/composables/useToast'
 import { initWeather, getWeatherForDate } from '@/composables/useWeather'
+import { useGoogleCalendar } from '@/composables/useGoogleCalendar'
 import axios from 'axios'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import CreateGroupEventModal from '@/components/CreateGroupEventModal.vue'
@@ -451,6 +468,7 @@ const currentMonth = ref(new Date().getMonth()) // 0-indexed
 const events       = ref([])
 const coachEvents  = ref([]) // workouts pushed by coach to athlete's calendar
 const raceBookmarks = ref([])
+const { connected: gcalConnected, importedEvents: googleEvents, readAll: readGoogleEvents } = useGoogleCalendar()
 const selectedDate = ref(null)
 const aiSuggestion = ref(null)
 const aiLoading    = ref(false)
@@ -523,8 +541,14 @@ function _makeDay(date, isCurrentMonth) {
     activities:  (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
     races:       raceBookmarks.value.filter(r => r.raceDate === fullDate),
     groupEvents: groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === fullDate),
+    googleEvents: googleEvents.value.filter(ev => googleEventDate(ev) === fullDate),
     weather:     getWeatherForDate(fullDate),
   }
+}
+
+// Google event dates come as either start.date (all-day) or start.dateTime (timed)
+function googleEventDate(ev) {
+  return (ev.start?.dateTime || ev.start?.date || '').slice(0, 10)
 }
 
 const selectedEvents = computed(() =>
@@ -542,6 +566,16 @@ const selectedRaces = computed(() =>
 const selectedGroupEvents = computed(() =>
   groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === selectedDate.value)
 )
+
+const selectedGoogleEvents = computed(() =>
+  googleEvents.value.filter(ev => googleEventDate(ev) === selectedDate.value)
+)
+
+function googleEventTimeLabel(ev) {
+  if (ev.start?.date && !ev.start?.dateTime) return 'All day'
+  const d = new Date(ev.start?.dateTime)
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+}
 
 function googleCalUrl(ge) {
   const dt = ge.eventDatetime?.replace('T', '').replace(/[-:]/g, '').slice(0, 15)
@@ -677,6 +711,15 @@ async function fetchEvents() {
   ])
   events.value      = Array.isArray(selfData)  ? selfData  : []
   coachEvents.value = Array.isArray(coachData) ? coachData : []
+}
+
+async function fetchGoogleEvents() {
+  if (!gcalConnected.value) return
+  const y = currentYear.value
+  const m = currentMonth.value
+  const timeMin = new Date(y, m, 1).toISOString()
+  const timeMax = new Date(y, m + 1, 0, 23, 59, 59).toISOString()
+  await readGoogleEvents({ timeMin, timeMax })
 }
 
 async function saveEvent() {
@@ -894,7 +937,7 @@ function weekDayNum(dateStr) {
 
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
-  await Promise.all([fetchEvents(), fetchRaceBookmarks(), groupEventStore.fetchMyEvents()])
+  await Promise.all([fetchEvents(), fetchRaceBookmarks(), groupEventStore.fetchMyEvents(), fetchGoogleEvents()])
 
   // Weather: use cached coords or request geolocation
   const cachedLoc = localStorage.getItem('runnit_weather_loc')
@@ -916,7 +959,10 @@ onMounted(async () => {
   }
 })
 
-watch([currentYear, currentMonth], fetchEvents)
+watch([currentYear, currentMonth], () => {
+  fetchEvents()
+  fetchGoogleEvents()
+})
 </script>
 
 <style scoped>
@@ -1619,6 +1665,25 @@ textarea.form-control { resize: vertical; min-height: 60px; }
   left: 4px;
   pointer-events: none;
 }
+
+.cal-gcal-icon {
+  font-size: 0.65rem;
+  color: #5A5348;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  pointer-events: none;
+}
+
+.drawer-gcal-event {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid #E7DFCE;
+}
+.drawer-gcal-event:last-child { border-bottom: none; }
 
 /* ── Drawer Group Event ───────────────────────────────────── */
 .drawer-group-event {
