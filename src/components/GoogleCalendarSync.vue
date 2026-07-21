@@ -57,6 +57,7 @@ import { useGoogleCalendar } from '@/composables/useGoogleCalendar'
 const props = defineProps({
   workouts: { type: Array, default: () => [] }
 })
+const emit = defineEmits(['synced'])
 
 const { connected, syncing, error, lastSync, connect, disconnect, syncAll } = useGoogleCalendar()
 
@@ -71,8 +72,9 @@ const lastSyncDisplay = computed(() => {
   return `Last synced: ${d.toLocaleDateString()}`
 })
 
-function handleSync() {
-  syncAll(props.workouts)
+async function handleSync() {
+  const results = await syncAll(props.workouts)
+  if (results?.length) emit('synced', results)
 }
 </script>
 

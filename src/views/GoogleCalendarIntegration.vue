@@ -42,7 +42,7 @@
       </div>
 
       <!-- The sync card -->
-      <GoogleCalendarSync :workouts="workouts" />
+      <GoogleCalendarSync :workouts="workouts" @synced="handleSynced" />
       <p v-if="workouts.length" class="gcal-ready-note">
         {{ workouts.length }} upcoming workout{{ workouts.length === 1 ? '' : 's' }} ready to sync.
       </p>
@@ -107,14 +107,28 @@ async function loadUpcomingWorkouts() {
       headers: getAuthHeaders(),
     })
     workouts.value = (data || []).map(ev => ({
+      id: ev.id,
       date: ev.plannedDate,
       title: ev.title || ev.workoutType?.replace('_', ' ') || 'Workout',
       description: ev.description || '',
       sport: ev.workoutType,
       durationMinutes: ev.durationMinutes,
+      googleEventId: ev.googleEventId,
     }))
   } catch {
     workouts.value = []
+  }
+}
+
+// Persist newly-created Google event IDs from a manual "Sync Now" so future
+// syncs/edits update in place instead of creating duplicates
+async function handleSynced(results) {
+  for (const r of results) {
+    const w = workouts.value.find(w => w.id === r.id)
+    if (w && !w.googleEventId) {
+      w.googleEventId = r.googleEventId
+      axios.put(`${API}/workout-events/${r.id}`, { googleEventId: r.googleEventId }, { headers: getAuthHeaders() }).catch(() => {})
+    }
   }
 }
 
@@ -123,7 +137,7 @@ onMounted(loadUpcomingWorkouts)
 const { connected, syncing, importedEvents, hasLoadedEvents, readAll } = useGoogleCalendar()
 
 function loadGoogleEvents() {
-  readAll(30)
+  readAll()
 }
 
 function formatEventTime(ev) {
