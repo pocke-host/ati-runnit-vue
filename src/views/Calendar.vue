@@ -468,7 +468,39 @@ const currentMonth = ref(new Date().getMonth()) // 0-indexed
 const events       = ref([])
 const coachEvents  = ref([]) // workouts pushed by coach to athlete's calendar
 const raceBookmarks = ref([])
-const { connected: gcalConnected, importedEvents: googleEvents, readAll: readGoogleEvents } = useGoogleCalendar()
+const {
+  connected: gcalConnected, importedEvents: googleEvents, readAll: readGoogleEvents,
+  pushEvent: gcalPushEvent, updateEvent: gcalUpdateEvent, deleteEvent: gcalDeleteEvent,
+} = useGoogleCalendar()
+
+// Maps a Runnit workout-event API record to the shape useGoogleCalendar expects
+function toGcalWorkout(ev) {
+  return {
+    date: ev.plannedDate,
+    title: ev.title,
+    description: ev.description || '',
+    sport: ev.workoutType,
+    durationMinutes: ev.durationMinutes,
+  }
+}
+
+// Best-effort push/update to Google Calendar — never blocks or fails the Runnit save
+async function syncEventToGoogle(ev) {
+  if (!gcalConnected.value) return
+  try {
+    if (ev.googleEventId) {
+      await gcalUpdateEvent(ev.googleEventId, toGcalWorkout(ev))
+    } else {
+      const created = await gcalPushEvent(toGcalWorkout(ev))
+      await axios.put(`${API}/workout-events/${ev.id}`, { googleEventId: created.id })
+      ev.googleEventId = created.id
+      const idx = events.value.findIndex(e => e.id === ev.id)
+      if (idx >= 0) events.value[idx] = { ...events.value[idx], googleEventId: created.id }
+    }
+  } catch (err) {
+    showToast('Saved, but Google Calendar sync failed.', 'error')
+  }
+}
 const selectedDate = ref(null)
 const aiSuggestion = ref(null)
 const aiLoading    = ref(false)
@@ -742,15 +774,19 @@ async function saveEvent() {
       durationMinutes: createForm.value.durationMinutes || null,
       source:          'MANUAL',
     }
+    let saved
     if (editingEvent.value) {
       const { data } = await axios.put(`${API}/workout-events/${editingEvent.value.id}`, payload)
       const idx = events.value.findIndex(e => e.id === editingEvent.value.id)
       if (idx >= 0) events.value[idx] = data
+      saved = data
     } else {
       const { data } = await axios.post(`${API}/workout-events`, payload)
       events.value.push(data)
+      saved = data
     }
     closeCreateForm()
+    syncEventToGoogle(saved)
   } catch (e) {
     formError.value = e.response?.data?.error || 'Failed to save'
   } finally {
@@ -766,10 +802,16 @@ function deleteEvent(id) {
 async function doDeleteEvent() {
   showDeleteWorkoutConfirm.value = false
   const id = pendingDeleteId.value
+  const target = events.value.find(e => e.id === id)
   try {
     await axios.delete(`${API}/workout-events/${id}`)
     events.value = events.value.filter(e => e.id !== id)
     showToast('Workout removed.', 'info')
+    if (target?.googleEventId && gcalConnected.value) {
+      gcalDeleteEvent(target.googleEventId).catch(() => {
+        showToast('Removed, but Google Calendar still has this event.', 'error')
+      })
+    }
   } catch {
     showToast('Failed to remove workout. Try again.', 'error')
   }
@@ -860,6 +902,7 @@ async function acceptAiSuggestion() {
     const { data } = await axios.post(`${API}/workout-events`, payload)
     events.value.push(data)
     aiSuggestion.value = null
+    syncEventToGoogle(data)
   } catch { /* silent */ }
   finally { saveLoading.value = false }
 }
@@ -900,6 +943,7 @@ async function addWeekPlan() {
       }
       const { data } = await axios.post(`${API}/workout-events`, payload)
       events.value.push(data)
+      syncEventToGoogle(data)
     }
     showWeekPlanModal.value = false
   } catch { /* silent */ }
