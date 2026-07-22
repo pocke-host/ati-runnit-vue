@@ -80,15 +80,21 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import axios from 'axios'
 import GoogleCalendarSync from '@/components/GoogleCalendarSync.vue'
 import { useGoogleCalendar } from '@/composables/useGoogleCalendar'
+import { useToast } from '@/composables/useToast'
 
 useHead({
   title: 'Google Calendar — Runnit',
   meta: [{ name: 'description', content: 'Sync your Runnit training plan to Google Calendar.' }],
 })
+
+const route = useRoute()
+const router = useRouter()
+const { showToast } = useToast()
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const getAuthHeaders = () => {
@@ -132,9 +138,20 @@ async function handleSynced(results) {
   }
 }
 
-onMounted(loadUpcomingWorkouts)
+const { connected, syncing, importedEvents, hasLoadedEvents, checkStatus, readAll } = useGoogleCalendar()
 
-const { connected, syncing, importedEvents, hasLoadedEvents, readAll } = useGoogleCalendar()
+onMounted(async () => {
+  loadUpcomingWorkouts()
+  await checkStatus()
+
+  if (route.query.googleCalendar === 'connected') {
+    showToast('Google Calendar connected.', 'success')
+    router.replace({ query: {} })
+  } else if (route.query.error) {
+    showToast('Failed to connect Google Calendar. Please try again.', 'error')
+    router.replace({ query: {} })
+  }
+})
 
 function loadGoogleEvents() {
   readAll()

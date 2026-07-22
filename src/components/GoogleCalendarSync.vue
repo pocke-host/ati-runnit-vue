@@ -1,19 +1,8 @@
 <template>
   <div class="gcal-card">
 
-    <!-- Not configured -->
-    <div v-if="notConfigured" class="gcal-row">
-      <div class="gcal-left">
-        <svg class="gcal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="0" ry="0"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <div>
-          <div class="gcal-label">GOOGLE CALENDAR</div>
-          <div class="gcal-desc">Not configured — add <code>VITE_GOOGLE_CLIENT_ID</code> to enable.</div>
-        </div>
-      </div>
-    </div>
-
     <!-- Connected state -->
-    <div v-else-if="connected" class="gcal-row">
+    <div v-if="connected" class="gcal-row">
       <div class="gcal-left">
         <span class="gcal-status-dot"></span>
         <div>
@@ -51,7 +40,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useGoogleCalendar } from '@/composables/useGoogleCalendar'
 
 const props = defineProps({
@@ -59,9 +48,9 @@ const props = defineProps({
 })
 const emit = defineEmits(['synced'])
 
-const { connected, syncing, error, lastSync, connect, disconnect, syncAll } = useGoogleCalendar()
+const { connected, syncing, error, lastSync, checkStatus, connect, disconnect, syncAll } = useGoogleCalendar()
 
-const notConfigured = computed(() => !import.meta.env.VITE_GOOGLE_CLIENT_ID)
+onMounted(checkStatus)
 
 const lastSyncDisplay = computed(() => {
   if (!lastSync.value) return 'Never synced — click Sync Now to push workouts.'
