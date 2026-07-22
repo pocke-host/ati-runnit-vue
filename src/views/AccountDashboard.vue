@@ -233,29 +233,54 @@
               <div class="db2-card-title">Recovery</div>
               <div class="db2-recovery-date">Today</div>
             </div>
-            <div class="db2-recovery-grid">
-              <div class="db2-recovery-score-cell" v-if="todayWellness.recoveryScore != null">
+
+            <!-- Rings: Recovery + Strain -->
+            <div class="db2-recovery-rings-row">
+              <div class="db2-recovery-ring-cell" v-if="todayWellness.recoveryScore != null">
                 <div class="db2-recovery-ring" :style="{ borderColor: recoveryColor }">
                   <span :style="{ color: recoveryColor }">{{ todayWellness.recoveryScore }}<span class="db2-recovery-pct">%</span></span>
                 </div>
+                <div class="db2-recovery-ring-lbl">Recovery</div>
               </div>
-              <div class="db2-recovery-stats">
-                <div class="db2-recovery-stat" v-if="todayWellness.hrvMilli != null">
-                  <span class="db2-recovery-stat-lbl">HRV</span>
-                  <span class="db2-recovery-stat-val">{{ Math.round(todayWellness.hrvMilli) }}<span class="db2-recovery-unit">ms</span></span>
+              <div class="db2-recovery-ring-cell" v-if="todayWellness.strain != null">
+                <div class="db2-recovery-ring db2-recovery-ring--strain">
+                  <span>{{ todayWellness.strain.toFixed(1) }}</span>
                 </div>
-                <div class="db2-recovery-stat" v-if="todayWellness.restingHeartRate != null">
-                  <span class="db2-recovery-stat-lbl">Resting HR</span>
-                  <span class="db2-recovery-stat-val">{{ todayWellness.restingHeartRate }}<span class="db2-recovery-unit">bpm</span></span>
-                </div>
-                <div class="db2-recovery-stat" v-if="todayWellness.sleepPerformancePct != null">
-                  <span class="db2-recovery-stat-lbl">Sleep</span>
-                  <span class="db2-recovery-stat-val">{{ todayWellness.sleepPerformancePct }}<span class="db2-recovery-unit">%</span></span>
-                </div>
-                <div class="db2-recovery-stat" v-if="todayWellness.strain != null">
-                  <span class="db2-recovery-stat-lbl">Strain</span>
-                  <span class="db2-recovery-stat-val">{{ todayWellness.strain.toFixed(1) }}</span>
-                </div>
+                <div class="db2-recovery-ring-lbl">Strain · {{ strainBand }}</div>
+              </div>
+            </div>
+
+            <!-- HRV / RHR / Sleep stats -->
+            <div class="db2-recovery-stats">
+              <div class="db2-recovery-stat" v-if="todayWellness.hrvMilli != null">
+                <span class="db2-recovery-stat-lbl">HRV</span>
+                <span class="db2-recovery-stat-val">{{ Math.round(todayWellness.hrvMilli) }}<span class="db2-recovery-unit">ms</span></span>
+              </div>
+              <div class="db2-recovery-stat" v-if="todayWellness.restingHeartRate != null">
+                <span class="db2-recovery-stat-lbl">Resting HR</span>
+                <span class="db2-recovery-stat-val">{{ todayWellness.restingHeartRate }}<span class="db2-recovery-unit">bpm</span></span>
+              </div>
+              <div class="db2-recovery-stat" v-if="todayWellness.sleepPerformancePct != null">
+                <span class="db2-recovery-stat-lbl">Sleep</span>
+                <span class="db2-recovery-stat-val">{{ todayWellness.sleepPerformancePct }}<span class="db2-recovery-unit">%</span></span>
+              </div>
+              <div class="db2-recovery-stat" v-if="todayWellness.totalSleepMinutes != null">
+                <span class="db2-recovery-stat-lbl">Time Asleep</span>
+                <span class="db2-recovery-stat-val">{{ Math.floor(todayWellness.totalSleepMinutes / 60) }}<span class="db2-recovery-unit">h</span> {{ todayWellness.totalSleepMinutes % 60 }}<span class="db2-recovery-unit">m</span></span>
+              </div>
+            </div>
+
+            <!-- Sleep stage breakdown -->
+            <div class="db2-sleep-stages" v-if="sleepStageBreakdown">
+              <div class="db2-sleep-stages-bar">
+                <div class="db2-sleep-stage-seg db2-sleep-stage-seg--light" :style="{ width: sleepStageBreakdown.lightPct + '%' }"></div>
+                <div class="db2-sleep-stage-seg db2-sleep-stage-seg--deep" :style="{ width: sleepStageBreakdown.deepPct + '%' }"></div>
+                <div class="db2-sleep-stage-seg db2-sleep-stage-seg--rem" :style="{ width: sleepStageBreakdown.remPct + '%' }"></div>
+              </div>
+              <div class="db2-sleep-stages-legend">
+                <span class="db2-sleep-legend-item"><span class="db2-sleep-dot db2-sleep-dot--light"></span>Light {{ sleepStageBreakdown.lightPct }}%</span>
+                <span class="db2-sleep-legend-item"><span class="db2-sleep-dot db2-sleep-dot--deep"></span>Deep {{ sleepStageBreakdown.deepPct }}%</span>
+                <span class="db2-sleep-legend-item"><span class="db2-sleep-dot db2-sleep-dot--rem"></span>REM {{ sleepStageBreakdown.remPct }}%</span>
               </div>
             </div>
           </div>
@@ -2191,6 +2216,28 @@ const recoveryColor = computed(() => {
   if (score >= 67) return '#2A55F5'
   if (score >= 34) return '#FFC53D'
   return '#ef4444'
+})
+
+// WHOOP's own strain bands — 0-21 scale (Borg-based, not a percentage)
+const strainBand = computed(() => {
+  const s = todayWellness.value?.strain
+  if (s == null) return ''
+  if (s < 10) return 'Light'
+  if (s < 14) return 'Moderate'
+  if (s < 18) return 'Strenuous'
+  return 'All Out'
+})
+
+const sleepStageBreakdown = computed(() => {
+  const w = todayWellness.value
+  if (!w || w.lightSleepMinutes == null || w.deepSleepMinutes == null || w.remSleepMinutes == null) return null
+  const total = w.lightSleepMinutes + w.deepSleepMinutes + w.remSleepMinutes
+  if (total <= 0) return null
+  return {
+    lightPct: Math.round((w.lightSleepMinutes / total) * 100),
+    deepPct: Math.round((w.deepSleepMinutes / total) * 100),
+    remPct: Math.round((w.remSleepMinutes / total) * 100),
+  }
 })
 
 onMounted(async () => {
@@ -4176,13 +4223,12 @@ textarea.form-control{resize:vertical;min-height:72px}
   text-transform: uppercase;
   color: #8A8A8A;
 }
-.db2-recovery-grid {
+.db2-recovery-rings-row {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 18px;
+  gap: 24px;
+  padding: 18px 18px 14px;
 }
-.db2-recovery-score-cell { flex-shrink: 0; }
+.db2-recovery-ring-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .db2-recovery-ring {
   width: 72px;
   height: 72px;
@@ -4195,12 +4241,22 @@ textarea.form-control{resize:vertical;min-height:72px}
   font-weight: 800;
   font-size: 1.3rem;
 }
+.db2-recovery-ring--strain { border-color: #2A55F5; color: #2A55F5; }
 .db2-recovery-pct { font-size: 0.7rem; }
+.db2-recovery-ring-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  text-align: center;
+}
 .db2-recovery-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px 18px;
-  flex: 1;
+  padding: 0 18px 16px;
 }
 .db2-recovery-stat { display: flex; flex-direction: column; }
 .db2-recovery-stat-lbl {
@@ -4224,6 +4280,40 @@ textarea.form-control{resize:vertical;min-height:72px}
   color: #8A8A8A;
   margin-left: 2px;
 }
+
+/* Sleep stage breakdown bar */
+.db2-sleep-stages { border-top: 2px solid #E7DFCE; margin: 0 18px 18px; padding-top: 14px; }
+.db2-sleep-stages-bar {
+  display: flex;
+  height: 10px;
+  border: 2px solid #16130F;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.db2-sleep-stage-seg { height: 100%; }
+.db2-sleep-stage-seg--light { background: #C9C2B4; }
+.db2-sleep-stage-seg--deep  { background: #16130F; }
+.db2-sleep-stage-seg--rem   { background: #2A55F5; }
+.db2-sleep-stages-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.db2-sleep-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #5A5348;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.db2-sleep-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.db2-sleep-dot--light { background: #C9C2B4; }
+.db2-sleep-dot--deep  { background: #16130F; }
+.db2-sleep-dot--rem   { background: #2A55F5; }
 
 /* ── RECENT ACTIVITIES ── */
 .db2-recent { grid-row: span 2; display: flex; flex-direction: column; }
