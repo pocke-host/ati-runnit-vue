@@ -29,6 +29,28 @@
         <i class="bi bi-exclamation-circle-fill me-2"></i>{{ actionError }}
       </div>
 
+      <!-- Invite Athletes -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">INVITE YOUR ROSTER</h2>
+        </div>
+        <div class="invite-card">
+          <p class="invite-copy">
+            Share this link with your athletes — anyone who opens it joins your roster instantly, no request/approve needed. Bring your whole team over at once.
+          </p>
+          <div v-if="inviteLink" class="invite-link-row">
+            <input class="invite-link-input" :value="inviteLink" readonly @focus="$event.target.select()" />
+            <button class="btn-copy-invite" @click="copyInviteLink">
+              {{ inviteCopied ? 'Copied!' : 'Copy' }}
+            </button>
+          </div>
+          <button v-else class="btn-get-invite" @click="loadInviteLink" :disabled="inviteLoading">
+            <span v-if="inviteLoading" class="spinner-border spinner-border-sm me-2"></span>
+            Get my invite link
+          </button>
+        </div>
+      </section>
+
       <!-- Pending Requests -->
       <section v-if="pendingRequests.length > 0" class="section">
         <div class="section-header">
@@ -153,6 +175,36 @@ const { athletes, pendingRequests, loading } = storeToRefs(coachStore)
 const actionLoading = ref(null)
 const actionError = ref('')
 
+// Invite link
+const inviteLink = ref('')
+const inviteLoading = ref(false)
+const inviteCopied = ref(false)
+
+const loadInviteLink = async () => {
+  inviteLoading.value = true
+  try {
+    const token = localStorage.getItem('token')
+    const res = await fetch(`${API}/coach/invite-link`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) throw new Error('Failed to load invite link')
+    const data = await res.json()
+    inviteLink.value = data.url
+  } catch {
+    actionError.value = 'Failed to load invite link. Please try again.'
+  } finally {
+    inviteLoading.value = false
+  }
+}
+
+const copyInviteLink = async () => {
+  try {
+    await navigator.clipboard.writeText(inviteLink.value)
+    inviteCopied.value = true
+    setTimeout(() => { inviteCopied.value = false }, 2000)
+  } catch { /* clipboard permission denied — link is still selectable in the input */ }
+}
+
 // Coaching rate
 const rateInput = ref(user.value?.monthlyRate ?? null)
 const savingRate = ref(false)
@@ -232,7 +284,7 @@ const decline = async (reqId) => {
 }
 
 onMounted(async () => {
-  await Promise.all([coachStore.fetchAthletes(), coachStore.fetchRequests()])
+  await Promise.all([coachStore.fetchAthletes(), coachStore.fetchRequests(), loadInviteLink()])
   // Load compliance for each athlete in parallel (non-blocking)
   athletes.value.forEach(async (athlete) => {
     const weeks = await coachStore.fetchAthleteCompliance(athlete.id, 4)
@@ -394,6 +446,46 @@ onMounted(async () => {
 .ath-link:hover { color: #2A55F5; }
 
 /* Coaching Rate card */
+.invite-card {
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 4px 4px 0 #16130F;
+}
+.invite-copy { font-size: 0.88rem; color: #5A5348; line-height: 1.5; margin: 0; }
+.invite-link-row { display: flex; gap: 10px; }
+.invite-link-input {
+  flex: 1;
+  border: 2px solid #16130F;
+  padding: 10px 14px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+  background: #FBF6EC;
+  color: #16130F;
+  min-width: 0;
+}
+.btn-copy-invite, .btn-get-invite {
+  border: 2px solid #16130F;
+  background: #2A55F5;
+  color: #fff;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 20px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #16130F;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-copy-invite:hover, .btn-get-invite:hover:not(:disabled) { background: #1E42D6; }
+.btn-get-invite { display: inline-flex; align-items: center; justify-content: center; height: 44px; }
+.btn-get-invite:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
 .rate-card {
   border: 2px solid #16130F;
   background: #fff;

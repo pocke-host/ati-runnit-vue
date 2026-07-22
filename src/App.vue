@@ -84,6 +84,13 @@ onMounted(() => {
   initDeepLinks()
   if (isAuthenticated.value) initPush()
 
+  // Resume a coach invite the user clicked before signing up/in
+  const pendingInvite = sessionStorage.getItem('pending_coach_invite')
+  if (pendingInvite && isAuthenticated.value && route.path !== `/join-coach/${pendingInvite}`) {
+    sessionStorage.removeItem('pending_coach_invite')
+    router.push(`/join-coach/${pendingInvite}?autoAccept=1`)
+  }
+
   // Backend warm-up
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
   fetch(`${API_URL}/health`, { method: 'GET' }).catch(() => {})
