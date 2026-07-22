@@ -471,6 +471,7 @@ const raceBookmarks = ref([])
 const {
   connected: gcalConnected, importedEvents: googleEvents, readAll: readGoogleEvents,
   pushEvent: gcalPushEvent, updateEvent: gcalUpdateEvent, deleteEvent: gcalDeleteEvent,
+  checkStatus: checkGcalStatus,
 } = useGoogleCalendar()
 
 // Maps a Runnit workout-event API record to the shape useGoogleCalendar expects
@@ -981,6 +982,7 @@ function weekDayNum(dateStr) {
 
 onMounted(async () => {
   if (!activities.value.length) await activityStore.fetchActivities()
+  await checkGcalStatus()
   await Promise.all([fetchEvents(), fetchRaceBookmarks(), groupEventStore.fetchMyEvents(), fetchGoogleEvents()])
 
   // Weather: use cached coords or request geolocation
