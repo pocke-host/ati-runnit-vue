@@ -16,7 +16,7 @@
         <div class="st-sidebar-item st-sidebar-item--active">Account</div>
         <div class="st-sidebar-item">Units &amp; Display</div>
         <div class="st-sidebar-item">Privacy</div>
-        <div class="st-sidebar-item">Connected Apps</div>
+        <router-link to="/devices" class="st-sidebar-item">Connected Apps</router-link>
         <div class="st-sidebar-item">Notifications</div>
         <div class="st-sidebar-item">Billing</div>
       </nav>
@@ -563,6 +563,7 @@ onMounted(() => {
   align-self: start;
 }
 .st-sidebar-item {
+  display: block;
   padding: 12px 22px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.7rem;
