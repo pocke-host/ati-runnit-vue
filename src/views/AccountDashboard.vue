@@ -227,6 +227,39 @@
             </div>
           </div>
 
+          <!-- RECOVERY (WHOOP or other wearable-reported wellness) -->
+          <div class="db2-card db2-recovery" v-if="todayWellness">
+            <div class="db2-card-head">
+              <div class="db2-card-title">Recovery</div>
+              <div class="db2-recovery-date">Today</div>
+            </div>
+            <div class="db2-recovery-grid">
+              <div class="db2-recovery-score-cell" v-if="todayWellness.recoveryScore != null">
+                <div class="db2-recovery-ring" :style="{ borderColor: recoveryColor }">
+                  <span :style="{ color: recoveryColor }">{{ todayWellness.recoveryScore }}<span class="db2-recovery-pct">%</span></span>
+                </div>
+              </div>
+              <div class="db2-recovery-stats">
+                <div class="db2-recovery-stat" v-if="todayWellness.hrvMilli != null">
+                  <span class="db2-recovery-stat-lbl">HRV</span>
+                  <span class="db2-recovery-stat-val">{{ Math.round(todayWellness.hrvMilli) }}<span class="db2-recovery-unit">ms</span></span>
+                </div>
+                <div class="db2-recovery-stat" v-if="todayWellness.restingHeartRate != null">
+                  <span class="db2-recovery-stat-lbl">Resting HR</span>
+                  <span class="db2-recovery-stat-val">{{ todayWellness.restingHeartRate }}<span class="db2-recovery-unit">bpm</span></span>
+                </div>
+                <div class="db2-recovery-stat" v-if="todayWellness.sleepPerformancePct != null">
+                  <span class="db2-recovery-stat-lbl">Sleep</span>
+                  <span class="db2-recovery-stat-val">{{ todayWellness.sleepPerformancePct }}<span class="db2-recovery-unit">%</span></span>
+                </div>
+                <div class="db2-recovery-stat" v-if="todayWellness.strain != null">
+                  <span class="db2-recovery-stat-lbl">Strain</span>
+                  <span class="db2-recovery-stat-val">{{ todayWellness.strain.toFixed(1) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- RECENT ACTIVITIES (grid-row span 2) -->
           <div class="db2-card db2-recent">
             <div class="db2-card-head">
@@ -2140,11 +2173,32 @@ const loadData = async () => {
 
 const { refreshing, pullY } = usePullToRefresh(loadData)
 
+// Recovery/sleep/strain — only populated for users with a wearable that reports it (WHOOP today)
+const todayWellness = ref(null)
+
+async function loadTodayWellness() {
+  try {
+    const { data } = await axios.get(`${API_URL}/wellness/today`, { headers: getAuthHeaders() })
+    todayWellness.value = data?.available === false ? null : data
+  } catch {
+    todayWellness.value = null
+  }
+}
+
+const recoveryColor = computed(() => {
+  const score = todayWellness.value?.recoveryScore
+  if (score == null) return '#767676'
+  if (score >= 67) return '#2A55F5'
+  if (score >= 34) return '#FFC53D'
+  return '#ef4444'
+})
+
 onMounted(async () => {
   // Render empty charts immediately so the canvas elements appear at once
   await nextTick()
   updateCharts()
   await loadData()
+  loadTodayWellness()
 })
 
 onUnmounted(() => {
@@ -4112,6 +4166,64 @@ textarea.form-control{resize:vertical;min-height:72px}
 }
 .db2-insights-link:hover { color: #FBF6EC; }
 .db2-card-head--ink .db2-eyebrow { color: #2A55F5; }
+
+/* ── RECOVERY ── */
+.db2-recovery-date {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+}
+.db2-recovery-grid {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+}
+.db2-recovery-score-cell { flex-shrink: 0; }
+.db2-recovery-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  border: 4px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+.db2-recovery-pct { font-size: 0.7rem; }
+.db2-recovery-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+  flex: 1;
+}
+.db2-recovery-stat { display: flex; flex-direction: column; }
+.db2-recovery-stat-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+}
+.db2-recovery-stat-val {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #16130F;
+}
+.db2-recovery-unit {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #8A8A8A;
+  margin-left: 2px;
+}
 
 /* ── RECENT ACTIVITIES ── */
 .db2-recent { grid-row: span 2; display: flex; flex-direction: column; }
