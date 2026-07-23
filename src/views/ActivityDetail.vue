@@ -35,7 +35,7 @@
           <i class="bi bi-arrow-left me-1"></i>Back
         </button>
         <div class="top-bar-meta">
-          <span class="sport-chip">{{ getSportIcon(activity.sportType) }} {{ activity.sportType }}</span>
+          <span class="sport-chip">{{ getSportIcon(activity.sportType) }} {{ sportLabel(activity) }}</span>
           <span class="top-date">{{ formatDate(activity.performedAt) }}</span>
         </div>
         <div class="top-bar-spacer"></div>
@@ -607,6 +607,16 @@ const getSportIcon = (sport) => {
     OTHER: '🏋️'
   }
   return icons[sport] || '🏋️'
+}
+
+// Device-synced "OTHER" activities (WHOOP has ~100 named sports; Runnit only
+// tracks RUN/BIKE/SWIM/HIKE/WALK explicitly) preserve the real device label in
+// notes as "PROVIDER: Name" — show that instead of the bare word "OTHER"
+const sportLabel = (act) => {
+  if (act.sportType === 'OTHER' && act.notes && /^[A-Z]+: /.test(act.notes)) {
+    return act.notes.split(': ').slice(1).join(': ')
+  }
+  return act.sportType
 }
 
 const getInitial = (val) => {
