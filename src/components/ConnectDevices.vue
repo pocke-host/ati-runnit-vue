@@ -145,6 +145,9 @@
               <span v-if="syncing" class="spinner"></span>
               {{ syncing ? 'Syncing…' : 'Sync Now' }}
             </button>
+            <button class="btn-disconnect" @click="resyncWhoop" :disabled="resyncingWhoop">
+              {{ resyncingWhoop ? 'Fixing dates…' : 'Activities showing wrong dates? Fix now' }}
+            </button>
             <button class="btn-disconnect" @click="disconnectWhoop">Disconnect</button>
           </div>
         </template>
@@ -423,6 +426,20 @@ const syncWhoop = async () => {
     showStatus('Sync failed. Please try again.', 'error')
   } finally {
     syncing.value = false
+  }
+}
+
+const resyncingWhoop = ref(false)
+const resyncWhoop = async () => {
+  resyncingWhoop.value = true
+  try {
+    const { data } = await axios.post(`${API_URL}/integrations/whoop/resync`, {}, { headers: getAuthHeaders() })
+    showStatus(`Fixed — removed ${data.deleted} activities with wrong dates and re-imported ${data.imported} with the correct ones.`)
+    await checkConnectionStatus()
+  } catch {
+    showStatus('Failed to fix activity dates. Please try again.', 'error')
+  } finally {
+    resyncingWhoop.value = false
   }
 }
 
