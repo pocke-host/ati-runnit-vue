@@ -35,8 +35,8 @@
           <i class="bi bi-arrow-left me-1"></i>Back
         </button>
         <div class="top-bar-meta">
-          <span class="sport-chip">{{ getSportIcon(activity.sportType) }} {{ activity.sportType }}</span>
-          <span class="top-date">{{ formatDate(activity.createdAt) }}</span>
+          <span class="sport-chip">{{ getSportIcon(activity.sportType) }} {{ sportLabel(activity) }}</span>
+          <span class="top-date">{{ formatDate(activity.performedAt) }}</span>
         </div>
         <div class="top-bar-spacer"></div>
       </div>
@@ -53,7 +53,7 @@
             <router-link :to="`/profile/${activity.userId}`" class="user-name-link">
               {{ activity.userDisplayName || 'Athlete' }}
             </router-link>
-            <div class="user-sub">{{ formatDate(activity.createdAt) }}</div>
+            <div class="user-sub">{{ formatDate(activity.performedAt) }}</div>
           </div>
           <span v-if="activityPRs.length > 0" class="gr-pr-stamp">
             {{ activityPRs.length === 1 ? 'PR!' : `${activityPRs.length}× PR!` }}
@@ -213,7 +213,7 @@
                 :to="`/activities/${e.id}`"
                 :class="['similar-row', { 'similar-row-current': e.id === activity.id }]"
               >
-                <span class="sr-date">{{ formatDateShort(e.createdAt) }}</span>
+                <span class="sr-date">{{ formatDateShort(e.performedAt) }}</span>
                 <span class="sr-dist">{{ formatDistance(e.distanceMeters) }}</span>
                 <span class="sr-pace">{{ getSimilarPace(e) }}</span>
                 <span class="sr-dur">{{ formatDuration(e.durationSeconds) }}</span>
@@ -264,7 +264,7 @@
                       <span v-else-if="getCourseRank(a) === 3" class="rank-bronze">🥉</span>
                       <span v-else class="rank-num">{{ getCourseRank(a) }}</span>
                     </td>
-                    <td>{{ formatDateShort(a.createdAt) }}</td>
+                    <td>{{ formatDateShort(a.performedAt) }}</td>
                     <td class="course-time">{{ formatDuration(a.durationSeconds) }}</td>
                     <td class="course-pace">{{ formatPace(a.durationSeconds / 60 / ((a.distanceMeters || 1) / 1000)) }}</td>
                     <td>
@@ -444,13 +444,13 @@ const similarEfforts = computed(() => {
       a.distanceMeters <= hi &&
       a.durationSeconds > 0
     )
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .sort((a, b) => new Date(b.performedAt) - new Date(a.performedAt))
     .slice(0, 6)
   // Make sure current activity is in the list
   const hasCur = pool.some(a => String(a.id) === String(cur.id))
   if (!hasCur) pool.push(cur)
   return pool
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .sort((a, b) => new Date(b.performedAt) - new Date(a.performedAt))
     .slice(0, 6)
 })
 
@@ -607,6 +607,16 @@ const getSportIcon = (sport) => {
     OTHER: '🏋️'
   }
   return icons[sport] || '🏋️'
+}
+
+// Device-synced "OTHER" activities (WHOOP has ~100 named sports; Runnit only
+// tracks RUN/BIKE/SWIM/HIKE/WALK explicitly) preserve the real device label in
+// notes as "PROVIDER: Name" — show that instead of the bare word "OTHER"
+const sportLabel = (act) => {
+  if (act.sportType === 'OTHER' && act.notes && /^[A-Z]+: /.test(act.notes)) {
+    return act.notes.split(': ').slice(1).join(': ')
+  }
+  return act.sportType
 }
 
 const getInitial = (val) => {

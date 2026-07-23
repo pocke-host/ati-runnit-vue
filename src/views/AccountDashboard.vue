@@ -86,7 +86,7 @@
               <div class="db2-feat-head">
                 <span class="db2-latest-badge">Latest</span>
                 <div class="db2-feat-title">{{ getActivityName(activities[0]) }}</div>
-                <div class="db2-feat-date">{{ formatDateShort(activities[0].createdAt) }}</div>
+                <div class="db2-feat-date">{{ formatDateShort(activities[0].performedAt) }}</div>
               </div>
               <div class="db2-feat-map">
                 <svg viewBox="0 0 900 210" preserveAspectRatio="none" class="db2-route-svg">
@@ -303,7 +303,7 @@
                   <div class="db2-recent-name">{{ getActivityName(act) }}</div>
                   <div class="db2-recent-meta">{{ formatDuration(act.durationSeconds) }} · {{ formatDistance(act.distanceMeters) }}</div>
                 </div>
-                <div class="db2-recent-date">{{ formatDateShort(act.createdAt) }}</div>
+                <div class="db2-recent-date">{{ formatDateShort(act.performedAt) }}</div>
               </router-link>
               <div v-if="!activities || !activities.length" class="db2-recent-empty">No activities yet — log your first!</div>
             </div>
@@ -755,7 +755,7 @@
                     {{ formatDuration(activity.durationSeconds) }} • {{ formatDistance(activity.distanceMeters) }}
                   </div>
                 </div>
-                <div class="activity-date">{{ formatDateShort(activity.createdAt) }}</div>
+                <div class="activity-date">{{ formatDateShort(activity.performedAt) }}</div>
               </div>
             </div>
 
@@ -849,7 +849,7 @@
             <div class="dm-featured-head">
               <span class="dm-latest-badge">Latest</span>
               <div class="dm-featured-title">{{ getActivityName(activities[0]) }}</div>
-              <div class="dm-featured-date">{{ formatDateShort(activities[0].createdAt) }}</div>
+              <div class="dm-featured-date">{{ formatDateShort(activities[0].performedAt) }}</div>
             </div>
             <div class="dm-featured-map">
               <svg viewBox="0 0 360 150" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
@@ -975,7 +975,7 @@
                   <div class="dm-act-name">{{ getActivityName(act) }}</div>
                   <div class="dm-act-meta">{{ formatDuration(act.durationSeconds) }} · {{ formatDistance(act.distanceMeters) }}</div>
                 </div>
-                <div class="dm-act-date">{{ formatDateShort(act.createdAt) }}</div>
+                <div class="dm-act-date">{{ formatDateShort(act.performedAt) }}</div>
               </router-link>
             </div>
             <div v-else class="dm-recent-empty">No activities yet — log your first one!</div>
@@ -1498,7 +1498,7 @@ const currentStreak = computed(() => {
 
   const uniqueDays = [...new Set(
     acts.map(a => {
-      const d = new Date(a.createdAt)
+      const d = new Date(a.performedAt)
       d.setHours(0, 0, 0, 0)
       return d.getTime()
     })
@@ -1523,7 +1523,7 @@ const currentStreak = computed(() => {
 const activityToday = computed(() => {
   const today = new Date(); today.setHours(0,0,0,0)
   return (activities.value || []).some(a => {
-    const d = new Date(a.createdAt); d.setHours(0,0,0,0)
+    const d = new Date(a.performedAt); d.setHours(0,0,0,0)
     return d.getTime() === today.getTime()
   })
 })
@@ -1548,7 +1548,7 @@ const weekCalendar = computed(() => {
     date.setHours(0, 0, 0, 0)
     const dateStr = date.toDateString()
     const dayActs = acts.filter(a => {
-      const d = new Date(a.createdAt); d.setHours(0, 0, 0, 0)
+      const d = new Date(a.performedAt); d.setHours(0, 0, 0, 0)
       return d.toDateString() === dateStr
     })
     return {
@@ -1592,7 +1592,7 @@ const dashInsights = computed(() => {
 
   const dailyLoad = new Array(DAYS).fill(0)
   for (const a of acts) {
-    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
+    const daysAgo = Math.floor((today - new Date(a.performedAt)) / dayMs)
     if (daysAgo >= 0 && daysAgo < DAYS) {
       dailyLoad[DAYS - 1 - daysAgo] += (a.distanceMeters || 0) / 1000
     }
@@ -1660,12 +1660,12 @@ const monthCompare = computed(() => {
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
 
   const thisKm = acts
-    .filter(a => new Date(a.createdAt) >= thisMonthStart)
+    .filter(a => new Date(a.performedAt) >= thisMonthStart)
     .reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
 
   const lastKm = acts
     .filter(a => {
-      const d = new Date(a.createdAt)
+      const d = new Date(a.performedAt)
       return d >= lastMonthStart && d < thisMonthStart
     })
     .reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
@@ -1685,7 +1685,7 @@ const weeklyChartData = computed(() => {
   monday.setHours(0, 0, 0, 0)
 
   acts.forEach(a => {
-    const d = new Date(a.createdAt)
+    const d = new Date(a.performedAt)
     if (d >= monday) {
       const idx = (d.getDay() + 6) % 7
       if (chartView.value === 'distance') {
@@ -1715,7 +1715,7 @@ const totalStats = computed(() => {
 const monthlyDistanceMeters = computed(() => {
   const now = new Date()
   const acts = (activities.value || []).filter(a => {
-    const d = new Date(a.createdAt)
+    const d = new Date(a.performedAt)
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
   })
   return acts.reduce((sum, a) => sum + (a.distanceMeters || 0), 0)
@@ -1724,7 +1724,7 @@ const monthlyDistanceMeters = computed(() => {
 const monthlyActivityCount = computed(() => {
   const now = new Date()
   return (activities.value || []).filter(a => {
-    const d = new Date(a.createdAt)
+    const d = new Date(a.performedAt)
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
   }).length
 })
@@ -1750,7 +1750,7 @@ const sportBreakdown = computed(() => {
     cutoff = new Date(now.getFullYear(), 0, 1)
   }
 
-  const acts = (activities.value || []).filter(a => !cutoff || new Date(a.createdAt) >= cutoff)
+  const acts = (activities.value || []).filter(a => !cutoff || new Date(a.performedAt) >= cutoff)
   const breakdown = {}
   const colors = {
     RUN:   '#0052FF',
@@ -1796,7 +1796,7 @@ const getSportIcon = (sportType) => {
 // Returns a contextual name like "Morning Run", "Evening Ride", etc.
 const getActivityName = (activity) => {
   if (activity.title) return activity.title
-  const hour = new Date(activity.createdAt).getHours()
+  const hour = new Date(activity.performedAt).getHours()
   const time = hour < 5 ? 'Night' : hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : hour < 20 ? 'Evening' : 'Night'
   const sport = { RUN: 'Run', BIKE: 'Ride', SWIM: 'Swim', HIKE: 'Hike', WALK: 'Walk' }[activity.sportType] || activity.sportType
   return `${time} ${sport}`

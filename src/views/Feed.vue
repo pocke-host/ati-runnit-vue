@@ -93,7 +93,7 @@
                       <span v-if="item.user?.id === user?.id" class="you-label">(You)</span>
                     </div>
                   </router-link>
-                  <div class="card-time">{{ formatTime(item.createdAt) }}</div>
+                  <div class="card-time">{{ formatTime(item.performedAt || item.createdAt) }}</div>
                 </div>
               </div>
 
@@ -128,7 +128,7 @@
                     <div class="gr-user-handle">@{{ item.user?.handle || (item.user?.displayName||'').toLowerCase().replace(/\s+/g,'') }}</div>
                   </div>
                   <span class="gr-sport-tag" :class="item.isPR ? 'gr-sport-tag--pr' : (['RUN','BIKE','WALK'].includes(item.sportType)) ? 'gr-sport-tag--cobalt' : 'gr-sport-tag--outline'">{{ item.isPR ? 'PR' : item.sportType === 'RUN' ? 'Run' : item.sportType === 'BIKE' ? 'Bike' : item.sportType === 'WALK' ? 'Walk' : item.sportType === 'SWIM' ? 'Swim' : item.sportType || 'Activity' }}</span>
-                  <div class="gr-timestamp">{{ formatTime(item.createdAt) }}</div>
+                  <div class="gr-timestamp">{{ formatTime(item.performedAt || item.createdAt) }}</div>
                 </div>
 
                 <!-- Big Shoulders stat row -->
@@ -516,11 +516,11 @@ const sortedFeedItems = computed(() => {
   // Apply time period filter
   const cutoff = getTimeCutoff()
   if (cutoff) {
-    filtered = filtered.filter(item => new Date(item.createdAt) >= cutoff)
+    filtered = filtered.filter(item => new Date(item.performedAt || item.createdAt) >= cutoff)
   }
 
   if (sortOrder.value === 'newest') {
-    return [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    return [...filtered].sort((a, b) => new Date(b.performedAt || b.createdAt) - new Date(a.performedAt || a.createdAt))
   } else {
     // Sort by popularity (reactions for moments, distance for activities)
     return [...filtered].sort((a, b) => {
