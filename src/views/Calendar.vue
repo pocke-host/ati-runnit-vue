@@ -571,7 +571,7 @@ function _makeDay(date, isCurrentMonth) {
     isToday: fullDate === todayStr,
     isPast:  date < new Date(todayStr),
     events:      allEvents,
-    activities:  (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === fullDate),
+    activities:  (activities.value || []).filter(a => a.performedAt?.slice(0, 10) === fullDate),
     races:       raceBookmarks.value.filter(r => r.raceDate === fullDate),
     groupEvents: groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === fullDate),
     googleEvents: googleEvents.value.filter(ev => googleEventDate(ev) === fullDate),
@@ -589,7 +589,7 @@ const selectedEvents = computed(() =>
 )
 
 const selectedActivities = computed(() =>
-  (activities.value || []).filter(a => a.createdAt?.slice(0, 10) === selectedDate.value)
+  (activities.value || []).filter(a => a.performedAt?.slice(0, 10) === selectedDate.value)
 )
 
 const selectedRaces = computed(() =>
@@ -856,7 +856,7 @@ function _buildContext() {
   const dayMs = 86400000
   const dailyLoad = new Array(90).fill(0)
   for (const a of acts) {
-    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
+    const daysAgo = Math.floor((today - new Date(a.performedAt)) / dayMs)
     if (daysAgo >= 0 && daysAgo < 90) dailyLoad[89 - daysAgo] += (a.distanceMeters || 0) / 1000
   }
   let ctl = 0, atl = 0

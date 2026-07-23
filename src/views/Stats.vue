@@ -465,8 +465,8 @@ const thisWeek = computed(() => {
   weekStart.setHours(0, 0, 0, 0)
   const priorStart = new Date(weekStart.getTime() - 7 * dayMs)
 
-  const thisActs  = acts.filter(a => new Date(a.createdAt) >= weekStart)
-  const priorActs = acts.filter(a => { const d = new Date(a.createdAt); return d >= priorStart && d < weekStart })
+  const thisActs  = acts.filter(a => new Date(a.performedAt) >= weekStart)
+  const priorActs = acts.filter(a => { const d = new Date(a.performedAt); return d >= priorStart && d < weekStart })
 
   const sumDist = arr => arr.reduce((s, a) => s + (a.distanceMeters || 0), 0)
   const sumDur  = arr => arr.reduce((s, a) => s + (a.durationSeconds || 0), 0)
@@ -480,7 +480,7 @@ const thisWeek = computed(() => {
     const d = new Date(now.getTime() - i * dayMs)
     d.setHours(0, 0, 0, 0)
     const dEnd = new Date(d); dEnd.setHours(23, 59, 59, 999)
-    const active = acts.some(a => { const ad = new Date(a.createdAt); return ad >= d && ad <= dEnd })
+    const active = acts.some(a => { const ad = new Date(a.performedAt); return ad >= d && ad <= dEnd })
     dots.push({ label: d.toLocaleDateString('en-US', { weekday: 'short' })[0], active })
   }
 
@@ -510,7 +510,7 @@ const streak = computed(() => {
   }
   const hasAct = (wStart) => {
     const wEnd = new Date(wStart.getTime() + weekMs - 1)
-    return acts.some(a => { const d = new Date(a.createdAt); return d >= wStart && d <= wEnd })
+    return acts.some(a => { const d = new Date(a.performedAt); return d >= wStart && d <= wEnd })
   }
 
   // Current streak — walk backwards from this week
@@ -521,7 +521,7 @@ const streak = computed(() => {
   }
 
   // Best streak ever — walk forward from first activity's week
-  const firstDate = acts.reduce((min, a) => { const d = new Date(a.createdAt); return d < min ? d : min }, new Date())
+  const firstDate = acts.reduce((min, a) => { const d = new Date(a.performedAt); return d < min ? d : min }, new Date())
   const firstWk   = toSunday(firstDate)
   const numWeeks  = Math.ceil((now - firstWk) / weekMs) + 2
 
@@ -553,7 +553,7 @@ const performanceMetrics = computed(() => {
   // Daily TSS proxy: (hours × IF²) × 100
   const dailyTss = new Array(DAYS).fill(0)
   for (const a of acts) {
-    const daysAgo = Math.floor((today - new Date(a.createdAt)) / dayMs)
+    const daysAgo = Math.floor((today - new Date(a.performedAt)) / dayMs)
     if (daysAgo >= 0 && daysAgo < DAYS) {
       const ifFactor = IF_BY_TYPE[a.sportType] || 0.75
       const tss = ((a.durationSeconds || 0) / 3600) * (ifFactor * ifFactor) * 100
@@ -576,7 +576,7 @@ const performanceMetrics = computed(() => {
   // Recent runs for VO2max + race predictions
   const recentRuns = acts
     .filter(a => ['RUN', 'Running'].includes(a.sportType) && (a.distanceMeters || 0) > 2000 && (a.durationSeconds || 0) > 600)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .sort((a, b) => new Date(b.performedAt) - new Date(a.performedAt))
     .slice(0, 15)
 
   // VO2max — Jack Daniels formula with distance-appropriate effort utilization
@@ -620,7 +620,7 @@ const performanceMetrics = computed(() => {
   for (let i = 0; i < 12; i++) {
     const wEnd   = new Date(now.getTime() - i * 7 * dayMs)
     const wStart = new Date(wEnd.getTime() - 6 * dayMs)
-    if (acts.some(a => { const d = new Date(a.createdAt); return d >= wStart && d <= wEnd })) activeWeeks++
+    if (acts.some(a => { const d = new Date(a.performedAt); return d >= wStart && d <= wEnd })) activeWeeks++
   }
   const consistency = Math.round((activeWeeks / 12) * 100)
 
@@ -661,7 +661,7 @@ const vo2maxTrend = computed(() => {
       (a.distanceMeters || 0) > 2000 &&
       (a.durationSeconds || 0) > 600
     )
-    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    .sort((a, b) => new Date(a.performedAt) - new Date(b.performedAt))
     .slice(-30)
     .map(r => {
       const v    = r.distanceMeters / (r.durationSeconds / 60)
@@ -671,7 +671,7 @@ const vo2maxTrend = computed(() => {
                  : 0.83
       const est  = (-4.60 + 0.182258 * v + 0.000104 * v * v) / util
       return {
-        date:   new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        date:   new Date(r.performedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         vo2max: Math.min(85, Math.max(25, Math.round(est * 10) / 10)),
       }
     })
@@ -714,7 +714,7 @@ const weeklyData = computed(() => {
     const start = new Date(end); start.setDate(end.getDate() - 6)
     const label = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     const meters = (activities.value || [])
-      .filter(a => { const d = new Date(a.createdAt); return d >= start && d <= end })
+      .filter(a => { const d = new Date(a.performedAt); return d >= start && d <= end })
       .reduce((s, a) => s + (a.distanceMeters || 0), 0)
     const dist = isImperial.value
       ? parseFloat((meters / 1000 * 0.621371).toFixed(2))
@@ -733,7 +733,7 @@ const monthlyData = computed(() => {
     const end   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
     const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
     const meters = (activities.value || [])
-      .filter(a => { const ad = new Date(a.createdAt); return ad >= start && ad <= end })
+      .filter(a => { const ad = new Date(a.performedAt); return ad >= start && ad <= end })
       .reduce((s, a) => s + (a.distanceMeters || 0), 0)
     const dist = isImperial.value
       ? parseFloat((meters / 1000 * 0.621371).toFixed(2))
@@ -759,7 +759,7 @@ const weeklyTargetKm = computed(() => {
 const daysSinceLastActivity = computed(() => {
   const acts = activities.value || []
   if (!acts.length) return null
-  const latest = acts.reduce((max, a) => { const d = new Date(a.createdAt); return d > max ? d : max }, new Date(0))
+  const latest = acts.reduce((max, a) => { const d = new Date(a.performedAt); return d > max ? d : max }, new Date(0))
   return Math.floor((Date.now() - latest.getTime()) / 86400000)
 })
 
@@ -770,8 +770,8 @@ const heatmapData = computed(() => {
 
   const dailyKm = {}
   for (const a of acts) {
-    if (!a.createdAt) continue
-    const key = new Date(a.createdAt).toISOString().slice(0, 10)
+    if (!a.performedAt) continue
+    const key = new Date(a.performedAt).toISOString().slice(0, 10)
     dailyKm[key] = (dailyKm[key] || 0) + (a.distanceMeters || 0) / 1000
   }
 
