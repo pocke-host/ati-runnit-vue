@@ -411,6 +411,8 @@ const handleNotifClick = async (n) => {
   else if (n.type === 'PLAN_ASSIGNED') router.push('/plans')
   else if (n.type === 'WORKOUT_REMINDER') router.push('/plans')
   else if (n.type === 'PERSONAL_RECORD') router.push('/stats')
+  else if (n.type === 'PLAN_ADAPTED' && n.referenceId) router.push(`/plans/${n.referenceId}`)
+  else if (n.type === 'WHOOP_NEEDS_RECONNECT') router.push('/devices')
   // fallback: stay put (modal already closed)
 }
 

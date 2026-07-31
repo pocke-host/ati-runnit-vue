@@ -213,6 +213,11 @@
                 Target: {{ formatPace(workout.targetPaceSeconds) }}
               </div>
 
+              <!-- Adaptation reason -->
+              <div v-if="workoutAdaptations[workout.id]" class="adaptation-note">
+                <i class="bi bi-lightbulb-fill me-1"></i>{{ workoutAdaptations[workout.id].reason }}
+              </div>
+
               <p class="workout-desc" v-if="workout.description">{{ workout.description }}</p>
 
               <!-- Structured steps -->
@@ -452,6 +457,7 @@ const { showToast } = useToast()
 const plan = ref(null)
 const loading = ref(false)
 const selectedWeek = ref(1)
+const workoutAdaptations = ref({})
 const weekTabsEl = ref(null)
 const workoutLoading = ref({})
 const actionLoading = ref(false)
@@ -732,12 +738,31 @@ onMounted(async () => {
     plan.value = data
     selectedWeek.value = currentWeek.value
     scrollToActiveTab()
+    if (plan.value?.isActive) loadWorkoutAdaptations()
   } catch {
     plan.value = null
   } finally {
     loading.value = false
   }
 })
+
+// Adaptations come back one row per changed field — group by workout,
+// keep only the most recent event per workout since its reason is full prose.
+async function loadWorkoutAdaptations() {
+  try {
+    const rows = await planStore.fetchActivePlanAdaptations()
+    const latest = {}
+    for (const row of rows) {
+      const existing = latest[row.planWorkoutId]
+      if (!existing || new Date(row.createdAt) > new Date(existing.createdAt)) {
+        latest[row.planWorkoutId] = row
+      }
+    }
+    workoutAdaptations.value = latest
+  } catch {
+    // Non-critical — the plan itself already rendered fine without this.
+  }
+}
 </script>
 
 <style scoped>
@@ -969,6 +994,19 @@ onMounted(async () => {
 }
 
 .workout-desc { font-size: 0.85rem; color: rgba(15,18,16,0.55); margin: 0; line-height: 1.5; font-style: italic; }
+
+/* ── Adaptation Reason ── */
+.adaptation-note {
+  display: flex; align-items: flex-start; gap: 4px;
+  font-size: 0.78rem; font-weight: 600; line-height: 1.5;
+  color: #16130F;
+  background: #EEF1FF;
+  border: 2px solid #2A55F5;
+  border-radius: 0;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.adaptation-note i { color: #2A55F5; flex-shrink: 0; margin-top: 1px; }
 
 /* Structured steps in plan */
 .steps-preview-strip { display: flex; gap: 2px; margin-top: 8px; }

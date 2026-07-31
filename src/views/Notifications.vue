@@ -174,6 +174,8 @@ async function handleClick(n) {
   else if (n.type === 'PERSONAL_RECORD')  router.push('/stats')
   else if (n.type === 'ACHIEVEMENT')      router.push('/achievements')
   else if (n.type === 'COACH_NOTE' && n.activityId) router.push(`/activities/${n.activityId}`)
+  else if (n.type === 'PLAN_ADAPTED' && n.referenceId) router.push(`/plans/${n.referenceId}`)
+  else if (n.type === 'WHOOP_NEEDS_RECONNECT') router.push('/devices')
 }
 
 async function markAll() {

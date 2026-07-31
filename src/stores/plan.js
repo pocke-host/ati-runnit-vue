@@ -62,6 +62,20 @@ export const usePlanStore = defineStore('plan', () => {
     }
   }
 
+  async function fetchActivePlanAdaptations() {
+    loading.value = true
+    error.value = null
+    try {
+      const { data } = await axios.get(`${API_URL}/plans/active/adaptations`, { headers: getAuthHeaders() })
+      return Array.isArray(data) ? data : (data.content || [])
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to fetch plan adaptations'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function createPlan(planData) {
     loading.value = true
     error.value = null
@@ -257,6 +271,7 @@ export const usePlanStore = defineStore('plan', () => {
     plans, activePlan, loading, error,
     fetchPlans, fetchPlan, createPlan, setActivePlan,
     deletePlan, completeWorkout, uncompleteWorkout, suggestPlan,
-    fetchAthletePlans, createPlanForAthlete, updatePlan, addWorkout, updateWorkout, deleteWorkout
+    fetchAthletePlans, createPlanForAthlete, updatePlan, addWorkout, updateWorkout, deleteWorkout,
+    fetchActivePlanAdaptations
   }
 })
