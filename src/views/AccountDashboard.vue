@@ -298,7 +298,7 @@
                 :to="`/activities/${act.id}`"
                 class="db2-recent-row"
               >
-                <div class="db2-recent-icon-wrap">{{ getSportIcon(act.sportType) }}</div>
+                <div class="db2-recent-icon-wrap"><i :class="['bi', sportIconClass(act.sportType)]"></i></div>
                 <div class="db2-recent-info">
                   <div class="db2-recent-name">{{ getActivityName(act) }}</div>
                   <div class="db2-recent-meta">{{ formatDuration(act.durationSeconds) }} · {{ formatDistance(act.distanceMeters) }}</div>
@@ -455,7 +455,7 @@
                   :to="`/activities/${day.activities[0].id}`"
                   class="wday-dot wday-done"
                   :title="day.activities[0].sportType"
-                >{{ getSportEmoji(day.activities[0].sportType) }}</router-link>
+                ><i :class="['bi', sportIconClass(day.activities[0].sportType)]"></i></router-link>
                 <div v-else-if="day.activities.length > 1" class="wday-dot wday-multi">{{ day.activities.length }}</div>
                 <div v-else-if="!day.isFuture" class="wday-dot wday-empty"></div>
                 <div v-else class="wday-dot wday-future"></div>
@@ -748,7 +748,7 @@
                 :key="activity.id"
                 class="activity-item"
               >
-                <div class="activity-icon">{{ getSportIcon(activity.sportType) }}</div>
+                <div class="activity-icon"><i :class="['bi', sportIconClass(activity.sportType)]"></i></div>
                 <div class="activity-details">
                   <div class="activity-name">{{ getActivityName(activity) }}</div>
                   <div class="activity-meta">
@@ -874,7 +874,7 @@
               </div>
               <div class="dm-fstat">
                 <div class="dm-fstat-lbl">Type</div>
-                <div class="dm-fstat-num">{{ getSportIcon(activities[0].sportType) }}</div>
+                <div class="dm-fstat-num"><i :class="['bi', sportIconClass(activities[0].sportType)]"></i></div>
               </div>
             </div>
           </div>
@@ -970,7 +970,7 @@
                 :to="`/activities/${act.id}`"
                 class="dm-activity-row"
               >
-                <div class="dm-act-icon">{{ getSportIcon(act.sportType) }}</div>
+                <div class="dm-act-icon"><i :class="['bi', sportIconClass(act.sportType)]"></i></div>
                 <div class="dm-act-info">
                   <div class="dm-act-name">{{ getActivityName(act) }}</div>
                   <div class="dm-act-meta">{{ formatDuration(act.durationSeconds) }} · {{ formatDistance(act.distanceMeters) }}</div>
@@ -1368,6 +1368,7 @@ import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useSportIcon } from '@/composables/useSportIcon'
 import { useDisciplineScore } from '@/composables/useDisciplineScore'
 import { useTrainingBlock } from '@/composables/useTrainingBlock'
 import { useArchetype } from '@/composables/useArchetype'
@@ -1427,6 +1428,7 @@ const { myCoach } = storeToRefs(athleteStore)
 const myCoachLoaded = ref(false)
 const fullActivePlan = ref(null)
 const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
+const { sportIconClass } = useSportIcon()
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 
 const showActivityModal = ref(false)
@@ -1527,11 +1529,6 @@ const activityToday = computed(() => {
     return d.getTime() === today.getTime()
   })
 })
-
-const getSportEmoji = (sport) => {
-  const map = { RUN: '🏃', RUNNING: '🏃', BIKE: '🚴', CYCLING: '🚴', SWIM: '🏊', SWIMMING: '🏊', HIKE: '🥾', HIKING: '🥾', WALK: '🚶', WALKING: '🚶' }
-  return map[sport?.toUpperCase()] || '⚡'
-}
 
 const weekCalendar = computed(() => {
   const acts = activities.value || []
@@ -1780,18 +1777,6 @@ const filteredActivities = computed(() => {
 
 const friendsCount = computed(() => followingList.value.length)
 const followersCount = computed(() => followersList.value.length)
-
-const getSportIcon = (sportType) => {
-  const icons = {
-    RUN: '🏃',
-    BIKE: '🚴',
-    SWIM: '🏊',
-    HIKE: '🥾',
-    WALK: '🚶',
-    OTHER: '🏋️'
-  }
-  return icons[sportType] || '🏋️'
-}
 
 // Returns a contextual name like "Morning Run", "Evening Ride", etc.
 const getActivityName = (activity) => {
