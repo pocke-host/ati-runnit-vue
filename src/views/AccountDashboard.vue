@@ -1205,6 +1205,9 @@
               <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'WALK' }]">
                 <input type="radio" v-model="activityForm.sportType" value="WALK" hidden />Walk
               </label>
+              <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'STRENGTH' }]">
+                <input type="radio" v-model="activityForm.sportType" value="STRENGTH" hidden />Strength
+              </label>
               <label :class="['la-sport', { 'la-sport--on': activityForm.sportType === 'OTHER' }]">
                 <input type="radio" v-model="activityForm.sportType" value="OTHER" hidden />Other
               </label>
@@ -1228,12 +1231,48 @@
           </div>
 
           <!-- Distance -->
-          <div class="la-group">
+          <div v-if="activityForm.sportType !== 'STRENGTH'" class="la-group">
             <div class="la-lbl">DISTANCE <span class="la-optional">— OPTIONAL</span></div>
             <div class="la-dist-row">
               <input v-model.number="activityForm.distance" type="number" class="la-input" :placeholder="isImperial ? '0.0' : '0.0'" step="0.01" min="0" />
               <span class="la-unit">{{ distanceLabel }}</span>
             </div>
+          </div>
+
+          <!-- Exercises (strength only) -->
+          <div v-if="activityForm.sportType === 'STRENGTH'" class="la-group">
+            <div class="la-lbl">EXERCISES</div>
+            <div v-for="(exercise, exIdx) in strengthExercises" :key="exIdx" class="la-exercise-card">
+              <div class="la-exercise-head">
+                <input
+                  v-model="exercise.exerciseName"
+                  type="text"
+                  class="la-input la-exercise-name"
+                  placeholder="Exercise name…"
+                  list="common-exercises"
+                  required
+                />
+                <button type="button" class="la-exercise-remove" @click="removeStrengthExercise(exIdx)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+              <div v-for="(set, setIdx) in exercise.sets" :key="setIdx" class="la-set-row">
+                <span class="la-set-num">{{ setIdx + 1 }}</span>
+                <input v-model.number="set.reps" type="number" class="la-input la-set-input" placeholder="Reps" min="0" required />
+                <input v-model.number="set.weight" type="number" class="la-input la-set-input" :placeholder="isImperial ? 'lb' : 'kg'" step="0.5" min="0" />
+                <label class="la-set-warmup">
+                  <input type="checkbox" v-model="set.isWarmup" />W
+                </label>
+                <button type="button" class="la-set-remove" @click="removeStrengthSet(exIdx, setIdx)">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+              <button type="button" class="la-add-set" @click="addStrengthSet(exIdx)">+ Add Set</button>
+            </div>
+            <button type="button" class="la-add-exercise" @click="addStrengthExercise">+ Add Exercise</button>
+            <datalist id="common-exercises">
+              <option v-for="name in COMMON_EXERCISES" :key="name" :value="name" />
+            </datalist>
           </div>
 
           <!-- Title -->
@@ -1452,6 +1491,33 @@ const activityForm = ref({
 })
 const activityLoading = ref(false)
 const activityError = ref('')
+
+// Strength logging — separate from activityForm since it's structurally different
+// (nested exercises/sets, not a flat set of fields).
+const strengthExercises = ref([])
+const COMMON_EXERCISES = [
+  'Barbell Bench Press', 'Barbell Back Squat', 'Barbell Deadlift', 'Barbell Overhead Press',
+  'Barbell Row', 'Barbell Front Squat', 'Romanian Deadlift', 'Incline Bench Press',
+  'Pull-Up', 'Chin-Up', 'Push-Up', 'Dip',
+  'Dumbbell Bench Press', 'Dumbbell Row', 'Dumbbell Shoulder Press', 'Dumbbell Lunge',
+  'Dumbbell Curl', 'Lateral Raise', 'Goblet Squat',
+  'Leg Press', 'Leg Curl', 'Leg Extension', 'Calf Raise',
+  'Lat Pulldown', 'Cable Row', 'Tricep Pushdown', 'Face Pull',
+  'Plank', 'Hip Thrust', 'Kettlebell Swing', 'Clean and Jerk', 'Snatch',
+]
+
+function addStrengthExercise() {
+  strengthExercises.value.push({ exerciseName: '', sets: [{ reps: null, weight: null, isWarmup: false }] })
+}
+function removeStrengthExercise(exIdx) {
+  strengthExercises.value.splice(exIdx, 1)
+}
+function addStrengthSet(exIdx) {
+  strengthExercises.value[exIdx].sets.push({ reps: null, weight: null, isWarmup: false })
+}
+function removeStrengthSet(exIdx, setIdx) {
+  strengthExercises.value[exIdx].sets.splice(setIdx, 1)
+}
 
 const momentForm = ref({
   photoUrl: '',
@@ -1816,6 +1882,7 @@ const closeActivityModal = () => {
     distance: null, gear: '', avgHeartRate: null, maxHeartRate: null,
     cadence: null, elevationGain: null, calories: null, notes: ''
   }
+  strengthExercises.value = []
   activityError.value = ''
 }
 
@@ -1868,27 +1935,44 @@ const handleActivitySubmit = async () => {
   try {
     const f = activityForm.value
     const totalSeconds = (f.durationMinutes || 0) * 60 + (f.durationSeconds || 0)
-    const distanceMeters = f.distance
-      ? Math.round(f.distance * (isImperial.value ? 1609.34 : 1000))
-      : null
-    const elevationMeters = f.elevationGain
-      ? isImperial.value ? f.elevationGain / 3.28084 : f.elevationGain
-      : null
 
-    await activityStore.createActivity({
-      sportType: f.sportType,
-      title: f.title || null,
-      workoutType: f.workoutType || null,
-      durationSeconds: totalSeconds,
-      distanceMeters,
-      gear: f.gear || null,
-      avgHeartRate: f.avgHeartRate || null,
-      maxHeartRate: f.maxHeartRate || null,
-      cadence: f.cadence || null,
-      elevationGain: elevationMeters ? Math.round(elevationMeters) : null,
-      calories: f.calories || null,
-      notes: f.notes || null,
-    })
+    if (f.sportType === 'STRENGTH') {
+      await activityStore.createStrengthActivity({
+        durationSeconds: totalSeconds,
+        calories: f.calories || null,
+        notes: f.notes || null,
+        exercises: strengthExercises.value.map(ex => ({
+          exerciseName: ex.exerciseName,
+          sets: ex.sets.map(s => ({
+            reps: s.reps,
+            weightKg: s.weight ? (isImperial.value ? s.weight * 0.453592 : s.weight) : null,
+            isWarmup: s.isWarmup,
+          })),
+        })),
+      })
+    } else {
+      const distanceMeters = f.distance
+        ? Math.round(f.distance * (isImperial.value ? 1609.34 : 1000))
+        : null
+      const elevationMeters = f.elevationGain
+        ? isImperial.value ? f.elevationGain / 3.28084 : f.elevationGain
+        : null
+
+      await activityStore.createActivity({
+        sportType: f.sportType,
+        title: f.title || null,
+        workoutType: f.workoutType || null,
+        durationSeconds: totalSeconds,
+        distanceMeters,
+        gear: f.gear || null,
+        avgHeartRate: f.avgHeartRate || null,
+        maxHeartRate: f.maxHeartRate || null,
+        cadence: f.cadence || null,
+        elevationGain: elevationMeters ? Math.round(elevationMeters) : null,
+        calories: f.calories || null,
+        notes: f.notes || null,
+      })
+    }
 
     closeActivityModal()
     await activityStore.fetchActivities()
@@ -2939,6 +3023,21 @@ textarea.form-control{resize:vertical;min-height:72px}
 /* distance */
 .la-dist-row{display:flex;align-items:center;gap:10px}
 .la-dist-row .la-input{flex:1}
+/* strength exercises */
+.la-exercise-card{border:2px solid #E7DFCE;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.la-exercise-head{display:flex;align-items:center;gap:8px}
+.la-exercise-name{flex:1}
+.la-exercise-remove{flex:none;width:38px;height:38px;background:transparent;border:2px solid #E7DFCE;color:#5A5348;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s}
+.la-exercise-remove:hover{border-color:#C0392B;color:#C0392B}
+.la-set-row{display:flex;align-items:center;gap:8px}
+.la-set-num{width:20px;flex:none;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.7rem;font-weight:700;color:#8A8A8A;text-align:center}
+.la-set-input{flex:1;padding:8px 10px;font-size:0.9rem}
+.la-set-warmup{flex:none;display:flex;align-items:center;gap:3px;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.62rem;font-weight:700;color:#8A8A8A;cursor:pointer;user-select:none}
+.la-set-remove{flex:none;width:28px;height:28px;background:transparent;border:none;color:#8A8A8A;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.la-set-remove:hover{color:#C0392B}
+.la-add-set{align-self:flex-start;background:transparent;border:none;color:#2A55F5;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;padding:4px 0}
+.la-add-exercise{width:100%;height:42px;background:transparent;border:2px dashed #E7DFCE;color:#5A5348;font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.la-add-exercise:hover{border-color:#2A55F5;color:#2A55F5}
 /* notes */
 .la-notes-wrap{position:relative}
 .la-mic{position:absolute;right:10px;top:10px;width:30px;height:30px;border:2px solid #E7DFCE;background:#FBF6EC;color:#5A5348;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;transition:all 0.15s}

@@ -43,6 +43,26 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
+  async function createStrengthActivity(data) {
+    loading.value = true
+    error.value = null
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.post(`${API_URL}/activities/strength`, data, {
+        timeout: 30000,
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      activities.value.unshift(response.data)
+      saveCache(activities.value)
+      return response.data
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Failed to create strength activity'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchActivities() {
     // Only show spinner on first load — if cache exists show it instantly
     if (!activities.value.length) loading.value = true
@@ -142,7 +162,7 @@ export const useActivityStore = defineStore('activity', () => {
 
   return {
     activities, loading, error,
-    createActivity, fetchActivities, fetchActivity, deleteActivity,
+    createActivity, createStrengthActivity, fetchActivities, fetchActivity, deleteActivity,
     fetchFeed, reactToActivity, removeReaction, fetchComments, addComment,
   }
 })
