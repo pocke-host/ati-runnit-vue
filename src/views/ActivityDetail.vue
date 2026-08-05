@@ -35,7 +35,7 @@
           <i class="bi bi-arrow-left me-1"></i>Back
         </button>
         <div class="top-bar-meta">
-          <span class="sport-chip">{{ getSportIcon(activity.sportType) }} {{ sportLabel(activity) }}</span>
+          <span class="sport-chip"><i :class="['bi', sportIconClass(activity.sportType), 'sport-chip-icon']"></i> {{ sportLabel(activity) }}</span>
           <span class="top-date">{{ formatDate(activity.performedAt) }}</span>
         </div>
         <div class="top-bar-spacer"></div>
@@ -382,6 +382,7 @@ import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
 import { useToast } from '@/composables/useToast'
+import { useSportIcon } from '@/composables/useSportIcon'
 import RouteViewer from '@/components/RouteViewer.vue'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -404,6 +405,7 @@ const activityStore = useActivityStore()
 const notificationStore = useNotificationStore()
 
 const { formatDistance, formatDuration, formatPace, formatElevation } = useUnits()
+const { sportIconClass } = useSportIcon()
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
@@ -595,19 +597,6 @@ const elevationDisplay = computed(() => {
   const elev = a.elevationMeters ?? a.elevationGain ?? null
   return elev != null ? formatElevation(elev) : '—'
 })
-
-// Helpers
-const getSportIcon = (sport) => {
-  const icons = {
-    RUN: '🏃', Running: '🏃',
-    BIKE: '🚴', Cycling: '🚴',
-    SWIM: '🏊', Swimming: '🏊',
-    HIKE: '🥾', Hiking: '🥾',
-    WALK: '🚶', Walking: '🚶',
-    OTHER: '🏋️'
-  }
-  return icons[sport] || '🏋️'
-}
 
 // Device-synced "OTHER" activities (WHOOP has ~100 named sports; Runnit only
 // tracks RUN/BIKE/SWIM/HIKE/WALK explicitly) preserve the real device label in
@@ -971,6 +960,11 @@ onMounted(init)
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+}
+.sport-chip-icon {
+  color: #2A55F5;
+  margin-right: 2px;
+  font-size: 0.85em;
 }
 .top-date {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
