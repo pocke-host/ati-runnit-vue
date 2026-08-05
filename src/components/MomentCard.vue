@@ -33,10 +33,23 @@
         loading="lazy"
         class="moment-img"
       />
+      <!-- No photo/video (e.g. auto-created from a synced activity) — show a
+           stat summary instead of leaving this area empty. -->
+      <div v-else-if="moment.activitySportType" class="moment-stat-summary">
+        <i :class="['bi', sportIconClass(moment.activitySportType), 'moment-stat-icon']"></i>
+        <span class="moment-stat-sport">{{ sportLabel(moment.activitySportType) }}</span>
+        <span v-if="moment.activityDistanceMeters" class="moment-stat-value">
+          {{ formatDistance(moment.activityDistanceMeters) }}
+        </span>
+        <span v-if="moment.activityDurationSeconds" class="moment-stat-value">
+          {{ formatDuration(moment.activityDurationSeconds) }}
+        </span>
+      </div>
     </div>
 
-    <!-- Song Info (only when present) -->
+    <!-- Caption / Song Info (only when present) -->
     <div class="moment-content">
+      <p v-if="moment.caption" class="moment-caption">{{ moment.caption }}</p>
       <div v-if="moment.songTitle" class="song-info">
         <i class="bi bi-music-note-beamed me-2"></i>
         <strong>{{ moment.songTitle }}</strong>
@@ -77,6 +90,11 @@
 
 <script setup>
 import { useMomentStore } from '@/stores/moment'
+import { useUnits } from '@/composables/useUnits'
+import { useSportIcon } from '@/composables/useSportIcon'
+
+const { formatDistance, formatDuration } = useUnits()
+const { sportIconClass, sportLabel } = useSportIcon()
 
 const props = defineProps({
   moment: {
@@ -153,6 +171,36 @@ const formatDate = (dateString) => {
   max-height: 600px;
   object-fit: cover;
   display: block;
+}
+.moment-stat-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 28px 20px;
+  color: #FBF6EC;
+}
+.moment-stat-icon {
+  font-size: 1.4rem;
+  color: #2A55F5;
+}
+.moment-stat-sport {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+.moment-stat-value {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+.moment-caption {
+  font-size: 0.95rem;
+  color: #16130F;
+  margin: 0 0 12px;
+  line-height: 1.5;
 }
 .moment-video {
   width: 100%;

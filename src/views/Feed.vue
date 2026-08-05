@@ -56,11 +56,19 @@
           <template v-if="item.type === 'moment'">
             <div class="moment-image" @click="openMoment(item)">
               <img
+                v-if="item.photoUrl"
                 :src="item.photoUrl"
                 :alt="`${item.user.displayName}'s moment`"
                 loading="lazy"
                 @error="(e) => e.target.style.display='none'"
               />
+              <!-- No photo (e.g. auto-created from a synced activity) — show a stat summary instead of an empty box -->
+              <div v-else-if="item.activitySportType" class="moment-stat-fallback">
+                <i :class="['bi', sportIconClass(item.activitySportType), 'moment-stat-fallback-icon']"></i>
+                <span class="moment-stat-fallback-sport">{{ sportLabel(item.activitySportType) }}</span>
+                <span v-if="item.activityDistanceMeters" class="moment-stat-fallback-value">{{ formatDistance(item.activityDistanceMeters) }}</span>
+                <span v-if="item.activityDurationSeconds" class="moment-stat-fallback-value">{{ formatDuration(item.activityDurationSeconds) }}</span>
+              </div>
               <div class="moment-overlay">
                 <div class="moment-stats">
                   <span class="stat-item">
@@ -389,6 +397,7 @@ import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { useUnits } from '@/composables/useUnits'
+import { useSportIcon } from '@/composables/useSportIcon'
 import { useToast } from '@/composables/useToast'
 import AppSpinner from '@/components/AppSpinner.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
@@ -407,6 +416,7 @@ const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 const { user } = storeToRefs(authStore)
 const { formatDistance, formatDuration } = useUnits()
+const { sportIconClass, sportLabel } = useSportIcon()
 const { classifyActivity } = useWorkoutClassifier()
 
 const feedDateline = computed(() => {
@@ -1181,6 +1191,37 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-end;
   padding: 20px;
+}
+
+.moment-stat-fallback {
+  position: absolute;
+  inset: 0;
+  background: #16130F;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #FBF6EC;
+  padding: 24px;
+  text-align: center;
+}
+.moment-stat-fallback-icon {
+  font-size: 2.2rem;
+  color: #2A55F5;
+}
+.moment-stat-fallback-sport {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+}
+.moment-stat-fallback-value {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 .feed-card:hover .moment-overlay {
