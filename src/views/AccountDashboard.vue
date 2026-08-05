@@ -1845,16 +1845,25 @@ const friendsCount = computed(() => followingList.value.length)
 const followersCount = computed(() => followersList.value.length)
 
 // Returns a contextual name like "Morning Run", "Evening Ride", etc.
+// Device-synced "OTHER" activities preserve the real device label in notes as
+// "PROVIDER: Name" (WHOOP/Garmin/Coros all do this) — show that instead of the bare word "OTHER".
 const getActivityName = (activity) => {
   if (activity.title) return activity.title
-  const hour = new Date(activity.performedAt).getHours()
-  const time = hour < 5 ? 'Night' : hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : hour < 20 ? 'Evening' : 'Night'
-  const sport = { RUN: 'Run', BIKE: 'Ride', SWIM: 'Swim', HIKE: 'Hike', WALK: 'Walk' }[activity.sportType] || activity.sportType
-  return `${time} ${sport}`
+  const performedAt = new Date(activity.performedAt)
+  const hour = isNaN(performedAt.getTime()) ? null : performedAt.getHours()
+  const time = hour == null ? '' : (hour < 5 ? 'Night' : hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : hour < 20 ? 'Evening' : 'Night')
+  const sportMap = { RUN: 'Run', BIKE: 'Ride', SWIM: 'Swim', HIKE: 'Hike', WALK: 'Walk', STRENGTH: 'Strength', OTHER: 'Workout' }
+  let sport = sportMap[activity.sportType] || activity.sportType || 'Workout'
+  if (activity.sportType === 'OTHER' && activity.notes && /^[A-Z]+: /.test(activity.notes)) {
+    sport = activity.notes.split(': ').slice(1).join(': ')
+  }
+  return time ? `${time} ${sport}` : sport
 }
 
 const formatDateShort = (dateString) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
+  const d = new Date(dateString)
+  if (isNaN(d.getTime())) return '—'
+  return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric'
   })
