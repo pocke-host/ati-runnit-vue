@@ -93,22 +93,42 @@
 
       <!-- GR 4-CELL HEADLINE STAT STRIP -->
       <div class="gr-stat-strip">
-        <div class="gr-stat-strip-cell">
-          <div class="gr-stat-strip-num">{{ formatDistance(activity.distanceMeters) || '—' }}</div>
-          <div class="gr-stat-strip-lbl">Dist</div>
-        </div>
-        <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
-          <div class="gr-stat-strip-num">{{ computedPace }}</div>
-          <div class="gr-stat-strip-lbl">Pace</div>
-        </div>
-        <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
-          <div class="gr-stat-strip-num">{{ formatDuration(activity.durationSeconds) }}</div>
-          <div class="gr-stat-strip-lbl">Time</div>
-        </div>
-        <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
-          <div class="gr-stat-strip-num">{{ elevationDisplay }}</div>
-          <div class="gr-stat-strip-lbl">Elev</div>
-        </div>
+        <template v-if="isStrength">
+          <div class="gr-stat-strip-cell">
+            <div class="gr-stat-strip-num">{{ formatWeight(strengthTotals.volumeKg) }}</div>
+            <div class="gr-stat-strip-lbl">Volume</div>
+          </div>
+          <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+            <div class="gr-stat-strip-num">{{ strengthTotals.exerciseCount }}</div>
+            <div class="gr-stat-strip-lbl">Exercises</div>
+          </div>
+          <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+            <div class="gr-stat-strip-num">{{ strengthTotals.setCount }}</div>
+            <div class="gr-stat-strip-lbl">Sets</div>
+          </div>
+          <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+            <div class="gr-stat-strip-num">{{ formatDuration(activity.durationSeconds) }}</div>
+            <div class="gr-stat-strip-lbl">Time</div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="gr-stat-strip-cell">
+            <div class="gr-stat-strip-num">{{ formatDistance(activity.distanceMeters) || '—' }}</div>
+            <div class="gr-stat-strip-lbl">Dist</div>
+          </div>
+          <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+            <div class="gr-stat-strip-num">{{ computedPace }}</div>
+            <div class="gr-stat-strip-lbl">Pace</div>
+          </div>
+          <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+            <div class="gr-stat-strip-num">{{ formatDuration(activity.durationSeconds) }}</div>
+            <div class="gr-stat-strip-lbl">Time</div>
+          </div>
+          <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
+            <div class="gr-stat-strip-num">{{ elevationDisplay }}</div>
+            <div class="gr-stat-strip-lbl">Elev</div>
+          </div>
+        </template>
       </div>
 
       <!-- MAIN LAYOUT -->
@@ -173,6 +193,42 @@
             <div v-if="activity.notes" class="notes-row">
               <div class="notes-label">Notes</div>
               <p class="notes-text">{{ activity.notes }}</p>
+            </div>
+          </div>
+
+          <!-- Strength Exercises -->
+          <div class="det-card" v-if="isStrength && activity.strengthExercises?.length">
+            <h3 class="det-section-title">Exercises</h3>
+            <div v-for="ex in activity.strengthExercises" :key="ex.id" class="ex-block">
+              <div class="ex-block-head">
+                <span class="ex-name">{{ ex.exerciseName }}</span>
+                <span class="ex-set-count">{{ ex.sets.length }} {{ ex.sets.length === 1 ? 'SET' : 'SETS' }}</span>
+              </div>
+              <div class="ex-table-wrap">
+                <table class="ex-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Reps</th>
+                      <th>Weight</th>
+                      <th>RPE</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="s in ex.sets" :key="s.id" :class="{ 'ex-row-warmup': s.isWarmup }">
+                      <td class="ex-set-num">{{ s.setNumber }}</td>
+                      <td class="ex-reps">{{ s.reps }}</td>
+                      <td class="ex-weight">{{ formatWeight(s.weightKg) }}</td>
+                      <td class="ex-rpe">{{ s.rpe != null ? s.rpe : '—' }}</td>
+                      <td class="ex-warmup-cell">
+                        <span v-if="s.isWarmup" class="ex-warmup-badge">Warmup</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p v-if="ex.notes" class="ex-notes">{{ ex.notes }}</p>
             </div>
           </div>
 
@@ -403,7 +459,7 @@ const { user } = storeToRefs(authStore)
 const activityStore = useActivityStore()
 const notificationStore = useNotificationStore()
 
-const { formatDistance, formatDuration, formatPace, formatElevation } = useUnits()
+const { formatDistance, formatDuration, formatPace, formatElevation, isImperial } = useUnits()
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
@@ -573,6 +629,29 @@ const computedPace = computed(() => {
   if (!activity.value?.distanceMeters || !activity.value?.durationSeconds) return '—'
   const minPerKm = (activity.value.durationSeconds / 60) / (activity.value.distanceMeters / 1000)
   return formatPace(minPerKm)
+})
+
+// Strength activities — volume/exercise/set totals in place of distance/pace/elevation
+const isStrength = computed(() => activity.value?.sportType === 'STRENGTH')
+
+const KG_TO_LB = 2.20462
+const formatWeight = (kg) => {
+  if (kg == null) return '—'
+  const val = isImperial.value ? kg * KG_TO_LB : kg
+  return `${Math.round(val).toLocaleString()} ${isImperial.value ? 'lb' : 'kg'}`
+}
+
+const strengthTotals = computed(() => {
+  const exercises = activity.value?.strengthExercises || []
+  let volumeKg = 0
+  let setCount = 0
+  exercises.forEach(ex => {
+    (ex.sets || []).forEach(s => {
+      setCount++
+      if (!s.isWarmup && s.weightKg != null && s.reps) volumeKg += s.weightKg * s.reps
+    })
+  })
+  return { exerciseCount: exercises.length, setCount, volumeKg }
 })
 
 // Auto workout classification
@@ -1694,5 +1773,76 @@ onMounted(init)
   font-weight: 700;
   letter-spacing: 0.10em;
   padding: 2px 8px;
+}
+
+/* ── Strength Exercises ── */
+.ex-block {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #E7DFCE;
+}
+.ex-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.ex-block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.ex-name {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  color: #16130F;
+}
+.ex-set-count {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #8A8A8A;
+  white-space: nowrap;
+}
+.ex-table-wrap { overflow-x: auto; border: 2px solid #E7DFCE; }
+.ex-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.ex-table th {
+  text-align: left;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8A8A8A;
+  padding: 8px 12px;
+  border-bottom: 2px solid #E7DFCE;
+  background: #F1EADC;
+}
+.ex-table td {
+  padding: 8px 12px;
+  border-bottom: 1.5px solid #E7DFCE;
+  font-variant-numeric: tabular-nums;
+}
+.ex-table tbody tr:last-child td { border-bottom: none; }
+.ex-row-warmup { color: #8A8A8A; }
+.ex-set-num { font-weight: 700; color: #16130F; }
+.ex-reps, .ex-weight { font-weight: 700; }
+.ex-warmup-cell { text-align: right; }
+.ex-warmup-badge {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #F1EADC;
+  border: 1.5px solid #E7DFCE;
+  padding: 2px 6px;
+  color: #8A8A8A;
+}
+.ex-notes {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: rgba(15,18,16,0.65);
+  line-height: 1.5;
 }
 </style>
