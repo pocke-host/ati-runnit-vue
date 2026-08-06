@@ -40,32 +40,6 @@
         </template>
       </div>
 
-      <!-- Zwift -->
-      <div class="device-card">
-        <div class="device-icon-circle">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v5M14 17H9m5 0a2 2 0 1 1 4 0 2 2 0 0 1-4 0ZM9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
-        </div>
-        <h3>Zwift</h3>
-        <p>Sync rides and runs from Zwift</p>
-
-        <template v-if="!zwiftConnected">
-          <button class="btn btn-primary" @click="connectZwift" :disabled="loading">
-            Connect Zwift
-          </button>
-        </template>
-        <template v-else>
-          <div class="connected-state">
-            <div class="connected-chip">
-              <span class="green-dot"></span>
-              CONNECTED
-            </div>
-            <button class="btn btn-outline" @click="disconnectZwift">
-              <i class="bi bi-check-circle me-2"></i>Disconnect
-            </button>
-          </div>
-        </template>
-      </div>
-
       <!-- Apple Health -->
       <div class="device-card">
         <div class="device-icon-circle">
@@ -153,35 +127,6 @@
         </template>
       </div>
 
-      <!-- Wahoo -->
-      <div class="device-card">
-        <div class="device-icon-circle">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5ZM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        </div>
-        <h3>Wahoo</h3>
-        <p>Sync rides and workouts from Wahoo ELEMNT, KICKR, and SYSTM</p>
-        <template v-if="!wahooConnected">
-          <button class="btn btn-primary" @click="connectWahoo" :disabled="loading">
-            Connect Wahoo
-          </button>
-        </template>
-        <template v-else>
-          <div class="connected-state">
-            <div class="connected-chip">
-              <span class="green-dot"></span>
-              CONNECTED
-            </div>
-            <div class="last-sync-label">Last synced: {{ relativeTime(wahooLastSync) }}</div>
-            <div v-if="syncCounts.wahoo" class="sync-count">{{ syncCounts.wahoo }} activities synced</div>
-            <button class="btn btn-primary" @click="syncWahoo" :disabled="syncing">
-              <span v-if="syncing" class="spinner"></span>
-              {{ syncing ? 'Syncing…' : 'Sync Now' }}
-            </button>
-            <button class="btn-disconnect" @click="disconnectWahoo">Disconnect</button>
-          </div>
-        </template>
-      </div>
-
       <!-- Fitbit (Coming Soon) -->
       <div class="device-card device-coming-soon">
         <div class="device-icon-circle">
@@ -216,9 +161,6 @@ const garminConnected = ref(false)
 const garminLastSync = ref(null)
 const corosConnected = ref(false)
 const corosLastSync = ref(null)
-const zwiftConnected = ref(false)
-const wahooConnected = ref(false)
-const wahooLastSync = ref(null)
 const whoopConnected = ref(false)
 const whoopLastSync = ref(null)
 const loading = ref(false)
@@ -226,15 +168,13 @@ const syncing = ref(false)
 const gpxImporting = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
-const syncCounts = ref({ garmin: 0, coros: 0, wahoo: 0, whoop: 0 })
-
-
+const syncCounts = ref({ garmin: 0, coros: 0, whoop: 0 })
 
 const { showToast } = useToast()
 const showDisconnectConfirm = ref(false)
-const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'zwift' | 'wahoo' | 'whoop'
+const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'whoop'
 
-const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', zwift: 'Zwift', wahoo: 'Wahoo', whoop: 'WHOOP' }
+const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', whoop: 'WHOOP' }
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -261,11 +201,9 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, corosRes, zwiftRes, wahooRes, whoopRes, countsRes] = await Promise.all([
+  const [garminRes, corosRes, whoopRes, countsRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
     safeFetch(`${API_URL}/integrations/coros/status`),
-    safeFetch(`${API_URL}/integrations/zwift/status`),
-    safeFetch(`${API_URL}/integrations/wahoo/status`),
     safeFetch(`${API_URL}/integrations/whoop/status`),
     safeFetch(`${API_URL}/integrations/sync-counts`),
   ])
@@ -276,13 +214,6 @@ const checkConnectionStatus = async () => {
   if (corosRes) {
     corosConnected.value = corosRes.data.connected
     corosLastSync.value = corosRes.data.lastSync || null
-  }
-  if (zwiftRes) {
-    zwiftConnected.value = zwiftRes.data.connected
-  }
-  if (wahooRes) {
-    wahooConnected.value = wahooRes.data.connected
-    wahooLastSync.value = wahooRes.data.lastSync || null
   }
   if (whoopRes) {
     whoopConnected.value = whoopRes.data.connected
@@ -307,8 +238,6 @@ const connectGarmin = async () => {
 
 const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconnectConfirm.value = true }
 const disconnectCoros  = () => { pendingDisconnect.value = 'coros';  showDisconnectConfirm.value = true }
-const disconnectZwift  = () => { pendingDisconnect.value = 'zwift';  showDisconnectConfirm.value = true }
-const disconnectWahoo  = () => { pendingDisconnect.value = 'wahoo';  showDisconnectConfirm.value = true }
 const disconnectWhoop  = () => { pendingDisconnect.value = 'whoop';  showDisconnectConfirm.value = true }
 
 const doDisconnect = async () => {
@@ -318,8 +247,6 @@ const doDisconnect = async () => {
     await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
     if (service === 'garmin') { garminConnected.value = false; garminLastSync.value = null }
     if (service === 'coros')  { corosConnected.value  = false; corosLastSync.value  = null }
-    if (service === 'zwift')  { zwiftConnected.value  = false }
-    if (service === 'wahoo')  { wahooConnected.value  = false; wahooLastSync.value  = null }
     if (service === 'whoop')  { whoopConnected.value  = false; whoopLastSync.value  = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
   } catch {
@@ -365,44 +292,6 @@ const syncCoros = async () => {
   }
 }
 
-const connectZwift = async () => {
-  loading.value = true
-  try {
-    const { data } = await axios.get(`${API_URL}/integrations/zwift/connect`, {
-      headers: getAuthHeaders()
-    })
-    window.location.href = data.authorizationUrl
-  } catch {
-    showStatus('Failed to connect Zwift. Please try again.', 'error')
-  } finally {
-    loading.value = false
-  }
-}
-
-const connectWahoo = async () => {
-  loading.value = true
-  try {
-    const { data } = await axios.get(`${API_URL}/integrations/wahoo/connect`, { headers: getAuthHeaders() })
-    window.location.href = data.authorizationUrl
-  } catch {
-    showStatus('Failed to connect Wahoo. Please try again.', 'error')
-  } finally {
-    loading.value = false
-  }
-}
-
-const syncWahoo = async () => {
-  syncing.value = true
-  try {
-    await axios.post(`${API_URL}/integrations/wahoo/sync`, {}, { headers: getAuthHeaders() })
-    showStatus('Wahoo sync triggered — activities will appear shortly.')
-    await checkConnectionStatus()
-  } catch {
-    showStatus('Sync failed. Please try again.', 'error')
-  } finally {
-    syncing.value = false
-  }
-}
 
 const connectWhoop = async () => {
   loading.value = true
@@ -472,12 +361,6 @@ onMounted(() => {
   } else if (params.get('coros') === 'connected') {
     corosConnected.value = true
     showStatus('COROS connected! Your workouts will sync automatically.')
-  } else if (params.get('zwift') === 'connected') {
-    zwiftConnected.value = true
-    showStatus('Zwift connected successfully!')
-  } else if (params.get('wahoo') === 'connected') {
-    wahooConnected.value = true
-    showStatus('Wahoo connected successfully!')
   } else if (params.get('whoop') === 'connected') {
     whoopConnected.value = true
     showStatus('WHOOP connected! Your workouts will sync automatically.')
@@ -485,7 +368,7 @@ onMounted(() => {
     showStatus('Connection failed. Please try again.', 'error')
   }
 
-  if (params.has('garmin') || params.has('coros') || params.has('zwift') || params.has('wahoo') || params.has('whoop') || params.has('error')) {
+  if (params.has('garmin') || params.has('coros') || params.has('whoop') || params.has('error')) {
     history.replaceState({}, '', window.location.pathname)
   }
 })
