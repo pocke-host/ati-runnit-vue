@@ -51,7 +51,7 @@
 - `useNotificationStore()` — bell count, poll every 30s
 
 ## Reactions (Moments + Activities)
-Valid types: `LIKE`, `FIRE`, `CLAP` only — matches DB enum exactly
+Valid types: `LIKE` (heart), `KUDOS` (thumbs-up) only — matches DB enum exactly
 
 ## Router
 All routes lazy-loaded in `src/router/index.js`. Auth guard redirects to `/login`.

@@ -345,12 +345,12 @@
             <h3 class="det-section-title">Reactions</h3>
             <div class="gr-reaction-bar">
               <button
-                v-for="rxn in [{type:'LIKE',label:'♥ Like'},{type:'FIRE',label:'Fire'},{type:'CLAP',label:'Clap'}]"
+                v-for="rxn in [{type:'LIKE',label:'Like',icon:'bi-heart-fill'},{type:'KUDOS',label:'Kudos',icon:'bi-hand-thumbs-up-fill'}]"
                 :key="rxn.type"
                 :class="['gr-rxn-btn', { 'gr-rxn-btn--active': userReaction === rxn.type }]"
                 @click="toggleReaction(rxn.type)"
                 :disabled="reactionLoading"
-              >{{ rxn.label }}<template v-if="reactionCounts[rxn.type]"> {{ reactionCounts[rxn.type] }}</template></button>
+              ><i :class="['bi', rxn.icon, 'me-1']"></i>{{ rxn.label }}<template v-if="reactionCounts[rxn.type]"> {{ reactionCounts[rxn.type] }}</template></button>
             </div>
           </div>
 

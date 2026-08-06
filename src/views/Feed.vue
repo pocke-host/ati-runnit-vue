@@ -180,11 +180,11 @@
               <!-- Reaction bar -->
               <div class="gr-reaction-bar" @click.stop>
                 <button
-                  v-for="rxn in [{type:'LIKE',label:'Like'},{type:'FIRE',label:'Fire'},{type:'CLAP',label:'Clap'}]"
+                  v-for="rxn in [{type:'LIKE',label:'Like',icon:'bi-heart-fill'},{type:'KUDOS',label:'Kudos',icon:'bi-hand-thumbs-up-fill'}]"
                   :key="rxn.type"
                   :class="['gr-rxn-btn', { 'gr-rxn-btn--active': getActivityReaction(item.id) === rxn.type }]"
                   @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
-                >{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)">&nbsp;{{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
+                ><i :class="['bi', rxn.icon, 'me-1']"></i>{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)">&nbsp;{{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
               </div>
 
             </router-link>
@@ -298,7 +298,7 @@
             </div>
 
             <div class="moment-reactions">
-              <button 
+              <button
                 :class="['reaction-btn', {active: userReaction === 'LIKE'}]"
                 @click="toggleReaction('LIKE')"
                 :disabled="reactionLoading"
@@ -306,21 +306,13 @@
                 <i class="bi bi-heart-fill"></i>
                 <span>{{ reactionCounts.LIKE || 0 }}</span>
               </button>
-              <button 
-                :class="['reaction-btn', {active: userReaction === 'FIRE'}]"
-                @click="toggleReaction('FIRE')"
+              <button
+                :class="['reaction-btn', {active: userReaction === 'KUDOS'}]"
+                @click="toggleReaction('KUDOS')"
                 :disabled="reactionLoading"
               >
-                <i class="bi bi-fire"></i>
-                <span>{{ reactionCounts.FIRE || 0 }}</span>
-              </button>
-              <button 
-                :class="['reaction-btn', {active: userReaction === 'CLAP'}]"
-                @click="toggleReaction('CLAP')"
-                :disabled="reactionLoading"
-              >
-                👏
-                <span>{{ reactionCounts.CLAP || 0 }}</span>
+                <i class="bi bi-hand-thumbs-up-fill"></i>
+                <span>{{ reactionCounts.KUDOS || 0 }}</span>
               </button>
             </div>
 
@@ -454,7 +446,7 @@ const getAuthHeaders = () => {
 }
 
 // Activity reactions in feed
-const activityReactionMap = ref({}) // { [activityId]: { userReaction: null, counts: {LIKE:0, FIRE:0, CLAP:0} } }
+const activityReactionMap = ref({}) // { [activityId]: { userReaction: null, counts: {LIKE:0, KUDOS:0} } }
 
 const getActivityReaction = (id) => activityReactionMap.value[id]?.userReaction || null
 const getActivityReactionCount = (id, type) => activityReactionMap.value[id]?.counts?.[type] || 0
@@ -463,12 +455,12 @@ const initActivityReactions = (activity) => {
   if (activityReactionMap.value[activity.id]) return
   activityReactionMap.value[activity.id] = {
     userReaction: activity.userReaction || null,
-    counts: activity.reactionCounts || { LIKE: 0, FIRE: 0, CLAP: 0 }
+    counts: activity.reactionCounts || { LIKE: 0, KUDOS: 0 }
   }
 }
 
 const toggleActivityReaction = async (activityId, type) => {
-  const current = activityReactionMap.value[activityId] || { userReaction: null, counts: { LIKE: 0, FIRE: 0, CLAP: 0 } }
+  const current = activityReactionMap.value[activityId] || { userReaction: null, counts: { LIKE: 0, KUDOS: 0 } }
   const prev = current.userReaction
   try {
     if (prev === type) {

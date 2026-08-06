@@ -61,26 +61,19 @@
 
       <!-- Reactions -->
       <div class="reactions">
-        <button 
+        <button
           @click="handleReaction('LIKE')"
           :class="{ active: moment.currentUserReaction === 'LIKE' }"
           class="reaction-btn"
         >
-          ❤️
+          <i class="bi bi-heart-fill"></i>
         </button>
-        <button 
-          @click="handleReaction('FIRE')"
-          :class="{ active: moment.currentUserReaction === 'FIRE' }"
+        <button
+          @click="handleReaction('KUDOS')"
+          :class="{ active: moment.currentUserReaction === 'KUDOS' }"
           class="reaction-btn"
         >
-          🔥
-        </button>
-        <button 
-          @click="handleReaction('CLAP')"
-          :class="{ active: moment.currentUserReaction === 'CLAP' }"
-          class="reaction-btn"
-        >
-          👏
+          <i class="bi bi-hand-thumbs-up-fill"></i>
         </button>
         <span class="reaction-count">{{ moment.reactionCount }}</span>
       </div>
@@ -227,21 +220,24 @@ const formatDate = (dateString) => {
 .reaction-btn {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 20px;
+  color: #8A8A8A;
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.6;
   transition: all 0.2s;
   padding: 4px 8px;
 }
 
 .reaction-btn:hover {
   opacity: 1;
-  transform: scale(1.2);
+  color: #2A55F5;
+  transform: scale(1.15);
 }
 
 .reaction-btn.active {
   opacity: 1;
-  transform: scale(1.1);
+  color: #2A55F5;
+  transform: scale(1.05);
 }
 
 .reaction-count {

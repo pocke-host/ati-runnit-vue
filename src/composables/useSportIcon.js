@@ -5,9 +5,6 @@
 // reasonable stand-ins from the installed set (checked against the actual
 // bootstrap-icons package, not guessed): speed for running, a water drop
 // for swimming, a tree for hiking/trail, explosive power for strength.
-// bi-fire is deliberately not reused here — it's already the FIRE reaction
-// icon elsewhere in the app, and reusing it for a sport type would make an
-// activity card ambiguous about which meaning a flame icon has.
 
 const SPORT_ICONS = {
   RUN: 'bi-speedometer2',
