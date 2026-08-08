@@ -680,6 +680,9 @@
               <button class="action-btn" @click="goToFeed">
                 <i class="bi bi-collection me-2"></i>View Feed
               </button>
+              <router-link to="/strength" class="action-btn">
+                <i class="bi bi-graph-up me-2"></i>Strength Progress
+              </router-link>
               <button class="action-btn action-btn-danger" @click="handleLogout">
                 <i class="bi bi-box-arrow-right me-2"></i>Logout
               </button>

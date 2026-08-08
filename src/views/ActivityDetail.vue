@@ -460,7 +460,7 @@ const { user } = storeToRefs(authStore)
 const activityStore = useActivityStore()
 const notificationStore = useNotificationStore()
 
-const { formatDistance, formatDuration, formatPace, formatElevation, isImperial } = useUnits()
+const { formatDistance, formatDuration, formatPace, formatElevation, formatWeight, isImperial } = useUnits()
 const { sportIconClass } = useSportIcon()
 
 const getAuthHeaders = () => {
@@ -635,13 +635,6 @@ const computedPace = computed(() => {
 
 // Strength activities — volume/exercise/set totals in place of distance/pace/elevation
 const isStrength = computed(() => activity.value?.sportType === 'STRENGTH')
-
-const KG_TO_LB = 2.20462
-const formatWeight = (kg) => {
-  if (kg == null) return '—'
-  const val = isImperial.value ? kg * KG_TO_LB : kg
-  return `${Math.round(val).toLocaleString()} ${isImperial.value ? 'lb' : 'kg'}`
-}
 
 const strengthTotals = computed(() => {
   const exercises = activity.value?.strengthExercises || []

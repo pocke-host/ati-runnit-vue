@@ -65,6 +65,9 @@
           :class="['jumpnav-btn', { active: activeSection === s.id }]"
           @click="jumpTo(s.id)"
         >{{ s.label }}</button>
+        <router-link to="/strength" class="jumpnav-btn jumpnav-btn--nav">
+          <i class="bi bi-graph-up me-1"></i>Strength
+        </router-link>
       </div>
     </nav>
 
@@ -1162,6 +1165,14 @@ onUnmounted(() => {
 }
 .jumpnav-btn:hover { color: #16130F; }
 .jumpnav-btn.active { color: #2A55F5; border-bottom-color: #2A55F5; }
+.jumpnav-btn--nav {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  border-left: 2px solid #E7DFCE;
+  color: #2A55F5;
+}
+.jumpnav-btn--nav:hover { color: #1E42D6; }
 
 /* ── SECTION SHARED ────────────────────────────── */
 .stats-content {
