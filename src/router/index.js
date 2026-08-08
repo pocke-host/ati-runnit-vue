@@ -53,6 +53,7 @@ const routes = [
   { path: '/profile/:id',         name: 'UserProfile',    component: () => import('@/views/UserProfile.vue'),      meta: { requiresAuth: true } },
   { path: '/achievements',        name: 'Achievements',   component: () => import('@/views/Achievements.vue'),     meta: { requiresAuth: true } },
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },
+  { path: '/strength',            name: 'Strength',       component: () => import('@/views/StrengthProgress.vue'), meta: { requiresAuth: true } },
   { path: '/explore',             name: 'Explore',        component: () => import('@/views/Explore.vue'),          meta: { requiresAuth: true } },
   { path: '/multisport-events/:id', name: 'MultisportEventDetail', component: () => import('@/views/MultisportEventDetail.vue'), meta: { requiresAuth: true } },
   { path: '/calendar',            name: 'Calendar',       component: () => import('@/views/Calendar.vue'),         meta: { requiresAuth: true } },

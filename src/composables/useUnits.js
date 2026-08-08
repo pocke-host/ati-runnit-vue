@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/auth'
 
 const KM_TO_MI = 0.621371
 const M_TO_FT = 3.28084
+const KG_TO_LB = 2.20462
 
 export function useUnits() {
   const authStore = useAuthStore()
@@ -98,6 +99,15 @@ export function useUnits() {
   }
 
   /**
+   * Format kg → "225 lb" | "102 kg"
+   */
+  function formatWeight(kg) {
+    if (kg == null) return '—'
+    const val = isImperial.value ? kg * KG_TO_LB : kg
+    return `${Math.round(val).toLocaleString()} ${isImperial.value ? 'lb' : 'kg'}`
+  }
+
+  /**
    * Raw conversion helpers (no string formatting)
    */
   function metersToDisplay(meters) {
@@ -116,6 +126,7 @@ export function useUnits() {
     formatPace,
     formatElevation,
     formatSpeed,
+    formatWeight,
     metersToDisplay,
   }
 }
