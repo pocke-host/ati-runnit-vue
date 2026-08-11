@@ -83,5 +83,11 @@
 	<string>Runnit connects to Bluetooth heart rate monitors and fitness sensors during workouts.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Runnit connects to Bluetooth heart rate monitors and fitness sensors during workouts.</string>
+
+	<!-- ── HealthKit: auto-sync workouts from Apple Health ── -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Runnit reads your workouts from Apple Health so they automatically sync into your training log.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Runnit does not write to Apple Health today, but may in a future update.</string>
 </dict>
 </plist>

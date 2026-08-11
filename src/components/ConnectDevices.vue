@@ -46,18 +46,44 @@
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z"/></svg>
         </div>
         <h3>Apple Health</h3>
-        <p>On iPhone: install the RUNNIT app and grant HealthKit access for automatic sync. On web: import a GPX file.</p>
-        <div class="apple-actions">
-          <button class="btn btn-outline" @click="showToast('iOS app — install from the App Store once available', 'info')">
-            <i class="bi bi-apple me-2"></i>Get iOS App
-          </button>
-          <label class="btn btn-primary gpx-import-label" :class="{ disabled: gpxImporting }">
-            <span v-if="gpxImporting" class="spinner spinner-sm me-1"></span>
-            <i v-else class="bi bi-upload me-2"></i>
-            Import GPX
-            <input type="file" accept=".gpx,.fit,.tcx" class="gpx-file-input" @change="importGpx" :disabled="gpxImporting" />
-          </label>
-        </div>
+
+        <template v-if="appleHealthAvailable">
+          <p>Sync runs, rides, and more straight from HealthKit</p>
+          <template v-if="!appleHealthConnected">
+            <button class="btn btn-primary" @click="connectAppleHealth" :disabled="appleHealthConnecting">
+              <span v-if="appleHealthConnecting" class="spinner"></span>
+              {{ appleHealthConnecting ? 'Connecting…' : 'Connect Apple Health' }}
+            </button>
+          </template>
+          <template v-else>
+            <div class="connected-state">
+              <div class="connected-chip">
+                <span class="green-dot"></span>
+                CONNECTED
+              </div>
+              <div class="last-sync-label">
+                Last synced: {{ relativeTime(appleHealthLastSync) }}
+              </div>
+              <div v-if="syncCounts.appleHealth" class="sync-count">{{ syncCounts.appleHealth }} activities synced</div>
+              <button class="btn btn-primary" @click="syncAppleHealth" :disabled="appleHealthSyncing">
+                <span v-if="appleHealthSyncing" class="spinner"></span>
+                {{ appleHealthSyncing ? 'Syncing…' : 'Sync Now' }}
+              </button>
+              <button class="btn-disconnect" @click="disconnectAppleHealth">Disconnect</button>
+            </div>
+          </template>
+        </template>
+        <template v-else>
+          <p>On iPhone: open the RUNNIT app and grant HealthKit access for automatic sync. On web: import a GPX file.</p>
+          <div class="apple-actions">
+            <label class="btn btn-primary gpx-import-label" :class="{ disabled: gpxImporting }">
+              <span v-if="gpxImporting" class="spinner spinner-sm me-1"></span>
+              <i v-else class="bi bi-upload me-2"></i>
+              Import GPX
+              <input type="file" accept=".gpx,.fit,.tcx" class="gpx-file-input" @change="importGpx" :disabled="gpxImporting" />
+            </label>
+          </div>
+        </template>
       </div>
 
       <!-- COROS -->
@@ -154,6 +180,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import { useToast } from '@/composables/useToast'
+import { useAppleHealth } from '@/composables/useAppleHealth'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -168,13 +195,20 @@ const syncing = ref(false)
 const gpxImporting = ref(false)
 const statusMessage = ref('')
 const statusType = ref('success')
-const syncCounts = ref({ garmin: 0, coros: 0, whoop: 0 })
+const syncCounts = ref({ garmin: 0, coros: 0, whoop: 0, appleHealth: 0 })
 
 const { showToast } = useToast()
 const showDisconnectConfirm = ref(false)
-const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'whoop'
+const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'whoop' | 'appleHealth'
 
-const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', whoop: 'WHOOP' }
+const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', whoop: 'WHOOP', appleHealth: 'Apple Health' }
+
+const appleHealth = useAppleHealth()
+const appleHealthAvailable = appleHealth.isAvailable
+const appleHealthConnected = ref(false)
+const appleHealthLastSync = ref(null)
+const appleHealthConnecting = ref(false)
+const appleHealthSyncing = ref(false)
 
 const showStatus = (message, type = 'success') => {
   statusMessage.value = message
@@ -201,10 +235,11 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, corosRes, whoopRes, countsRes] = await Promise.all([
+  const [garminRes, corosRes, whoopRes, appleHealthRes, countsRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
     safeFetch(`${API_URL}/integrations/coros/status`),
     safeFetch(`${API_URL}/integrations/whoop/status`),
+    safeFetch(`${API_URL}/integrations/apple-health/status`),
     safeFetch(`${API_URL}/integrations/sync-counts`),
   ])
   if (garminRes) {
@@ -218,6 +253,10 @@ const checkConnectionStatus = async () => {
   if (whoopRes) {
     whoopConnected.value = whoopRes.data.connected
     whoopLastSync.value = whoopRes.data.lastSync || null
+  }
+  if (appleHealthRes) {
+    appleHealthConnected.value = appleHealthRes.data.connected
+    appleHealthLastSync.value = appleHealthRes.data.lastSync || null
   }
   if (countsRes?.data) syncCounts.value = countsRes.data
 }
@@ -239,15 +278,21 @@ const connectGarmin = async () => {
 const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconnectConfirm.value = true }
 const disconnectCoros  = () => { pendingDisconnect.value = 'coros';  showDisconnectConfirm.value = true }
 const disconnectWhoop  = () => { pendingDisconnect.value = 'whoop';  showDisconnectConfirm.value = true }
+const disconnectAppleHealth = () => { pendingDisconnect.value = 'appleHealth'; showDisconnectConfirm.value = true }
 
 const doDisconnect = async () => {
   showDisconnectConfirm.value = false
   const service = pendingDisconnect.value
   try {
-    await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
-    if (service === 'garmin') { garminConnected.value = false; garminLastSync.value = null }
-    if (service === 'coros')  { corosConnected.value  = false; corosLastSync.value  = null }
-    if (service === 'whoop')  { whoopConnected.value  = false; whoopLastSync.value  = null }
+    if (service === 'appleHealth') {
+      await appleHealth.disconnect()
+    } else {
+      await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
+    }
+    if (service === 'garmin')      { garminConnected.value      = false; garminLastSync.value      = null }
+    if (service === 'coros')       { corosConnected.value       = false; corosLastSync.value       = null }
+    if (service === 'whoop')       { whoopConnected.value       = false; whoopLastSync.value       = null }
+    if (service === 'appleHealth') { appleHealthConnected.value = false; appleHealthLastSync.value = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
   } catch {
     showToast(`Failed to disconnect ${disconnectLabels[service]}. Try again.`, 'error')
@@ -329,6 +374,33 @@ const resyncWhoop = async () => {
     showStatus('Failed to fix activity dates. Please try again.', 'error')
   } finally {
     resyncingWhoop.value = false
+  }
+}
+
+const connectAppleHealth = async () => {
+  appleHealthConnecting.value = true
+  try {
+    await appleHealth.connect()
+    appleHealthConnected.value = true
+    showStatus('Apple Health connected! Syncing your workouts…')
+    await syncAppleHealth()
+  } catch {
+    showStatus('Failed to connect Apple Health. Please try again.', 'error')
+  } finally {
+    appleHealthConnecting.value = false
+  }
+}
+
+const syncAppleHealth = async () => {
+  appleHealthSyncing.value = true
+  try {
+    const { imported } = await appleHealth.sync()
+    showStatus(`Apple Health sync complete — ${imported} activities synced.`)
+    await checkConnectionStatus()
+  } catch {
+    showStatus('Sync failed. Please try again.', 'error')
+  } finally {
+    appleHealthSyncing.value = false
   }
 }
 

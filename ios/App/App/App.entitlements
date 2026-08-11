@@ -12,5 +12,9 @@
 		<string>location</string>
 		<string>audio</string>
 	</array>
+
+	<!-- HealthKit: read workouts to auto-sync into Runnit -->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
 </dict>
 </plist>
