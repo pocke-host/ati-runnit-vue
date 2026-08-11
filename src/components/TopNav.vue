@@ -298,7 +298,7 @@
           </nav>
           <div class="drawer-footer">
             <router-link to="/signin" class="drawer-link" @click="mobileMenuOpen = false">Login</router-link>
-            <router-link to="/waitlist" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">Join Waitlist</router-link>
+            <router-link to="/signup" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">Join Us</router-link>
           </div>
         </template>
       </div>
