@@ -5,10 +5,22 @@
     <div class="rk-footer-cta">
       <div class="rk-footer-cta-headline">Lace Up.</div>
       <div class="rk-footer-cta-sub">Claim your @handle and bring the friend who always flakes.</div>
-      <div class="rk-footer-cta-form">
-        <span class="rk-footer-cta-input">you@email.com</span>
-        <router-link to="/waitlist" class="rk-footer-cta-btn">Join →</router-link>
-      </div>
+      <form class="rk-footer-cta-form" @submit.prevent="submitEmail" @click.stop>
+        <input
+          v-model.trim="email"
+          type="email"
+          class="rk-footer-cta-input"
+          placeholder="you@email.com"
+          aria-label="Email address"
+          autocomplete="email"
+          :disabled="submitting || submitted"
+        />
+        <button type="submit" class="rk-footer-cta-btn" :disabled="submitting || submitted">
+          <span v-if="submitted">On the list ✓</span>
+          <span v-else>{{ submitting ? '...' : 'Join →' }}</span>
+        </button>
+      </form>
+      <p v-if="errorMsg" class="rk-footer-cta-err">{{ errorMsg }}</p>
     </div>
 
     <!-- Ticker seam -->
@@ -81,7 +93,42 @@ export default {
 </script>
 
 <script setup>
+import { ref } from 'vue'
+
 const year = new Date().getFullYear()
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const email = ref('')
+const submitting = ref(false)
+const submitted = ref(false)
+const errorMsg = ref('')
+
+async function submitEmail() {
+  errorMsg.value = ''
+  if (!email.value) return
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    errorMsg.value = 'Enter a valid email.'
+    return
+  }
+  submitting.value = true
+  try {
+    const res = await fetch(`${API_URL}/newsletter/waitlist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      errorMsg.value = data.error || 'Something went wrong. Try again.'
+      return
+    }
+    submitted.value = true
+  } catch {
+    errorMsg.value = 'Network error. Please try again.'
+  } finally {
+    submitting.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -125,13 +172,19 @@ const year = new Date().getFullYear()
 }
 .rk-footer-cta-input {
   flex: 1;
+  min-width: 0;
   padding: 15px 18px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.92rem;
   font-weight: 500;
-  color: #8a8a8a;
+  color: #16130F;
   text-align: left;
+  background: transparent;
+  border: none;
+  outline: none;
 }
+.rk-footer-cta-input::placeholder { color: #8a8a8a; }
+.rk-footer-cta-input:disabled { opacity: 0.6; }
 .rk-footer-cta-btn {
   background: #16130F;
   color: #FBF6EC;
@@ -142,10 +195,21 @@ const year = new Date().getFullYear()
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
+  border: none;
   flex-shrink: 0;
+  cursor: pointer;
   transition: opacity 0.15s;
 }
 .rk-footer-cta-btn:hover { opacity: 0.8; }
+.rk-footer-cta-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+.rk-footer-cta-err {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #FFC53D;
+  margin: 12px 0 0;
+}
 
 /* ── Ticker Seam ── */
 .rk-footer-ticker-wrap {
