@@ -345,7 +345,7 @@ function scrollTo(id) {
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
-  padding-top: var(--nav-h, 66px);
+  padding-top: calc(var(--nav-h, 66px) + var(--spec-h, 35px));
 }
 .home-inner {
   max-width: 1040px;
@@ -1216,7 +1216,7 @@ function scrollTo(id) {
   .section-body { max-width: 100%; }
 }
 @media (max-width: 640px) {
-  .home-page { padding-top: 56px; }
+  .home-page { padding-top: calc(var(--nav-h, 56px) + var(--spec-h, 35px)); }
   .home-inner { padding: 0 18px; }
   .hero { padding: 32px 0 0; }
   .hero-grid { padding-bottom: 40px; }
