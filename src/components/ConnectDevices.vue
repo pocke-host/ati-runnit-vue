@@ -269,7 +269,7 @@ const connectGarmin = async () => {
     })
     window.location.href = data.authorizationUrl
   } catch {
-    showStatus('Failed to connect Garmin. Please try again.', 'error')
+    showStatus("Couldn't connect Garmin. Try again.", 'error')
   } finally {
     loading.value = false
   }
@@ -295,7 +295,7 @@ const doDisconnect = async () => {
     if (service === 'appleHealth') { appleHealthConnected.value = false; appleHealthLastSync.value = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
   } catch {
-    showToast(`Failed to disconnect ${disconnectLabels[service]}. Try again.`, 'error')
+    showToast(`Couldn't disconnect ${disconnectLabels[service]}. Try again.`, 'error')
   }
 }
 
@@ -306,7 +306,7 @@ const syncNow = async () => {
     showStatus('Sync triggered — activities will appear shortly.')
     await checkConnectionStatus()
   } catch {
-    showStatus('Sync failed. Please try again.', 'error')
+    showStatus("Sync didn't take. Try again.", 'error')
   } finally {
     syncing.value = false
   }
@@ -318,7 +318,7 @@ const connectCoros = async () => {
     const { data } = await axios.get(`${API_URL}/integrations/coros/connect`, { headers: getAuthHeaders() })
     window.location.href = data.url
   } catch {
-    showStatus('Failed to connect COROS. Please try again.', 'error')
+    showStatus("Couldn't connect COROS. Try again.", 'error')
   } finally {
     loading.value = false
   }
@@ -331,7 +331,7 @@ const syncCoros = async () => {
     showStatus('COROS sync triggered — activities will appear shortly.')
     await checkConnectionStatus()
   } catch {
-    showStatus('Sync failed. Please try again.', 'error')
+    showStatus("Sync didn't take. Try again.", 'error')
   } finally {
     syncing.value = false
   }
@@ -344,7 +344,7 @@ const connectWhoop = async () => {
     const { data } = await axios.get(`${API_URL}/integrations/whoop/connect`, { headers: getAuthHeaders() })
     window.location.href = data.url
   } catch {
-    showStatus('Failed to connect WHOOP. Please try again.', 'error')
+    showStatus("Couldn't connect WHOOP. Try again.", 'error')
   } finally {
     loading.value = false
   }
@@ -357,7 +357,7 @@ const syncWhoop = async () => {
     showStatus('WHOOP sync triggered — activities will appear shortly.')
     await checkConnectionStatus()
   } catch {
-    showStatus('Sync failed. Please try again.', 'error')
+    showStatus("Sync didn't take. Try again.", 'error')
   } finally {
     syncing.value = false
   }
@@ -371,7 +371,7 @@ const resyncWhoop = async () => {
     showStatus(`Fixed — removed ${data.deleted} activities with wrong dates and re-imported ${data.imported} with the correct ones.`)
     await checkConnectionStatus()
   } catch {
-    showStatus('Failed to fix activity dates. Please try again.', 'error')
+    showStatus("Couldn't fix those dates. Try again.", 'error')
   } finally {
     resyncingWhoop.value = false
   }
@@ -385,7 +385,7 @@ const connectAppleHealth = async () => {
     showStatus('Apple Health connected! Syncing your workouts…')
     await syncAppleHealth()
   } catch {
-    showStatus('Failed to connect Apple Health. Please try again.', 'error')
+    showStatus("Couldn't connect Apple Health. Try again.", 'error')
   } finally {
     appleHealthConnecting.value = false
   }
@@ -398,7 +398,7 @@ const syncAppleHealth = async () => {
     showStatus(`Apple Health sync complete — ${imported} activities synced.`)
     await checkConnectionStatus()
   } catch {
-    showStatus('Sync failed. Please try again.', 'error')
+    showStatus("Sync didn't take. Try again.", 'error')
   } finally {
     appleHealthSyncing.value = false
   }
@@ -429,7 +429,7 @@ onMounted(() => {
   const params = new URLSearchParams(window.location.search)
   if (params.get('garmin') === 'connected') {
     garminConnected.value = true
-    showStatus('Garmin connected successfully!')
+    showStatus("Garmin's in.")
   } else if (params.get('coros') === 'connected') {
     corosConnected.value = true
     showStatus('COROS connected! Your workouts will sync automatically.')
@@ -437,7 +437,7 @@ onMounted(() => {
     whoopConnected.value = true
     showStatus('WHOOP connected! Your workouts will sync automatically.')
   } else if (params.get('error')) {
-    showStatus('Connection failed. Please try again.', 'error')
+    showStatus("That connection didn't go through. Try again.", 'error')
   }
 
   if (params.has('garmin') || params.has('coros') || params.has('whoop') || params.has('error')) {
