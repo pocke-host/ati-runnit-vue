@@ -403,7 +403,7 @@
       closeCreateStoryModal()
       fetchStories()
     } catch (err) {
-      storyError.value = err.response?.data?.message || err.response?.data?.error || 'Failed to upload story. Please try again.'
+      storyError.value = err.response?.data?.message || err.response?.data?.error || "Story didn't post. Try again."
     } finally {
       storyLoading.value = false
     }

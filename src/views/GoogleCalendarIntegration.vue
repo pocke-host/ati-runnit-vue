@@ -18,7 +18,7 @@
         </div>
         <div>
           <div class="gcal-explainer-head">Two-way training visibility</div>
-          <p class="gcal-explainer-body">Connect once and your planned workouts — runs, rides, swims, strength sessions — push to Google Calendar automatically. Your training shows up alongside your meetings so nothing gets lost.</p>
+          <p class="gcal-explainer-body">Connect once and your planned workouts — runs, rides, swims, strength sessions — push to Google Calendar automatically. Your training shows up right next to your meetings.</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
             <span class="gcal-read-title">{{ ev.summary || '(No title)' }}</span>
           </div>
         </div>
-        <p v-else-if="hasLoadedEvents" class="gcal-explainer-body">No events found in the next 30 days.</p>
+        <p v-else-if="hasLoadedEvents" class="gcal-explainer-body">Nothing on the books for the next 30 days.</p>
       </div>
 
     </div>
@@ -148,7 +148,7 @@ onMounted(async () => {
     showToast('Google Calendar connected.', 'success')
     router.replace({ query: {} })
   } else if (route.query.error) {
-    showToast('Failed to connect Google Calendar. Please try again.', 'error')
+    showToast('Google Calendar wouldn\'t connect. Give it another shot.', 'error')
     router.replace({ query: {} })
   }
 })

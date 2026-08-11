@@ -378,7 +378,7 @@
 
               <div v-else-if="comments.length === 0" class="comments-empty">
                 <i class="bi bi-chat"></i>
-                <p>No comments yet. Be the first!</p>
+                <p>No comments yet. Break the silence.</p>
               </div>
 
               <div v-else class="comments">
@@ -422,7 +422,7 @@
     <ConfirmModal
       v-model="showDeleteConfirm"
       title="Delete Activity"
-      body="This will permanently delete your activity and all its data. This cannot be undone."
+      body="Gone for good — the activity and everything on it. No undo."
       confirm-label="Delete"
       :danger="true"
       @confirm="doDelete"
@@ -832,7 +832,7 @@ const init = async () => {
       loadFollowStatus()
     }
   } catch (err) {
-    pageError.value = err.response?.data?.error || 'Failed to load activity'
+    pageError.value = err.response?.data?.error || "Couldn't load this activity"
   } finally {
     pageLoading.value = false
   }
@@ -872,7 +872,7 @@ const toggleFollow = async () => {
       })
     }
   } catch (err) {
-    showToast(err.response?.data?.error || 'Failed to update follow. Try again.', 'error')
+    showToast(err.response?.data?.error || "Follow didn't go through. Try again.", 'error')
   } finally {
     followLoading.value = false
   }
@@ -895,7 +895,7 @@ const toggleReaction = async (type) => {
       userReaction.value = type
     }
   } catch (err) {
-    showToast(err.response?.data?.error || 'Failed to save reaction. Try again.', 'error')
+    showToast(err.response?.data?.error || "Reaction didn't land. Try again.", 'error')
   } finally {
     reactionLoading.value = false
   }
@@ -909,7 +909,7 @@ const submitComment = async () => {
     comments.value.push(data)
     newComment.value = ''
   } catch (err) {
-    showToast(err.response?.data?.error || 'Failed to post comment. Try again.', 'error')
+    showToast(err.response?.data?.error || "Comment didn't send. Try again.", 'error')
   } finally {
     commentLoading.value = false
   }
@@ -925,7 +925,7 @@ const doDelete = async () => {
     if (window.history.length > 2) router.back()
     else router.push('/feed')
   } catch {
-    showToast('Failed to delete activity. Try again.', 'error')
+    showToast("Delete didn't go through. Try again.", 'error')
   } finally {
     deleteLoading.value = false
   }

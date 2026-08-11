@@ -47,7 +47,7 @@ export const useUploadStore = defineStore('upload', () => {
       return signData.fileUrl
       
     } catch (err) {
-      error.value = err.response?.data?.error || 'Upload failed'
+      error.value = err.response?.data?.error || "Upload didn't go through. Try again."
       throw err
     } finally {
       uploading.value = false

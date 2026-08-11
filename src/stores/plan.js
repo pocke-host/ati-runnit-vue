@@ -37,7 +37,7 @@ export const usePlanStore = defineStore('plan', () => {
       activePlan.value = plans.value.find(p => p.isActive) || null
       saveCache(plans.value)
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch plans'
+      error.value = err.response?.data?.error || "Couldn't load your plans. Check your connection."
     } finally {
       loading.value = false
     }
@@ -55,7 +55,7 @@ export const usePlanStore = defineStore('plan', () => {
       return data
     } catch (err) {
       if (cached) return cached  // network failure — serve stale cache
-      error.value = err.response?.data?.error || 'Failed to fetch plan'
+      error.value = err.response?.data?.error || "Couldn't load that plan. Check your connection."
       throw err
     } finally {
       loading.value = false
@@ -69,7 +69,7 @@ export const usePlanStore = defineStore('plan', () => {
       const { data } = await axios.get(`${API_URL}/plans/active/adaptations`, { headers: getAuthHeaders() })
       return Array.isArray(data) ? data : (data.content || [])
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch plan adaptations'
+      error.value = err.response?.data?.error || "Couldn't load plan adaptations. Check your connection."
       throw err
     } finally {
       loading.value = false
@@ -86,7 +86,7 @@ export const usePlanStore = defineStore('plan', () => {
       saveCache(plans.value)
       return data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to create plan'
+      error.value = err.response?.data?.error || "Couldn't create the plan. Give it another shot."
       throw err
     } finally {
       loading.value = false
@@ -101,7 +101,7 @@ export const usePlanStore = defineStore('plan', () => {
       saveCache(plans.value)
       return data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to set active plan'
+      error.value = err.response?.data?.error || "Couldn't set that as your active plan. Try again."
       throw err
     }
   }
@@ -113,7 +113,7 @@ export const usePlanStore = defineStore('plan', () => {
       if (activePlan.value?.id === id) activePlan.value = null
       saveCache(plans.value)
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to delete plan'
+      error.value = err.response?.data?.error || "Couldn't delete the plan. Try again."
       throw err
     }
   }
@@ -127,7 +127,7 @@ export const usePlanStore = defineStore('plan', () => {
       )
       _patchCachedWorkout(planId, workoutId, { completed: true, skipped: false })
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to update workout'
+      error.value = err.response?.data?.error || "Couldn't mark the workout done. Try again."
       throw err
     }
   }
@@ -141,7 +141,7 @@ export const usePlanStore = defineStore('plan', () => {
       )
       _patchCachedWorkout(planId, workoutId, { completed: false })
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to update workout'
+      error.value = err.response?.data?.error || "Couldn't undo that workout. Try again."
       throw err
     }
   }
@@ -168,7 +168,7 @@ export const usePlanStore = defineStore('plan', () => {
       const { data } = await axios.get(`${API_URL}/plans`, { params: { athleteId }, headers: getAuthHeaders() })
       return Array.isArray(data) ? data : (data.content || [])
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch athlete plans'
+      error.value = err.response?.data?.error || "Couldn't load their plans. Check your connection."
       throw err
     } finally {
       loading.value = false
@@ -182,7 +182,7 @@ export const usePlanStore = defineStore('plan', () => {
       const { data } = await axios.post(`${API_URL}/plans`, { ...planData, athleteId }, { headers: getAuthHeaders() })
       return data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to create plan'
+      error.value = err.response?.data?.error || "Couldn't create the plan for your athlete. Try again."
       throw err
     } finally {
       loading.value = false
@@ -199,7 +199,7 @@ export const usePlanStore = defineStore('plan', () => {
       if (_detailCache[planId]) { _detailCache[planId] = { ..._detailCache[planId], ...data }; saveDetailCache(_detailCache) }
       return data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to update plan'
+      error.value = err.response?.data?.error || "Couldn't save the plan changes. Try again."
       throw err
     }
   }
@@ -220,7 +220,7 @@ export const usePlanStore = defineStore('plan', () => {
       }
       return data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to add workout'
+      error.value = err.response?.data?.error || "Couldn't add the workout. Try again."
       throw err
     }
   }
@@ -235,7 +235,7 @@ export const usePlanStore = defineStore('plan', () => {
       _patchCachedWorkout(planId, workoutId, data)
       return data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to update workout'
+      error.value = err.response?.data?.error || "Couldn't save those workout changes. Try again."
       throw err
     }
   }
@@ -251,7 +251,7 @@ export const usePlanStore = defineStore('plan', () => {
         saveDetailCache(_detailCache)
       }
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to delete workout'
+      error.value = err.response?.data?.error || "Couldn't delete the workout. Try again."
       throw err
     }
   }

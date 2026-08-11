@@ -127,7 +127,7 @@
 
         <div v-else-if="athletes.length === 0" class="empty-state">
           <i class="bi bi-people empty-icon"></i>
-          <p>No athletes yet. Share your profile so athletes can find you.</p>
+          <p>Roster's empty — for now. Put your profile out there and let athletes find you.</p>
           <router-link to="/coaches" class="btn-cta-sm">View your listing →</router-link>
         </div>
 
@@ -191,7 +191,7 @@ const loadInviteLink = async () => {
     const data = await res.json()
     inviteLink.value = data.url
   } catch {
-    actionError.value = 'Failed to load invite link. Please try again.'
+    actionError.value = 'Invite link didn\'t load. Try again.'
   } finally {
     inviteLoading.value = false
   }
@@ -231,7 +231,7 @@ const saveRate = async () => {
     rateStatus.value = 'Rate saved!'
     rateStatusType.value = 'success'
   } catch {
-    rateStatus.value = 'Failed to save. Please try again.'
+    rateStatus.value = 'Rate didn\'t save. Try again.'
     rateStatusType.value = 'error'
   } finally {
     savingRate.value = false
@@ -268,7 +268,7 @@ const approve = async (reqId) => {
   try {
     await coachStore.approveRequest(reqId)
   } catch {
-    actionError.value = 'Failed to approve request. Please try again.'
+    actionError.value = 'Couldn\'t approve that request. Try again.'
   } finally {
     actionLoading.value = null
   }
@@ -279,7 +279,7 @@ const decline = async (reqId) => {
   try {
     await coachStore.rejectRequest(reqId)
   } catch {
-    actionError.value = 'Failed to decline request. Please try again.'
+    actionError.value = 'Couldn\'t decline that request. Try again.'
   }
 }
 

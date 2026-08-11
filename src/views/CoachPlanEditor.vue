@@ -303,7 +303,7 @@ const savePlan = async () => {
     await planStore.updatePlan(plan.value.id, { name: planName.value })
     isDirty.value = false
   } catch {
-    saveError.value = 'Failed to save plan. Please try again.'
+    saveError.value = "Plan didn't save. Try again."
   } finally {
     saving.value = false
   }
@@ -372,7 +372,7 @@ const doDelete = async () => {
     await planStore.deleteWorkout(plan.value.id, workout.id)
     weekData.value[activeWeek.value].workouts = weekData.value[activeWeek.value].workouts.filter(w => w.id !== workout.id)
   } catch {
-    deleteError.value = 'Failed to delete workout. Please try again.'
+    deleteError.value = "Workout didn't delete. Try again."
   }
 }
 
@@ -408,7 +408,7 @@ const copyWeek = async (targetWeek) => {
     showToast(`Week ${activeWeek.value} copied to Week ${targetWeek}.`, 'success')
     showCopyWeek.value = false
   } catch {
-    showToast('Failed to copy week. Please try again.', 'error')
+    showToast("Week didn't copy. Try again.", 'error')
   } finally {
     copyingWeek.value = false
   }
@@ -426,7 +426,7 @@ const saveWorkoutToLibrary = async (workout) => {
     })
     showToast('Saved to library.', 'success')
   } catch {
-    showToast('Failed to save to library.', 'error')
+    showToast("Didn't save to library. Try again.", 'error')
   } finally {
     savingToLib.value = null
   }
@@ -446,7 +446,7 @@ const saveAsTemplate = async () => {
     await planStore.updatePlan(plan.value.id, { isTemplate: true })
     showToast('Saved as template.', 'success')
   } catch {
-    showToast('Failed to save template.', 'error')
+    showToast("Template didn't save. Try again.", 'error')
   } finally {
     savingTemplate.value = false
   }

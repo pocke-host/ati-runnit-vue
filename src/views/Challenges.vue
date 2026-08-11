@@ -5,7 +5,7 @@
       <div class="ch-inner">
         <span class="ch-eyebrow">Compete</span>
         <h1 class="ch-hero-headline">Challenges.</h1>
-        <p class="ch-hero-sub">Monthly challenges, community competition, milestones that stick.</p>
+        <p class="ch-hero-sub">Chase crowns. Beat the block. New challenge drops every month.</p>
       </div>
     </section>
 
@@ -164,7 +164,7 @@
                   {{
                     activeTab === 'my'
                       ? 'Nothing live right now — check back soon, or start one and drag your crew in.'
-                      : 'Try adjusting your filters or check back later for new challenges.'
+                      : 'Nothing matches. Loosen the filters or check back soon.'
                   }}
                 </p>
                 <button
@@ -235,7 +235,7 @@
           <div class="lb-empty-icon">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#5A5348" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
           </div>
-          <p class="lb-empty-text">No entries yet. Be the first!</p>
+          <p class="lb-empty-text">Board's empty. Claim the crown.</p>
         </div>
 
         <!-- Ranked list -->
@@ -310,7 +310,7 @@ async function fetchChallenges() {
     if (!res.ok) throw new Error('Failed to fetch challenges')
     allChallenges.value = await res.json()
   } catch (err) {
-    showToast('Failed to load challenges.', 'error')
+    showToast("Challenges didn't load. Refresh and try again.", 'error')
     allChallenges.value = []
   } finally {
     loading.value = false
@@ -325,7 +325,7 @@ async function fetchMyChallenges() {
     if (!res.ok) throw new Error('Failed to fetch my challenges')
     myChallenges.value = await res.json()
   } catch (err) {
-    showToast('Failed to load your challenges.', 'error')
+    showToast("Your challenges didn't load. Refresh and try again.", 'error')
     myChallenges.value = []
   }
 }
@@ -340,7 +340,7 @@ async function enterChallenge(id) {
     if (!res.ok) throw new Error('Failed to enter challenge')
     await fetchMyChallenges()
   } catch (err) {
-    showToast('Failed to join challenge. Try again.', 'error')
+    showToast("Join didn't go through. Try again.", 'error')
   } finally {
     enteringId.value = null
   }
@@ -358,7 +358,7 @@ async function leaveChallenge(id) {
     // If the leaderboard drawer is open for this challenge, close it
     if (lbChallenge.value?.id === id) lbOpen.value = false
   } catch (err) {
-    showToast('Failed to leave challenge. Try again.', 'error')
+    showToast("Leave didn't go through. Try again.", 'error')
   } finally {
     enteringId.value = null
   }
@@ -374,7 +374,7 @@ async function fetchLeaderboard(id) {
     if (!res.ok) throw new Error('Failed to fetch leaderboard')
     leaderboard.value = await res.json()
   } catch (err) {
-    showToast('Failed to load leaderboard.', 'error')
+    showToast("Leaderboard's not loading. Try again.", 'error')
     leaderboard.value = []
   } finally {
     lbLoading.value = false

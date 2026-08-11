@@ -12,7 +12,7 @@
             <i class="bi bi-plus me-1"></i> New Workout
           </button>
         </div>
-        <p class="lib-sub">Build reusable workouts. Assign to any athlete in one click.</p>
+        <p class="lib-sub">Build it once. Assign it to any athlete, every time.</p>
       </div>
     </section>
 
@@ -41,7 +41,7 @@
       <!-- Empty -->
       <div v-else-if="filtered.length === 0 && libStore.library.length === 0" class="lib-empty">
         <i class="bi bi-collection" style="font-size:2.5rem;color:#D0D0D0"></i>
-        <p>Your library is empty. Build your first workout to start saving time.</p>
+        <p>Library's empty. Build your first workout.</p>
         <button class="btn-primary" @click="openNew">Build First Workout</button>
       </div>
       <div v-else-if="filtered.length === 0" class="lib-empty">
@@ -219,7 +219,7 @@
     <div v-if="deleteTarget" class="modal-overlay" @click.self="deleteTarget = null">
       <div class="modal-card modal-card--sm">
         <h3 class="modal-confirm-title">Delete "{{ deleteTarget.name }}"?</h3>
-        <p class="modal-confirm-sub">This workout will be removed from your library. Already-scheduled workouts won't be affected.</p>
+        <p class="modal-confirm-sub">Gone from your library. Anything already scheduled stays put.</p>
         <div class="modal-actions">
           <button class="btn-ghost" @click="deleteTarget = null">Cancel</button>
           <button class="btn-danger" @click="doDelete" :disabled="deleting">
@@ -339,7 +339,7 @@ const saveWorkout = async () => {
     }
     showDrawer.value = false
   } catch {
-    saveError.value = 'Failed to save. Please try again.'
+    saveError.value = "Didn't save. Try again."
   } finally {
     saving.value = false
   }
@@ -371,7 +371,7 @@ const doAssign = async () => {
     showToast(`Workout assigned to ${assignedAthleteIds.value.length} athlete${assignedAthleteIds.value.length !== 1 ? 's' : ''}.`, 'success')
     showAssign.value = false
   } catch {
-    assignError.value = 'Failed to assign. Please try again.'
+    assignError.value = "Didn't assign. Try again."
   } finally {
     assigning.value = false
   }
@@ -390,7 +390,7 @@ const doDelete = async () => {
     showToast('Workout removed from library.', 'success')
     deleteTarget.value = null
   } catch {
-    showToast('Failed to delete. Please try again.', 'error')
+    showToast("Didn't delete. Try again.", 'error')
   } finally {
     deleting.value = false
   }

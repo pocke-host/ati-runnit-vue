@@ -63,7 +63,7 @@
         <div class="sp-contact-card">
           <div class="sp-contact-left">
             <h2 class="sp-contact-title">Still stuck?</h2>
-            <p class="sp-contact-sub">We're a small team of athletes — real humans, usually back to you within a day.</p>
+            <p class="sp-contact-sub">We're a small team of athletes. Usually back to you within a day.</p>
           </div>
           <div class="sp-contact-right">
             <a href="mailto:support@runnit.live" class="sp-contact-btn sp-contact-btn--primary">Email Support</a>

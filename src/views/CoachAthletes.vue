@@ -27,7 +27,7 @@
       <template v-if="tab === 'requests'">
         <div v-if="pendingRequests.length === 0" class="empty-state">
           <i class="bi bi-person-check empty-icon"></i>
-          <p>No pending requests.</p>
+          <p>Nothing pending.</p>
         </div>
         <div v-else class="request-list">
           <div v-for="req in pendingRequests" :key="req.id" class="request-card">
@@ -51,7 +51,7 @@
         </div>
         <div v-else-if="athletes.length === 0" class="empty-state">
           <i class="bi bi-people empty-icon"></i>
-          <p>No athletes yet.</p>
+          <p>No athletes on your roster yet.</p>
         </div>
         <div v-else class="accordion-list">
           <div v-for="athlete in athletes" :key="athlete.id" class="accordion-item">
@@ -77,7 +77,7 @@
                 <div class="spinner-border spinner-border-sm me-2"></div> Loading plans...
               </div>
               <template v-else>
-                <div v-if="athletePlans[athlete.id].length === 0" class="no-plans">No plans assigned.</div>
+                <div v-if="athletePlans[athlete.id].length === 0" class="no-plans">Nothing assigned yet.</div>
                 <div v-else class="plan-list">
                   <div v-for="plan in athletePlans[athlete.id]" :key="plan.id" class="plan-row">
                     <div class="plan-info">
@@ -196,7 +196,7 @@ const approve = async (reqId) => {
   try {
     await coachStore.approveRequest(reqId)
   } catch {
-    actionError.value = 'Failed to approve request. Please try again.'
+    actionError.value = "Couldn't approve that. Try again."
   }
 }
 const decline = async (reqId) => {
@@ -204,7 +204,7 @@ const decline = async (reqId) => {
   try {
     await coachStore.rejectRequest(reqId)
   } catch {
-    actionError.value = 'Failed to decline request. Please try again.'
+    actionError.value = "Couldn't decline that. Try again."
   }
 }
 
@@ -232,7 +232,7 @@ const submitCreatePlan = async () => {
     // Navigate directly to the editor
     if (plan?.id) router.push(`/coach/plans/${plan.id}/edit`)
   } catch (e) {
-    createModal.error = e?.response?.data?.message || 'Failed to create plan. Try again.'
+    createModal.error = e?.response?.data?.message || "Plan didn't create. Try again."
   } finally {
     createModal.loading = false
   }

@@ -108,7 +108,7 @@
               <div class="card-label">TARGET RACES</div>
               <button class="link-btn" @click="showAddRace = true">+ Add</button>
             </div>
-            <div v-if="races.length === 0" class="no-data">No target races set.</div>
+            <div v-if="races.length === 0" class="no-data">No target races on the calendar.</div>
             <div v-else class="race-list">
               <div v-for="race in races" :key="race.id" class="race-row">
                 <span class="race-priority" :class="`priority-${race.priority?.toLowerCase()}`">{{ race.priority || 'A' }}</span>
@@ -131,7 +131,7 @@
             <div v-if="loadingActivities" class="no-data">
               <div class="spinner-border spinner-border-sm me-2"></div> Loading…
             </div>
-            <div v-else-if="activities.length === 0" class="no-data">No activities yet.</div>
+            <div v-else-if="activities.length === 0" class="no-data">Nothing logged yet.</div>
             <div v-else class="activity-list">
               <div
                 v-for="act in activities.slice(0, 8)"
@@ -240,7 +240,7 @@
 
         <div v-else-if="calendarWeeks.length === 0" class="empty-card">
           <i class="bi bi-calendar3" style="font-size:2rem;color:#ccc"></i>
-          <p>No planned workouts for the next 4 weeks.</p>
+          <p>Next 4 weeks are wide open.</p>
           <button class="btn-primary-sm" @click="openAddWorkout(null)">Add a Workout</button>
         </div>
 
@@ -1153,7 +1153,7 @@ const submitAddWorkout = async () => {
     showAddWorkout.value = false
     showToast('Workout added to athlete calendar.', 'success')
   } catch {
-    showToast('Failed to add workout. Please try again.', 'error')
+    showToast("Workout didn't add. Try again.", 'error')
   } finally {
     addingWorkout.value = false
   }
@@ -1173,7 +1173,7 @@ const createPlan = async () => {
     showCreatePlan.value = false
     router.push(`/coach/plans/${plan.id}/edit`)
   } catch {
-    createPlanError.value = 'Failed to create plan. Please try again.'
+    createPlanError.value = "Plan didn't create. Try again."
   } finally {
     creatingPlan.value = false
   }
@@ -1186,7 +1186,7 @@ const activatePlan = async (planId) => {
     plans.value = plans.value.map(p => ({ ...p, isActive: p.id === planId, active: p.id === planId }))
     showToast('Plan set as active.', 'success')
   } catch {
-    showToast('Failed to activate plan.', 'error')
+    showToast("Didn't activate. Try again.", 'error')
   } finally {
     activatingPlanId.value = null
   }
@@ -1229,7 +1229,7 @@ const assignPlanToAthlete = async () => {
     plans.value.unshift(newPlan)
     showToast(`"${newPlan.name}" assigned to ${athlete.value?.displayName}.`, 'success')
   } catch {
-    assignPlanError.value = 'Failed to assign plan. Please try again.'
+    assignPlanError.value = "Didn't assign. Try again."
   } finally {
     assigningPlan.value = false
   }
@@ -1275,7 +1275,7 @@ const onDrop = async (targetDate) => {
     if (ev) ev.scheduledDate = targetDate
     showToast('Workout moved.', 'success')
   } catch {
-    showToast('Failed to move workout.', 'error')
+    showToast("Workout didn't move. Try again.", 'error')
   }
 }
 
@@ -1284,7 +1284,7 @@ const deleteCalEvent = async (ev) => {
     await coachStore.deleteCalendarEvent(athleteId.value, ev.id)
     calendarEvents.value = calendarEvents.value.filter(e => e.id !== ev.id)
   } catch {
-    showToast('Failed to remove workout.', 'error')
+    showToast("Workout didn't remove. Try again.", 'error')
   }
 }
 
@@ -1302,7 +1302,7 @@ const saveAnnotation = async (activityId) => {
     annotatingId.value = null
     showToast('Note saved.', 'success')
   } catch {
-    showToast('Failed to save note.', 'error')
+    showToast("Note didn't save. Try again.", 'error')
   }
 }
 
@@ -1317,7 +1317,7 @@ const addRace = async () => {
     showAddRace.value = false
     raceForm.value = { name: '', raceDate: '', priority: 'A', distance: '' }
   } catch {
-    showToast('Failed to add race.', 'error')
+    showToast("Race didn't add. Try again.", 'error')
   } finally {
     addingRace.value = false
   }
@@ -1328,7 +1328,7 @@ const removeRace = async (raceId) => {
     await coachStore.deleteAthleteRace(athleteId.value, raceId)
     races.value = races.value.filter(r => r.id !== raceId)
   } catch {
-    showToast('Failed to remove race.', 'error')
+    showToast("Race didn't remove. Try again.", 'error')
   }
 }
 
@@ -1375,7 +1375,7 @@ const saveZones = async () => {
     zonesSaved.value = true
     setTimeout(() => { zonesSaved.value = false }, 3000)
   } catch {
-    zonesSaveError.value = 'Failed to save zones. Please try again.'
+    zonesSaveError.value = "Zones didn't save. Try again."
   } finally {
     savingZones.value = false
   }

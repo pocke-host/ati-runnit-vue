@@ -7,8 +7,8 @@
             <p class="eyebrow text-uppercase fw-semibold mb-2">Sport module</p>
             <h1 class="display-5 fw-bold mb-2">Cycling</h1>
             <p class="lead mb-4">
-              Stack miles, chase PRs, and unlock routes riders actually repeat.
-              RUNNIT turns training into momentum — one ride at a time.
+              Stack miles, chase PRs, and repeat the routes worth repeating.
+              RUNNIT logs the ride. You keep chasing the next one.
             </p>
 
             <div class="d-flex gap-3 flex-wrap">
@@ -73,7 +73,7 @@
     <section class="cta text-center">
       <div class="container-xxl">
         <h2 class="fw-bold mb-2">Ready to ride?</h2>
-        <p class="text-muted mb-3">Join free and start tracking today.</p>
+        <p class="text-muted mb-3">Join free. Start tracking.</p>
         <router-link to="/signup" class="btn btn-primary btn-lg">Create Account</router-link>
       </div>
     </section>

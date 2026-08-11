@@ -319,7 +319,7 @@ useHead({
   title: 'Runnit — The Training App for Endurance Athletes',
   link: [{ rel: 'canonical', href: 'https://runnit.live' }],
   meta: [
-    { name: 'description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing, and race challenges for runners, cyclists, and triathletes — all in one app.' },
+    { name: 'description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, clubs, live sharing, and race challenges for athletes across running, cycling, swimming, and trail — all in one app.' },
     { property: 'og:title', content: 'Runnit — The Training App for Endurance Athletes' },
     { property: 'og:description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing, and race challenges — all in one app.' },
     { property: 'og:url', content: 'https://runnit.live' },

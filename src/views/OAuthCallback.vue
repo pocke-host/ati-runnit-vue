@@ -30,7 +30,7 @@ const error = ref('')
 onMounted(async () => {
   // Surface any error the backend forwarded (e.g. missing token from Apple)
   if (route.query.error) {
-    error.value = 'Sign-in failed. Please try again.'
+    error.value = 'Sign-in didn\'t go through. Give it another shot.'
     return
   }
 
@@ -50,7 +50,7 @@ onMounted(async () => {
       router.replace(homeDash)
     }
   } catch {
-    error.value = 'Could not load your account. Please try signing in again.'
+    error.value = 'Couldn\'t pull up your account. Sign in again.'
   }
 })
 </script>

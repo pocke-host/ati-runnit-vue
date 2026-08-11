@@ -66,7 +66,7 @@
           <div class="col-12 col-lg-5">
             <h2 class="fw-bold mb-3">Why athletes choose RUNNIT</h2>
             <p class="text-muted mb-4">
-              We’re not here for noise — we’re here for repeatable progress.
+              No noise. Just splits that add up week over week.
               Clear data, clean motivation, and a community that keeps you moving.
             </p>
             <ul class="list-unstyled m-0">
@@ -129,7 +129,7 @@
     <section class="cta">
       <div class="container-xxl text-center">
         <h2 class="fw-bold mb-3">Ready to train with us?</h2>
-        <p class="text-muted mb-4">Create a free account and start tracking today.</p>
+        <p class="text-muted mb-4">Create a free account and start tracking.</p>
         <router-link to="/signup" class="btn btn-primary btn-lg">Get Started</router-link>
       </div>
     </section>

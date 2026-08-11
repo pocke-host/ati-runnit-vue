@@ -17,7 +17,7 @@
         v-else-if="exercises.length === 0"
         icon="bi-graph-up"
         title="No strength sessions logged yet"
-        message="Log a strength workout with sets and reps, then come back here to see your progress."
+        message="Log the sets and reps. The progress chart takes it from there."
         action-label="Log a workout"
         @action="router.push('/dashboard')"
       />
@@ -105,7 +105,7 @@
           v-else
           icon="bi-graph-up"
           title="No history yet for this exercise"
-          message="Log another session with this exercise to start building a trend."
+          message="One more session with this exercise and the trend line shows up."
         />
       </template>
 
@@ -167,7 +167,7 @@ const fetchExercises = async () => {
     exercises.value = Array.isArray(data) ? data : []
     if (exercises.value.length) selectedExercise.value = exercises.value[0]
   } catch {
-    showToast('Failed to load exercises. Try again.', 'error')
+    showToast("Exercises didn't load. Try again.", 'error')
   } finally {
     loadingExercises.value = false
   }
@@ -186,7 +186,7 @@ const fetchExerciseData = async (exercise) => {
     await nextTick()
     renderChart()
   } catch {
-    showToast('Failed to load exercise history. Try again.', 'error')
+    showToast("Exercise history didn't load. Try again.", 'error')
   } finally {
     loadingData.value = false
   }

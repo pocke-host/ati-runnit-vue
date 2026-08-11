@@ -491,7 +491,7 @@ const changePassword = async () => {
     currentPassword.value = ''
     newPassword.value = ''
     confirmPassword.value = ''
-    showPasswordStatus('Password updated successfully!')
+    showPasswordStatus('Password updated.')
   } catch (err) {
     const msg = err.response?.data?.error || 'Failed to update password. Check your current password.'
     showPasswordStatus(msg, 'error')

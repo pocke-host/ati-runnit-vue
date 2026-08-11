@@ -8,7 +8,7 @@
             <h1 class="display-5 fw-bold mb-2">Swimming</h1>
             <p class="lead mb-4">
               Pool or open water — track pace, distance, and consistency.
-              RUNNIT turns sessions into momentum (and momentum into confidence).
+              RUNNIT logs every set. The confidence is on you.
             </p>
 
             <div class="d-flex gap-3 flex-wrap">

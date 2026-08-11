@@ -34,7 +34,7 @@
 
       <div v-else-if="filtered.length === 0" class="notif-empty">
         <i class="bi bi-bell"></i>
-        <p>{{ filter === 'unread' ? 'No unread notifications' : 'No notifications yet' }}</p>
+        <p>{{ filter === 'unread' ? "Zero unread. You're on top of it." : 'Quiet in here. Go earn some noise.' }}</p>
         <span v-if="filter === 'unread'" class="notif-empty-sub">
           You're all caught up!
         </span>

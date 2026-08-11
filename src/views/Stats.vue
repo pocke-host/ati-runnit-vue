@@ -78,7 +78,7 @@
         v-if="!hasActivities"
         icon="bi-lightning-charge"
         title="No activities yet"
-        message="Log your first run, ride, or workout to unlock your full stats dashboard."
+        message="Log your first run, ride, or workout — this is where the numbers pile up."
         actionLabel="Log Activity"
         actionTo="/activities/new"
       />
@@ -97,7 +97,7 @@
           title="No records yet"
           message="Log your first activity to start tracking PRs."
           action-to="/track"
-          action-label="Track a Run"
+          action-label="Track a Session"
         />
         <div v-else class="pr-grid">
           <div
@@ -128,7 +128,7 @@
         <div class="section-header">
           <span class="section-kicker">Race Predictions</span>
         </div>
-        <p class="race-pred-note">Based on your fastest recent effort — actual race times depend on conditions and fitness.</p>
+        <p class="race-pred-note">Built from your fastest recent effort. Race day has its own plans.</p>
         <div class="race-pred-grid">
           <div v-for="(time, dist) in performanceMetrics.racePreds" :key="dist" class="race-pred-card">
             <div class="race-pred-dist">{{ dist }}</div>
@@ -161,7 +161,7 @@
           </div>
         </div>
         <div class="fitness-empty-note" v-else>
-          Log at least 2 runs over 2 km to unlock your VO2max trend.
+          Log 2 runs over 2 km and your VO2max trend shows up here.
         </div>
 
         <!-- Fitness metric row -->
@@ -256,7 +256,7 @@
               {{ daysSinceLastActivity === 0 ? 'Great — you trained today!'
                 : daysSinceLastActivity <= 2 ? 'Normal recovery window'
                 : daysSinceLastActivity <= 5 ? 'Getting a bit long — consider a short run'
-                : 'Extended gap detected — ease back in gradually' }}
+                : 'Been a while — ease back in, don\'t sprint out the gate' }}
             </div>
           </div>
         </div>
@@ -299,10 +299,10 @@
         </Teleport>
       </section>
 
-      <!-- RUNNING STYLE -->
+      <!-- TRAINING STYLE -->
       <section id="stats-style" class="section">
         <div class="section-header">
-          <span class="section-kicker">Your Running Style</span>
+          <span class="section-kicker">Your Training Style</span>
         </div>
         <div class="archetype-card">
           <div class="arch-card-left">
@@ -340,7 +340,7 @@
           </div>
         </div>
         <div class="journey-empty-cta" v-if="growthTimeline.length < 3">
-          <p>Keep logging — more milestones unlock as you train.</p>
+          <p>Keep logging — the next milestone is closer than you think.</p>
         </div>
       </section>
 

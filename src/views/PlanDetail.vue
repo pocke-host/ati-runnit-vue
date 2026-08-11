@@ -597,7 +597,7 @@ const toggleWorkout = async (workout) => {
       postCompletion.value = { id: workout.id, rpe: workout.rpe || null, notes: workout.athleteNotes || '' }
     }
   } catch {
-    showToast('Failed to update workout.', 'error')
+    showToast('Couldn\'t update that workout — give it another tap.', 'error')
   } finally {
     delete workoutLoading.value[workout.id]
   }
@@ -644,7 +644,7 @@ const skipWorkout = async (workout) => {
       postCompletion.value = null
     }
   } catch {
-    showToast('Failed to update workout.', 'error')
+    showToast('Couldn\'t skip that workout — give it another tap.', 'error')
   } finally {
     delete workoutLoading.value[workout.id]
   }
@@ -692,9 +692,9 @@ const saveAdjustment = async (workout) => {
     if (updates.durationMinutes !== undefined) workout.durationMinutes = updates.durationMinutes
     if (updates.description !== undefined) workout.description = updates.description
     toggleAdjust(workout.id)
-    showToast('Workout updated.', 'success')
+    showToast('Workout dialed in.', 'success')
   } catch {
-    showToast('Failed to save changes.', 'error')
+    showToast('Couldn\'t save those changes — give it another shot.', 'error')
   } finally {
     delete adjustSaving.value[workout.id]
   }
@@ -707,7 +707,7 @@ const setActive = async () => {
     plan.value.isActive = true
     showToast('Plan set as active!', 'success')
   } catch {
-    showToast('Failed to set active.', 'error')
+    showToast('Couldn\'t make this your active plan — try again.', 'error')
   } finally {
     actionLoading.value = false
   }
@@ -724,7 +724,7 @@ const doDelete = async () => {
     await planStore.deletePlan(plan.value.id)
     router.push('/plans')
   } catch {
-    showToast('Failed to delete plan. Try again.', 'error')
+    showToast('Plan didn\'t delete — try again.', 'error')
     actionLoading.value = false
   }
 }
