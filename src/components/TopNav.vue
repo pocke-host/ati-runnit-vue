@@ -40,7 +40,7 @@
           <router-link to="/features" class="nav-link nav-link-gr">Features</router-link>
           <router-link to="/about" class="nav-link nav-link-gr">About</router-link>
           <router-link to="/pricing" class="nav-link nav-link-gr">Pricing</router-link>
-          <router-link to="/waitlist" class="nav-link nav-link-gr-cta">Join Waitlist</router-link>
+          <router-link to="/signup" class="nav-link nav-link-gr-cta">Join</router-link>
         </div>
 
         <!-- Auth icons -->
@@ -136,7 +136,7 @@
         </template>
 
         <!-- Mobile Join button (unauthenticated only, mobile only) -->
-        <router-link v-if="!isAuthenticated" to="/waitlist" class="mobile-join-btn mobile-join-btn--gr">Join</router-link>
+        <router-link v-if="!isAuthenticated" to="/signup" class="mobile-join-btn mobile-join-btn--gr">Join</router-link>
 
         <!-- Hamburger (mobile only, all users) -->
         <button
