@@ -124,7 +124,7 @@ async function submitEmail() {
     }
     submitted.value = true
   } catch {
-    errorMsg.value = 'Network error. Please try again.'
+    errorMsg.value = 'Network hiccup. Try again.'
   } finally {
     submitting.value = false
   }
