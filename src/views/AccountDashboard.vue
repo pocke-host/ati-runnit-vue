@@ -221,7 +221,7 @@
                 </div>
               </div>
             </template>
-            <div v-else class="db2-insights-empty">Log 3+ activities to unlock</div>
+            <div v-else class="db2-insights-empty">Log 3+ activities and insights show up here</div>
             <div class="db2-insights-foot">
               <router-link to="/stats" class="db2-insights-link">Full analysis →</router-link>
             </div>
@@ -1990,7 +1990,7 @@ const handleActivitySubmit = async () => {
     await activityStore.fetchActivities()
     updateCharts()
   } catch (err) {
-    activityError.value = err.response?.data?.error || 'Failed to create activity'
+    activityError.value = err.response?.data?.error || 'Activity didn\'t log — try again.'
   } finally {
     activityLoading.value = false
   }
@@ -2030,7 +2030,7 @@ const handleMomentSubmit = async () => {
     closeMomentModal()
     router.push('/feed')
   } catch (err) {
-    momentError.value = err.response?.data?.error || 'Failed to create moment'
+    momentError.value = err.response?.data?.error || 'Moment didn\'t post — try again.'
   }
 }
 
@@ -2090,7 +2090,7 @@ const followUser = async (userId) => {
     followingIds.value.add(userId)
     await loadFollowData()
   } catch {
-    showToast('Failed to follow user. Please try again.', 'error')
+    showToast('Follow didn\'t land — try again.', 'error')
   } finally {
     followLoading.value = false
   }
@@ -2105,7 +2105,7 @@ const unfollowUser = async (userId) => {
     followingIds.value.delete(userId)
     await loadFollowData()
   } catch {
-    showToast('Failed to unfollow user. Please try again.', 'error')
+    showToast('Unfollow didn\'t land — try again.', 'error')
   } finally {
     followLoading.value = false
   }

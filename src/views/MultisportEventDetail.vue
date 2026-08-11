@@ -185,7 +185,7 @@ async function deleteEvent() {
     })
     router.push('/feed')
   } catch {
-    deleteError.value = 'Failed to delete event. Please try again.'
+    deleteError.value = "Event didn't delete. Try again."
     deleting.value = false
     confirmDelete.value = false
   }

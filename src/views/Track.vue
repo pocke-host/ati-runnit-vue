@@ -20,7 +20,7 @@
       <ConfirmModal
         v-model="showStopConfirm"
         title="Stop Tracking?"
-        body="Your current session will end and you'll return to the dashboard. Any unsaved data will be lost."
+        body="This ends the session and drops whatever hasn't been saved. No coming back from this one."
         confirm-label="Stop & Exit"
         :danger="true"
         @confirm="doGoBack"

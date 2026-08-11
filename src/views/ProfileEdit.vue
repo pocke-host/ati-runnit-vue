@@ -16,7 +16,7 @@
 
       <!-- Status banner -->
       <div v-if="saved" class="pe-banner pe-banner-success">
-        <i class="bi bi-check-circle-fill"></i> Profile updated successfully.
+        <i class="bi bi-check-circle-fill"></i> Profile updated.
       </div>
       <div v-if="error" class="pe-banner pe-banner-error">
         <i class="bi bi-exclamation-circle-fill"></i> {{ error }}
@@ -264,7 +264,7 @@ const onFileChange = async (e) => {
     authStore.updateAvatar(data.avatarUrl)
     avatarPreview.value = null // let the store value take over
   } catch {
-    uploadError.value = 'Upload failed. Please try again.'
+    uploadError.value = "Upload didn't go through. Try again."
     avatarPreview.value = null
   } finally {
     uploadLoading.value = false
@@ -333,7 +333,7 @@ const saveProfile = async () => {
     initialForm.value = { ...form.value }
     setTimeout(() => { saved.value = false }, 4000)
   } catch (e) {
-    error.value = 'Failed to save changes. Please try again.'
+    error.value = "Changes didn't save. Try again."
   } finally {
     saving.value = false
   }
@@ -387,7 +387,7 @@ const doDeleteAccount = async () => {
     authStore.logout()
     router.push('/')
   } catch {
-    deleteError.value = 'Failed to delete account. Please try again or contact support.'
+    deleteError.value = "Account didn't delete. Try again, or reach out to support."
     showToast('Account deletion failed. Contact support if this continues.', 'error')
     deleting.value = false
   }

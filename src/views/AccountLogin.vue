@@ -145,7 +145,7 @@ const initGoogleSignIn = () => {
         await authStore.loginWithGoogle(credential)
         router.push(authStore.onboardingComplete ? (role.value === 'coach' ? '/coach/dashboard' : '/dashboard') : '/onboard')
       } catch {
-        googleError.value = 'Google sign-in failed. Please try again.'
+        googleError.value = "Google sign-in didn't go through. Try again."
       } finally {
         googleLoading.value = false
       }

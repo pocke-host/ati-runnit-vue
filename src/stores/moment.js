@@ -25,7 +25,7 @@ export const useMomentStore = defineStore('moment', () => {
       saveCache(FEED_CACHE_KEY, feed.value)
       return response.data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to create moment'
+      error.value = err.response?.data?.error || "Couldn't post that moment. Try again."
       throw err
     } finally {
       loading.value = false
@@ -43,7 +43,7 @@ export const useMomentStore = defineStore('moment', () => {
       saveCache(FEED_CACHE_KEY, feed.value)
       return { totalPages: data.totalPages ?? 1 }
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch feed'
+      error.value = err.response?.data?.error || "Couldn't load the feed. Check your connection."
       return { totalPages: 1 }
     } finally {
       loading.value = false
@@ -60,7 +60,7 @@ export const useMomentStore = defineStore('moment', () => {
       saveCache(USER_CACHE_KEY, userMoments.value)
       return { totalPages: data.totalPages ?? 1 }
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch moments'
+      error.value = err.response?.data?.error || "Couldn't load moments. Check your connection."
       return { totalPages: 1 }
     } finally {
       loading.value = false

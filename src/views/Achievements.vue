@@ -78,7 +78,7 @@
 
       <div v-if="!achievementStore.loading && filteredBadges.length === 0" class="empty-state">
         <div class="empty-icon">—</div>
-        <p class="empty-text">No badges in this category yet.</p>
+        <p class="empty-text">Nothing here yet. Go earn one.</p>
       </div>
     </div>
   </div>

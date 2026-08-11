@@ -14,7 +14,7 @@
       <div class="page-inner">
         <p class="story-lead">Most apps track your workout. Runnit is where your training lives.</p>
         <div class="story-grid">
-          <p class="story-body">Runnit started as one runner's frustration: the apps that tracked everything somehow felt like nothing. Numbers without a story. A feed full of strangers' splits and sponsored shoes.</p>
+          <p class="story-body">Runnit started as one athlete's frustration: the apps that tracked everything somehow felt like nothing. Numbers without a story. A feed full of strangers' splits and sponsored shoes.</p>
           <p class="story-body">So it got built — solo, in the hours around training — into the place a run actually lives. The photo. The route. The people who were there when your legs gave out at mile twenty.</p>
         </div>
       </div>

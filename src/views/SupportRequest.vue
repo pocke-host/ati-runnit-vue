@@ -104,7 +104,7 @@
               <button class="btn btn-primary w-100">Submit Request</button>
 
               <div v-if="submitted" class="alert alert-success mt-3 mb-0" role="status">
-                ✅ Request received. We’ll get back to you soon.
+                Got it. We'll be in touch within a day.
               </div>
             </div>
           </div>

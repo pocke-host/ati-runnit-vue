@@ -161,7 +161,7 @@ async function submit() {
     }
     submitted.value = true
   } catch {
-    serverError.value = 'Network error. Please try again.'
+    serverError.value = "Network hiccup. Try again."
   } finally {
     loading.value = false
   }

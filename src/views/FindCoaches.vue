@@ -5,7 +5,7 @@
       <div class="hero-inner">
         <div class="hero-kicker">RUNNIT COACHING</div>
         <h1 class="hero-title">FIND A COACH</h1>
-        <p class="hero-sub">Connect with expert coaches who'll take your training to the next level.</p>
+        <p class="hero-sub">Coaches who build your plan, break down every session, and call you out when you skip one.</p>
       </div>
     </section>
 
@@ -33,7 +33,7 @@
       <!-- Empty -->
       <div v-else-if="coaches.length === 0" class="empty-state">
         <i class="bi bi-person-badge empty-icon"></i>
-        <p>No coaches available yet. Check back soon.</p>
+        <p>Coach roster's empty — for now.</p>
       </div>
 
       <!-- Coach Grid -->
@@ -105,7 +105,7 @@ const sendRequest = async (coachId) => {
   try {
     await athleteStore.sendRequest(coachId)
   } catch {
-    requestError.value = 'Failed to send request. Please try again.'
+    requestError.value = 'Request didn\'t send. Try again.'
   } finally {
     actionLoading.value = null
   }

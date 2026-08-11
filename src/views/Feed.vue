@@ -196,14 +196,14 @@
         v-else-if="activeTab === 'following'"
         icon="bi-people"
         title="No one followed yet"
-        message="Follow other athletes to see their workouts and moments here."
+        message="Find your people. Their workouts and moments land here."
       />
 
       <EmptyState
         v-else-if="activeTab === 'mine'"
         icon="bi-collection"
         title="Nothing logged yet"
-        message="Track a workout or share a moment to get started."
+        message="Track a workout or share a moment — this is where it lives."
         actionLabel="Log Activity"
         actionTo="/track"
       />
@@ -345,7 +345,7 @@
 
                 <div v-else class="comments-empty">
                   <i class="bi bi-chat"></i>
-                  <p>No comments yet. Be the first!</p>
+                  <p>No comments yet. Break the silence.</p>
                 </div>
               </div>
 
@@ -374,7 +374,7 @@
     <ConfirmModal
       v-model="showDeleteMomentConfirm"
       title="Delete Moment"
-      body="This will permanently remove this moment from your feed."
+      body="Gone for good. No undo."
       confirm-label="Delete"
       :danger="true"
       @confirm="doDeleteMoment"
@@ -477,7 +477,7 @@ const toggleActivityReaction = async (activityId, type) => {
     }
     activityReactionMap.value[activityId] = { ...current }
   } catch {
-    showToast('Failed to save reaction. Please try again.', 'error')
+    showToast("Reaction didn't land. Tap it again.", 'error')
   }
 }
 
@@ -672,7 +672,7 @@ const addComment = async () => {
       moments.value[momentIndex].commentCount = (moments.value[momentIndex].commentCount || 0) + 1
     }
   } catch {
-    showToast('Failed to post comment. Please try again.', 'error')
+    showToast("Comment didn't send. Give it another shot.", 'error')
   } finally {
     commentLoading.value = false
   }
@@ -717,7 +717,7 @@ const toggleReaction = async (type) => {
       moments.value[momentIndex].reactions = prevCounts
       moments.value[momentIndex].currentUserReaction = prevReaction
     }
-    showToast('Failed to save reaction. Please try again.', 'error')
+    showToast("Reaction didn't land. Tap it again.", 'error')
   } finally {
     reactionLoading.value = false
   }
@@ -737,7 +737,7 @@ const doDeleteMoment = async () => {
     closeMoment()
     showToast('Moment deleted.', 'info')
   } catch {
-    showToast('Failed to delete moment. Try again.', 'error')
+    showToast("Delete didn't go through. Try again.", 'error')
   } finally {
     deleteLoading.value = false
   }
@@ -773,7 +773,7 @@ const followUser = async (userId) => {
   } catch {
     // Rollback
     followingIds.value.delete(userId)
-    showToast('Failed to follow user. Please try again.', 'error')
+    showToast("Follow didn't go through. Give it another tap.", 'error')
   } finally {
     followLoading.value = false
   }

@@ -411,7 +411,7 @@ async function goToCoachDashboard() {
     authStore.completeOnboarding()
     router.push('/coach/dashboard')
   } catch {
-    saveError.value = 'Failed to save your preferences. Please try again.'
+    saveError.value = "Preferences didn't save. Try again."
   } finally {
     saving.value = false
   }
@@ -438,7 +438,7 @@ async function goToDashboard() {
     authStore.completeOnboarding()
     router.push('/dashboard')
   } catch {
-    saveError.value = 'Failed to save your preferences. Please try again.'
+    saveError.value = "Preferences didn't save. Try again."
   } finally {
     saving.value = false
   }

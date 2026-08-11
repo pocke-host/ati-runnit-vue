@@ -5,7 +5,7 @@
       <div class="cancel-icon"><i class="bi bi-x-lg"></i></div>
       <p class="cancel-eyebrow">PAYMENT CANCELLED</p>
       <h1 class="cancel-headline">No worries.</h1>
-      <p class="cancel-sub">Your payment was cancelled. You have not been charged.</p>
+      <p class="cancel-sub">Nothing charged. Nothing lost. Come back whenever.</p>
       <router-link to="/subscribe" class="cancel-btn">Back to Plans →</router-link>
     </div>
   </main>

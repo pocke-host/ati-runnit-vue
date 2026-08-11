@@ -61,7 +61,7 @@
           <textarea
             v-model="form.caption"
             class="form-control form-textarea"
-            placeholder="What's on your mind?"
+            placeholder="How'd the session go?"
             maxlength="500"
             rows="3"
           ></textarea>
@@ -190,7 +190,7 @@ const pickPhoto = async () => {
       photoPreview.value = `data:${mimeType};base64,${photo.base64String}`
     } catch (err) {
       if (!err.message?.includes('cancelled')) {
-        showToast('Camera failed to open. Please try again.', 'error')
+        showToast('Camera wouldn\'t open. Give it another tap.', 'error')
       }
     }
   } else {
@@ -238,7 +238,7 @@ const handleSubmit = async () => {
     showToast('Moment shared!', 'success')
     router.push('/feed')
   } catch (err) {
-    const msg = err.response?.data?.error || err.message || 'Failed to share moment'
+    const msg = err.response?.data?.error || err.message || 'Moment didn\'t post — give it another shot.'
     error.value = msg
     showToast(msg, 'error')
   }

@@ -261,7 +261,7 @@
           <!-- Empty state -->
           <div class="drawer-empty" v-if="!selectedEvents.length && !selectedActivities.length && !selectedRaces.length && !selectedGroupEvents.length && !showCreateForm && !aiSuggestion">
             <i class="bi bi-calendar3" style="font-size:2rem;color:#E7DFCE"></i>
-            <p>Nothing planned yet</p>
+            <p>Board's empty. Plan something or add what you did.</p>
           </div>
 
           <!-- AI Suggestion card -->
@@ -381,7 +381,7 @@
         <div class="modal-body">
           <div v-if="weekPlanLoading" class="week-plan-loading">
             <div class="spinner-border"></div>
-            <p>Analyzing your training history…</p>
+            <p>Reading your training history…</p>
           </div>
           <div v-else class="week-plan-grid">
             <div
@@ -655,7 +655,7 @@ async function handleRsvp(ge, status) {
   try {
     await groupEventStore.rsvp(ge.myInviteId, status)
   } catch {
-    showToast('Failed to update RSVP. Please try again.', 'error')
+    showToast('RSVP didn\'t save — tap it again.', 'error')
   } finally {
     rsvpLoading.value = null
   }
@@ -789,7 +789,7 @@ async function saveEvent() {
     closeCreateForm()
     syncEventToGoogle(saved)
   } catch (e) {
-    formError.value = e.response?.data?.error || 'Failed to save'
+    formError.value = e.response?.data?.error || 'Workout didn\'t save — try again.'
   } finally {
     saveLoading.value = false
   }
@@ -814,7 +814,7 @@ async function doDeleteEvent() {
       })
     }
   } catch {
-    showToast('Failed to remove workout. Try again.', 'error')
+    showToast('Workout wouldn\'t budge — try removing it again.', 'error')
   }
 }
 

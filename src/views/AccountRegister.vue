@@ -238,7 +238,7 @@ const submit = async () => {
       router.push('/onboard')
     }
   } catch (e) {
-    error.value = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Registration failed. Please try again.'
+    error.value = e?.response?.data?.error || e?.response?.data?.message || e?.message || "Sign-up didn't go through. Try again."
   } finally {
     loading.value = false
   }
@@ -266,7 +266,7 @@ const initGoogleSignIn = () => {
           router.push('/onboard')
         }
       } catch {
-        googleError.value = 'Google sign-in failed. Please try again.'
+        googleError.value = "Google sign-in didn't go through. Try again."
       } finally {
         googleLoading.value = false
       }

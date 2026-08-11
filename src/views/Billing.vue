@@ -23,10 +23,10 @@
         <div class="billing-section">
           <p class="billing-desc">
             <template v-if="subscriptionTier === 'free'">
-              You're on the free plan. Upgrade to unlock route planning, pace insights, and safety tools.
+              You're on the free plan — consider it a warm-up. Go Pro for route planning, pace insights, and safety tools built for real training.
             </template>
             <template v-else>
-              Thank you for being a {{ tierLabel }} member. Manage your billing, update payment methods, or cancel anytime through the Stripe portal.
+              You're {{ tierLabel }} — full stop. Manage payment, switch plans, or walk away anytime, all from the portal.
             </template>
           </p>
 
@@ -79,7 +79,7 @@ const handlePortal = async () => {
   try {
     await openBillingPortal()
   } catch {
-    portalError.value = 'Unable to open billing portal. Please try again.'
+    portalError.value = "Couldn't open the billing portal. Try again."
   } finally {
     portalLoading.value = false
   }

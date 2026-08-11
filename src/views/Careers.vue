@@ -3,8 +3,8 @@
     <section class="ep-hero">
       <div class="ep-hero-inner">
         <div class="ep-kicker">RUNNIT // CAREERS</div>
-        <h1 class="ep-headline">Build the Future<br>of Movement.</h1>
-        <p class="ep-sub">We're a small team obsessed with helping athletes move better. If you care about craft, performance, and community — we want to hear from you.</p>
+        <h1 class="ep-headline">Help Athletes<br>Move Better.</h1>
+        <p class="ep-sub">We're a small team obsessed with helping athletes move better. If that's your kind of obsession too, send us something.</p>
       </div>
     </section>
 
@@ -26,7 +26,7 @@
 
         <div class="open-app">
           <h3>Don't see your role?</h3>
-          <p>Check out our LinkedIn page for more updates. <a href="https://www.linkedin.com/company/runnit-app/">Runnit LinkedIn Page</a>.</p>
+          <p>Follow along on <a href="https://www.linkedin.com/company/runnit-app/">LinkedIn</a>.</p>
         </div>
       </div>
     </section>
@@ -52,15 +52,15 @@ useHead({
   title: 'Careers — Runnit',
   link: [{ rel: 'canonical', href: 'https://runnit.live/careers' }],
   meta: [
-    { name: 'description', content: 'Join the team building the future of endurance training. Open roles in engineering, design, and growth at Runnit.' },
+    { name: 'description', content: 'Help build the training app endurance athletes actually want. Open roles in engineering, design, and growth at Runnit.' },
     { property: 'og:title', content: 'Careers — Runnit' },
-    { property: 'og:description', content: 'Join the team building the future of endurance training. Open roles in engineering, design, and growth.' },
+    { property: 'og:description', content: 'Help build the training app endurance athletes actually want. Open roles in engineering, design, and growth.' },
     { property: 'og:url', content: 'https://runnit.live/careers' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Careers — Runnit' },
-    { name: 'twitter:description', content: 'Join the team building the future of endurance training.' },
+    { name: 'twitter:description', content: 'Help build the training app endurance athletes actually want.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })

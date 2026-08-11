@@ -36,7 +36,7 @@ export const useActivityStore = defineStore('activity', () => {
       saveCache(activities.value)
       return response.data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to create activity'
+      error.value = err.response?.data?.error || "Couldn't save the activity. Try again."
       throw err
     } finally {
       loading.value = false
@@ -56,7 +56,7 @@ export const useActivityStore = defineStore('activity', () => {
       saveCache(activities.value)
       return response.data
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to create strength activity'
+      error.value = err.response?.data?.error || "Couldn't save the strength session. Try again."
       throw err
     } finally {
       loading.value = false
@@ -92,7 +92,7 @@ export const useActivityStore = defineStore('activity', () => {
       saveCache(all)
       return activities.value
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch activities'
+      error.value = err.response?.data?.error || "Couldn't load your activities. Check your connection."
       // Silently keep showing cached data on network failure
     } finally {
       loading.value = false
@@ -117,7 +117,7 @@ export const useActivityStore = defineStore('activity', () => {
       const { data } = await axios.get(`${API_URL}/activities/feed?page=${page}`)
       return Array.isArray(data) ? data : (data.content || [])
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to load feed'
+      error.value = err.response?.data?.error || "Couldn't load the feed. Check your connection."
       return []
     }
   }

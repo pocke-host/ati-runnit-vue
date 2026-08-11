@@ -126,7 +126,7 @@
           <div class="gr-clubs-empty" v-if="filtered.length === 0">
             <i class="bi bi-search"></i>
             <h5>No clubs found</h5>
-            <p>Try another sport or search term.</p>
+            <p>Nothing matched. Try another sport or search.</p>
           </div>
         </div>
       </div>
@@ -138,7 +138,7 @@
         <div v-if="myClubs.length === 0" class="gr-clubs-empty">
           <i class="bi bi-people"></i>
           <h5>No clubs yet</h5>
-          <p>Head to Discover to find clubs that match your sport.</p>
+          <p>Discover's got clubs for your sport. Go find yours.</p>
           <button class="gr-btn-join" @click="activeTab = 'discover'">Discover Clubs</button>
         </div>
         <div v-else class="gr-clubs-grid">
@@ -180,7 +180,7 @@
         <div v-if="myClubs.length === 0" class="empty">
           <i class="bi bi-link-45deg display-4 text-muted d-block mb-3"></i>
           <h5 class="mb-1">No clubs to invite to</h5>
-          <p class="text-muted mb-3">Join a club first to generate invite links.</p>
+          <p class="text-muted mb-3">No club, no invite link. Join one first.</p>
           <button class="btn-join" @click="activeTab = 'discover'">Discover Clubs</button>
         </div>
         <div v-else>
@@ -265,7 +265,7 @@
       <div class="container-xxl">
         <div class="cta-content">
           <h2 class="cta-title">Start your own club</h2>
-          <p class="cta-text">Bring athletes together, create events, and build community.</p>
+          <p class="cta-text">Gather your crew, run events, own your turf.</p>
           <button class="btn-cta" @click="createModalOpen = true">Create a Club</button>
         </div>
       </div>
@@ -512,7 +512,7 @@ async function submitCreateClub() {
     createModalOpen.value = false
     activeTab.value = 'my'
   } catch (e) {
-    createError.value = 'Could not create club. Please try again.'
+    createError.value = "Club didn't create. Give it another shot."
   } finally {
     creating.value = false
   }
@@ -556,7 +556,7 @@ async function joinClub(id) {
       }
     }
   } catch {
-    showToast('Failed to join club. Please try again.', 'error')
+    showToast("Join didn't go through. Try again.", 'error')
   } finally {
     joiningId.value = null
   }
@@ -579,7 +579,7 @@ async function leaveClub(id) {
       if (chatClub.value?.id === id) chatOpen.value = false
     }
   } catch {
-    showToast('Failed to leave club. Please try again.', 'error')
+    showToast("Leave didn't go through. Try again.", 'error')
   } finally {
     joiningId.value = null
   }
@@ -834,14 +834,14 @@ async function geocodeAndSave() {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ latitude: lat, longitude: lng, city: cityName }),
     })
-    if (!res.ok) throw new Error('Failed to save location.')
+    if (!res.ok) throw new Error("Location didn't save.")
     const updated = await res.json()
     // Update in myClubs
     const idx = myClubs.value.findIndex(c => c.id === updated.id)
     if (idx !== -1) myClubs.value[idx] = { ...myClubs.value[idx], ...updated }
     locationModalClub.value = null
   } catch (e) {
-    locationError.value = e.message || 'Failed to save location.'
+    locationError.value = e.message || "Location didn't save. Try again."
   } finally {
     locationSaving.value = false
   }

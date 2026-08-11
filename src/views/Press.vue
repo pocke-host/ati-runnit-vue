@@ -11,7 +11,7 @@
     <section class="ep-section">
       <div class="ep-content">
         <h2 class="ep-section-title">About Runnit</h2>
-        <p class="boilerplate">Runnit is an athlete training platform that helps runners, cyclists, swimmers, and hikers train smarter — not just harder. Founded in 2025, Runnit combines GPS activity tracking, social community, and AI-driven training plans into a single, clean experience. Athletes on Runnit have collectively logged over 1 million miles across 50+ countries.</p>
+        <p class="boilerplate">Runnit is a training platform for athletes — runners, cyclists, swimmers, and hikers alike. Founded in 2025, it combines GPS activity tracking, a social crew, and adaptive training plans in one app. Athletes on Runnit have logged over 1 million miles across 50+ countries.</p>
 
         <h2 class="ep-section-title" style="margin-top:48px;">Coverage</h2>
         <div class="press-list">

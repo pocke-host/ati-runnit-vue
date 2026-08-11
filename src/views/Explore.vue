@@ -6,7 +6,7 @@
       <div class="explore-header-inner">
         <div>
           <h1 class="explore-title">Explore</h1>
-          <p class="explore-sub">Discover athletes and routes near you</p>
+          <p class="explore-sub">Scout the block. Athletes and routes near you.</p>
         </div>
 
         <!-- Filters -->
@@ -32,7 +32,7 @@
     <!-- PERMISSION GATE -->
     <div v-if="locationStatus === 'denied'" class="permission-banner">
       <i class="bi bi-geo-alt-fill"></i>
-      Location access denied. Enable it in your browser settings to discover nearby athletes.
+      Location's off. Flip it on to see who's training nearby.
     </div>
 
     <div class="explore-body">
@@ -252,7 +252,7 @@ async function loadNearby() {
     activities.value = data.content || data || []
     plotActivities()
   } catch {
-    loadError.value = 'Could not load nearby activities. Check your connection and try again.'
+    loadError.value = "Nearby activity didn't load. Check your connection."
     activities.value = []
   } finally {
     loading.value = false
@@ -268,7 +268,7 @@ async function followAthlete(athlete) {
     })
     athlete.isFollowing = true
   } catch {
-    loadError.value = 'Failed to follow athlete. Please try again.'
+    loadError.value = "Follow didn't go through. Tap it again."
   }
 }
 

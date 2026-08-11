@@ -4,9 +4,9 @@
     <!-- HERO -->
     <section class="hero">
       <div class="container-xxl">
-        <p class="eyebrow">Train smarter.</p>
+        <p class="eyebrow">A plan that bends.</p>
         <h1 class="fw-bold mb-2">Training Plans</h1>
-        <p class="lead m-0">Periodized plans powered by sport science — built around your race date and fitness.</p>
+        <p class="lead m-0">Built around your race date and your fitness — not the other way round.</p>
       </div>
     </section>
 
@@ -58,7 +58,7 @@
       <section class="templates-section">
         <div class="section-header">
           <h2 class="section-title">Start from a Template</h2>
-          <p class="section-sub">Pick a goal — we'll pre-fill the plan builder for you.</p>
+          <p class="section-sub">Pick a goal. We'll build the first draft.</p>
         </div>
         <div class="templates-grid">
           <button
@@ -81,7 +81,7 @@
       <section class="new-plan-section">
         <div class="section-header">
           <h2 class="section-title">{{ plans.length ? 'Customize & Build' : 'Build Your Plan' }}</h2>
-          <p class="section-sub">Personalize every detail — or use a template above to get started fast.</p>
+          <p class="section-sub">Tune every detail, or grab a template above and go.</p>
         </div>
 
         <!-- ── WIZARD ── -->
@@ -168,7 +168,7 @@
 
             <!-- Step 3: Current Fitness -->
             <div v-else-if="wizardStep === 3" key="s3" class="wizard-content">
-              <div class="step-label">Tell us about your current fitness</div>
+              <div class="step-label">Where's your fitness at right now?</div>
 
               <div class="field-group">
                 <label class="field-label">Weekly {{ distanceLabel }} (current training)</label>
@@ -339,7 +339,7 @@
           v-else-if="!plans.length && wizardStep === 1 && !selectedGoal"
           icon="bi-calendar3"
           title="No plans yet"
-          message="Build a personalized periodized plan in 5 steps."
+          message="Build your plan in 5 steps."
         />
       </section>
     </div>

@@ -25,18 +25,18 @@
               <span class="plan-price">$0</span>
               <span class="plan-per">/MO</span>
             </div>
-            <div class="plan-tagline">For getting started</div>
+            <div class="plan-tagline">For lacing up</div>
             <div class="plan-features">
               <div v-for="f in freeFeatures" :key="f" class="plan-feature">
                 <span class="plan-check">✓</span>{{ f }}
               </div>
             </div>
-            <router-link to="/signup" class="btn-plan btn-plan--ghost">Get Started</router-link>
+            <router-link to="/signup" class="btn-plan btn-plan--ghost">Lace Up</router-link>
           </div>
 
           <!-- Pro (featured) -->
           <div class="plan-card plan-card--pro">
-            <div class="plan-badge">Most Popular</div>
+            <div class="plan-badge">Front Runner</div>
             <div class="plan-tier plan-tier--cobalt">Pro</div>
             <div class="plan-price-row">
               <span class="plan-price">{{ billing === 'annual' ? '$7' : '$9' }}</span>
@@ -79,7 +79,7 @@
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
       <p class="cta-sub">Start free. Upgrade when your training does.</p>
-      <router-link to="/signup" class="btn-pill-paper">Get Started</router-link>
+      <router-link to="/signup" class="btn-pill-paper">Lace Up</router-link>
     </section>
 
   </main>
@@ -96,7 +96,7 @@ import { useStripe } from '@/composables/useStripe'
 useHead({
   title: 'Pricing — Runnit',
   meta: [
-    { name: 'description', content: 'Pick your pace. Simple, honest pricing — free to start, Pro when your training does.' },
+    { name: 'description', content: 'Pick your pace. Straight-up pricing — free to start, Pro when your training does.' },
   ]
 })
 

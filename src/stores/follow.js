@@ -35,7 +35,7 @@ export const useFollowStore = defineStore('follow', () => {
         saveCache(FOLLOWING_CACHE_KEY, following.value)
       }
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to follow user'
+      error.value = err.response?.data?.error || "Couldn't follow. Try again."
       throw err
     } finally {
       loading.value = false
@@ -51,7 +51,7 @@ export const useFollowStore = defineStore('follow', () => {
       following.value = following.value.filter(u => String(u.id) !== String(userId))
       saveCache(FOLLOWING_CACHE_KEY, following.value)
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to unfollow user'
+      error.value = err.response?.data?.error || "Couldn't unfollow. Try again."
       throw err
     } finally {
       loading.value = false
@@ -66,7 +66,7 @@ export const useFollowStore = defineStore('follow', () => {
       followers.value = data
       saveCache(FOLLOWERS_CACHE_KEY, data)
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch followers'
+      error.value = err.response?.data?.error || "Couldn't load followers. Check your connection."
       throw err
     } finally {
       loading.value = false
@@ -81,7 +81,7 @@ export const useFollowStore = defineStore('follow', () => {
       following.value = data
       saveCache(FOLLOWING_CACHE_KEY, data)
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to fetch following'
+      error.value = err.response?.data?.error || "Couldn't load who you're following. Check your connection."
       throw err
     } finally {
       loading.value = false

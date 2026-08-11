@@ -15,7 +15,7 @@
       <div class="headline-block">
         <span class="badge-sticker">Payment Confirmed</span>
         <h1 class="success-h1">You're in.</h1>
-        <p class="success-sub">Welcome to {{ tierLabel }}. Route planning, goal tracking, and pace insights are unlocked.</p>
+        <p class="success-sub">{{ tierLabel }} is live. Go chase something bigger.</p>
       </div>
 
       <!-- Plan detail card -->
