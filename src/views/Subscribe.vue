@@ -49,7 +49,7 @@
               </div>
             </div>
             <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
-              {{ checkoutLoading === 'premium' ? 'Loading…' : planLabel('premium') }}
+              {{ checkoutLoading === 'premium' ? 'Redirecting…' : planLabel('premium') }}
             </button>
           </div>
 
@@ -67,7 +67,7 @@
               </div>
             </div>
             <button class="btn-plan btn-plan--ghost" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
-              {{ checkoutLoading === 'duo' ? 'Loading…' : planLabel('duo') }}
+              {{ checkoutLoading === 'duo' ? 'Redirecting…' : planLabel('duo') }}
             </button>
           </div>
 

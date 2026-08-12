@@ -205,7 +205,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useToast } from '@/composables/useToast'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -235,7 +234,7 @@ const onFileChange = async (e) => {
 
   // Validate type
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-    uploadError.value = 'Please upload a JPG, PNG, or WebP image.'
+    uploadError.value = 'Needs to be a JPG, PNG, or WebP.'
     return
   }
   // Validate size (5 MB)
@@ -339,8 +338,6 @@ const saveProfile = async () => {
   }
 }
 
-const { showToast } = useToast()
-
 // ── Unsaved changes guard ─────────────────────────────────────
 const initialForm = ref(null)
 const isDirty = computed(() => {
@@ -388,7 +385,6 @@ const doDeleteAccount = async () => {
     router.push('/')
   } catch {
     deleteError.value = "Account didn't delete. Try again, or reach out to support."
-    showToast('Account deletion failed. Contact support if this continues.', 'error')
     deleting.value = false
   }
 }

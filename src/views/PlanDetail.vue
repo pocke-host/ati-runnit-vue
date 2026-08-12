@@ -86,7 +86,7 @@
         <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="showDeleteConfirm = false">
           <div class="confirm-modal">
             <div class="confirm-title">Delete Plan</div>
-            <p class="confirm-body">Delete <strong>{{ plan.name }}</strong>? This can't be undone.</p>
+            <p class="confirm-body">Delete <strong>{{ plan.name }}</strong>? Every week in it — gone, no rebuilding.</p>
             <div class="confirm-actions">
               <button class="confirm-btn-cancel" @click="showDeleteConfirm = false">Cancel</button>
               <button class="confirm-btn-danger" @click="doDelete">Delete</button>

@@ -333,7 +333,7 @@ const saveWorkout = async (workout) => {
       steps:       workout.steps || [],
     })
   } catch {
-    saveError.value = 'A workout change could not be saved. Please refresh and try again.'
+    saveError.value = "That workout change didn't save. Refresh and try again."
   }
 }
 

@@ -99,7 +99,7 @@ useHead({
 const openFaq = ref(0)
 
 const categories = [
-  { title: 'Getting Started', desc: 'Create an account, log your first run, set up your profile.' },
+  { title: 'Getting Started', desc: 'Create an account, log your first session, set up your profile.' },
   { title: 'Tracking & GPS', desc: 'Recording activities, routes, splits, and accuracy.' },
   { title: 'Syncing Apps', desc: 'Garmin, Apple Health, and COROS connections.' },
   { title: 'Training Plans', desc: 'Adaptive plans, workouts, and rescheduling.' },
