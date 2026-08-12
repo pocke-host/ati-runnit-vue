@@ -376,7 +376,7 @@
 
     <!-- Not found -->
     <div v-else-if="!loading" class="page-loading">
-      <p>Plan not found.</p>
+      <p>Can't find that plan.</p>
       <button class="btn btn-primary mt-3" @click="router.push('/plans')">Back to Plans</button>
     </div>
   </div>

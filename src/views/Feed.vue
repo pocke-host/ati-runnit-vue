@@ -212,7 +212,7 @@
         v-else
         icon="bi-globe2"
         title="Nothing here yet"
-        message="Be the first to log an activity or share a moment!"
+        message="Log an activity or share a moment — someone has to go first."
       />
     </div>
 

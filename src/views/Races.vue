@@ -335,7 +335,7 @@ const toggleBookmark = async (event) => {
       await axios.delete(`${API_URL}/race-bookmarks/${bmId}`)
     } catch {
       bookmarkedIds.value.add(extId)
-      showToast('Failed to remove bookmark. Try again.', 'error')
+      showToast("Bookmark didn't remove. Try again.", 'error')
     }
   } else {
     bookmarkedIds.value = new Set([...bookmarkedIds.value, extId])
@@ -361,7 +361,7 @@ const toggleBookmark = async (event) => {
       bookmarkIdMap.value = { ...bookmarkIdMap.value, [extId]: data.id }
     } catch {
       bookmarkedIds.value = new Set([...bookmarkedIds.value].filter(x => x !== extId))
-      showToast('Failed to bookmark race. Try again.', 'error')
+      showToast("Didn't bookmark. Try again.", 'error')
     }
   }
 }

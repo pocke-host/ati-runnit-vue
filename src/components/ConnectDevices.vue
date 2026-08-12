@@ -167,7 +167,7 @@
   <ConfirmModal
     v-model="showDisconnectConfirm"
     title="Disconnect Integration"
-    :body="`Disconnect ${disconnectLabels[pendingDisconnect] || ''}? New activities will no longer sync automatically.`"
+    :body="`Disconnect ${disconnectLabels[pendingDisconnect] || ''}? Nothing new syncs in until you reconnect.`"
     confirm-label="Disconnect"
     :danger="true"
     @confirm="doDisconnect"

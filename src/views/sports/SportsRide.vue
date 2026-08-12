@@ -4,7 +4,7 @@
       <div class="container-xxl">
         <div class="row align-items-center g-4">
           <div class="col-12 col-lg-6">
-            <p class="eyebrow text-uppercase fw-semibold mb-2">Sport module</p>
+            <p class="eyebrow text-uppercase fw-semibold mb-2">Built For</p>
             <h1 class="display-5 fw-bold mb-2">Cycling</h1>
             <p class="lead mb-4">
               Stack miles, chase PRs, and repeat the routes worth repeating.

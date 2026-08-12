@@ -79,7 +79,7 @@
               </div>
               <div v-else-if="notifications.length === 0" class="notif-empty">
                 <i class="bi bi-bell"></i>
-                <p>No notifications yet</p>
+                <p>Quiet in here. Go earn some noise.</p>
               </div>
               <div v-else class="notif-list">
                 <div

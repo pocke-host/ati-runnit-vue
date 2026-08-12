@@ -423,7 +423,7 @@
   <ConfirmModal
     v-model="showDeleteWorkoutConfirm"
     title="Remove Workout"
-    body="This will remove the workout from your calendar."
+    body="Off the calendar. Gone."
     confirm-label="Remove"
     :danger="true"
     @confirm="doDeleteEvent"

@@ -87,7 +87,7 @@ async function accept() {
     joined.value = true
     showToast(`You're now training with ${data.coach.displayName}.`, 'success')
   } catch (err) {
-    errorMsg.value = err.response?.data?.error || 'Failed to join — please try again.'
+    errorMsg.value = err.response?.data?.error || "Didn't join. Try again."
   } finally {
     accepting.value = false
   }

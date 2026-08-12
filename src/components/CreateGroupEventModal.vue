@@ -142,7 +142,7 @@ async function submit() {
     emit('created', created)
     emit('close')
   } catch (e) {
-    error.value = e?.response?.data?.error || 'Failed to create event.'
+    error.value = e?.response?.data?.error || "Event didn't create."
   } finally {
     saving.value = false
   }

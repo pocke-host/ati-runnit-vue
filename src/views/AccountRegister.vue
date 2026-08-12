@@ -279,7 +279,7 @@ const initGoogleSignIn = () => {
 const onSocial = (provider) => {
   if (provider === 'google') {
     if (!window.google?.accounts?.id) {
-      googleError.value = 'Google Sign-In is loading, please try again.'
+      googleError.value = 'Google Sign-In is still loading — give it a second and try again.'
       return
     }
     googleLoading.value = true

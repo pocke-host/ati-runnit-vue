@@ -132,13 +132,13 @@
 
           <div v-else-if="activitiesError" class="tab-empty">
             <i class="bi bi-wifi-off"></i>
-            <p>Couldn't load activities.</p>
+            <p>Activities wouldn't load.</p>
             <button class="btn btn-outline btn-sm mt-2" @click="loadActivities()">Retry</button>
           </div>
 
           <div v-else-if="profileActivities.length === 0" class="tab-empty">
             <i class="bi bi-activity"></i>
-            <p>No activities logged yet.</p>
+            <p>Nothing logged yet.</p>
           </div>
 
           <div v-else class="activities-grid">
@@ -188,7 +188,7 @@
 
           <div v-else-if="moments.length === 0" class="tab-empty">
             <i class="bi bi-camera"></i>
-            <p>No moments shared yet.</p>
+            <p>No moments posted yet.</p>
           </div>
 
           <div v-else class="moments-grid">
@@ -216,7 +216,7 @@
 
           <div v-else-if="profileBadges.filter(b => b.earned).length === 0 && !isOwnProfile" class="tab-empty">
             <i class="bi bi-trophy"></i>
-            <p>No badges earned yet.</p>
+            <p>No badges on the board yet.</p>
           </div>
 
           <div v-else class="badges-grid">
@@ -268,7 +268,7 @@
 
           <div v-else-if="profileEvents.length === 0" class="tab-empty">
             <i class="bi bi-collection"></i>
-            <p>No multisport events yet.</p>
+            <p>No multisport events on the calendar yet.</p>
             <router-link v-if="isOwnProfile" to="/feed" class="btn btn-primary mt-2" style="font-size:.78rem">
               Create Event
             </router-link>
@@ -304,7 +304,7 @@
           </div>
           <div v-else-if="!personalRecords || !hasAnyRecord" class="tab-empty">
             <i class="bi bi-trophy"></i>
-            <p>No personal records yet. Log races or time trials to set PRs.</p>
+            <p>No PRs on the board yet. Race it or time-trial it to claim one.</p>
           </div>
           <div v-else class="records-grid">
             <div class="pr-card" v-if="personalRecords.best_5k">
@@ -581,7 +581,7 @@ const loadMoments = async () => {
     const { data } = await axios.get(`${API_URL}/users/${profileId.value}/moments`, { headers: getAuthHeaders() })
     moments.value = data.content || data || []
   } catch (err) {
-    showToast(err.response?.data?.error || 'Failed to load moments.', 'error')
+    showToast(err.response?.data?.error || "Moments didn't load.", 'error')
     moments.value = []
   } finally {
     momentsLoading.value = false
@@ -599,7 +599,7 @@ const loadFollowStatus = async () => {
       const { data } = await axios.get(`${API_URL}/follow/following`, { headers: getAuthHeaders() })
       following.value = (Array.isArray(data) ? data : []).some(u => String(u.id) === String(profileId.value))
     } catch {
-      showToast('Could not load follow status.', 'error')
+      showToast("Couldn't check follow status.", 'error')
     }
   }
 }
@@ -623,7 +623,7 @@ const toggleFollow = async () => {
       })
     }
   } catch (err) {
-    showToast(err.response?.data?.error || 'Failed to update follow. Try again.', 'error')
+    showToast(err.response?.data?.error || "Follow didn't go through. Try again.", 'error')
   } finally {
     followLoading.value = false
   }

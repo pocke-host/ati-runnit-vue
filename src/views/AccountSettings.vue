@@ -198,7 +198,7 @@
 
           <div class="settings-card">
             <!-- Contact list -->
-            <div v-if="contacts.length === 0" class="contact-empty">No emergency contacts added.</div>
+            <div v-if="contacts.length === 0" class="contact-empty">No emergency contacts yet.</div>
             <div v-else class="contact-list">
               <div v-for="c in contacts" :key="c.id" class="contact-row">
                 <div class="contact-info">
@@ -399,7 +399,7 @@ const saveProfile = async () => {
     authStore.setAuth({ ...user.value, displayName: displayName.value.trim(), ...data })
     showProfileStatus('Profile updated!')
   } catch {
-    showProfileStatus('Failed to update profile.', 'error')
+    showProfileStatus("Profile didn't save. Try again.", 'error')
   } finally {
     savingProfile.value = false
   }
@@ -447,7 +447,7 @@ const addContact = async () => {
     newContact.value = { name: '', phone: '', email: '' }
     showContactStatus('Contact added.')
   } catch {
-    showContactStatus('Failed to add contact.', 'error')
+    showContactStatus("Contact didn't save. Try again.", 'error')
   } finally {
     addingContact.value = false
   }
@@ -458,7 +458,7 @@ const removeContact = async (id) => {
     await axios.delete(`${API_URL}/emergency-contacts/${id}`, { headers: getAuthHeaders() })
     contacts.value = contacts.value.filter(c => c.id !== id)
   } catch {
-    showContactStatus('Failed to remove contact.', 'error')
+    showContactStatus("Contact didn't remove. Try again.", 'error')
   }
 }
 
@@ -493,7 +493,7 @@ const changePassword = async () => {
     confirmPassword.value = ''
     showPasswordStatus('Password updated.')
   } catch (err) {
-    const msg = err.response?.data?.error || 'Failed to update password. Check your current password.'
+    const msg = err.response?.data?.error || "Password didn't update. Double-check your current one."
     showPasswordStatus(msg, 'error')
   } finally {
     savingPassword.value = false
@@ -503,7 +503,7 @@ const changePassword = async () => {
 /* ── Unsaved display-name guard ── */
 onBeforeRouteLeave(() => {
   if (displayName.value !== user.value?.displayName) {
-    return window.confirm('You have unsaved changes to your display name. Leave anyway?')
+    return window.confirm('Your display name change is unsaved. Leave anyway?')
   }
 })
 

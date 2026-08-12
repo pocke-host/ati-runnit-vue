@@ -6,7 +6,7 @@
     <div class="heatmap-controls">
       <div class="heatmap-title">Activity Heatmap</div>
       <div class="heatmap-count" v-if="pointCount > 0">{{ pointCount }} activities plotted</div>
-      <div class="heatmap-empty" v-else-if="!loading">No activity data yet</div>
+      <div class="heatmap-empty" v-else-if="!loading">No activity on the map yet.</div>
       <div class="heatmap-loading" v-if="loading">
         <span class="spin"></span> Loading…
       </div>

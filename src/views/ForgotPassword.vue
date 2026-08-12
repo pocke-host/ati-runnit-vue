@@ -85,7 +85,7 @@ const submit = async () => {
     submittedEmail.value = email.value
     sent.value = true
   } catch (e) {
-    error.value = e?.response?.data?.error || "Something went wrong. Try again."
+    error.value = e?.response?.data?.error || "Didn't go through. Try again."
   } finally {
     loading.value = false
   }

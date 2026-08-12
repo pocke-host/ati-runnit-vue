@@ -36,7 +36,7 @@ export const useDMStore = defineStore('dm', () => {
       conversations.value = data
       saveConvCache(data)
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to load conversations'
+      error.value = err.response?.data?.error || "Conversations didn't load"
       if (!conversations.value.length) conversations.value = []
     } finally {
       loading.value = false

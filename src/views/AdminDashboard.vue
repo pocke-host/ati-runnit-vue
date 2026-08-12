@@ -86,7 +86,7 @@
               <td class="col-date">{{ formatDate(user.createdAt) }}</td>
             </tr>
             <tr v-if="!users.length && !loading">
-              <td colspan="7" class="empty-row">No users found.</td>
+              <td colspan="7" class="empty-row">No matches.</td>
             </tr>
           </tbody>
         </table>
@@ -146,7 +146,7 @@ const fetchUsers = async () => {
   } catch (e) {
     error.value = e?.response?.status === 403
       ? 'Access denied — admin role required.'
-      : 'Failed to load users.'
+      : "Users didn't load."
   } finally {
     loading.value = false
   }
@@ -173,7 +173,7 @@ const changeRole = async (user, newRole) => {
     if (idx !== -1) users.value[idx] = { ...users.value[idx], role: data.role }
     await fetchStats()
   } catch {
-    error.value = 'Failed to update role.'
+    error.value = "Role didn't update."
   } finally {
     updatingId.value = null
   }

@@ -216,7 +216,7 @@
     <div v-if="deleteTarget" class="modal-backdrop" @click.self="deleteTarget = null">
       <div class="modal-box">
         <h3 class="modal-title">Delete workout?</h3>
-        <p class="modal-sub">This cannot be undone.</p>
+        <p class="modal-sub">No undo on this one.</p>
         <div class="modal-actions">
           <button class="btn-cancel" @click="deleteTarget = null">Cancel</button>
           <button class="btn-confirm-delete" @click="doDelete">Delete</button>
@@ -229,7 +229,7 @@
     <div v-if="loading" class="loading-state">
       <div class="spinner-border spinner-border-sm me-2"></div> Loading plan…
     </div>
-    <div v-else class="loading-state">Plan not found.</div>
+    <div v-else class="loading-state">Can't find that plan.</div>
   </main>
 </template>
 
