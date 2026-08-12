@@ -28,7 +28,7 @@
 
     <div class="live-not-found" v-if="notFound">
       <i class="bi bi-geo-alt-fill" style="font-size:2rem;color:#ccc"></i>
-      <p>This live share link is no longer active or does not exist.</p>
+      <p>This link's gone cold. The share ended, or never existed.</p>
     </div>
 
     <div class="live-loading" v-if="loading && !share && !notFound">

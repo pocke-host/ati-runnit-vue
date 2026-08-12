@@ -47,11 +47,11 @@
       <!-- Roster Tab -->
       <template v-else>
         <div v-if="loading" class="empty-state">
-          <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+          <div class="spinner-border spinner-border-sm me-2"></div> Pulling up your roster…
         </div>
         <div v-else-if="athletes.length === 0" class="empty-state">
           <i class="bi bi-people empty-icon"></i>
-          <p>No athletes on your roster yet.</p>
+          <p>Roster's empty — for now.</p>
         </div>
         <div v-else class="accordion-list">
           <div v-for="athlete in athletes" :key="athlete.id" class="accordion-item">
@@ -74,7 +74,7 @@
 
             <div v-if="expanded.includes(athlete.id)" class="accordion-body">
               <div v-if="!athletePlans[athlete.id]" class="plan-loading">
-                <div class="spinner-border spinner-border-sm me-2"></div> Loading plans...
+                <div class="spinner-border spinner-border-sm me-2"></div> Pulling up plans…
               </div>
               <template v-else>
                 <div v-if="athletePlans[athlete.id].length === 0" class="no-plans">Nothing assigned yet.</div>

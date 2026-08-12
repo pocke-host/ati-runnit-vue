@@ -286,7 +286,7 @@ const onSocial = (provider) => {
     window.google.accounts.id.prompt((notification) => {
       if (notification.isNotDisplayed()) {
         googleLoading.value = false
-        googleError.value = 'Google Sign-In unavailable. Please use email or try again.'
+        googleError.value = "Google Sign-In's down. Use email instead."
       }
       if (notification.isDismissedMoment() && notification.getDismissedReason() !== 'credential_returned') {
         googleLoading.value = false

@@ -172,7 +172,7 @@ const submit = async () => {
     })
     done.value = true
   } catch (e) {
-    error.value = e?.response?.data?.error || 'This link may have expired. Please request a new one.'
+    error.value = e?.response?.data?.error || 'This link\'s expired. Request a new one.'
   } finally {
     loading.value = false
   }

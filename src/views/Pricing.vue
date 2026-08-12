@@ -32,7 +32,7 @@
               <li><b class="check">✓</b>&nbsp; Basic stats</li>
               <li><b class="check">✓</b>&nbsp; Apple Health sync</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--outline">Get Started</router-link>
+            <router-link to="/waitlist" class="btn-plan btn-plan--outline">Start Free</router-link>
           </div>
 
           <!-- Pro — featured -->
@@ -53,7 +53,7 @@
               <li><b class="check">✓</b>&nbsp; PR tracking</li>
             </ul>
             <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
-              {{ checkoutLoading === 'premium' ? 'Loading…' : planLabel('premium') }}
+              {{ checkoutLoading === 'premium' ? 'Redirecting…' : planLabel('premium') }}
             </button>
           </div>
 
@@ -73,7 +73,7 @@
               <li><b class="check">✓</b>&nbsp; Early features</li>
             </ul>
             <button class="btn-plan btn-plan--outline" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
-              {{ checkoutLoading === 'duo' ? 'Loading…' : planLabel('duo') }}
+              {{ checkoutLoading === 'duo' ? 'Redirecting…' : planLabel('duo') }}
             </button>
           </div>
 
@@ -85,7 +85,7 @@
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
       <p class="cta-sub">Start free. Upgrade when your training does.</p>
-      <router-link to="/waitlist" class="btn-pill-paper">Get Started</router-link>
+      <router-link to="/waitlist" class="btn-pill-paper">Start Free</router-link>
     </section>
 
   </main>

@@ -182,7 +182,7 @@ const handleGoogleSignIn = () => {
       if (notification.isNotDisplayed() || (notification.isDismissedMoment() && notification.getDismissedReason() !== 'credential_returned')) {
         googleLoading.value = false
         if (notification.isNotDisplayed()) {
-          googleError.value = 'Google Sign-In unavailable. Please use email or try again.'
+          googleError.value = "Google Sign-In's down. Use email instead."
         }
       }
     })
@@ -256,7 +256,7 @@ const onSubmit = async (e) => {
   error.value = ''
 
   if (!email.value || !password.value) {
-    error.value = 'Please enter your email and password.'
+    error.value = 'Email and password, both required.'
     return
   }
 

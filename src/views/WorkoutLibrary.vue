@@ -189,7 +189,7 @@
           </div>
           <div class="form-field">
             <label class="field-label">Select Athletes</label>
-            <div v-if="!athletes.length" class="assign-empty">No athletes on your roster yet.</div>
+            <div v-if="!athletes.length" class="assign-empty">Nobody on your roster yet.</div>
             <div v-else class="assign-list">
               <label v-for="ath in athletes" :key="ath.id" class="assign-athlete">
                 <input type="checkbox" v-model="assignedAthleteIds" :value="ath.id" class="assign-check" />

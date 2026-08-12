@@ -221,9 +221,9 @@
     <!-- ── Step 7: City ── -->
     <div v-else-if="step === 7" class="step-container">
       <button class="btn-back standalone" @click="back">← Back</button>
-      <h2 class="step-question">Where do<br>you run?</h2>
+      <h2 class="step-question">Where do<br>you train?</h2>
       <p style="color:#767676;font-size:0.9rem;margin:-24px 0 28px;font-weight:300;">
-        We'll use this to connect you with local run crews and events.
+        This connects you with crews and events near you.
       </p>
       <div class="tile-grid" style="grid-template-columns:1fr;gap:0;">
         <input
