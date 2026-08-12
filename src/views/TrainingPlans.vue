@@ -818,7 +818,7 @@ async function confirmCreate() {
     availableDays.value = new Set(['Monday', 'Wednesday', 'Thursday', 'Saturday', 'Sunday'])
     router.push(`/plans/${created.id}`)
   } catch {
-    showStatus('Failed to create plan. Try again.', 'error')
+    showStatus("Plan didn't create. Try again.", 'error')
   } finally {
     creating.value = false
   }

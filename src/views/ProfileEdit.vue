@@ -166,7 +166,7 @@
         <div class="danger-row">
           <div>
             <div class="danger-title">Delete Account</div>
-            <div class="danger-sub">Permanently delete your account and all data. This cannot be undone.</div>
+            <div class="danger-sub">Gone for good — account and everything on it. No undo.</div>
           </div>
           <button class="btn-danger" @click="confirmDelete" :disabled="deleting">
             <span v-if="deleting" class="btn-spinner"></span>
@@ -183,7 +183,7 @@
   <ConfirmModal
     v-model="showDeleteAccountConfirm"
     title="Delete Account"
-    body="This will permanently delete your account and all your data. There is no going back."
+    body="Gone for good — your account and everything on it. No undo."
     confirm-label="Yes, Delete My Account"
     :danger="true"
     @confirm="doDeleteAccount"
@@ -192,7 +192,7 @@
   <ConfirmModal
     v-model="showUnsavedConfirm"
     title="Unsaved Changes"
-    body="You have unsaved changes. Leave anyway?"
+    body="Changes aren't saved yet. Leave anyway?"
     confirm-label="Leave"
     :danger="true"
     @confirm="confirmLeave"
@@ -282,7 +282,7 @@ const removePhoto = async () => {
     })
     authStore.updateAvatar(null)
   } catch {
-    uploadError.value = 'Failed to remove photo.'
+    uploadError.value = "Photo didn't remove. Try again."
   } finally {
     uploadLoading.value = false
   }

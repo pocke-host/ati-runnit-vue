@@ -237,12 +237,12 @@ const placeMarkers = (mapInst, coordinates) => {
 // ── Map init ─────────────────────────────────────────
 const initializeMap = () => {
   if (!props.activity.routePolyline) {
-    error.value = 'No route data available'
+    error.value = 'No route on record for this one.'
     loading.value = false
     return
   }
   if (!MAPBOX_TOKEN) {
-    error.value = 'Map unavailable'
+    error.value = 'Map\'s down. The stats still are what they are.'
     loading.value = false
     return
   }
@@ -252,7 +252,7 @@ const initializeMap = () => {
     const coordinates = decodePolyline(props.activity.routePolyline)
 
     if (!coordinates.length) {
-      error.value = 'Invalid route data'
+      error.value = 'This route didn\'t save right.'
       loading.value = false
       return
     }
@@ -284,11 +284,11 @@ const initializeMap = () => {
     })
 
     map.value.on('error', () => {
-      error.value = 'Failed to load map'
+      error.value = 'Map wouldn\'t load.'
       loading.value = false
     })
   } catch {
-    error.value = 'Failed to initialize map'
+    error.value = 'Map wouldn\'t start.'
     loading.value = false
   }
 }

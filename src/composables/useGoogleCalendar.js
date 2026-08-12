@@ -39,7 +39,7 @@ export function useGoogleCalendar() {
       const { data } = await axios.get(`${BASE}/connect`, { headers: getAuthHeaders() })
       window.location.href = data.url
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to connect Google Calendar'
+      error.value = err.response?.data?.error || "Google Calendar didn't connect"
     }
   }
 
@@ -109,7 +109,7 @@ export function useGoogleCalendar() {
       importedEvents.value = await listEvents(range)
       hasLoadedEvents.value = true
     } catch (err) {
-      error.value = err.response?.data?.error || 'Failed to load Google Calendar events'
+      error.value = err.response?.data?.error || "Calendar events didn't load"
     } finally {
       syncing.value = false
     }

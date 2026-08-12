@@ -150,7 +150,7 @@
                 <router-link :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="db2-next-cta">View Plan →</router-link>
               </template>
               <div v-else class="db2-next-empty">
-                <div class="db2-next-empty-txt">No active plan</div>
+                <div class="db2-next-empty-txt">No plan running</div>
                 <router-link to="/plans" class="db2-next-cta">Browse Plans →</router-link>
               </div>
             </div>
@@ -1094,7 +1094,7 @@
 
             <div v-else-if="searchQuery" class="friends-empty">
               <i class="bi bi-search" style="font-size: 3rem; color: rgba(15,18,16,0.30);"></i>
-              <p>No users found</p>
+              <p>No matches.</p>
             </div>
 
             <div v-else class="friends-empty">

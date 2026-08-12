@@ -60,7 +60,7 @@
 
         <div v-else-if="!activities.length" class="list-empty">
           <i class="bi bi-map" style="font-size:2rem;color:#E7DFCE"></i>
-          <p>No activities found nearby.<br>Try increasing the radius or changing sport.</p>
+          <p>Nothing nearby.<br>Widen the radius or switch sports.</p>
         </div>
 
         <template v-else>

@@ -88,7 +88,7 @@
           <div class="kit-cell">
             <div class="kit-num">10</div>
             <div class="kit-name">Structured Plans</div>
-            <div class="kit-desc">Create structured plans seamlessly and sync with your calendar</div>
+            <div class="kit-desc">Build structured plans, then watch them land on your calendar</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">11</div>

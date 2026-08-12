@@ -187,7 +187,7 @@ async function save() {
     })
     emit('saved', data)
   } catch (e) {
-    error.value = e.response?.data?.error || 'Failed to save event.'
+    error.value = e.response?.data?.error || "Event didn't save."
   } finally {
     saving.value = false
   }

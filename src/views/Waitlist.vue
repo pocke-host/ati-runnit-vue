@@ -156,7 +156,7 @@ async function submit() {
     })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
-      serverError.value = data.error || 'Something went wrong. Try again.'
+      serverError.value = data.error || "Didn't go through. Try again."
       return
     }
     submitted.value = true

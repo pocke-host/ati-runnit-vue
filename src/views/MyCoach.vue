@@ -21,7 +21,7 @@
       <template v-else-if="!coach && !pendingCoachName">
         <div class="no-coach-card">
           <div class="no-coach-icon"><i class="bi bi-person-lines-fill"></i></div>
-          <h2 class="no-coach-title">You don't have a coach yet</h2>
+          <h2 class="no-coach-title">Flying solo — for now</h2>
           <p class="no-coach-desc">
             Find a certified coach to build your plan, review every workout, and keep you accountable.
           </p>

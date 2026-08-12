@@ -5,7 +5,7 @@
       <div class="container-xxl">
         <div class="row align-items-center g-5">
           <div class="col-12 col-lg-6">
-            <p class="eyebrow text-uppercase fw-semibold mb-2">Sport module</p>
+            <p class="eyebrow text-uppercase fw-semibold mb-2">Built For</p>
             <h1 class="display-5 fw-bold mb-3">Running</h1>
             <p class="lead mb-4">
               Log the miles. Watch your trends. Stack wins.
@@ -130,7 +130,7 @@
       <div class="container-xxl text-center">
         <h2 class="fw-bold mb-3">Ready to train with us?</h2>
         <p class="text-muted mb-4">Create a free account and start tracking.</p>
-        <router-link to="/signup" class="btn btn-primary btn-lg">Get Started</router-link>
+        <router-link to="/signup" class="btn btn-primary btn-lg">Create Account</router-link>
       </div>
     </section>
   </main>

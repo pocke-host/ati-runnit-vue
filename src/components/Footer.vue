@@ -119,7 +119,7 @@ async function submitEmail() {
     })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
-      errorMsg.value = data.error || 'Something went wrong. Try again.'
+      errorMsg.value = data.error || "Didn't go through. Try again."
       return
     }
     submitted.value = true

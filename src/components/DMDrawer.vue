@@ -32,8 +32,8 @@
 
           <div v-else-if="dmStore.conversations.length === 0" class="dm-empty">
             <i class="bi bi-chat-dots"></i>
-            <p>No conversations yet.</p>
-            <p class="dm-empty-sub">Tap the pencil icon to start one.</p>
+            <p>Nothing here yet.</p>
+            <p class="dm-empty-sub">Tap the pencil icon and start one.</p>
           </div>
 
           <div v-else class="dm-list">
@@ -77,7 +77,7 @@
 
           <div v-else-if="composeQuery && dmStore.composeResults.length === 0" class="dm-empty">
             <i class="bi bi-person-x"></i>
-            <p>No users found.</p>
+            <p>No matches.</p>
           </div>
 
           <div v-else class="dm-list">

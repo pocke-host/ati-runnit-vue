@@ -262,7 +262,7 @@
         <div class="lt-sos-title"><i class="bi bi-exclamation-triangle-fill"></i> SEND SOS ALERT</div>
         <p class="lt-sos-sub">This will sound an alert and send an email to your emergency contacts with your current location.</p>
         <div v-if="sosContacts.length === 0" class="lt-sos-no-contacts">
-          No emergency contacts found. Add contacts in Settings → Safety.
+          No emergency contacts yet. Add them in Settings → Safety.
         </div>
         <div v-else class="lt-sos-contacts">
           <div v-for="c in sosContacts" :key="c.id" class="lt-sos-contact">
@@ -788,7 +788,7 @@ const stopTracking = async () => {
       ? 'Session expired — log back in and tap Finish to retry.'
       : status === 413
         ? 'Route data too large to upload. Tap Finish to retry.'
-        : 'Failed to save. Tap Finish again to retry.'
+        : 'Didn\'t save. Tap Finish again to retry.'
     saving.value = false
     // Draft preserved in localStorage — no data loss on failure.
     // Tracking stays paused so retries use the same frozen snapshot.
