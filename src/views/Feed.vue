@@ -160,7 +160,15 @@
 
               <!-- Route map card -->
               <div class="gr-route-card">
-                <svg viewBox="0 0 600 260" preserveAspectRatio="none" class="gr-route-svg">
+                <img
+                  v-if="item.routePolyline && !mapImgFailed.has(item.id)"
+                  :src="staticMapUrl(item.routePolyline)"
+                  loading="lazy"
+                  alt=""
+                  class="gr-route-img"
+                  @error="mapImgFailed.add(item.id)"
+                />
+                <svg v-else viewBox="0 0 600 260" preserveAspectRatio="none" class="gr-route-svg">
                   <g stroke="#dcd3c1" stroke-width="1" fill="none">
                     <path d="M0,65 H600"/><path d="M0,130 H600"/><path d="M0,195 H600"/>
                     <path d="M150,0 V260"/><path d="M300,0 V260"/><path d="M450,0 V260"/>
@@ -402,6 +410,18 @@ import CreateEventForm from '@/components/CreateEventForm.vue'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
+const MAPBOX_STYLE = 'quinn-runnit/cmml6ynyy000701suetifc5y0' // same branded style as RouteViewer.vue
+
+// Real route thumbnail for the feed card — a static image, not a live map,
+// since a single feed page can hold 100+ cards and instantiating that many
+// live Mapbox GL contexts would be a real performance problem (see RouteViewer.vue
+// for the live version used on the activity detail page).
+const mapImgFailed = ref(new Set())
+function staticMapUrl(routePolyline) {
+  const path = `path-3+2A55F5-0.9(${encodeURIComponent(routePolyline)})`
+  return `https://api.mapbox.com/styles/v1/${MAPBOX_STYLE}/static/${path}/auto/800x380@2x?padding=40&access_token=${MAPBOX_TOKEN}`
+}
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -1090,6 +1110,13 @@ onUnmounted(() => {
   inset: 0;
   width: 100%;
   height: 100%;
+}
+.gr-route-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .gr-route-path {
   animation: rkDraw 2.4s ease-out 0.15s forwards;
