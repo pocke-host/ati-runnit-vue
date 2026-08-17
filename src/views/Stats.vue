@@ -198,6 +198,23 @@
         </div>
       </section>
 
+      <!-- SPORT FITNESS -->
+      <section id="stats-sport-fitness" class="section" v-if="sportFitness.length">
+        <div class="section-header">
+          <span class="section-kicker">Sport Fitness</span>
+        </div>
+        <div class="sport-fitness-row">
+          <FitnessGauge
+            v-for="s in sportFitness"
+            :key="s.key"
+            :score="s.fitnessScore"
+            :label="s.label"
+            :stat-label="s.statLabel"
+            :stat-value="s.statValue"
+          />
+        </div>
+      </section>
+
       <!-- TRAINING LOAD -->
       <section id="stats-load" class="section">
         <div class="section-header-row" style="margin-bottom:20px">
@@ -405,10 +422,12 @@ import { usePRStore } from '@/stores/pr'
 import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
+import { useFitnessLoad } from '@/composables/useFitnessLoad'
 import { useArchetype } from '@/composables/useArchetype'
 import { useGrowthTimeline } from '@/composables/useGrowthTimeline'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import FitnessGauge from '@/components/FitnessGauge.vue'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 
 Chart.register(...registerables)
@@ -429,6 +448,7 @@ const {
   formatDurationClock,
   formatPace,
   formatElevation,
+  formatSpeed,
 } = useUnits()
 
 const weeklyChartRef  = ref(null)
@@ -545,36 +565,8 @@ const performanceMetrics = computed(() => {
   const today = new Date()
   today.setHours(23, 59, 59, 999)
   const dayMs = 86400000
-  const DAYS  = 90
 
-  const IF_BY_TYPE = {
-    RUN: 0.85, Running: 0.85,
-    BIKE: 0.75, Cycling: 0.75,
-    SWIM: 0.70, Swimming: 0.70,
-  }
-
-  // Daily TSS proxy: (hours × IF²) × 100
-  const dailyTss = new Array(DAYS).fill(0)
-  for (const a of acts) {
-    const daysAgo = Math.floor((today - new Date(a.performedAt)) / dayMs)
-    if (daysAgo >= 0 && daysAgo < DAYS) {
-      const ifFactor = IF_BY_TYPE[a.sportType] || 0.75
-      const tss = ((a.durationSeconds || 0) / 3600) * (ifFactor * ifFactor) * 100
-      dailyTss[DAYS - 1 - daysAgo] += tss
-    }
-  }
-
-  // EMA — CTL (42d) and ATL (7d) using industry-standard 2/(τ+1) smoothing
-  let ctl = 0, atl = 0
-  const ctlK = 2 / 43, atlK = 2 / 8
-  for (let i = 0; i < DAYS; i++) {
-    ctl = ctl * (1 - ctlK) + dailyTss[i] * ctlK
-    atl = atl * (1 - atlK) + dailyTss[i] * atlK
-  }
-
-  const fitnessScore = Math.min(100, Math.round(ctl))
-  const fatigueScore = Math.min(100, Math.round(atl))
-  const formScore    = Math.round(fitnessScore - fatigueScore)
+  const { fitnessScore, fatigueScore, formScore } = useFitnessLoad(acts)
 
   // Recent runs for VO2max + race predictions
   const recentRuns = acts
@@ -628,6 +620,37 @@ const performanceMetrics = computed(() => {
   const consistency = Math.round((activeWeeks / 12) * 100)
 
   return { fitnessScore, fatigueScore, formScore, vo2max, racePreds, consistency, ctl, atl }
+})
+
+// Per-sport fitness gauges — same CTL/EMA model as performanceMetrics, scoped
+// to one sport at a time. Only shown for sports the athlete has actually logged.
+const SPORT_DEFS = [
+  { key: 'RUN',  label: 'Run',  types: ['RUN', 'Running'] },
+  { key: 'BIKE', label: 'Bike', types: ['BIKE', 'Cycling'] },
+  { key: 'SWIM', label: 'Swim', types: ['SWIM', 'Swimming'] },
+]
+const sportFitness = computed(() => {
+  const acts = activities.value || []
+  return SPORT_DEFS
+    .map(def => {
+      const sportActs = acts.filter(a => def.types.includes(a.sportType))
+      if (!sportActs.length) return null
+      const { fitnessScore } = useFitnessLoad(acts, def.types)
+
+      let statLabel = '', statValue = ''
+      const totalDist = sportActs.reduce((s, a) => s + (a.distanceMeters || 0), 0)
+      const totalDur  = sportActs.reduce((s, a) => s + (a.durationSeconds || 0), 0)
+      if (def.key === 'BIKE') {
+        statLabel = 'Avg Speed'
+        statValue = totalDur ? formatSpeed((totalDist / 1000) / (totalDur / 3600)) : '—'
+      } else {
+        statLabel = 'Avg Pace'
+        statValue = totalDist ? formatPace(totalDur / 60 / (totalDist / 1000)) : '—'
+      }
+
+      return { key: def.key, label: def.label, fitnessScore, statLabel, statValue }
+    })
+    .filter(Boolean)
 })
 
 const formColor = computed(() => {
@@ -1360,6 +1383,18 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+}
+.sport-fitness-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 24px;
+  border: 2px solid #16130F;
+  background: #fff;
+  padding: 28px 18px;
+}
+@media (max-width: 640px) {
+  .sport-fitness-row { gap: 16px; padding: 20px 12px; }
 }
 .fitness-metric-card {
   border: 2px solid #16130F;

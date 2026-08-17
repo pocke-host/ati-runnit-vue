@@ -12,6 +12,10 @@
             <button class="nav-btn" @click="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button>
           </div>
           <div class="cal-hero-actions">
+            <div class="view-toggle">
+              <button :class="['view-toggle-btn', { active: viewMode === 'planner' }]" @click="viewMode = 'planner'">Planner</button>
+              <button :class="['view-toggle-btn', { active: viewMode === 'heatmap' }]" @click="viewMode = 'heatmap'">Heatmap</button>
+            </div>
             <button class="hero-btn-ghost" @click="goToday">Today</button>
             <router-link to="/calendar/sync" class="hero-btn-ghost"><i class="bi bi-google me-1"></i>Google Calendar</router-link>
             <button class="hero-btn-ai" @click="openWeekPlan">
@@ -19,10 +23,19 @@
             </button>
           </div>
         </div>
-        <div class="cal-legend">
+        <div v-if="viewMode === 'planner'" class="cal-legend">
           <span v-for="(color, type) in legendColors" :key="type" class="legend-item">
             <span class="legend-dot" :style="{ background: color }"></span>{{ type.replace('_', ' ') }}
           </span>
+        </div>
+        <div v-else class="cal-legend heatmap-legend">
+          <span class="heatmap-legend-label">Less</span>
+          <span class="legend-cell heatmap-l0"></span>
+          <span class="legend-cell heatmap-l1"></span>
+          <span class="legend-cell heatmap-l2"></span>
+          <span class="legend-cell heatmap-l3"></span>
+          <span class="legend-cell heatmap-l4"></span>
+          <span class="heatmap-legend-label">More</span>
         </div>
       </div>
     </section>
@@ -47,6 +60,7 @@
               { 'cal-cell-today': day.isToday },
               { 'cal-cell-selected': day.fullDate === selectedDate },
               { 'cal-cell-past': day.isPast && !day.isToday },
+              viewMode === 'heatmap' ? `heatmap-l${day.heatmapLevel < 0 ? 'x' : day.heatmapLevel}` : '',
             ]"
             @click="selectDay(day.fullDate)"
           >
@@ -55,6 +69,11 @@
               <span v-if="day.weather" class="cal-weather-icon" :title="day.weather.label">{{ day.weather.icon }}</span>
             </div>
 
+            <template v-if="viewMode === 'heatmap'">
+              <div v-if="day.activities.length" class="cal-heatmap-count">{{ day.activities.length }} logged</div>
+            </template>
+
+            <template v-else>
             <!-- Planned events (self + coach-assigned) -->
             <div
               v-for="ev in day.events"
@@ -107,6 +126,7 @@
               @click.stop="quickAdd(day.fullDate)"
               :title="'Add workout on ' + day.fullDate"
             >+</button>
+            </template>
           </div>
         </div>
       </div>
@@ -503,6 +523,7 @@ async function syncEventToGoogle(ev) {
   }
 }
 const selectedDate = ref(null)
+const viewMode = ref('planner') // 'planner' | 'heatmap'
 const aiSuggestion = ref(null)
 const aiLoading    = ref(false)
 const aiVariant    = ref(0)
@@ -555,6 +576,12 @@ const calDays = computed(() => {
   return days
 })
 
+// Same 5-step level thresholds as Stats.vue's training-log heatmap (Stats.vue:796)
+// — one color language for training volume across the whole app.
+function _heatmapLevel(km) {
+  return km === 0 ? 0 : km < 5 ? 1 : km < 10 ? 2 : km < 20 ? 3 : 4
+}
+
 function _makeDay(date, isCurrentMonth) {
   const fullDate = date.toISOString().slice(0, 10)
   const today    = new Date()
@@ -564,6 +591,8 @@ function _makeDay(date, isCurrentMonth) {
     ...events.value.filter(e => e.plannedDate === fullDate),
     ...coachEvents.value.filter(e => (e.scheduledDate || e.plannedDate) === fullDate).map(e => ({ ...e, source: 'COACH', plannedDate: fullDate }))
   ]
+  const dayActivities = (activities.value || []).filter(a => a.performedAt?.slice(0, 10) === fullDate)
+  const dayKm = dayActivities.reduce((s, a) => s + (a.distanceMeters || 0), 0) / 1000
   return {
     date: date.getDate(),
     fullDate,
@@ -571,11 +600,12 @@ function _makeDay(date, isCurrentMonth) {
     isToday: fullDate === todayStr,
     isPast:  date < new Date(todayStr),
     events:      allEvents,
-    activities:  (activities.value || []).filter(a => a.performedAt?.slice(0, 10) === fullDate),
+    activities:  dayActivities,
     races:       raceBookmarks.value.filter(r => r.raceDate === fullDate),
     groupEvents: groupEvents.value.filter(ge => ge.eventDatetime?.slice(0, 10) === fullDate),
     googleEvents: googleEvents.value.filter(ev => googleEventDate(ev) === fullDate),
     weather:     getWeatherForDate(fullDate),
+    heatmapLevel: isCurrentMonth ? _heatmapLevel(dayKm) : -1,
   }
 }
 
@@ -1118,6 +1148,40 @@ watch([currentYear, currentMonth], () => {
   border-radius: 50%;
   flex-shrink: 0;
 }
+.heatmap-legend { align-items: center; }
+.heatmap-legend-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.60);
+}
+.legend-cell {
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(251,246,236,0.25);
+}
+
+.view-toggle {
+  display: flex;
+  border: 2px solid rgba(251,246,236,0.35);
+}
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  color: rgba(251,246,236,0.6);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.view-toggle-btn + .view-toggle-btn { border-left: 2px solid rgba(251,246,236,0.35); }
+.view-toggle-btn.active { background: #2A55F5; color: #fff; }
+.view-toggle-btn:not(.active):hover { background: rgba(251,246,236,0.10); color: #FBF6EC; }
 
 /* BODY SPLIT */
 .cal-body {
@@ -1173,6 +1237,24 @@ watch([currentYear, currentMonth], () => {
 .cal-cell-other .cal-date-num { color: #C4BAA8; }
 .cal-cell-today { border-color: #16130F; border-width: 2px; background: #FBF6EC; }
 .cal-cell-today .cal-date-num { background: #16130F; color: #FBF6EC; }
+
+/* Heatmap view — same 5-step scale as Stats.vue's training-log heatmap */
+.cal-cell.heatmap-l0 { background: #EDE5D5; }
+.cal-cell.heatmap-l1 { background: rgba(42,85,245,0.25); }
+.cal-cell.heatmap-l2 { background: rgba(42,85,245,0.55); }
+.cal-cell.heatmap-l3 { background: #2A55F5; }
+.cal-cell.heatmap-l3 .cal-date-num,
+.cal-cell.heatmap-l4 .cal-date-num { color: #FBF6EC; }
+.cal-cell.heatmap-l4 { background: #16130F; }
+.cal-cell.heatmap-lx { background: rgba(251,246,236,0.5); }
+.cal-heatmap-count {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
 .cal-cell-selected { border-color: #2A55F5; border-width: 2px; background: #EEF1FF; }
 .cal-cell-past { opacity: 0.75; }
 
