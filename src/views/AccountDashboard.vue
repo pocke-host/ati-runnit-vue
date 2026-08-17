@@ -198,6 +198,34 @@
             <div class="db2-ring-sub">{{ formatDistance(monthlyDistanceMeters) }} this month</div>
           </div>
 
+          <!-- WEEKLY XP -->
+          <div class="db2-card db2-xp">
+            <div class="db2-eyebrow">Weekly XP</div>
+            <div class="db2-ring-wrap">
+              <svg viewBox="0 0 42 42" class="db2-ring-svg">
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EDE5D5" stroke-width="5"/>
+                <circle cx="21" cy="21" r="15.9" fill="none" stroke="#FFC53D" stroke-width="5"
+                  :stroke-dasharray="`${weeklyXP.pct} ${100 - weeklyXP.pct}`"/>
+              </svg>
+              <div class="db2-ring-pct">{{ weeklyXP.earned }}</div>
+            </div>
+            <div class="db2-ring-sub">{{ weeklyXP.earned }} / {{ weeklyXP.target }} XP</div>
+            <div class="db2-xp-stats">
+              <div class="db2-xp-stat">
+                <div class="db2-xp-stat-val">{{ weeklyXP.sessionsLabel }}</div>
+                <div class="db2-xp-stat-lbl">Sessions</div>
+              </div>
+              <div class="db2-xp-stat">
+                <div class="db2-xp-stat-val">{{ formatDuration(weekDuration) }}</div>
+                <div class="db2-xp-stat-lbl">Duration</div>
+              </div>
+              <div class="db2-xp-stat">
+                <div class="db2-xp-stat-val">{{ formatDistance(weekDistance) }}</div>
+                <div class="db2-xp-stat-lbl">Distance</div>
+              </div>
+            </div>
+          </div>
+
           <!-- TRAINING INSIGHTS -->
           <div class="db2-card db2-insights">
             <div class="db2-card-head db2-card-head--ink">
@@ -1636,6 +1664,45 @@ const weekDistance = computed(() =>
   weekCalendar.value.reduce((sum, d) =>
     sum + d.activities.reduce((s, a) => s + (a.distanceMeters || 0), 0), 0)
 )
+
+const weekDuration = computed(() =>
+  weekCalendar.value.reduce((sum, d) =>
+    sum + d.activities.reduce((s, a) => s + (a.durationSeconds || 0), 0), 0)
+)
+
+// This week's planned workouts from the active plan (same weeks/workouts shape
+// todayWorkout already reads — here we scan all 7 days instead of just today).
+const weekPlannedWorkouts = computed(() => {
+  const plan = fullActivePlan.value || activePlan.value
+  if (!plan?.weeks?.length || !plan.startDate) return []
+
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const start = new Date(plan.startDate); start.setHours(0, 0, 0, 0)
+  const daysDiff = Math.floor((today - start) / 86400000)
+  if (daysDiff < 0) return []
+
+  const weekNum = Math.floor(daysDiff / 7) + 1
+  const week = plan.weeks.find(w => (w.weekNumber ?? (plan.weeks.indexOf(w) + 1)) === weekNum)
+  return week?.workouts || []
+})
+
+// Hybrid XP: base points for anything logged this week, bonus for hitting a
+// prescribed workout from the active plan — works with or without a plan.
+const weeklyXP = computed(() => {
+  const loggedCount = weekActivities.value
+  const planned = weekPlannedWorkouts.value
+  const completedCount = planned.filter(w => w.isCompleted).length
+
+  const earned = loggedCount * 10 + completedCount * 15
+  const target = planned.length ? planned.length * 25 : 30
+
+  return {
+    earned,
+    target,
+    pct: Math.min(100, Math.round((earned / target) * 100)),
+    sessionsLabel: planned.length ? `${completedCount}/${planned.length}` : `${loggedCount}`,
+  }
+})
 
 const streakSubtitle = computed(() => {
   if (currentStreak.value === 0) return 'Start your streak!'
@@ -4257,6 +4324,38 @@ textarea.form-control{resize:vertical;min-height:72px}
   font-variant-numeric: tabular-nums;
   font-size: 0.7rem;
   color: #5A5348;
+}
+
+/* ── WEEKLY XP ── */
+.db2-xp { padding: 18px; display: flex; flex-direction: column; align-items: center; }
+.db2-xp-stats {
+  display: flex;
+  width: 100%;
+  margin-top: 14px;
+  border-top: 2px solid #E7DFCE;
+  padding-top: 12px;
+}
+.db2-xp-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.db2-xp-stat-val {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #16130F;
+}
+.db2-xp-stat-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8A8A8A;
 }
 
 /* ── TRAINING INSIGHTS ── */
