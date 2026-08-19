@@ -1299,6 +1299,13 @@
                 </button>
               </div>
               <button type="button" class="la-add-set" @click="addStrengthSet(exIdx)">+ Add Set</button>
+              <input
+                v-model="exercise.notes"
+                type="text"
+                class="la-input la-exercise-notes"
+                placeholder="Notes (optional) — e.g. left shoulder tight"
+                maxlength="255"
+              />
             </div>
             <button type="button" class="la-add-exercise" @click="addStrengthExercise">+ Add Exercise</button>
             <datalist id="common-exercises">
@@ -1538,7 +1545,7 @@ const COMMON_EXERCISES = [
 ]
 
 function addStrengthExercise() {
-  strengthExercises.value.push({ exerciseName: '', sets: [{ reps: null, weight: null, isWarmup: false }] })
+  strengthExercises.value.push({ exerciseName: '', notes: '', sets: [{ reps: null, weight: null, isWarmup: false }] })
 }
 function removeStrengthExercise(exIdx) {
   strengthExercises.value.splice(exIdx, 1)
@@ -2022,6 +2029,7 @@ const handleActivitySubmit = async () => {
         notes: f.notes || null,
         exercises: strengthExercises.value.map(ex => ({
           exerciseName: ex.exerciseName,
+          notes: ex.notes || null,
           sets: ex.sets.map(s => ({
             reps: s.reps,
             weightKg: s.weight ? (isImperial.value ? s.weight * 0.453592 : s.weight) : null,
