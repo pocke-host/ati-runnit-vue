@@ -17,6 +17,7 @@
       <div class="navbar-links" v-if="isAuthenticated && role !== 'coach'">
         <router-link to="/feed" class="nav-link-auth">Feed</router-link>
         <router-link to="/explore" class="nav-link-auth">Explore</router-link>
+        <router-link to="/friends" class="nav-link-auth">Friends</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
         <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
@@ -261,6 +262,10 @@
                   <router-link to="/clubs" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
                     <span>Clubs</span>
+                  </router-link>
+                  <router-link to="/friends" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="8.5" cy="8" r="3.2"/><path d="M2.5 20c0-3.2 2.7-5.5 6-5.5s6 2.3 6 5.5"/><path d="M16 4.2a3.2 3.2 0 0 1 0 6.2M18.5 14.6c2.3.5 3.5 2.4 3.5 5.4"/></svg>
+                    <span>Friends</span>
                   </router-link>
                   <router-link to="/challenges" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>

@@ -91,6 +91,13 @@ onMounted(() => {
     router.push(`/join-coach/${pendingInvite}?autoAccept=1`)
   }
 
+  // Resume a friend invite the user clicked before signing up/in
+  const pendingFriendInvite = sessionStorage.getItem('pending_friend_invite')
+  if (pendingFriendInvite && isAuthenticated.value && route.path !== `/join/${pendingFriendInvite}`) {
+    sessionStorage.removeItem('pending_friend_invite')
+    router.push(`/join/${pendingFriendInvite}?autoAccept=1`)
+  }
+
   // Backend warm-up
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
   fetch(`${API_URL}/health`, { method: 'GET' }).catch(() => {})
