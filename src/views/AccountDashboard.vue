@@ -699,7 +699,7 @@
               <button class="action-btn" @click="openActivityModal">
                 <i class="bi bi-plus-circle me-2"></i>Log Activity
               </button>
-              <button class="action-btn" @click="openFriendsModal">
+              <button class="action-btn" @click="goToFriends">
                 <i class="bi bi-people me-2"></i>Find Friends
               </button>
               <button class="action-btn" @click="openMomentModal">
@@ -1040,170 +1040,6 @@
       </div><!-- /.dash-mobile -->
     </div>
 
-    <!-- FIND FRIENDS MODAL -->
-    <div v-if="showFriendsModal" class="modal-overlay" @click="closeFriendsModal">
-      <div class="modal-card modal-large" @click.stop>
-        <div class="modal-header">
-          <h3>Find Friends</h3>
-          <button class="modal-close" @click="closeFriendsModal">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- Search Bar -->
-          <div class="friends-search">
-            <div class="search-input-wrapper">
-              <i class="bi bi-search search-icon"></i>
-              <input 
-                v-model="searchQuery" 
-                type="text" 
-                class="form-control search-input"
-                placeholder="Search by name or email..."
-                @input="handleSearch"
-              />
-            </div>
-          </div>
-
-          <!-- Tabs -->
-          <div class="friends-tabs">
-            <button 
-              :class="['friends-tab', {active: friendsTab === 'search'}]" 
-              @click="friendsTab = 'search'"
-            >
-              <i class="bi bi-search me-2"></i>Search
-            </button>
-            <button 
-              :class="['friends-tab', {active: friendsTab === 'following'}]" 
-              @click="friendsTab = 'following'"
-            >
-              <i class="bi bi-person-check me-2"></i>Following ({{ friendsCount }})
-            </button>
-            <button 
-              :class="['friends-tab', {active: friendsTab === 'followers'}]" 
-              @click="friendsTab = 'followers'"
-            >
-              <i class="bi bi-people me-2"></i>Followers ({{ followersCount }})
-            </button>
-          </div>
-
-          <!-- Search Results -->
-          <div v-if="friendsTab === 'search'" class="friends-list">
-            <div v-if="searchLoading" class="friends-loading">
-              <div class="spinner-border spinner-border-sm"></div>
-              <span>Searching...</span>
-            </div>
-
-            <div v-else-if="searchResults.length" class="user-cards">
-              <div v-for="searchUser in searchResults" :key="searchUser.id" class="user-card">
-                <div class="user-avatar">{{ searchUser.displayName?.charAt(0).toUpperCase() || 'U' }}</div>
-                <div class="user-info">
-                  <div class="user-name">{{ searchUser.displayName || 'User' }}</div>
-                  <div class="user-email">{{ searchUser.email }}</div>
-                </div>
-                <button 
-                  v-if="!isFollowing(searchUser.id)"
-                  class="btn btn-sm btn-primary" 
-                  @click="followUser(searchUser.id)"
-                  :disabled="followLoading"
-                >
-                  <i class="bi bi-person-plus me-1"></i>Follow
-                </button>
-                <button 
-                  v-else
-                  class="btn btn-sm btn-outline" 
-                  @click="unfollowUser(searchUser.id)"
-                  :disabled="followLoading"
-                >
-                  <i class="bi bi-person-check me-1"></i>Following
-                </button>
-              </div>
-            </div>
-
-            <div v-else-if="searchQuery" class="friends-empty">
-              <i class="bi bi-search" style="font-size: 3rem; color: rgba(15,18,16,0.30);"></i>
-              <p>No matches.</p>
-            </div>
-
-            <div v-else class="friends-empty">
-              <i class="bi bi-people" style="font-size: 3rem; color: rgba(15,18,16,0.30);"></i>
-              <p>Search for friends by name or email</p>
-            </div>
-          </div>
-
-          <!-- Following List -->
-          <div v-if="friendsTab === 'following'" class="friends-list">
-            <div v-if="friendsLoading" class="friends-loading">
-              <div class="spinner-border spinner-border-sm"></div>
-              <span>Loading...</span>
-            </div>
-
-            <div v-else-if="followingList.length" class="user-cards">
-              <div v-for="friend in followingList" :key="friend.id" class="user-card">
-                <div class="user-avatar">{{ friend.displayName?.charAt(0).toUpperCase() || 'U' }}</div>
-                <div class="user-info">
-                  <div class="user-name">{{ friend.displayName || 'User' }}</div>
-                  <div class="user-stats">{{ friend.followerCount || 0 }} followers</div>
-                </div>
-                <button 
-                  class="btn btn-sm btn-outline" 
-                  @click="unfollowUser(friend.id)"
-                  :disabled="followLoading"
-                >
-                  <i class="bi bi-person-dash me-1"></i>Unfollow
-                </button>
-              </div>
-            </div>
-
-            <div v-else class="friends-empty">
-              <i class="bi bi-people" style="font-size: 3rem; color: rgba(15,18,16,0.30);"></i>
-              <p>You're not following anyone yet</p>
-              <button class="btn btn-sm btn-primary mt-2" @click="friendsTab = 'search'">Find Friends</button>
-            </div>
-          </div>
-
-          <!-- Followers List -->
-          <div v-if="friendsTab === 'followers'" class="friends-list">
-            <div v-if="friendsLoading" class="friends-loading">
-              <div class="spinner-border spinner-border-sm"></div>
-              <span>Loading...</span>
-            </div>
-
-            <div v-else-if="followersList.length" class="user-cards">
-              <div v-for="follower in followersList" :key="follower.id" class="user-card">
-                <div class="user-avatar">{{ follower.displayName?.charAt(0).toUpperCase() || 'U' }}</div>
-                <div class="user-info">
-                  <div class="user-name">{{ follower.displayName || 'User' }}</div>
-                  <div class="user-stats">{{ follower.followingCount || 0 }} following</div>
-                </div>
-                <button 
-                  v-if="!isFollowing(follower.id)"
-                  class="btn btn-sm btn-primary" 
-                  @click="followUser(follower.id)"
-                  :disabled="followLoading"
-                >
-                  <i class="bi bi-person-plus me-1"></i>Follow Back
-                </button>
-                <button 
-                  v-else
-                  class="btn btn-sm btn-outline" 
-                  @click="unfollowUser(follower.id)"
-                  :disabled="followLoading"
-                >
-                  <i class="bi bi-person-check me-1"></i>Following
-                </button>
-              </div>
-            </div>
-
-            <div v-else class="friends-empty">
-              <i class="bi bi-people" style="font-size: 3rem; color: rgba(15,18,16,0.30);"></i>
-              <p>No followers yet</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- LOG ACTIVITY MODAL -->
     <div v-if="showActivityModal" class="la-overlay" @click="closeActivityModal">
       <div class="la-sheet" @click.stop>
@@ -1510,7 +1346,6 @@ const { isListening: micListening, isSupported: micSupported, toggleListening } 
 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
-const showFriendsModal = ref(false)
 
 const activityForm = ref({
   sportType: '',
@@ -1568,16 +1403,11 @@ const photoPreview = ref(null)
 const momentError = ref('')
 const fileInput = ref(null)
 
-// Friends/Follow state
-const friendsTab = ref('search')
-const searchQuery = ref('')
-const searchResults = ref([])
-const searchLoading = ref(false)
+// Friends/Follow state — following/followers counts feed the dashboard stat tiles;
+// the actual Find Friends UI (search, suggestions, invite) lives at /friends now.
 const followingList = ref([])
 const followersList = ref([])
 const friendsLoading = ref(false)
-const followLoading = ref(false)
-const followingIds = ref(new Set())
 
 const filters = ['All', 'Run', 'Bike', 'Swim', 'Hike', 'Walk']
 const activeFilter = ref('All')
@@ -2003,15 +1833,8 @@ const closeMomentModal = () => {
   momentError.value = ''
 }
 
-const openFriendsModal = async () => {
-  showFriendsModal.value = true
-  await loadFollowData()
-}
-
-const closeFriendsModal = () => {
-  showFriendsModal.value = false
-  searchQuery.value = ''
-  searchResults.value = []
+const goToFriends = () => {
+  router.push('/friends')
 }
 
 const handleActivitySubmit = async () => {
@@ -2115,25 +1938,6 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-const handleSearch = async () => {
-  if (!searchQuery.value.trim()) {
-    searchResults.value = []
-    return
-  }
-
-  searchLoading.value = true
-  try {
-    const { data } = await axios.get(`${API_URL}/users/search?query=${searchQuery.value}`, {
-      headers: getAuthHeaders()
-    })
-    searchResults.value = data.filter(u => u.id !== user.value.id)
-  } catch {
-    searchResults.value = []
-  } finally {
-    searchLoading.value = false
-  }
-}
-
 const loadFollowData = async () => {
   friendsLoading.value = true
   try {
@@ -2141,48 +1945,13 @@ const loadFollowData = async () => {
       axios.get(`${API_URL}/follow/following`, { headers: getAuthHeaders() }),
       axios.get(`${API_URL}/follow/followers`, { headers: getAuthHeaders() })
     ])
-    
+
     followingList.value = followingRes.data
     followersList.value = followersRes.data
-    followingIds.value = new Set(followingList.value.map(f => f.id))
   } catch {
     // follow data is non-critical, silent fail
   } finally {
     friendsLoading.value = false
-  }
-}
-
-const isFollowing = (userId) => {
-  return followingIds.value.has(userId)
-}
-
-const followUser = async (userId) => {
-  followLoading.value = true
-  try {
-    await axios.post(`${API_URL}/follow/${userId}`, {}, {
-      headers: getAuthHeaders()
-    })
-    followingIds.value.add(userId)
-    await loadFollowData()
-  } catch {
-    showToast('Follow didn\'t land — try again.', 'error')
-  } finally {
-    followLoading.value = false
-  }
-}
-
-const unfollowUser = async (userId) => {
-  followLoading.value = true
-  try {
-    await axios.delete(`${API_URL}/follow/${userId}`, {
-      headers: getAuthHeaders()
-    })
-    followingIds.value.delete(userId)
-    await loadFollowData()
-  } catch {
-    showToast('Unfollow didn\'t land — try again.', 'error')
-  } finally {
-    followLoading.value = false
   }
 }
 
