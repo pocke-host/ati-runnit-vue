@@ -853,13 +853,19 @@ function showHeatmapTooltip(day, event) {
 function hideHeatmapTooltip() { heatmapTooltip.value = null }
 
 // ── Sport breakdown ───────────────────────────────
+// Categorical, CVD-validated (node scripts/validate_palette.js from the dataviz
+// skill — passes chroma/CVD/normal-vision checks; OTHER's low chroma is the
+// intentional "catch-all reads as muted" exception, not a validator miss).
+// RUN anchors on brand cobalt since it's the flagship sport; the rest are a
+// fixed hue order, never reassigned by frequency.
 const SPORT_COLORS = {
-  RUN: '#0C0C0C',      Running: '#0C0C0C',
-  BIKE: '#404040',     Cycling: '#404040',
-  SWIM: '#707070',     Swimming: '#707070',
-  HIKE: '#A0A0A0',     Hiking: '#A0A0A0',
-  WALK: '#C8C8C8',     Walking: '#C8C8C8',
-  OTHER: '#E0E0E0',
+  RUN: '#2A55F5',      Running: '#2A55F5',
+  BIKE: '#16A34A',     Cycling: '#16A34A',
+  SWIM: '#9333EA',     Swimming: '#9333EA',
+  HIKE: '#EA580C',     Hiking: '#EA580C',
+  STRENGTH: '#DB2777',
+  WALK: '#CA8A04',     Walking: '#CA8A04',
+  OTHER: '#6B6B6B',
 }
 const sportBreakdown = computed(() => {
   const map = {}
