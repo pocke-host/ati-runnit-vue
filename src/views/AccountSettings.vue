@@ -31,36 +31,48 @@
           <div class="settings-card">
             <!-- Avatar row -->
             <div class="profile-avatar-row">
-              <div class="profile-avatar">{{ userInitial }}</div>
+              <div class="avatar-upload-wrap" @click="triggerFilePicker" title="Change photo">
+                <UserAvatar :src="avatarPreview || user?.avatarUrl" :name="user?.displayName" :size="56" />
+                <div class="avatar-overlay">
+                  <span v-if="uploadLoading" class="spinner-border spinner-border-sm"></span>
+                  <i v-else class="bi bi-camera-fill"></i>
+                </div>
+              </div>
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="avatar-file-input"
+                @change="onFileChange"
+              />
               <div class="profile-avatar-info">
                 <div class="profile-name">{{ user?.displayName || 'Athlete' }}</div>
                 <div class="profile-email">{{ user?.email }}</div>
               </div>
-              <button class="st-photo-btn">Change Photo</button>
+              <button
+                v-if="user?.avatarUrl && !avatarPreview"
+                class="st-photo-btn st-photo-btn--remove"
+                type="button"
+                @click.stop="removePhoto"
+                :disabled="uploadLoading"
+              >Remove</button>
             </div>
+            <p v-if="uploadError" class="avatar-error">{{ uploadError }}</p>
+            <p v-else class="field-hint">JPG, PNG or WebP · max 5 MB</p>
 
             <div class="divider"></div>
 
             <!-- Display Name -->
             <div class="field-group">
               <label class="field-label">Display Name</label>
-              <div class="field-input-wrap">
-                <input
-                  v-model="displayName"
-                  type="text"
-                  class="field-input"
-                  placeholder="Your name"
-                  :disabled="savingProfile"
-                />
-                <button
-                  class="btn btn-primary btn-sm"
-                  @click="saveProfile"
-                  :disabled="savingProfile || displayName === user?.displayName"
-                >
-                  <span v-if="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
-                  Save
-                </button>
-              </div>
+              <input
+                v-model="form.displayName"
+                type="text"
+                class="field-input"
+                placeholder="Your name"
+                maxlength="60"
+                :disabled="savingProfile"
+              />
             </div>
 
             <!-- Email (read-only) -->
@@ -69,11 +81,56 @@
               <div class="field-readonly">{{ user?.email }}</div>
             </div>
 
-            <!-- Bio (display only — edit via Profile Edit) -->
+            <!-- Bio -->
             <div class="field-group">
               <label class="field-label">Bio</label>
-              <div class="field-readonly field-readonly--bio">{{ user?.bio || 'No bio yet — add one in Edit Profile.' }}</div>
-              <div class="field-counter">{{ (user?.bio || '').length }} / 300</div>
+              <textarea
+                v-model="form.bio"
+                class="field-input field-textarea"
+                placeholder="A few words about you and your training..."
+                maxlength="300"
+                rows="3"
+                :disabled="savingProfile"
+              ></textarea>
+              <div class="field-counter">{{ form.bio?.length ?? 0 }} / 300</div>
+            </div>
+
+            <!-- Location -->
+            <div class="field-group">
+              <label class="field-label">Location</label>
+              <input
+                v-model="form.location"
+                type="text"
+                class="field-input"
+                placeholder="City, State"
+                maxlength="80"
+                :disabled="savingProfile"
+              />
+            </div>
+
+            <!-- Primary Sport -->
+            <div class="field-group">
+              <label class="field-label">Primary Sport</label>
+              <select v-model="form.primarySport" class="field-input field-select" :disabled="savingProfile">
+                <option value="running">Running</option>
+                <option value="cycling">Cycling</option>
+                <option value="swimming">Swimming</option>
+                <option value="triathlon">Triathlon</option>
+                <option value="trail">Trail Running</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <div></div>
+              <button
+                class="btn btn-primary btn-sm"
+                @click="saveProfile"
+                :disabled="savingProfile || !isProfileDirty"
+              >
+                <span v-if="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
+                Save Changes
+              </button>
             </div>
 
             <div v-if="profileStatus" :class="['field-status', profileStatusType]">
@@ -145,17 +202,6 @@
         <!-- ── PRIVACY ────────────────────────────── -->
         <section class="settings-section">
           <div class="section-label">Privacy</div>
-          <div class="settings-card">
-            <div class="field-row">
-              <div>
-                <div class="field-label">Profile Visibility</div>
-                <div class="field-hint">Control who can see your profile and activities.</div>
-              </div>
-              <button class="btn btn-sm" @click="router.push('/profile/edit')">
-                <i class="bi bi-pencil me-1"></i>Edit in Profile
-              </button>
-            </div>
-          </div>
 
           <!-- Toggles card -->
           <div class="settings-card settings-card--toggles">
@@ -164,7 +210,12 @@
                 <div class="field-label">Public Profile</div>
                 <div class="field-hint">Anyone can view your profile and activity history.</div>
               </div>
-              <div class="st-toggle st-toggle--on">
+              <div
+                :class="['st-toggle', { 'st-toggle--on': isPublic }]"
+                role="switch"
+                :aria-checked="isPublic"
+                @click="toggleVisibility"
+              >
                 <div class="st-toggle-knob"></div>
               </div>
             </div>
@@ -327,13 +378,25 @@
               </button>
             </div>
             <div class="st-danger-zone">
-              <a href="#" class="st-delete-link">Delete account</a>
+              <a href="#" class="st-delete-link" @click.prevent="confirmDelete">Delete account</a>
+              <div v-if="deleteError" class="field-status error" style="margin-top: 12px;">
+                <i class="bi bi-exclamation-circle-fill"></i> {{ deleteError }}
+              </div>
             </div>
           </div>
         </section>
 
       </div><!-- /st-panel -->
     </div><!-- /st-layout -->
+
+    <ConfirmModal
+      v-model="showDeleteAccountConfirm"
+      title="Delete Account"
+      body="Gone for good — your account and everything on it. No undo."
+      confirm-label="Yes, Delete My Account"
+      :danger="true"
+      @confirm="doDeleteAccount"
+    />
   </div><!-- /settings-page -->
 </template>
 
@@ -345,6 +408,8 @@ import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useToast } from '@/composables/useToast'
 import axios from 'axios'
+import UserAvatar from '@/components/UserAvatar.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -354,11 +419,129 @@ const { user, unitSystem } = storeToRefs(authStore)
 const { formatDistance, formatPace, formatElevation } = useUnits()
 const { showToast } = useToast()
 
-const displayName = ref(user.value?.displayName || '')
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+// ── Profile form (Display Name, Bio, Location, Primary Sport) ──────────────
+const form = ref({ displayName: '', bio: '', location: '', primarySport: 'running' })
+const initialForm = ref(null)
 const savingProfile = ref(false)
 const profileStatus = ref('')
 const profileStatusType = ref('success')
 let profileStatusTimer = null
+
+const isProfileDirty = computed(() => {
+  if (!initialForm.value) return false
+  const f = form.value, i = initialForm.value
+  return f.displayName !== i.displayName || f.bio !== i.bio ||
+    f.location !== i.location || f.primarySport !== i.primarySport
+})
+
+const showProfileStatus = (msg, type = 'success') => {
+  clearTimeout(profileStatusTimer)
+  profileStatus.value = msg
+  profileStatusType.value = type
+  profileStatusTimer = setTimeout(() => { profileStatus.value = '' }, 3500)
+}
+
+const saveProfile = async () => {
+  if (!form.value.displayName.trim() || !isProfileDirty.value) return
+  savingProfile.value = true
+  try {
+    const { data } = await axios.patch(`${API_URL}/users/me`, {
+      displayName: form.value.displayName.trim(),
+      bio: form.value.bio,
+      location: form.value.location,
+      primarySport: form.value.primarySport,
+    }, { headers: getAuthHeaders() })
+
+    authStore.setAuth({ ...user.value, ...form.value, ...data })
+    initialForm.value = { ...form.value }
+    showProfileStatus('Profile updated!')
+  } catch {
+    showProfileStatus("Profile didn't save. Try again.", 'error')
+  } finally {
+    savingProfile.value = false
+  }
+}
+
+// ── Avatar upload ────────────────────────────────────────────────────────
+const fileInput = ref(null)
+const avatarPreview = ref(null)
+const uploadLoading = ref(false)
+const uploadError = ref('')
+
+const triggerFilePicker = () => fileInput.value?.click()
+
+const onFileChange = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  uploadError.value = ''
+
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    uploadError.value = 'Needs to be a JPG, PNG, or WebP.'
+    return
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    uploadError.value = 'Image must be under 5 MB.'
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = (ev) => { avatarPreview.value = ev.target.result }
+  reader.readAsDataURL(file)
+
+  uploadLoading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const { data } = await axios.post(`${API_URL}/users/me/avatar`, form, {
+      headers: { 'Content-Type': 'multipart/form-data', ...getAuthHeaders() }
+    })
+    authStore.updateAvatar(data.avatarUrl)
+    avatarPreview.value = null
+  } catch {
+    uploadError.value = "Upload didn't go through. Try again."
+    avatarPreview.value = null
+  } finally {
+    uploadLoading.value = false
+    e.target.value = ''
+  }
+}
+
+const removePhoto = async () => {
+  uploadLoading.value = true
+  uploadError.value = ''
+  try {
+    await axios.delete(`${API_URL}/users/me/avatar`, { headers: getAuthHeaders() })
+    authStore.updateAvatar(null)
+  } catch {
+    uploadError.value = "Photo didn't remove. Try again."
+  } finally {
+    uploadLoading.value = false
+  }
+}
+
+// ── Profile visibility (saves immediately, like unit system) ───────────────
+const isPublic = ref(user.value?.isPublic ?? true)
+
+const toggleVisibility = async () => {
+  const next = !isPublic.value
+  isPublic.value = next
+  try {
+    const { data } = await axios.patch(`${API_URL}/users/me`, { isPublic: next }, { headers: getAuthHeaders() })
+    authStore.setAuth({ ...user.value, isPublic: data.isPublic ?? next })
+  } catch {
+    isPublic.value = !next
+    showToast("Visibility didn't update. Try again.", 'error')
+  }
+}
+
+const selectUnit = (system) => {
+  authStore.setUnitSystem(system)
+}
 
 // Preview values (5 km run at 5:30 /km pace, 137m elevation)
 const PREVIEW_METERS = 5000
@@ -369,45 +552,30 @@ const previewDistance = computed(() => formatDistance(PREVIEW_METERS))
 const previewPace = computed(() => formatPace(PREVIEW_PACE_MIN_KM))
 const previewElevation = computed(() => formatElevation(PREVIEW_ELEVATION_M))
 
-const userInitial = computed(() => user.value?.displayName?.charAt(0).toUpperCase() || 'A')
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token')
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
-
-const selectUnit = (system) => {
-  authStore.setUnitSystem(system)
-}
-
-const showProfileStatus = (msg, type = 'success') => {
-  clearTimeout(profileStatusTimer)
-  profileStatus.value = msg
-  profileStatusType.value = type
-  profileStatusTimer = setTimeout(() => { profileStatus.value = '' }, 3500)
-}
-
-const saveProfile = async () => {
-  if (!displayName.value.trim()) return
-  savingProfile.value = true
-  try {
-    const { data } = await axios.patch(
-      `${API_URL}/users/me`,
-      { displayName: displayName.value.trim() },
-      { headers: getAuthHeaders() }
-    )
-    authStore.setAuth({ ...user.value, displayName: displayName.value.trim(), ...data })
-    showProfileStatus('Profile updated!')
-  } catch {
-    showProfileStatus("Profile didn't save. Try again.", 'error')
-  } finally {
-    savingProfile.value = false
-  }
-}
-
 const handleLogout = () => {
   authStore.logout()
   router.push('/')
+}
+
+// ── Delete account ───────────────────────────────────────────────────────
+const deleting = ref(false)
+const deleteError = ref('')
+const showDeleteAccountConfirm = ref(false)
+
+const confirmDelete = () => { showDeleteAccountConfirm.value = true }
+
+const doDeleteAccount = async () => {
+  showDeleteAccountConfirm.value = false
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await axios.delete(`${API_URL}/users/me`, { headers: getAuthHeaders() })
+    authStore.logout()
+    router.push('/')
+  } catch {
+    deleteError.value = "Account didn't delete. Try again, or reach out to support."
+    deleting.value = false
+  }
 }
 
 /* ── Emergency Contacts ── */
@@ -500,14 +668,24 @@ const changePassword = async () => {
   }
 }
 
-/* ── Unsaved display-name guard ── */
+/* ── Unsaved profile-form guard ── */
 onBeforeRouteLeave(() => {
-  if (displayName.value !== user.value?.displayName) {
-    return window.confirm('Your display name change is unsaved. Leave anyway?')
+  if (isProfileDirty.value) {
+    return window.confirm('Your profile changes are unsaved. Leave anyway?')
   }
 })
 
 onMounted(() => {
+  if (user.value) {
+    form.value = {
+      displayName: user.value.displayName || '',
+      bio: user.value.bio || '',
+      location: user.value.location || '',
+      primarySport: user.value.primarySport || 'running',
+    }
+    initialForm.value = { ...form.value }
+    isPublic.value = user.value.isPublic ?? true
+  }
   loadContacts()
 })
 </script>
@@ -627,20 +805,36 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
 }
-.profile-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: #2A55F5;
+.avatar-upload-wrap {
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  border-radius: 50%;
   border: 2px solid #16130F;
+  flex-shrink: 0;
+}
+.avatar-upload-wrap:hover .avatar-overlay { opacity: 1; }
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(22,19,15,0.55);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
   color: #fff;
-  font-size: 1.3rem;
-  flex-shrink: 0;
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
+.avatar-file-input { display: none; }
+.avatar-error {
+  font-size: 0.78rem;
+  color: #C0392B;
+  margin: -8px 0 0;
+}
+.st-photo-btn--remove { color: #C0392B; border-color: #C0392B; }
+.st-photo-btn--remove:hover { background: rgba(192,57,43,0.06); }
 .profile-avatar-info { flex: 1; }
 .profile-name {
   font-weight: 800;
@@ -729,6 +923,22 @@ onMounted(() => {
 .field-input:focus { border-color: #2A55F5; }
 .field-input:disabled { opacity: 0.55; cursor: not-allowed; background: #F1EADC; }
 .field-input::placeholder { color: #8a8a8a; }
+
+.field-textarea {
+  height: auto;
+  min-height: 72px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.field-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2316130F' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
 
 .field-readonly {
   flex: 1;

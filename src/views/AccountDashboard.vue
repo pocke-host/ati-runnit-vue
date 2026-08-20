@@ -738,7 +738,7 @@
                   <i class="bi bi-circle me-2"></i>{{ item.label }}
                 </li>
               </ul>
-              <router-link to="/profile/edit" class="nudge-cta">Complete Profile →</router-link>
+              <router-link to="/settings" class="nudge-cta">Complete Profile →</router-link>
             </div>
             <!-- Subscription CTA -->
             <div v-if="subscriptionTier === 'free'" class="upgrade-banner">

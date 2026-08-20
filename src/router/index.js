@@ -51,7 +51,7 @@ const routes = [
   { path: '/plans',               name: 'Plans',          component: () => import('@/views/TrainingPlans.vue'),    meta: { requiresAuth: true } },
   { path: '/plans/:id',           name: 'PlanDetail',     component: () => import('@/views/PlanDetail.vue'),       meta: { requiresAuth: true } },
   { path: '/activities/:id',      name: 'ActivityDetail', component: () => import('@/views/ActivityDetail.vue'),   meta: { requiresAuth: true } },
-  { path: '/profile/edit',        name: 'ProfileEdit',    component: () => import('@/views/ProfileEdit.vue'),      meta: { requiresAuth: true } },
+  { path: '/profile/edit',        redirect: '/settings' }, // merged into Settings — keep old links/bookmarks working
   { path: '/profile/:id',         name: 'UserProfile',    component: () => import('@/views/UserProfile.vue'),      meta: { requiresAuth: true } },
   { path: '/achievements',        name: 'Achievements',   component: () => import('@/views/Achievements.vue'),     meta: { requiresAuth: true } },
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },

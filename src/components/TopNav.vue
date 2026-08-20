@@ -121,9 +121,6 @@
               <router-link :to="role === 'coach' ? '/coach/dashboard' : '/dashboard'" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-grid-3x3-gap"></i> Dashboard
               </router-link>
-              <router-link to="/profile/edit" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-person-circle"></i> Edit Profile
-              </router-link>
               <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-gear"></i> Settings
               </router-link>

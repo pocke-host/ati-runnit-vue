@@ -385,7 +385,7 @@
     storyError.value = ''
 
     try {
-      // Upload via presigned S3 URL (same flow as CreateMoment/ProfileEdit)
+      // Upload via presigned S3 URL (same flow as CreateMoment/Settings)
       const mediaUrl = await uploadStore.uploadImage(storyFile.value)
 
       // Create story record
