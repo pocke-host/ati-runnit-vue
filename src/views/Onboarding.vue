@@ -226,13 +226,31 @@
         This connects you with crews and events near you.
       </p>
       <div class="tile-grid" style="grid-template-columns:1fr;gap:0;">
-        <input
-          v-model="selections.city"
-          class="city-input"
-          placeholder="City (e.g. Austin, TX)"
-          @keyup.enter="finish"
-          autofocus
-        />
+        <div class="city-input-wrap">
+          <input
+            v-model="selections.city"
+            class="city-input"
+            placeholder="City (e.g. Austin, TX)"
+            autocomplete="off"
+            @input="onCityInput"
+            @focus="onCityInput"
+            @keydown.down.prevent="moveCityHighlight(1)"
+            @keydown.up.prevent="moveCityHighlight(-1)"
+            @keyup.enter="onCityEnter"
+            @blur="onCityBlur"
+            autofocus
+          />
+          <ul v-if="showCitySuggestions && citySuggestions.length" class="city-suggestions">
+            <li
+              v-for="(s, i) in citySuggestions"
+              :key="s.id"
+              :class="{ 'city-suggestion--active': i === cityHighlight }"
+              @mousedown.prevent="selectCitySuggestion(s)"
+            >
+              {{ s.place_name }}
+            </li>
+          </ul>
+        </div>
       </div>
       <button class="btn-cta mt-auto" @click="finish">Continue</button>
     </div>
@@ -286,6 +304,7 @@ const authStore = useAuthStore()
 const { user, role } = storeToRefs(authStore)
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 const step = ref(1)
 const ATHLETE_STEPS = 6  // steps 2–7 are the 6 choice screens (city added)
@@ -393,6 +412,63 @@ function back() {
 
 function finish() {
   step.value = 8
+}
+
+// ── City autocomplete (Mapbox geocoding) ──────────────────────────────────
+const citySuggestions = ref([])
+const showCitySuggestions = ref(false)
+const cityHighlight = ref(-1)
+let citySearchTimer = null
+
+function onCityInput() {
+  clearTimeout(citySearchTimer)
+  const query = selections.city.trim()
+  if (!query || !MAPBOX_TOKEN) {
+    citySuggestions.value = []
+    showCitySuggestions.value = false
+    return
+  }
+  citySearchTimer = setTimeout(async () => {
+    try {
+      const q = encodeURIComponent(query)
+      const res = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=${MAPBOX_TOKEN}&types=place,region&autocomplete=true&limit=5`
+      )
+      const data = await res.json()
+      citySuggestions.value = data.features || []
+      showCitySuggestions.value = citySuggestions.value.length > 0
+      cityHighlight.value = -1
+    } catch {
+      citySuggestions.value = []
+      showCitySuggestions.value = false
+    }
+  }, 250)
+}
+
+function moveCityHighlight(dir) {
+  if (!showCitySuggestions.value || !citySuggestions.value.length) return
+  const max = citySuggestions.value.length - 1
+  cityHighlight.value = Math.min(max, Math.max(0, cityHighlight.value + dir))
+}
+
+function selectCitySuggestion(feature) {
+  selections.city = feature.place_name
+  citySuggestions.value = []
+  showCitySuggestions.value = false
+  cityHighlight.value = -1
+}
+
+function onCityEnter() {
+  if (showCitySuggestions.value && cityHighlight.value >= 0) {
+    selectCitySuggestion(citySuggestions.value[cityHighlight.value])
+  } else {
+    showCitySuggestions.value = false
+    finish()
+  }
+}
+
+function onCityBlur() {
+  setTimeout(() => { showCitySuggestions.value = false }, 150)
 }
 
 function finishCoach() {
@@ -763,6 +839,10 @@ async function goToDashboard() {
 }
 
 /* ── City input ── */
+.city-input-wrap {
+  position: relative;
+  margin-bottom: 32px;
+}
 .city-input {
   width: 100%;
   padding: 18px 20px;
@@ -773,7 +853,7 @@ async function goToDashboard() {
   color: #16130F;
   background: #fff;
   outline: none;
-  margin-bottom: 32px;
+  margin-bottom: 0;
   transition: border-color 0.15s;
 }
 .city-input:focus {
@@ -781,6 +861,37 @@ async function goToDashboard() {
 }
 .city-input::placeholder {
   color: #C5C5C5;
+}
+
+.city-suggestions {
+  position: absolute;
+  top: calc(100% - 2px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 2px solid #16130F;
+  border-top: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.city-suggestions li {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #16130F;
+  border-bottom: 2px solid #E7DFCE;
+}
+.city-suggestions li:last-child {
+  border-bottom: none;
+}
+.city-suggestions li:hover,
+.city-suggestions li.city-suggestion--active {
+  background: #EEF1FF;
+  color: #2A55F5;
 }
 
 /* ── Save error ── */
