@@ -725,6 +725,14 @@ function nextMonth() {
 function goToday() {
   currentYear.value  = new Date().getFullYear()
   currentMonth.value = new Date().getMonth()
+  // Resetting the month/year alone was a no-op whenever you were already viewing the
+  // current month (the default view) — also select today so the button always does
+  // something visible.
+  selectedDate.value   = todayStr
+  aiSuggestion.value   = null
+  showCreateForm.value = false
+  editingEvent.value   = null
+  formError.value      = ''
 }
 
 // ── Day selection ─────────────────────────────────────────────
