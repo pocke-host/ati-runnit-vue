@@ -347,7 +347,7 @@
               <button
                 v-for="rxn in [{type:'LIKE',label:'Like',icon:'bi-heart-fill'},{type:'KUDOS',label:'Kudos',icon:'bi-hand-thumbs-up-fill'}]"
                 :key="rxn.type"
-                :class="['gr-rxn-btn', { 'gr-rxn-btn--active': userReaction === rxn.type }]"
+                :class="['gr-rxn-btn', { 'gr-rxn-btn--active': userReactions.has(rxn.type) }]"
                 @click="toggleReaction(rxn.type)"
                 :disabled="reactionLoading"
               ><i :class="['bi', rxn.icon, 'me-1']"></i>{{ rxn.label }}<template v-if="reactionCounts[rxn.type]"> {{ reactionCounts[rxn.type] }}</template></button>
@@ -477,7 +477,7 @@ const commentsLoading = ref(false)
 const newComment = ref('')
 const commentLoading = ref(false)
 const reactionLoading = ref(false)
-const userReaction = ref(null)
+const userReactions = ref(new Set())
 const reactionCounts = ref({})
 const following = ref(false)
 const followLoading = ref(false)
@@ -797,7 +797,7 @@ const init = async () => {
   pageError.value = ''
   activity.value = null
   comments.value = []
-  userReaction.value = null
+  userReactions.value = new Set()
   reactionCounts.value = {}
 
   try {
@@ -819,8 +819,11 @@ const init = async () => {
     }
     activity.value = actData
     comments.value = Array.isArray(commData) ? commData : []
-    reactionCounts.value = actData.reactions || {}
-    userReaction.value = actData.currentUserReaction || null
+    // Backend field names are reactionCounts/userReactions (FeedActivityDTO) — this used to
+    // read reactions/currentUserReaction, which don't exist on that DTO, so reactions always
+    // rendered as empty/unreacted on load regardless of actual state.
+    reactionCounts.value = actData.reactionCounts || {}
+    userReactions.value = new Set(actData.userReactions || [])
 
     if (isOwn.value) {
       if (!activityStore.activities.length) await activityStore.fetchActivities()
@@ -882,18 +885,16 @@ const toggleReaction = async (type) => {
   if (reactionLoading.value) return
   reactionLoading.value = true
   try {
-    if (userReaction.value === type) {
-      await activityStore.removeReaction(activityId.value)
+    if (userReactions.value.has(type)) {
+      await activityStore.removeReaction(activityId.value, type)
       reactionCounts.value[type] = Math.max(0, (reactionCounts.value[type] || 1) - 1)
-      userReaction.value = null
+      userReactions.value.delete(type)
     } else {
-      if (userReaction.value) {
-        reactionCounts.value[userReaction.value] = Math.max(0, (reactionCounts.value[userReaction.value] || 1) - 1)
-      }
       await activityStore.reactToActivity(activityId.value, type)
       reactionCounts.value[type] = (reactionCounts.value[type] || 0) + 1
-      userReaction.value = type
+      userReactions.value.add(type)
     }
+    userReactions.value = new Set(userReactions.value)
   } catch (err) {
     showToast(err.response?.data?.error || "Reaction didn't land. Try again.", 'error')
   } finally {

@@ -190,7 +190,7 @@
                 <button
                   v-for="rxn in [{type:'LIKE',label:'Like',icon:'bi-heart-fill'},{type:'KUDOS',label:'Kudos',icon:'bi-hand-thumbs-up-fill'}]"
                   :key="rxn.type"
-                  :class="['gr-rxn-btn', { 'gr-rxn-btn--active': getActivityReaction(item.id) === rxn.type }]"
+                  :class="['gr-rxn-btn', { 'gr-rxn-btn--active': hasActivityReaction(item.id, rxn.type) }]"
                   @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
                 ><i :class="['bi', rxn.icon, 'me-1']"></i>{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)">&nbsp;{{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
               </div>
@@ -465,37 +465,35 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-// Activity reactions in feed
-const activityReactionMap = ref({}) // { [activityId]: { userReaction: null, counts: {LIKE:0, KUDOS:0} } }
+// Activity reactions in feed — LIKE and KUDOS are independent, so a user can hold both
+// at once. { [activityId]: { userReactions: Set<string>, counts: {LIKE:0, KUDOS:0} } }
+const activityReactionMap = ref({})
 
-const getActivityReaction = (id) => activityReactionMap.value[id]?.userReaction || null
+const hasActivityReaction = (id, type) => activityReactionMap.value[id]?.userReactions?.has(type) || false
 const getActivityReactionCount = (id, type) => activityReactionMap.value[id]?.counts?.[type] || 0
 
 const initActivityReactions = (activity) => {
   if (activityReactionMap.value[activity.id]) return
   activityReactionMap.value[activity.id] = {
-    userReaction: activity.userReaction || null,
+    userReactions: new Set(activity.userReactions || []),
     counts: activity.reactionCounts || { LIKE: 0, KUDOS: 0 }
   }
 }
 
 const toggleActivityReaction = async (activityId, type) => {
-  const current = activityReactionMap.value[activityId] || { userReaction: null, counts: { LIKE: 0, KUDOS: 0 } }
-  const prev = current.userReaction
+  const current = activityReactionMap.value[activityId] || { userReactions: new Set(), counts: { LIKE: 0, KUDOS: 0 } }
+  const alreadyReacted = current.userReactions.has(type)
   try {
-    if (prev === type) {
-      // Remove reaction
-      await axios.delete(`${API_URL}/activities/${activityId}/reactions`, { headers: getAuthHeaders() })
+    if (alreadyReacted) {
+      await axios.delete(`${API_URL}/activities/${activityId}/reactions`, { params: { type }, headers: getAuthHeaders() })
       current.counts[type] = Math.max(0, (current.counts[type] || 0) - 1)
-      current.userReaction = null
+      current.userReactions.delete(type)
     } else {
-      // Add/change reaction
       await axios.post(`${API_URL}/activities/${activityId}/reactions`, { type }, { headers: getAuthHeaders() })
-      if (prev) current.counts[prev] = Math.max(0, (current.counts[prev] || 0) - 1)
       current.counts[type] = (current.counts[type] || 0) + 1
-      current.userReaction = type
+      current.userReactions.add(type)
     }
-    activityReactionMap.value[activityId] = { ...current }
+    activityReactionMap.value[activityId] = { ...current, userReactions: new Set(current.userReactions) }
   } catch {
     showToast("Reaction didn't land. Tap it again.", 'error')
   }
