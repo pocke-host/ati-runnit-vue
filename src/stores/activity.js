@@ -122,30 +122,33 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
+  // LIKE and KUDOS are independent — a user can hold both on the same activity, so
+  // userReactions is an array of every type currently held, not a single value.
   async function reactToActivity(id, type) {
     const { data } = await axios.post(`${API_URL}/activities/${id}/reactions`, { type })
-    // Patch local cache — use DTO field names: userReaction + reactionCounts map
     const act = activities.value.find(a => String(a.id) === String(id))
     if (act) {
-      const prev = act.userReaction
       if (!act.reactionCounts) act.reactionCounts = {}
-      if (prev && prev !== type) act.reactionCounts[prev] = Math.max(0, (act.reactionCounts[prev] || 0) - 1)
-      act.reactionCounts[type] = (act.reactionCounts[type] || 0) + 1
-      act.userReaction = type
+      if (!act.userReactions) act.userReactions = []
+      if (!act.userReactions.includes(type)) {
+        act.reactionCounts[type] = (act.reactionCounts[type] || 0) + 1
+        act.userReactions.push(type)
+      }
       saveCache(activities.value)
     }
     return data
   }
 
-  async function removeReaction(id) {
-    await axios.delete(`${API_URL}/activities/${id}/reactions`)
+  async function removeReaction(id, type) {
+    await axios.delete(`${API_URL}/activities/${id}/reactions`, { params: { type } })
     const act = activities.value.find(a => String(a.id) === String(id))
     if (act) {
-      const prev = act.userReaction
-      if (prev && act.reactionCounts) {
-        act.reactionCounts[prev] = Math.max(0, (act.reactionCounts[prev] || 0) - 1)
+      if (act.reactionCounts) {
+        act.reactionCounts[type] = Math.max(0, (act.reactionCounts[type] || 0) - 1)
       }
-      act.userReaction = null
+      if (act.userReactions) {
+        act.userReactions = act.userReactions.filter(t => t !== type)
+      }
       saveCache(activities.value)
     }
   }
