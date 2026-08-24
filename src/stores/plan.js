@@ -106,6 +106,20 @@ export const usePlanStore = defineStore('plan', () => {
     }
   }
 
+  async function setPlanAdaptive(id, enabled) {
+    try {
+      const { data } = await axios.patch(
+        `${API_URL}/plans/${id}/adaptive`,
+        { adaptiveEnabled: enabled },
+        { headers: getAuthHeaders() }
+      )
+      return data
+    } catch (err) {
+      error.value = err.response?.data?.error || "Couldn't update auto-adjust. Try again."
+      throw err
+    }
+  }
+
   async function deletePlan(id) {
     try {
       await axios.delete(`${API_URL}/plans/${id}`, { headers: getAuthHeaders() })
@@ -269,7 +283,7 @@ export const usePlanStore = defineStore('plan', () => {
 
   return {
     plans, activePlan, loading, error,
-    fetchPlans, fetchPlan, createPlan, setActivePlan,
+    fetchPlans, fetchPlan, createPlan, setActivePlan, setPlanAdaptive,
     deletePlan, completeWorkout, uncompleteWorkout, suggestPlan,
     fetchAthletePlans, createPlanForAthlete, updatePlan, addWorkout, updateWorkout, deleteWorkout,
     fetchActivePlanAdaptations

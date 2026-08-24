@@ -27,6 +27,9 @@
             />
           </div>
         </div>
+        <button class="btn-save-template" @click="showAthletePreview = true" title="See what the athlete will see">
+          <i class="bi bi-eye me-1"></i>Preview as Athlete
+        </button>
         <button class="btn-save-template" @click="saveAsTemplate" :disabled="savingTemplate" title="Save as reusable template">
           <span v-if="savingTemplate" class="spinner-border spinner-border-sm"></span>
           <span v-else><i class="bi bi-bookmark-star me-1"></i>Template</span>
@@ -223,6 +226,42 @@
         </div>
       </div>
     </div>
+
+    <!-- Preview as Athlete Modal -->
+    <div v-if="showAthletePreview" class="modal-backdrop" @click.self="showAthletePreview = false">
+      <div class="preview-box">
+        <div class="preview-header">
+          <div>
+            <div class="preview-kicker">Preview</div>
+            <h3 class="preview-title">What {{ plan.athleteName || 'the athlete' }} sees</h3>
+          </div>
+          <button class="preview-close" @click="showAthletePreview = false"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="preview-body">
+          <div v-for="w in weeks" :key="w" class="preview-week">
+            <div class="preview-phase-banner">
+              <span class="preview-phase-label">{{ phaseLabel(weekData[w]?.phase) }}</span>
+              <span class="preview-phase-week">Week {{ w }}</span>
+              <span v-if="weekData[w]?.theme" class="preview-phase-theme">{{ weekData[w].theme }}</span>
+            </div>
+            <div v-if="weekData[w]?.workouts?.length" class="preview-workout-list">
+              <div v-for="workout in weekData[w].workouts" :key="workout.id" class="preview-workout-card">
+                <div class="preview-workout-top">
+                  <span class="preview-workout-day">{{ workout.day }}</span>
+                  <span class="preview-type-chip" :style="{ background: previewTypeColor(workout.type) }">{{ workout.type }}</span>
+                </div>
+                <div class="preview-workout-stats">
+                  <span v-if="workout.distance">{{ workout.distance }} {{ distLabel }}</span>
+                  <span v-if="workout.duration">{{ workout.duration }} min</span>
+                </div>
+                <p v-if="workout.description" class="preview-workout-desc">{{ workout.description }}</p>
+              </div>
+            </div>
+            <p v-else class="preview-empty">Rest week — nothing scheduled.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <main v-else class="plan-editor-loading">
@@ -273,6 +312,16 @@ const phases = [
   { value: 'TAPER',    label: 'Taper' },
   { value: 'RECOVERY', label: 'Recovery' },
 ]
+const phaseLabel = (value) => phases.find(p => p.value === value)?.label || 'Plan'
+
+// Preview as Athlete
+const showAthletePreview = ref(false)
+const PREVIEW_TYPE_COLORS = {
+  'Tempo Run': '#2A55F5', 'Interval': '#2A55F5', 'Long Run': '#2A55F5',
+  'Easy Run': '#8A8A8A', 'Recovery Run': '#8A8A8A', 'Cross Train': '#8A8A8A', 'Strength': '#8A8A8A',
+  'Rest': '#E7DFCE',
+}
+const previewTypeColor = (type) => PREVIEW_TYPE_COLORS[type] || '#8A8A8A'
 
 // Steps builder state
 const expandedSteps = ref(new Set())
@@ -515,7 +564,7 @@ onMounted(async () => {
   position: sticky;
   top: var(--nav-h, 64px);
   z-index: 100;
-  background: #000;
+  background: #16130F;
   border-bottom: none;
 }
 .editor-bar-inner {
@@ -555,11 +604,13 @@ onMounted(async () => {
 .sport-badge { padding: 3px 10px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .btn-save {
   padding: 8px 22px;
-  background: #fff; color: #000; border: none;
+  background: #2A55F5; color: #fff; border: 2px solid #16130F; border-radius: 999px;
+  box-shadow: 3px 3px 0 #FBF6EC;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   cursor: pointer; flex-shrink: 0;
 }
-.btn-save:hover { background: #e5e5e5; }
+.btn-save:hover { background: #1E42D6; }
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .editor-error {
@@ -591,13 +642,13 @@ onMounted(async () => {
 .week-tab-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; padding-left: 16px; flex-shrink: 0; }
 .week-action-btn {
   padding: 6px 12px;
-  background: #fff; border: 2px solid #E7DFCE; color: #767676;
+  background: #fff; border: 2px solid #E7DFCE; color: #5A5348;
   font-family: inherit; font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
   display: flex; align-items: center; gap: 5px; text-decoration: none;
   transition: all 0.15s;
 }
-.week-action-btn:hover { border-color: #000; color: #000; }
+.week-action-btn:hover { border-color: #16130F; color: #16130F; }
 .copy-week-bar {
   background: #FBF6EC;
   border-top: 2px solid #E7DFCE;
@@ -607,29 +658,29 @@ onMounted(async () => {
   gap: 10px;
   flex-wrap: wrap;
 }
-.copy-week-label { font-size: 0.75rem; font-weight: 700; color: #767676; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+.copy-week-label { font-size: 0.75rem; font-weight: 700; color: #5A5348; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
 .copy-week-targets { display: flex; gap: 6px; flex-wrap: wrap; }
 .copy-target-btn {
   padding: 6px 14px;
-  background: #fff; border: 2px solid #E7DFCE; color: #000;
+  background: #fff; border: 2px solid #E7DFCE; color: #16130F;
   font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer;
   transition: all 0.15s;
 }
 .copy-target-btn:hover { border-color: #2A55F5; color: #2A55F5; }
 .copy-target-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .copy-close-btn {
-  margin-left: auto; background: none; border: none; color: #767676;
+  margin-left: auto; background: none; border: none; color: #5A5348;
   cursor: pointer; font-size: 1rem; padding: 0 4px;
 }
-.copy-close-btn:hover { color: #000; }
+.copy-close-btn:hover { color: #16130F; }
 .week-tab {
   padding: 12px 20px;
   background: none; border: none; border-bottom: 2px solid transparent;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  color: #767676; cursor: pointer; white-space: nowrap;
+  color: #5A5348; cursor: pointer; white-space: nowrap;
   transition: color 0.15s, border-color 0.15s;
 }
-.week-tab.active { color: #000; border-bottom-color: #000; }
+.week-tab.active { color: #16130F; border-bottom-color: #16130F; }
 
 /* Week content */
 .week-content { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
@@ -637,10 +688,10 @@ onMounted(async () => {
 .week-theme-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px; }
 .theme-input {
   border: none; border-bottom: 2px solid #E7DFCE;
-  padding: 8px 0; font-size: 0.95rem; font-weight: 600; color: #000;
+  padding: 8px 0; font-size: 0.95rem; font-weight: 600; color: #16130F;
   outline: none; font-family: inherit; background: transparent;
 }
-.theme-input:focus { border-bottom-color: #000; }
+.theme-input:focus { border-bottom-color: #16130F; }
 .theme-input::placeholder { color: #BDBDBD; font-weight: 400; }
 
 /* Workout cards */
@@ -650,10 +701,10 @@ onMounted(async () => {
 .day-select, .type-select {
   padding: 6px 10px; border: 2px solid #E7DFCE; background: #fff;
   font-size: 0.82rem; font-weight: 600; font-family: inherit;
-  color: #000; outline: none; cursor: pointer;
+  color: #16130F; outline: none; cursor: pointer;
   border-radius: 0;
 }
-.day-select:focus, .type-select:focus { border-color: #000; }
+.day-select:focus, .type-select:focus { border-color: #16130F; }
 .btn-trash {
   margin-left: auto; background: none; border: none;
   color: #BDBDBD; font-size: 1rem; cursor: pointer; padding: 4px 8px;
@@ -664,54 +715,54 @@ onMounted(async () => {
 .workout-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .field-group { display: flex; flex-direction: column; gap: 6px; }
 .field-group.full-width { grid-column: 1 / -1; }
-.field-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; color: #767676; text-transform: uppercase; }
+.field-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; color: #5A5348; text-transform: uppercase; }
 .input-unit-row { display: flex; align-items: center; gap: 8px; }
 .field-input {
   width: 80px; padding: 7px 10px; border: 2px solid #E7DFCE;
   font-size: 0.9rem; font-weight: 600; font-family: inherit;
-  color: #000; outline: none; border-radius: 0; background: #fff;
+  color: #16130F; outline: none; border-radius: 0; background: #fff;
 }
-.field-input:focus { border-color: #000; }
-.unit-label { font-size: 0.78rem; color: #767676; font-weight: 600; }
+.field-input:focus { border-color: #16130F; }
+.unit-label { font-size: 0.78rem; color: #5A5348; font-weight: 600; }
 .desc-textarea {
   width: 100%; padding: 10px; border: 2px solid #E7DFCE;
-  font-size: 0.88rem; font-family: inherit; color: #000;
+  font-size: 0.88rem; font-family: inherit; color: #16130F;
   resize: none; outline: none; overflow: hidden;
   min-height: 60px; border-radius: 0;
 }
-.desc-textarea:focus { border-color: #000; }
+.desc-textarea:focus { border-color: #16130F; }
 
 /* Step builder in workout card */
 .workout-steps-section { border-top: 2px solid #E7DFCE; padding-top: 12px; }
 .steps-toggle-btn {
   display: flex; align-items: center; gap: 6px;
   background: none; border: none; font-family: inherit;
-  font-size: 0.72rem; font-weight: 700; color: #767676;
+  font-size: 0.72rem; font-weight: 700; color: #5A5348;
   text-transform: uppercase; letter-spacing: 0.06em;
   cursor: pointer; padding: 0; transition: color 0.15s;
 }
-.steps-toggle-btn:hover { color: #000; }
+.steps-toggle-btn:hover { color: #16130F; }
 .steps-wrap { margin-top: 12px; }
 .steps-lib-row { display: flex; justify-content: flex-end; margin-top: 8px; }
 .btn-save-lib {
   display: flex; align-items: center; gap: 4px;
-  padding: 6px 14px; background: #fff; color: #767676;
+  padding: 6px 14px; background: #fff; color: #5A5348;
   border: 2px solid #E7DFCE; font-family: inherit;
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
   text-transform: uppercase; cursor: pointer; transition: all 0.15s;
 }
-.btn-save-lib:hover { border-color: #000; color: #000; }
+.btn-save-lib:hover { border-color: #16130F; color: #16130F; }
 .btn-save-lib:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Add workout */
 .btn-add-workout {
   width: 100%; padding: 14px;
-  background: #fff; color: #767676;
+  background: #fff; color: #5A5348;
   border: 1px dashed #BDBDBD; font-size: 0.82rem; font-weight: 600;
   letter-spacing: 0.06em; cursor: pointer; font-family: inherit;
   transition: border-color 0.15s, color 0.15s;
 }
-.btn-add-workout:hover { border-color: #000; border-style: solid; color: #000; }
+.btn-add-workout:hover { border-color: #16130F; border-style: solid; color: #16130F; }
 
 /* Modal */
 .modal-backdrop {
@@ -720,10 +771,10 @@ onMounted(async () => {
 }
 .modal-box { background: #fff; padding: 32px; max-width: 360px; width: calc(100% - 48px); }
 .modal-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; }
-.modal-sub { font-size: 0.88rem; color: #767676; margin: 0 0 24px; }
+.modal-sub { font-size: 0.88rem; color: #5A5348; margin: 0 0 24px; }
 .modal-actions { display: flex; gap: 10px; }
 .btn-cancel {
-  flex: 1; padding: 12px; background: #fff; color: #000;
+  flex: 1; padding: 12px; background: #fff; color: #16130F;
   border: 2px solid #E7DFCE; font-size: 0.82rem; font-weight: 600; cursor: pointer;
 }
 .btn-confirm-delete {
@@ -732,10 +783,60 @@ onMounted(async () => {
   letter-spacing: 0.04em; text-transform: uppercase;
 }
 
-.plan-editor-loading { min-height: 100vh; padding-top: var(--page-top); display: flex; align-items: center; justify-content: center; }
-.loading-state { display: flex; align-items: center; color: #767676; font-size: 0.9rem; }
+/* Preview as Athlete */
+.preview-box {
+  background: #FBF6EC; border: 2px solid #16130F; box-shadow: 6px 6px 0 #16130F;
+  max-width: 640px; width: calc(100% - 48px); max-height: 85vh;
+  display: flex; flex-direction: column;
+}
+.preview-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 24px 24px 16px; border-bottom: 2px solid #E7DFCE; flex-shrink: 0;
+}
+.preview-kicker {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #2A55F5; margin-bottom: 4px;
+}
+.preview-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900; font-size: 1.4rem; text-transform: uppercase; margin: 0; color: #16130F;
+}
+.preview-close {
+  background: none; border: none; font-size: 1.1rem; color: #16130F; cursor: pointer; padding: 4px;
+}
+.preview-body { overflow-y: auto; padding: 16px 24px 24px; }
+.preview-week { margin-bottom: 20px; }
+.preview-week:last-child { margin-bottom: 0; }
+.preview-phase-banner {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 8px 14px; background: #16130F; color: #FBF6EC; margin-bottom: 10px;
+}
+.preview-phase-label {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-weight: 700; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: #2A55F5;
+}
+.preview-phase-week { font-weight: 700; font-size: 0.82rem; }
+.preview-phase-theme { font-size: 0.78rem; color: rgba(251,246,236,0.7); }
+.preview-workout-list { display: flex; flex-direction: column; gap: 8px; }
+.preview-workout-card { border: 2px solid #E7DFCE; padding: 10px 14px; background: #fff; }
+.preview-workout-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.preview-workout-day { font-weight: 700; font-size: 0.85rem; color: #16130F; }
+.preview-type-chip {
+  color: #fff; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 3px 10px; flex-shrink: 0;
+}
+.preview-workout-stats {
+  display: flex; gap: 12px; font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.78rem; color: #5A5348; margin-bottom: 4px;
+}
+.preview-workout-desc { font-size: 0.82rem; color: #5A5348; margin: 4px 0 0; line-height: 1.4; }
+.preview-empty { font-size: 0.85rem; color: #8A8A8A; font-style: italic; margin: 0; }
 
-.spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(0,0,0,0.10); border-top-color: #000; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
+.plan-editor-loading { min-height: 100vh; padding-top: var(--page-top); display: flex; align-items: center; justify-content: center; }
+.loading-state { display: flex; align-items: center; color: #5A5348; font-size: 0.9rem; }
+
+.spinner-border { width: 1rem; height: 1rem; border: 2px solid rgba(0,0,0,0.10); border-top-color: #16130F; border-radius: 50%; animation: spin 0.75s linear infinite; display: inline-block; }
 .spinner-border-sm { width: 0.85rem; height: 0.85rem; }
 .me-2 { margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -797,10 +898,10 @@ onMounted(async () => {
   font-weight: 600;
   padding: 6px 10px;
   cursor: pointer;
-  color: #000;
+  color: #16130F;
   min-width: 120px;
 }
-.phase-select:focus { outline: none; border-color: #000; }
+.phase-select:focus { outline: none; border-color: #16130F; }
 
 /* Auto volume panel */
 .auto-vol-bar {
