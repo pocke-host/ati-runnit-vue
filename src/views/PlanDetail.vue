@@ -66,6 +66,16 @@
             >
               <i class="bi bi-check-circle me-1"></i>Set Active
             </button>
+            <button
+              class="btn btn-sm adaptive-toggle-btn"
+              :class="{ 'adaptive-toggle-btn--off': !plan.adaptiveEnabled }"
+              @click="toggleAdaptive"
+              :disabled="adaptiveToggleLoading"
+              :title="plan.adaptiveEnabled ? 'Auto-adjust is on — click to take full manual control' : 'Auto-adjust is off — click to let the plan adapt to your training again'"
+            >
+              <i :class="['bi', plan.adaptiveEnabled ? 'bi-magic' : 'bi-pause-circle', 'me-1']"></i>
+              Auto-Adjust: {{ plan.adaptiveEnabled ? 'On' : 'Off' }}
+            </button>
             <button class="btn btn-outline-danger btn-sm" @click="confirmDelete" :disabled="actionLoading">
               <i class="bi bi-trash me-1"></i>Delete
             </button>
@@ -97,14 +107,18 @@
 
       <!-- Week selector tabs -->
       <div class="week-tabs-wrapper">
+        <button class="week-overview-toggle" @click="showOverview = !showOverview">
+          <i :class="['bi', showOverview ? 'bi-list' : 'bi-grid-3x3-gap-fill']"></i>
+          {{ showOverview ? 'Week View' : 'Plan Overview' }}
+        </button>
         <button
-          v-if="currentWeek && selectedWeek !== currentWeek"
+          v-if="!showOverview && currentWeek && selectedWeek !== currentWeek"
           class="week-jump-today"
           @click="selectedWeek = currentWeek; scrollToActiveTab()"
         >
           <i class="bi bi-arrow-right-circle me-1"></i>Current Week
         </button>
-        <div class="week-tabs" ref="weekTabsEl">
+        <div v-if="!showOverview" class="week-tabs" ref="weekTabsEl">
           <button
             v-for="w in plan.weeks"
             :key="w.weekNumber"
@@ -121,8 +135,37 @@
         </div>
       </div>
 
+      <!-- Plan overview — week-at-a-glance across the whole block -->
+      <div v-if="showOverview" class="plan-overview container-xxl">
+        <div class="overview-grid">
+          <button
+            v-for="w in plan.weeks"
+            :key="w.weekNumber"
+            class="overview-week"
+            :class="{ 'overview-week--current': w.weekNumber === currentWeek }"
+            :style="{ borderLeftColor: phaseColors[w.phase] || '#8A8A8A' }"
+            @click="selectedWeek = w.weekNumber; showOverview = false"
+          >
+            <div class="overview-week-head">
+              <span class="overview-week-num">W{{ w.weekNumber }}</span>
+              <span class="overview-week-phase" :style="{ color: phaseColors[w.phase] || '#8A8A8A' }">{{ w.phase }}</span>
+            </div>
+            <div class="overview-days">
+              <span
+                v-for="workout in w.workouts"
+                :key="workout.id"
+                class="overview-day-dot"
+                :class="{ 'overview-day-dot--done': workout.completed }"
+                :style="{ background: typeChipColor(workout.workoutType) }"
+                :title="`${workout.title || workout.workoutType}${workout.completed ? ' — done' : ''}`"
+              ></span>
+            </div>
+          </button>
+        </div>
+      </div>
+
       <!-- Week content -->
-      <div class="week-content container-xxl" v-if="activeWeekData">
+      <div class="week-content container-xxl" v-if="activeWeekData && !showOverview">
         <!-- Week header -->
         <div class="week-header">
           <div>
@@ -277,41 +320,23 @@
             </div>
           </div><!-- /.workout-card -->
 
-          <!-- Post-completion panel moved to bottom sheet below -->
-
-          <!-- Post-completion panel (bottom-sheet stub — keeps workout loop clean) -->
-          <div v-if="false && postCompletion?.id === workout.id" class="completion-panel">
-            <div class="cp-header">
-              <span class="cp-title">How'd it go?</span>
-              <button class="cp-close" @click="closePostCompletion"><i class="bi bi-x"></i></button>
-            </div>
-            <div class="rpe-row">
-              <span class="rpe-label">Effort (RPE)</span>
-              <div class="rpe-btns">
-                <button
-                  v-for="n in 10"
-                  :key="n"
-                  :class="['rpe-btn', { active: postCompletion.rpe === n }]"
-                  @click="postCompletion.rpe = n"
-                >{{ n }}</button>
-              </div>
-            </div>
-            <textarea
-              v-model="postCompletion.notes"
-              class="cp-notes"
-              placeholder="How did the workout feel? Any notes…"
-              rows="2"
-            ></textarea>
-            <div class="cp-actions">
-              <button class="cp-skip-btn" @click="closePostCompletion">Skip</button>
-              <button class="cp-save-btn" @click="savePostCompletion(workout)">Save Note</button>
-            </div>
-          </div>
+          <!-- Post-completion RPE/notes entry happens in the bottom sheet, not inline here -->
 
           <!-- Adjust panel -->
           <div v-if="adjustOpen.has(workout.id)" class="adjust-panel">
             <div class="ap-title">Adjust Workout</div>
             <div class="ap-fields">
+              <div class="ap-field">
+                <label class="ap-label">Workout Type</label>
+                <select v-model="adjustForm[workout.id].type" class="ap-input ap-select">
+                  <option value="EASY">Easy</option>
+                  <option value="TEMPO">Tempo</option>
+                  <option value="INTERVAL">Interval</option>
+                  <option value="LONG_RUN">Long Run</option>
+                  <option value="RECOVERY">Recovery</option>
+                  <option value="REST">Rest</option>
+                </select>
+              </div>
               <div class="ap-field">
                 <label class="ap-label">Distance ({{ distLabel }})</label>
                 <input
@@ -332,7 +357,7 @@
               </div>
             </div>
             <div class="ap-field" style="margin-top:8px">
-              <label class="ap-label">Notes / Workout Swap</label>
+              <label class="ap-label">Notes</label>
               <textarea
                 v-model="adjustForm[workout.id].description"
                 class="ap-textarea"
@@ -444,11 +469,11 @@ const toggleSteps = (workoutId) => {
 }
 
 const STEP_COLORS = {
-  WARMUP:'#767676', EASY:'#767676', AEROBIC:'#0052FF', TEMPO:'#0052FF',
-  THRESHOLD:'#000000', VO2MAX:'#000000', INTERVAL:'#000000',
-  SPRINT:'#000000', RECOVERY:'#767676', COOLDOWN:'#767676'
+  WARMUP:'#8A8A8A', EASY:'#8A8A8A', AEROBIC:'#2A55F5', TEMPO:'#2A55F5',
+  THRESHOLD:'#16130F', VO2MAX:'#16130F', INTERVAL:'#16130F',
+  SPRINT:'#16130F', RECOVERY:'#8A8A8A', COOLDOWN:'#8A8A8A'
 }
-const stepColor = (t) => STEP_COLORS[t] || '#767676'
+const stepColor = (t) => STEP_COLORS[t] || '#8A8A8A'
 const authStore = useAuthStore()
 const { unitSystem } = storeToRefs(authStore)
 
@@ -457,6 +482,7 @@ const { showToast } = useToast()
 const plan = ref(null)
 const loading = ref(false)
 const selectedWeek = ref(1)
+const showOverview = ref(false) // week-at-a-glance toggle — additive UI state only
 const workoutAdaptations = ref({})
 const weekTabsEl = ref(null)
 const workoutLoading = ref({})
@@ -492,9 +518,9 @@ const formatDateShort = (str) => {
 
 function typeChipColor(wType) {
   return {
-    EASY: '#767676', TEMPO: '#0052FF', INTERVAL: '#000000',
-    LONG_RUN: '#0052FF', RECOVERY: '#767676', REST: '#767676',
-  }[wType] || '#767676'
+    EASY: '#8A8A8A', TEMPO: '#2A55F5', INTERVAL: '#16130F',
+    LONG_RUN: '#2A55F5', RECOVERY: '#8A8A8A', REST: '#8A8A8A',
+  }[wType] || '#8A8A8A'
 }
 
 function formatPace(sPerKm) {
@@ -511,7 +537,7 @@ function formatPace(sPerKm) {
 // ── Phase ─────────────────────────────────────────
 
 const phaseColors = {
-  BASE: '#767676', BUILD: '#0052FF', PEAK: '#000000', TAPER: '#767676',
+  BASE: '#8A8A8A', BUILD: '#2A55F5', PEAK: '#16130F', TAPER: '#8A8A8A',
 }
 
 const phaseDescriptions = {
@@ -667,6 +693,7 @@ const toggleAdjust = (workoutId) => {
         distance: workout.distanceMeters ? parseFloat((workout.distanceMeters / (isImperial.value ? 1609.34 : 1000)).toFixed(2)) : '',
         duration: workout.durationMinutes || '',
         description: workout.description || '',
+        type: workout.workoutType || 'EASY',
       }
     }
   }
@@ -687,10 +714,14 @@ const saveAdjustment = async (workout) => {
     if (form.description !== undefined) {
       updates.description = form.description
     }
+    if (form.type && form.type !== workout.workoutType) {
+      updates.workoutType = form.type
+    }
     await planStore.updateWorkout(plan.value.id, workout.id, updates)
     if (updates.distanceMeters !== undefined) workout.distanceMeters = updates.distanceMeters
     if (updates.durationMinutes !== undefined) workout.durationMinutes = updates.durationMinutes
     if (updates.description !== undefined) workout.description = updates.description
+    if (updates.workoutType !== undefined) workout.workoutType = updates.workoutType
     toggleAdjust(workout.id)
     showToast('Workout dialed in.', 'success')
   } catch {
@@ -710,6 +741,21 @@ const setActive = async () => {
     showToast('Couldn\'t make this your active plan — try again.', 'error')
   } finally {
     actionLoading.value = false
+  }
+}
+
+const adaptiveToggleLoading = ref(false)
+const toggleAdaptive = async () => {
+  adaptiveToggleLoading.value = true
+  const next = !plan.value.adaptiveEnabled
+  try {
+    await planStore.setPlanAdaptive(plan.value.id, next)
+    plan.value.adaptiveEnabled = next
+    showToast(next ? 'Auto-adjust is back on.' : 'Auto-adjust is off — this plan is fully manual now.', 'success')
+  } catch {
+    showToast("Couldn't update auto-adjust — try again.", 'error')
+  } finally {
+    adaptiveToggleLoading.value = false
   }
 }
 
@@ -774,7 +820,7 @@ async function loadWorkoutAdaptations() {
 }
 
 /* Page loading */
-.page-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; color: rgba(15,18,16,0.55); }
+.page-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; color: rgba(22,19,15,0.55); }
 
 /* Plan detail skeleton */
 @keyframes sk-shimmer {
@@ -794,7 +840,7 @@ async function loadWorkoutAdaptations() {
 .sk-bar-lg  { width: 320px; height: 32px; }
 .plan-skeleton { padding-top: var(--page-top); }
 .sk-header {
-  background: #000;
+  background: #16130F;
   padding: 40px 24px 36px;
   display: flex;
   flex-direction: column;
@@ -830,7 +876,7 @@ async function loadWorkoutAdaptations() {
 }
 
 /* ── Plan Header ── */
-.plan-header { background: #000; color: white; padding: 24px 0 28px; }
+.plan-header { background: #16130F; color: white; padding: 24px 0 28px; }
 .plan-header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 20px; }
 .back-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; color: rgba(255,255,255,0.75); font-weight: 700; font-size: 0.9rem; cursor: pointer; padding: 0; font-family: inherit; transition: color 0.2s; }
 .back-btn:hover { color: white; }
@@ -880,7 +926,7 @@ async function loadWorkoutAdaptations() {
 .confirm-actions { display: flex; gap: 10px; margin-top: 8px; }
 .confirm-btn-cancel {
   flex: 1; height: 44px; border: 2px solid #E7DFCE; background: #fff;
-  color: #767676; font-family: inherit; font-weight: 700; font-size: 0.82rem;
+  color: #8A8A8A; font-family: inherit; font-weight: 700; font-size: 0.82rem;
   text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
 }
 .confirm-btn-danger {
@@ -893,11 +939,22 @@ async function loadWorkoutAdaptations() {
 /* ── Week Tabs ── */
 .week-tabs-wrapper {
   background: rgba(255,255,255,0.95);
-  border-bottom: 1px solid rgba(15,18,16,0.08);
+  border-bottom: 1px solid rgba(22,19,15,0.08);
   position: sticky; top: var(--nav-h); z-index: 50;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   display: flex; align-items: stretch;
 }
+.week-overview-toggle {
+  flex-shrink: 0;
+  padding: 0 16px;
+  border: none; border-right: 2px solid #E7DFCE;
+  background: #FBF6EC; color: #16130F;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px; transition: background 0.15s;
+}
+.week-overview-toggle:hover { background: #EEF1FF; color: #2A55F5; }
 .week-jump-today {
   flex-shrink: 0;
   padding: 0 14px;
@@ -913,42 +970,69 @@ async function loadWorkoutAdaptations() {
   position: relative; display: flex; flex-direction: column; align-items: center;
   padding: 14px 16px; border: none; background: transparent;
   font-family: inherit; font-size: 0.82rem; font-weight: 700;
-  color: rgba(15,18,16,0.55); cursor: pointer; transition: all 0.2s;
+  color: rgba(22,19,15,0.55); cursor: pointer; transition: all 0.2s;
   border-bottom: 3px solid transparent; white-space: nowrap;
 }
-.week-tab:hover { color: rgba(15,18,16,0.85); }
-.week-tab.active { color: #000; border-bottom-color: #000; }
-.week-tab.current .week-tab-label { color: #000; }
-.week-tab-dot { width: 6px; height: 6px; border-radius: 0; background: #000; margin-top: 4px; }
+.week-tab:hover { color: rgba(22,19,15,0.85); }
+.week-tab.active { color: #16130F; border-bottom-color: #16130F; }
+.week-tab.current .week-tab-label { color: #16130F; }
+.week-tab-dot { width: 6px; height: 6px; border-radius: 0; background: #16130F; margin-top: 4px; }
+
+/* ── Plan Overview (week-at-a-glance) ── */
+.plan-overview { padding: 24px 24px 4px; }
+.overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.overview-week {
+  border: 2px solid #E7DFCE; border-left: 4px solid #8A8A8A; background: #fff;
+  padding: 12px 14px; text-align: left; cursor: pointer; font-family: inherit;
+  display: flex; flex-direction: column; gap: 10px; transition: box-shadow 0.15s, border-color 0.15s;
+}
+.overview-week:hover { box-shadow: 3px 3px 0 #16130F; border-color: #16130F; }
+.overview-week--current { border-color: #16130F; box-shadow: 3px 3px 0 #2A55F5; }
+.overview-week-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.overview-week-num {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900; font-size: 1.3rem; line-height: 1; color: #16130F;
+}
+.overview-week-phase {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.overview-days { display: flex; flex-wrap: wrap; gap: 5px; }
+.overview-day-dot { width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0; opacity: 0.4; }
+.overview-day-dot--done { opacity: 1; }
 
 /* ── Week Content ── */
 .week-content { padding: 28px 24px 60px; }
 .week-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
-.week-title { font-weight: 900; font-size: 1.2rem; color: rgba(15,18,16,0.92); margin-bottom: 6px; }
-.week-stats { display: flex; gap: 16px; font-size: 0.85rem; color: rgba(15,18,16,0.60); font-weight: 600; flex-wrap: wrap; }
-.week-progress-mini { width: 120px; height: 6px; background: rgba(15,18,16,0.10); border-radius: 0; overflow: hidden; flex-shrink: 0; }
-.week-progress-fill { height: 100%; background: #000; border-radius: 0; transition: width 0.4s; }
+.week-title {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-weight: 900; font-size: 1.7rem; line-height: 0.85;
+  text-transform: uppercase; color: #16130F; margin-bottom: 6px;
+}
+.week-stats { display: flex; gap: 16px; font-size: 0.85rem; color: rgba(22,19,15,0.60); font-weight: 600; flex-wrap: wrap; }
+.week-progress-mini { width: 120px; height: 6px; background: rgba(22,19,15,0.10); border-radius: 0; overflow: hidden; flex-shrink: 0; }
+.week-progress-fill { height: 100%; background: #16130F; border-radius: 0; transition: width 0.4s; }
 
 /* ── Workout Cards ── */
 .workouts-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
 .workout-card {
   display: flex; gap: 16px; align-items: flex-start;
-  background: white; border: 1px solid rgba(15,18,16,0.10);
+  background: white; border: 1px solid rgba(22,19,15,0.10);
   border-radius: 0; padding: 20px; transition: all 0.2s;
 }
-.workout-today { border-color: #000; }
+.workout-today { border-color: #16130F; }
 .workout-completed { background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.20); }
 .workout-missed { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.02); }
 
 /* Check button */
 .check-btn {
   width: 36px; height: 36px; border-radius: 0;
-  border: 2px solid rgba(15,18,16,0.20);
+  border: 2px solid rgba(22,19,15,0.20);
   background: transparent; display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all 0.2s; flex-shrink: 0; font-size: 1rem;
-  color: rgba(15,18,16,0.50);
+  color: rgba(22,19,15,0.50);
 }
-.check-btn:hover { border-color: #000; color: #000; }
+.check-btn:hover { border-color: #16130F; color: #16130F; }
 .check-btn.checked { background: rgba(16,185,129,1); border-color: rgba(16,185,129,1); color: white; }
 .check-btn:disabled { opacity: 0.50; cursor: not-allowed; }
 
@@ -956,15 +1040,15 @@ async function loadWorkoutAdaptations() {
 .workout-body { flex: 1; min-width: 0; }
 .workout-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
 .workout-day-type { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.workout-day { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.50); }
-.workout-sep { color: rgba(15,18,16,0.25); }
-.workout-type { font-weight: 900; font-size: 1rem; color: rgba(15,18,16,0.90); }
+.workout-day { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(22,19,15,0.50); }
+.workout-sep { color: rgba(22,19,15,0.25); }
+.workout-type { font-weight: 900; font-size: 1rem; color: rgba(22,19,15,0.90); }
 .workout-completed .workout-type { text-decoration: line-through; opacity: 0.55; }
 
 /* Workout type colors */
 .type-easy, .type-recovery   { color: #047857; }
 .type-tempo                  { color: #2A55F5; }
-.type-long                   { color: #000; }
+.type-long                   { color: #16130F; }
 .type-interval               { color: #b91c1c; }
 .type-endurance              { color: #047857; }
 
@@ -977,23 +1061,23 @@ async function loadWorkoutAdaptations() {
 }
 
 .workout-tags { display: flex; gap: 6px; }
-.tag-today  { background: rgba(196,106,42,0.12); color: #000; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
+.tag-today  { background: rgba(196,106,42,0.12); color: #16130F; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 .tag-missed { background: rgba(239,68,68,0.10); color: #dc2626; padding: 3px 10px; border-radius: 0; font-size: 0.72rem; font-weight: 700; }
 
 .workout-detail-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
-.workout-dist { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; color: rgba(15,18,16,0.90); line-height: 1; }
-.workout-dur { font-size: 0.85rem; font-weight: 600; color: rgba(15,18,16,0.50); }
-.dur-sep { color: rgba(15,18,16,0.25); margin-right: 4px; }
+.workout-dist { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.02em; color: rgba(22,19,15,0.90); line-height: 1; }
+.workout-dur { font-size: 0.85rem; font-weight: 600; color: rgba(22,19,15,0.50); }
+.dur-sep { color: rgba(22,19,15,0.25); margin-right: 4px; }
 
 /* Pace target */
 .pace-target {
   display: inline-flex; align-items: center;
-  font-size: 0.82rem; font-weight: 700; color: rgba(15,18,16,0.60);
-  background: rgba(15,18,16,0.04); padding: 3px 10px; border-radius: 0;
+  font-size: 0.82rem; font-weight: 700; color: rgba(22,19,15,0.60);
+  background: rgba(22,19,15,0.04); padding: 3px 10px; border-radius: 0;
   margin-bottom: 6px;
 }
 
-.workout-desc { font-size: 0.85rem; color: rgba(15,18,16,0.55); margin: 0; line-height: 1.5; font-style: italic; }
+.workout-desc { font-size: 0.85rem; color: rgba(22,19,15,0.55); margin: 0; line-height: 1.5; font-style: italic; }
 
 /* ── Adaptation Reason ── */
 .adaptation-note {
@@ -1014,41 +1098,41 @@ async function loadWorkoutAdaptations() {
 .steps-toggle {
   display: flex; align-items: center; gap: 5px; margin-top: 6px;
   background: none; border: none; font-family: inherit;
-  font-size: 0.72rem; font-weight: 700; color: #767676;
+  font-size: 0.72rem; font-weight: 700; color: #8A8A8A;
   cursor: pointer; padding: 0; text-transform: uppercase; letter-spacing: 0.05em;
   transition: color 0.15s;
 }
-.steps-toggle:hover { color: #000; }
+.steps-toggle:hover { color: #16130F; }
 .steps-expanded { margin-top: 8px; border: 2px solid #E7DFCE; padding: 8px; background: #FAFAFA; }
 .step-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F5F5F5; flex-wrap: wrap; }
 .step-row:last-child { border-bottom: none; }
 .step-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .step-info { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .step-type { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-.step-dur { font-size: 0.7rem; color: #767676; }
-.step-target { font-size: 0.68rem; background: rgba(15,18,16,0.06); padding: 1px 5px; color: #555; font-weight: 600; }
+.step-dur { font-size: 0.7rem; color: #8A8A8A; }
+.step-target { font-size: 0.68rem; background: rgba(22,19,15,0.06); padding: 1px 5px; color: #555; font-weight: 600; }
 .step-notes { font-size: 0.68rem; color: #999; font-style: italic; }
 
 /* Week summary */
 .week-summary {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-  background: white; border: 1px solid rgba(15,18,16,0.10);
+  background: white; border: 1px solid rgba(22,19,15,0.10);
   border-radius: 0; padding: 20px 28px;
 }
 .summary-stat { text-align: center; }
-.summary-val { font-size: 1.4rem; font-weight: 900; color: #000; margin-bottom: 4px; }
-.summary-key { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(15,18,16,0.50); }
+.summary-val { font-size: 1.4rem; font-weight: 900; color: #16130F; margin-bottom: 4px; }
+.summary-key { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(22,19,15,0.50); }
 
 /* Skip button */
 .skip-btn {
   width: 28px; height: 28px; margin-top: 6px;
-  border: 1px solid rgba(15,18,16,0.14); background: transparent;
+  border: 1px solid rgba(22,19,15,0.14); background: transparent;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 0.72rem; color: rgba(15,18,16,0.35);
+  cursor: pointer; font-size: 0.72rem; color: rgba(22,19,15,0.35);
   transition: all 0.15s;
 }
-.skip-btn:hover { border-color: #767676; color: #767676; }
-.skip-btn--active { background: #767676; border-color: #767676; color: #fff; }
+.skip-btn:hover { border-color: #8A8A8A; color: #8A8A8A; }
+.skip-btn--active { background: #8A8A8A; border-color: #8A8A8A; color: #fff; }
 .skip-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 /* Skipped card */
@@ -1059,46 +1143,36 @@ async function loadWorkoutAdaptations() {
 .athlete-note-row {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 10px; padding-top: 10px;
-  border-top: 1px solid rgba(15,18,16,0.06);
+  border-top: 1px solid rgba(22,19,15,0.06);
 }
 .rpe-chip {
   font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
   background: rgba(42,85,245,0.08); color: #2A55F5; padding: 2px 8px;
 }
-.athlete-note-text { font-size: 0.82rem; color: rgba(15,18,16,0.55); font-style: italic; flex: 1; min-width: 0; }
+.athlete-note-text { font-size: 0.82rem; color: rgba(22,19,15,0.55); font-style: italic; flex: 1; min-width: 0; }
 .note-edit-btn { background: none; border: none; color: #ccc; font-size: 0.7rem; cursor: pointer; padding: 0 4px; }
-.note-edit-btn:hover { color: #767676; }
+.note-edit-btn:hover { color: #8A8A8A; }
 
 /* Workout bottom actions */
 .workout-bottom-actions {
   display: flex; gap: 8px; margin-top: 12px; padding-top: 10px;
-  border-top: 1px solid rgba(15,18,16,0.06);
+  border-top: 1px solid rgba(22,19,15,0.06);
 }
 .wba-btn {
   display: inline-flex; align-items: center; gap: 4px;
-  background: none; border: 1px solid rgba(15,18,16,0.12);
+  background: none; border: 1px solid rgba(22,19,15,0.12);
   font-family: inherit; font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.05em; text-transform: uppercase;
-  color: rgba(15,18,16,0.55); padding: 5px 12px; cursor: pointer;
+  color: rgba(22,19,15,0.55); padding: 5px 12px; cursor: pointer;
   transition: all 0.15s;
 }
-.wba-btn:hover { border-color: #000; color: #000; }
+.wba-btn:hover { border-color: #16130F; color: #16130F; }
 .wba-btn-start {
   background: #2A55F5; border-color: #2A55F5; color: #fff;
 }
 .wba-btn-start:hover { background: #1E42D6; border-color: #1E42D6; color: #fff; }
 
-/* Post-completion panel */
-.completion-panel {
-  background: #000; color: #fff;
-  padding: 20px; display: flex; flex-direction: column; gap: 14px;
-  animation: slideDown 0.2s ease;
-}
-@keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-.cp-header { display: flex; align-items: center; justify-content: space-between; }
-.cp-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-.cp-close { background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1rem; cursor: pointer; padding: 0; }
-.cp-close:hover { color: #fff; }
+/* Post-completion RPE/notes — used by the bottom sheet only */
 .rpe-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .rpe-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); flex-shrink: 0; }
 .rpe-btns { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -1117,7 +1191,6 @@ async function loadWorkoutAdaptations() {
 }
 .cp-notes::placeholder { color: rgba(255,255,255,0.30); }
 .cp-notes:focus { border-color: rgba(255,255,255,0.40); }
-.cp-actions { display: flex; gap: 10px; justify-content: flex-end; }
 .cp-skip-btn {
   background: none; border: 1px solid rgba(255,255,255,0.20); color: rgba(255,255,255,0.55);
   font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
@@ -1135,23 +1208,24 @@ async function loadWorkoutAdaptations() {
   background: #fff; border: 2px solid #E7DFCE; border-top: none;
   padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
 }
-.ap-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #767676; margin-bottom: 4px; }
-.ap-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ap-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #8A8A8A; margin-bottom: 4px; }
+.ap-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+.ap-select { background: #fff; cursor: pointer; }
 .ap-field { display: flex; flex-direction: column; gap: 4px; }
 .ap-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #999; }
 .ap-input {
   height: 38px; border: 2px solid #E7DFCE; padding: 0 10px;
   font-family: inherit; font-size: 0.88rem; outline: none;
 }
-.ap-input:focus { border-color: #000; }
+.ap-input:focus { border-color: #16130F; }
 .ap-textarea {
   border: 2px solid #E7DFCE; padding: 8px 10px; font-family: inherit;
   font-size: 0.85rem; outline: none; resize: none; width: 100%; box-sizing: border-box;
 }
-.ap-textarea:focus { border-color: #000; }
+.ap-textarea:focus { border-color: #16130F; }
 .ap-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
 .ap-cancel {
-  background: none; border: 2px solid #E7DFCE; color: #767676;
+  background: none; border: 2px solid #E7DFCE; color: #8A8A8A;
   font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; padding: 8px 16px; cursor: pointer;
 }
@@ -1174,18 +1248,26 @@ async function loadWorkoutAdaptations() {
 
 /* Buttons */
 .btn {
-  border: 1px solid rgba(15,18,16,0.14); background: rgba(255,255,255,0.60);
-  color: rgba(15,18,16,0.78); border-radius: 0; height: 40px; padding: 0 18px;
-  font-weight: 700; font-family: inherit;
+  border: 2px solid #16130F; background: #fff;
+  color: #16130F; border-radius: 0; height: 40px; padding: 0 18px;
+  font-weight: 700; font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; transition: all 0.2s;
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: #2A55F5; border-color: transparent; color: white; }
+.btn-primary {
+  background: #2A55F5; border-color: #16130F; color: #fff;
+  border-radius: 999px; box-shadow: 3px 3px 0 #16130F;
+}
 .btn-primary:hover:not(:disabled) { background: #1E42D6; }
-.btn-outline-danger { background: rgba(255,255,255,0.70); border-color: rgba(220,38,38,0.30); color: #dc2626; }
-.btn-outline-danger:hover:not(:disabled) { background: rgba(220,38,38,0.06); }
-.btn-sm { height: 36px; padding: 0 14px; font-size: 0.85rem; border-radius: 0; }
+.btn-outline-danger { background: #fff; border-color: #C0392B; color: #C0392B; }
+.btn-outline-danger:hover:not(:disabled) { background: rgba(192,57,43,0.06); }
+.adaptive-toggle-btn { background: #fff; border-color: #2A55F5; color: #2A55F5; }
+.adaptive-toggle-btn:hover:not(:disabled) { background: #EEF1FF; }
+.adaptive-toggle-btn--off { border-color: #8A8A8A; color: #8A8A8A; }
+.adaptive-toggle-btn--off:hover:not(:disabled) { background: rgba(138,138,138,0.08); }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 0.72rem; }
 .mt-3 { margin-top: 16px; }
 
 @media (max-width: 640px) {
@@ -1202,7 +1284,7 @@ async function loadWorkoutAdaptations() {
   display: flex; align-items: flex-end;
 }
 .rpe-sheet {
-  width: 100%; background: #000; color: #fff;
+  width: 100%; background: #16130F; color: #fff;
   border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .rpe-sheet-handle {
