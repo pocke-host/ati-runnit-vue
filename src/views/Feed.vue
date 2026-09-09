@@ -229,6 +229,7 @@
       <div class="modal-box">
         <h2 class="modal-title">Create Multisport Event</h2>
         <CreateEventForm
+          :initialActivityId="route.query.activityId"
           @saved="onEventCreated"
           @cancel="showCreateEvent = false"
         />
@@ -392,7 +393,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
@@ -410,6 +411,7 @@ import CreateEventForm from '@/components/CreateEventForm.vue'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const route = useRoute()
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 const MAPBOX_STYLE = 'quinn-runnit/cmml6ynyy000701suetifc5y0' // same branded style as RouteViewer.vue
 
@@ -812,6 +814,7 @@ const { refreshing: feedRefreshing, pullY: feedPullY } = usePullToRefresh(fetchF
 onMounted(() => {
   fetchFeed()
   loadFollowStatus()
+  if (route.query.createEvent === '1') showCreateEvent.value = true
   document.addEventListener('keydown', handleKeydown)
 })
 

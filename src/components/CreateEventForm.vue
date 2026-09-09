@@ -102,7 +102,10 @@ import { useActivityStore } from '@/stores/activity'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 
-const props = defineProps({ initial: { type: Object, default: null } })
+const props = defineProps({
+  initial: { type: Object, default: null },
+  initialActivityId: { type: [String, Number], default: null },
+})
 const emit  = defineEmits(['saved', 'cancel'])
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
@@ -119,7 +122,7 @@ const form = ref({
   eventType: props.initial?.eventType || 'TRIATHLON',
   eventDate: props.initial?.eventDate || '',
   notes:     props.initial?.notes     || '',
-  segments:  (props.initial?.segments || []).map(s => ({
+  segments:  (props.initial?.segments || (props.initialActivityId ? [{ label: 'RUN', activityId: props.initialActivityId }] : [])).map(s => ({
     _key: ++_keyCounter,
     label:      s.label || 'OTHER',
     activityId: s.activityId || '',
