@@ -111,6 +111,32 @@
       </div>
     </section>
 
+    <!-- OFFICIAL RESULTS -->
+    <section class="results-import-section">
+      <div class="container-xxl results-import-inner">
+        <div>
+          <div class="hero-eyebrow">Race history</div>
+          <h2 class="results-import-title">Official results</h2>
+          <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
+        </div>
+        <form class="results-import-form" @submit.prevent="importResult">
+          <input v-model="resultForm.raceName" required placeholder="Race name" class="result-input" />
+          <input v-model="resultForm.raceDate" type="date" class="result-input" />
+          <input v-model="resultForm.distance" placeholder="Distance (e.g. Marathon)" class="result-input" />
+          <input v-model.number="resultForm.finishTimeSeconds" type="number" min="1" placeholder="Finish seconds" class="result-input" />
+          <input v-model="resultForm.source" placeholder="Provider (e.g. RunSignup)" class="result-input" />
+          <input v-model="resultForm.resultUrl" type="url" placeholder="Official result URL" class="result-input" />
+          <button class="result-submit" :disabled="resultSaving">{{ resultSaving ? 'Importing…' : 'Import result' }}</button>
+        </form>
+        <div v-if="raceResults.length" class="result-history">
+          <div v-for="result in raceResults" :key="result.id" class="result-history-row">
+            <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.source }}</span></div>
+            <a v-if="result.resultUrl" :href="result.resultUrl" target="_blank" rel="noopener">Verify ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- RESULTS -->
     <section class="results">
       <div class="container-xxl">
@@ -309,6 +335,25 @@ const { showToast } = useToast()
 /* ─── Bookmarks ───────────────────────────────────────────── */
 const bookmarkedIds = ref(new Set())
 const bookmarkIdMap = ref({})
+const raceResults = ref([])
+const resultSaving = ref(false)
+const resultForm = ref({ raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' })
+
+const loadRaceResults = async () => {
+  try { const { data } = await axios.get(`${API_URL}/race-results`); raceResults.value = Array.isArray(data) ? data : [] } catch { /* unauthenticated users can still browse races */ }
+}
+
+const importResult = async () => {
+  if (resultSaving.value) return
+  resultSaving.value = true
+  try {
+    const { data } = await axios.post(`${API_URL}/race-results/import`, resultForm.value)
+    raceResults.value.unshift(data)
+    resultForm.value = { raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' }
+    showToast('Official result imported.', 'success')
+  } catch (err) { showToast(err.response?.data?.error || 'Result import failed.', 'error') }
+  finally { resultSaving.value = false }
+}
 
 const loadBookmarks = async () => {
   try {
@@ -1128,6 +1173,7 @@ const generatePlan = async (event) => {
 onMounted(() => {
   fetchEvents()
   loadBookmarks()
+  loadRaceResults()
 })
 
 // Re-fetch when zipcode changes (debounced)
@@ -1140,6 +1186,19 @@ watch(zipcode, () => {
 
 <style scoped>
 @keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+.results-import-section { padding: 28px 0; background: #FFC53D; border-top: 2px solid #16130F; border-bottom: 2px solid #16130F; }
+.results-import-inner { display: grid; grid-template-columns: minmax(220px, .8fr) 1.2fr; gap: 24px; align-items: start; }
+.results-import-title { margin: 4px 0; font-size: 2rem; font-weight: 900; text-transform: uppercase; }
+.results-import-copy { max-width: 380px; margin: 0; font-size: .82rem; }
+.results-import-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.result-input { min-width: 0; padding: 10px; border: 2px solid #16130F; background: #fff; font-size: .78rem; }
+.result-submit { grid-column: 1 / -1; border: 2px solid #16130F; padding: 10px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.result-submit:disabled { opacity: .5; }
+.result-history { grid-column: 1 / -1; display: grid; gap: 6px; margin-top: 4px; }
+.result-history-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; background: #fff; border: 2px solid #16130F; font-size: .8rem; }
+.result-history-row span { display: block; color: #5A5348; font-size: .7rem; margin-top: 3px; }
+.result-history-row a { color: #2A55F5; font-weight: 800; white-space: nowrap; }
+@media (max-width: 700px) { .results-import-inner { grid-template-columns: 1fr; } .results-import-form { grid-template-columns: 1fr; } .result-submit { grid-column: auto; } }
 
 /* Ticker */
 .ev-ticker-wrap {
