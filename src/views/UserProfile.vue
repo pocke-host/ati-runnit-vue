@@ -104,8 +104,12 @@
             <span class="ctab-count">{{ moments.length }}</span>
           </button>
           <button :class="['ctab', { active: tab === 'badges' }]" @click="tab = 'badges'">
-            <i class="bi bi-trophy me-2"></i>Badges
+            <i class="bi bi-trophy me-2"></i>Trophy Case
             <span class="ctab-count">{{ profileBadges.filter(b => b.earned).length }}</span>
+          </button>
+          <button :class="['ctab', { active: tab === 'races' }]" @click="tab = 'races'">
+            <i class="bi bi-flag me-2"></i>Races
+            <span class="ctab-count">{{ raceActivities.length }}</span>
           </button>
           <button :class="['ctab', { active: tab === 'journey' }]" @click="tab = 'journey'">
             <i class="bi bi-map me-2"></i>Journey
@@ -204,6 +208,25 @@
                 <span><i class="bi bi-chat-fill me-1"></i>{{ m.commentCount || 0 }}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ── RACES TAB ── -->
+        <div v-if="tab === 'races'">
+          <div v-if="raceActivities.length === 0" class="tab-empty">
+            <i class="bi bi-flag"></i>
+            <p>No races on the board yet.</p>
+            <span>Race-distance activities will show up here automatically.</span>
+          </div>
+          <div v-else class="races-list">
+            <router-link v-for="race in raceActivities" :key="race.id" :to="`/activities/${race.id}`" class="race-row">
+              <div class="race-row-icon">🏁</div>
+              <div class="race-row-body">
+                <div class="race-row-name">{{ raceDistanceLabel(race) }} Race</div>
+                <div class="race-row-meta">{{ formatTimeFull(race.performedAt || race.createdAt) }} · {{ formatDistance(race.distanceMeters) }}</div>
+              </div>
+              <div class="race-row-time">{{ formatDuration(race.durationSeconds) }}</div>
+            </router-link>
           </div>
         </div>
 
@@ -437,6 +460,9 @@ const badgesLoaded = ref(false)
 const profileEvents = ref([])
 const eventsLoading = ref(false)
 const eventsLoaded = ref(false)
+const raceActivitiesSource = ref([])
+const racesLoaded = ref(false)
+const racesLoading = ref(false)
 
 const profileId = computed(() => route.params.id)
 const isOwnProfile = computed(() => user.value?.id && String(user.value.id) === String(profileId.value))
@@ -447,6 +473,15 @@ const disciplineData  = computed(() => useDisciplineScore(profileActivities.valu
 const archetypeData   = computed(() => useArchetype(profileActivities.value))
 const serverArchetype = ref(null)
 const growthTimeline  = computed(() => useGrowthTimeline(profileActivities.value))
+const raceActivities = computed(() => (raceActivitiesSource.value.length ? raceActivitiesSource.value : profileActivities.value || [])
+  .filter(a => ['RUN', 'Running'].includes(a.sportType) && raceDistanceLabel(a))
+  .sort((a, b) => new Date(b.performedAt || b.createdAt) - new Date(a.performedAt || a.createdAt)))
+
+function raceDistanceLabel(activity) {
+  const km = (activity?.distanceMeters || 0) / 1000
+  const distances = [[5, '5K'], [10, '10K'], [21.0975, 'Half Marathon'], [42.195, 'Marathon']]
+  return distances.find(([distance]) => Math.abs(km - distance) / distance <= 0.05)?.[1] || ''
+}
 
 // Streak
 const currentStreak = computed(() => {
@@ -667,6 +702,20 @@ function switchToEvents() {
   if (!eventsLoaded.value) loadEvents()
 }
 
+async function loadRaces() {
+  if (racesLoaded.value || racesLoading.value) return
+  racesLoading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/activities?userId=${profileId.value}&page=0&size=200`, { headers: getAuthHeaders() })
+    raceActivitiesSource.value = data.content || data || []
+    racesLoaded.value = true
+  } catch {
+    raceActivitiesSource.value = profileActivities.value
+  } finally {
+    racesLoading.value = false
+  }
+}
+
 function eventTypeLabel(type) {
   const map = { TRIATHLON: 'Triathlon', DUATHLON: 'Duathlon', AQUABIKE: 'Aquabike', BRICK: 'Brick', STAGE_RACE: 'Stage Race', TRIP: 'Trip', MULTISPORT: 'Multisport', OTHER: 'Event' }
   return map[type] || type
@@ -680,6 +729,7 @@ watch(tab, (val) => {
   if (val === 'badges' && !badgesLoaded.value) {
     loadBadges()
   }
+  if (val === 'races') loadRaces()
 })
 
 // Re-load when navigating between profiles
@@ -693,6 +743,8 @@ const init = async () => {
   badgesLoaded.value = false
   profileEvents.value = []
   eventsLoaded.value = false
+  raceActivitiesSource.value = []
+  racesLoaded.value = false
   await loadProfile()
   if (!notFound.value && !pageError.value) {
     await Promise.all([loadActivities(), loadFollowStatus()])
@@ -1255,6 +1307,14 @@ onMounted(init)
 }
 
 /* Events tab */
+.races-list { display: grid; gap: 10px; }
+.race-row { display: flex; align-items: center; gap: 14px; padding: 16px; background: #fff; border: 2px solid #16130F; color: #16130F; text-decoration: none; }
+.race-row:hover { color: #16130F; transform: translateX(3px); }
+.race-row-icon { font-size: 1.5rem; }
+.race-row-body { flex: 1; min-width: 0; }
+.race-row-name { font-weight: 800; }
+.race-row-meta { color: #5A5348; font-size: .78rem; margin-top: 3px; }
+.race-row-time { font-family: 'Spline Sans Mono', monospace; font-weight: 800; white-space: nowrap; }
 .events-list { display: flex; flex-direction: column; }
 .event-row {
   display: flex; align-items: center; justify-content: space-between;

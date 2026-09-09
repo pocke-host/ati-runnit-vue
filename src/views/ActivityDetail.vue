@@ -194,6 +194,16 @@
               <div class="notes-label">Notes</div>
               <p class="notes-text">{{ activity.notes }}</p>
             </div>
+
+            <div v-if="activity.listeningTrack" class="listening-row">
+              <i class="bi bi-music-note-beamed"></i>
+              <div>
+                <div class="listening-label">Listening to</div>
+                <a v-if="activity.listeningUrl" :href="activity.listeningUrl" target="_blank" rel="noopener" class="listening-track">{{ activity.listeningTrack }}</a>
+                <div v-else class="listening-track">{{ activity.listeningTrack }}</div>
+                <div v-if="activity.listeningArtist" class="listening-artist">{{ activity.listeningArtist }}</div>
+              </div>
+            </div>
           </div>
 
           <!-- Strength Exercises -->
@@ -382,7 +392,7 @@
               </div>
 
               <div v-else class="comments">
-                <div v-for="c in comments" :key="c.id" class="comment">
+                <div v-for="c in comments" :key="c.id" :class="['comment', { 'comment-reply': c.parentId }]">
                   <div class="gr-comment-avatar" :style="{ background: ['#2A55F5','#16130F','#FFC53D'][((c.user?.displayName||'').charCodeAt(0)||65) % 3], color: ((c.user?.displayName||'').charCodeAt(0)||65) % 3 === 2 ? '#16130F' : '#fff' }">
                     {{ ((c.user?.displayName||'').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?') }}
                   </div>
@@ -392,12 +402,16 @@
                       <span class="comment-time">{{ formatTime(c.createdAt) }}</span>
                     </div>
                     <p class="comment-text">{{ c.text }}</p>
+                    <img v-if="c.mediaUrl && c.mediaType === 'IMAGE'" :src="c.mediaUrl" alt="Comment attachment" class="comment-media" loading="lazy" />
+                    <a v-else-if="c.mediaUrl" :href="c.mediaUrl" target="_blank" rel="noopener" class="comment-media-link">View attachment</a>
+                    <button type="button" class="comment-reply-btn" @click="startReply(c)">Reply</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <form @submit.prevent="submitComment" class="comment-form">
+              <form @submit.prevent="submitComment" class="comment-form">
+                <div v-if="replyingTo" class="replying-to">Replying to comment <button type="button" @click="replyingTo = null">×</button></div>
               <input
                 v-model="newComment"
                 type="text"
@@ -476,6 +490,7 @@ const comments = ref([])
 const commentsLoading = ref(false)
 const newComment = ref('')
 const commentLoading = ref(false)
+const replyingTo = ref(null)
 const reactionLoading = ref(false)
 const userReactions = ref(new Set())
 const reactionCounts = ref({})
@@ -906,14 +921,20 @@ const submitComment = async () => {
   if (!newComment.value.trim() || commentLoading.value) return
   commentLoading.value = true
   try {
-    const data = await activityStore.addComment(activityId.value, newComment.value.trim())
+    const data = await activityStore.addComment(activityId.value, newComment.value.trim(), replyingTo.value ? { parentId: replyingTo.value.id } : {})
     comments.value.push(data)
     newComment.value = ''
+    replyingTo.value = null
   } catch (err) {
     showToast(err.response?.data?.error || "Comment didn't send. Try again.", 'error')
   } finally {
     commentLoading.value = false
   }
+}
+
+const startReply = (comment) => {
+  replyingTo.value = comment
+  document.querySelector('.comment-input')?.focus()
 }
 
 const handleDelete = () => { showDeleteConfirm.value = true }
@@ -1517,6 +1538,18 @@ onMounted(init)
   color: #5A5348;
 }
 .comment-text { margin: 0; font-size: 0.88rem; color: #16130F; line-height: 1.55; }
+.comment-reply { margin-left: 24px; padding-left: 12px; border-left: 2px solid #2A55F5; }
+.comment-reply-btn { border: 0; background: transparent; color: #2A55F5; font-size: .7rem; font-weight: 800; padding: 5px 0 0; cursor: pointer; }
+.comment-media { display: block; max-width: 220px; max-height: 180px; object-fit: cover; margin-top: 8px; border: 2px solid #16130F; }
+.comment-media-link { display: inline-block; margin-top: 8px; color: #2A55F5; font-size: .75rem; font-weight: 700; }
+.replying-to { flex-basis: 100%; color: #5A5348; font-size: .75rem; }
+.replying-to button { border: 0; background: transparent; font-size: 1rem; cursor: pointer; }
+.listening-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 18px; padding-top: 14px; border-top: 1.5px solid #E7DFCE; }
+.listening-row > i { color: #2A55F5; font-size: 1.1rem; }
+.listening-label { color: #5A5348; font-family: 'Spline Sans Mono', monospace; font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.listening-track { color: #16130F; font-weight: 800; text-decoration: none; }
+.listening-track:hover { color: #2A55F5; }
+.listening-artist { color: #5A5348; font-size: .78rem; }
 
 /* Comment form */
 .comment-form {
