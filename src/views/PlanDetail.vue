@@ -316,6 +316,9 @@
                 >
                   <i class="bi bi-play-fill me-1"></i>Start
                 </button>
+                <button class="wba-btn" @click="openActivityPicker(workout)">
+                  <i class="bi bi-link-45deg me-1"></i>{{ workout.linkedActivityId ? 'Change activity' : 'Attach activity' }}
+                </button>
               </div>
             </div>
           </div><!-- /.workout-card -->
@@ -442,7 +445,24 @@
         </div>
       </div>
     </Transition>
-  </Teleport>
+      </Teleport>
+
+      <Teleport to="body">
+        <div v-if="activityPickerWorkout" class="attach-overlay" @click.self="activityPickerWorkout = null">
+          <div class="attach-modal">
+            <div class="attach-modal-head"><strong>Attach an activity</strong><button @click="activityPickerWorkout = null">×</button></div>
+            <p class="attach-help">Link a completed activity to “{{ activityPickerWorkout.title }}”.</p>
+            <select v-model="selectedActivityId" class="attach-select">
+              <option value="">Choose an activity…</option>
+              <option v-for="a in attachableActivities" :key="a.id" :value="String(a.id)">{{ activityLabel(a) }}</option>
+            </select>
+            <div class="attach-actions">
+              <button v-if="activityPickerWorkout.linkedActivityId" class="attach-clear" @click="saveActivityAttachment(null)">Unlink</button>
+              <button class="attach-save" @click="saveActivityAttachment(selectedActivityId || null)" :disabled="attachmentSaving">{{ attachmentSaving ? 'Saving…' : 'Save link' }}</button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
 </template>
 
 <script setup>
@@ -453,10 +473,13 @@ import { useUnits } from '@/composables/useUnits'
 import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth.js'
 import { storeToRefs } from 'pinia'
+import { useActivityStore } from '@/stores/activity.js'
 
 const router = useRouter()
 const route = useRoute()
 const planStore = usePlanStore()
+const activityStore = useActivityStore()
+const { activities } = storeToRefs(activityStore)
 const { formatDistance, isImperial } = useUnits()
 const distLabel = computed(() => isImperial.value ? 'mi' : 'km')
 
@@ -488,6 +511,11 @@ const weekTabsEl = ref(null)
 const workoutLoading = ref({})
 const actionLoading = ref(false)
 const showDeleteConfirm = ref(false)
+const activityPickerWorkout = ref(null)
+const selectedActivityId = ref('')
+const attachmentSaving = ref(false)
+const attachableActivities = computed(() => (activities.value || []).filter(a => a?.id).slice(0, 200))
+const activityLabel = (a) => `${new Date(a.performedAt || a.createdAt || Date.now()).toLocaleDateString()} · ${a.title || a.sportType || 'Activity'}${a.distanceMeters ? ` · ${(a.distanceMeters / 1000).toFixed(1)} km` : ''}`
 
 // Post-completion RPE + notes
 const postCompletion = ref(null) // { id, rpe, notes }
@@ -680,6 +708,24 @@ const startWorkout = (workout) => {
   router.push(`/track?planId=${plan.value?.id}&workoutId=${workout.id}`)
 }
 
+const openActivityPicker = async (workout) => {
+  activityPickerWorkout.value = workout
+  selectedActivityId.value = workout.linkedActivityId ? String(workout.linkedActivityId) : ''
+  if (!activities.value.length) await activityStore.fetchActivities()
+}
+
+const saveActivityAttachment = async (activityId) => {
+  if (!activityPickerWorkout.value || attachmentSaving.value) return
+  attachmentSaving.value = true
+  try {
+    await planStore.updateWorkout(plan.value.id, activityPickerWorkout.value.id, { linkedActivityId: activityId })
+    activityPickerWorkout.value.linkedActivityId = activityId
+    showToast(activityId ? 'Activity attached to the training block.' : 'Activity unlinked.', 'success')
+    activityPickerWorkout.value = null
+  } catch { showToast('Couldn’t update that activity link.', 'error') }
+  finally { attachmentSaving.value = false }
+}
+
 const toggleAdjust = (workoutId) => {
   const s = new Set(adjustOpen.value)
   if (s.has(workoutId)) {
@@ -818,6 +864,17 @@ async function loadWorkoutAdaptations() {
   padding-top: var(--page-top);
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
+.attach-overlay { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(22,19,15,.55); }
+.attach-modal { width: min(440px, 100%); padding: 20px; background: var(--r-offwhite); border: 2px solid #16130F; box-shadow: 6px 6px 0 #16130F; }
+.attach-modal-head { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; }
+.attach-modal-head button { border: 0; background: transparent; font-size: 1.5rem; cursor: pointer; }
+.attach-help { color: #5A5348; font-size: .82rem; }
+.attach-select { width: 100%; border: 2px solid #16130F; padding: 11px; background: #fff; }
+.attach-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.attach-clear, .attach-save { border: 2px solid #16130F; padding: 9px 13px; font-weight: 800; cursor: pointer; }
+.attach-clear { background: transparent; }
+.attach-save { background: #2A55F5; color: #fff; }
+.attach-save:disabled { opacity: .5; }
 
 /* Page loading */
 .page-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; color: rgba(22,19,15,0.55); }
