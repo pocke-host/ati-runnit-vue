@@ -130,6 +130,11 @@
         <p class="lt-notes-sub">Add a note while it's fresh</p>
         <div class="lt-listening-fields">
           <div class="lt-listening-heading"><i class="bi bi-music-note-beamed"></i> Listening to</div>
+          <SpotifyTrackPicker v-if="!listeningTrack" @select="selectListeningTrack" />
+          <div v-else class="lt-selected-track">
+            <strong>{{ listeningTrack }}</strong><span v-if="listeningArtist"> · {{ listeningArtist }}</span>
+            <button type="button" @click="clearListeningTrack">Change</button>
+          </div>
           <input v-model="listeningTrack" class="lt-notes-textarea lt-listening-input" placeholder="Track or podcast (optional)" />
           <input v-model="listeningArtist" class="lt-notes-textarea lt-listening-input" placeholder="Artist / show (optional)" />
         </div>
@@ -298,6 +303,7 @@ import { useVoiceNote } from '@/composables/useVoiceNote'
 import { useToast } from '@/composables/useToast'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import axios from 'axios'
+import SpotifyTrackPicker from '@/components/SpotifyTrackPicker.vue'
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
 
@@ -363,6 +369,7 @@ const postNotes        = ref('')
 const notesSubmitting  = ref(false)
 const listeningTrack   = ref('')
 const listeningArtist  = ref('')
+const listeningUrl     = ref('')
 
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 const { showToast } = useToast()
@@ -804,7 +811,7 @@ const stopTracking = async () => {
 
 async function finishWithNotes() {
   if (notesSubmitting.value) return
-  if (postNotes.value.trim() && savedActivityId.value) {
+  if ((postNotes.value.trim() || listeningTrack.value.trim()) && savedActivityId.value) {
     notesSubmitting.value = true
     try {
       const token = localStorage.getItem('token')
@@ -815,6 +822,7 @@ async function finishWithNotes() {
           listeningTrack: listeningTrack.value.trim(),
           listeningArtist: listeningArtist.value.trim(),
           listeningProvider: listeningTrack.value.trim() ? 'SPOTIFY' : '',
+          listeningUrl: listeningUrl.value || '',
         },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -825,6 +833,18 @@ async function finishWithNotes() {
     }
   }
   router.push('/dashboard')
+}
+
+function selectListeningTrack(track) {
+  listeningTrack.value = track.name || ''
+  listeningArtist.value = track.artist || ''
+  listeningUrl.value = track.externalUrl || ''
+}
+
+function clearListeningTrack() {
+  listeningTrack.value = ''
+  listeningArtist.value = ''
+  listeningUrl.value = ''
 }
 
 function skipNotes() {
@@ -1659,6 +1679,8 @@ onUnmounted(() => {
 }
 .lt-notes-done:hover:not(:disabled) { background: #1E42D6; }
 .lt-notes-done:disabled { opacity: 0.5; cursor: not-allowed; }
+.lt-selected-track { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; font-size: .78rem; }
+.lt-selected-track button { margin-left: auto; border: 0; background: transparent; color: #2A55F5; font-size: .7rem; font-weight: 800; cursor: pointer; }
 
 /* ── Mapbox control overrides ── */
 :deep(.mapboxgl-ctrl-geolocate),
