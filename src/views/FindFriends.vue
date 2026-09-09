@@ -204,6 +204,8 @@ async function copyInviteLink() {
     await navigator.clipboard.writeText(inviteUrl.value)
     copied.value = true
     setTimeout(() => { copied.value = false }, 2000)
+    // Best-effort funnel tracking — never block the copy UX on this.
+    axios.post(`${API}/invite/copied`, {}, { headers: getAuthHeaders() }).catch(() => {})
   } catch {
     showToast("Couldn't copy — long-press the link to copy it manually.", 'error')
   }
