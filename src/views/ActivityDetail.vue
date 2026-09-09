@@ -412,13 +412,23 @@
 
               <form @submit.prevent="submitComment" class="comment-form">
                 <div v-if="replyingTo" class="replying-to">Replying to comment <button type="button" @click="replyingTo = null">×</button></div>
-              <input
-                v-model="newComment"
+                <input
+                  v-model="newComment"
                 type="text"
                 class="comment-input"
                 placeholder="Add a comment…"
                 :disabled="commentLoading"
-              />
+                @input="searchMentionUsers"
+                />
+              <div v-if="mentionSuggestions.length" class="mention-suggestions">
+                <button v-for="candidate in mentionSuggestions" :key="candidate.id" type="button" @click="selectMention(candidate)">
+                  @{{ candidate.user || candidate.displayName }}
+                </button>
+              </div>
+              <label class="comment-attach" title="Attach an image or GIF">
+                <i class="bi bi-paperclip"></i>
+                <input type="file" accept="image/*" @change="handleCommentMedia" :disabled="commentLoading" />
+              </label>
               <button
                 type="submit"
                 class="comment-submit"
@@ -458,6 +468,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import { useUploadStore } from '@/stores/upload'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
 import { useNotificationStore } from '@/stores/notification'
@@ -473,6 +484,7 @@ const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
 const activityStore = useActivityStore()
 const notificationStore = useNotificationStore()
+const uploadStore = useUploadStore()
 
 const { formatDistance, formatDuration, formatPace, formatElevation, formatWeight, isImperial } = useUnits()
 const { sportIconClass } = useSportIcon()
@@ -491,6 +503,9 @@ const commentsLoading = ref(false)
 const newComment = ref('')
 const commentLoading = ref(false)
 const replyingTo = ref(null)
+const mentionSuggestions = ref([])
+const commentMediaUrl = ref('')
+const commentMediaType = ref('')
 const reactionLoading = ref(false)
 const userReactions = ref(new Set())
 const reactionCounts = ref({})
@@ -921,15 +936,47 @@ const submitComment = async () => {
   if (!newComment.value.trim() || commentLoading.value) return
   commentLoading.value = true
   try {
-    const data = await activityStore.addComment(activityId.value, newComment.value.trim(), replyingTo.value ? { parentId: replyingTo.value.id } : {})
+    const options = {
+      ...(replyingTo.value ? { parentId: replyingTo.value.id } : {}),
+      ...(commentMediaUrl.value ? { mediaUrl: commentMediaUrl.value, mediaType: commentMediaType.value } : {}),
+    }
+    const data = await activityStore.addComment(activityId.value, newComment.value.trim(), options)
     comments.value.push(data)
     newComment.value = ''
     replyingTo.value = null
+    commentMediaUrl.value = ''
+    commentMediaType.value = ''
   } catch (err) {
     showToast(err.response?.data?.error || "Comment didn't send. Try again.", 'error')
   } finally {
     commentLoading.value = false
   }
+}
+
+const searchMentionUsers = async () => {
+  const match = newComment.value.match(/(?:^|\s)@([\w.-]{2,30})$/)
+  if (!match) { mentionSuggestions.value = []; return }
+  try {
+    const { data } = await axios.get(`${API_URL}/users/search`, { params: { query: match[1] }, headers: getAuthHeaders() })
+    mentionSuggestions.value = Array.isArray(data) ? data.slice(0, 5) : []
+  } catch { mentionSuggestions.value = [] }
+}
+
+const selectMention = (candidate) => {
+  const handle = candidate.user || candidate.displayName
+  newComment.value = newComment.value.replace(/@[\w.-]{2,30}$/, `@${handle} `)
+  mentionSuggestions.value = []
+}
+
+const handleCommentMedia = async (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+  if (file.size > 10 * 1024 * 1024) { showToast('Attachments must be under 10 MB.', 'error'); return }
+  try {
+    commentMediaUrl.value = await uploadStore.uploadImage(file)
+    commentMediaType.value = 'IMAGE'
+    showToast('Attachment ready.', 'success')
+  } catch { showToast('Attachment upload failed.', 'error') }
 }
 
 const startReply = (comment) => {
@@ -1553,6 +1600,7 @@ onMounted(init)
 
 /* Comment form */
 .comment-form {
+  position: relative;
   display: flex;
   gap: 8px;
   border-top: 2px solid #E7DFCE;
@@ -1589,6 +1637,11 @@ onMounted(init)
 }
 .comment-submit:hover:not(:disabled) { background: #1E42D6; }
 .comment-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.comment-attach { width: 36px; height: 44px; display: grid; place-items: center; border: 2px solid #16130F; color: #2A55F5; cursor: pointer; }
+.comment-attach input { display: none; }
+.mention-suggestions { position: absolute; bottom: 58px; left: 0; display: flex; flex-direction: column; background: #fff; border: 2px solid #16130F; z-index: 2; }
+.mention-suggestions button { border: 0; background: #fff; text-align: left; padding: 8px 12px; font-size: .78rem; cursor: pointer; }
+.mention-suggestions button:hover { background: #FBF6EC; }
 
 /* PR Banner */
 .pr-banner {

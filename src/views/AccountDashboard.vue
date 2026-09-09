@@ -34,6 +34,9 @@
             </div>
             <div class="db2-hero-right">
               <span class="db2-phase-badge">{{ trainingBlock.label }} PHASE</span>
+              <router-link v-if="daysToRace !== null" :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="db2-race-countdown">
+                {{ daysToRace === 0 ? 'RACE DAY' : `${daysToRace} DAYS TO RACE` }}
+              </router-link>
               <span v-if="riskBadge" :class="['db2-risk-badge', riskBadge.modifier]">{{ riskBadge.label }}</span>
               <button class="db2-btn-ghost" type="button" @click="openActivityModal">＋ Log</button>
               <button class="db2-btn-cobalt" type="button" @click="openMomentModal">◉ Moment</button>
@@ -1625,6 +1628,14 @@ const todayWorkout = computed(() => {
 const disciplineData = computed(() => useDisciplineScore(activities.value))
 const trainingBlock  = computed(() => useTrainingBlock(activities.value))
 const archetypeData  = computed(() => useArchetype(activities.value))
+const daysToRace = computed(() => {
+  const target = fullActivePlan.value?.targetRaceDate || activePlan.value?.targetRaceDate
+  if (!target) return null
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const race = new Date(`${target}T00:00:00`)
+  const days = Math.ceil((race - today) / 86400000)
+  return days >= 0 ? days : null
+})
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -3693,6 +3704,20 @@ textarea.form-control{resize:vertical;min-height:72px}
   border: 2px solid #16130F;
   transform: rotate(-2deg);
 }
+.db2-race-countdown {
+  display: inline-block;
+  color: #16130F;
+  background: #fff;
+  border: 2px solid #16130F;
+  padding: 8px 10px;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-decoration: none;
+  transform: rotate(2deg);
+}
+.db2-race-countdown:hover { color: #16130F; background: #FBF6EC; }
 .db2-risk-badge {
   display: inline-block;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;

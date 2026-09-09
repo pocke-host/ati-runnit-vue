@@ -213,10 +213,18 @@
 
         <!-- ── RACES TAB ── -->
         <div v-if="tab === 'races'">
-          <div v-if="raceActivities.length === 0" class="tab-empty">
+          <div v-if="raceActivities.length === 0 && !raceBookmarks.length" class="tab-empty">
             <i class="bi bi-flag"></i>
             <p>No races on the board yet.</p>
             <span>Race-distance activities will show up here automatically.</span>
+          </div>
+          <div v-if="raceBookmarks.length" class="race-bookmarks">
+            <div class="race-section-label">Upcoming / Saved</div>
+            <div v-for="race in raceBookmarks" :key="`bookmark-${race.id}`" class="race-row race-row--saved">
+              <div class="race-row-icon">📌</div>
+              <div class="race-row-body"><div class="race-row-name">{{ race.raceName }}</div><div class="race-row-meta">{{ race.raceDate || 'Date TBD' }} · {{ [race.city, race.state].filter(Boolean).join(', ') }}</div></div>
+              <a v-if="race.raceUrl" :href="race.raceUrl" target="_blank" rel="noopener" class="race-row-link">Details →</a>
+            </div>
           </div>
           <div v-else class="races-list">
             <router-link v-for="race in raceActivities" :key="race.id" :to="`/activities/${race.id}`" class="race-row">
@@ -463,6 +471,7 @@ const eventsLoaded = ref(false)
 const raceActivitiesSource = ref([])
 const racesLoaded = ref(false)
 const racesLoading = ref(false)
+const raceBookmarks = ref([])
 
 const profileId = computed(() => route.params.id)
 const isOwnProfile = computed(() => user.value?.id && String(user.value.id) === String(profileId.value))
@@ -706,8 +715,9 @@ async function loadRaces() {
   if (racesLoaded.value || racesLoading.value) return
   racesLoading.value = true
   try {
-    const { data } = await axios.get(`${API_URL}/activities?userId=${profileId.value}&page=0&size=200`, { headers: getAuthHeaders() })
-    raceActivitiesSource.value = data.content || data || []
+    const { data } = await axios.get(`${API_URL}/users/${profileId.value}/race-history`, { headers: getAuthHeaders() })
+    raceActivitiesSource.value = data.activities || []
+    raceBookmarks.value = data.bookmarks || []
     racesLoaded.value = true
   } catch {
     raceActivitiesSource.value = profileActivities.value
@@ -745,6 +755,7 @@ const init = async () => {
   eventsLoaded.value = false
   raceActivitiesSource.value = []
   racesLoaded.value = false
+  raceBookmarks.value = []
   await loadProfile()
   if (!notFound.value && !pageError.value) {
     await Promise.all([loadActivities(), loadFollowStatus()])
@@ -1315,6 +1326,9 @@ onMounted(init)
 .race-row-name { font-weight: 800; }
 .race-row-meta { color: #5A5348; font-size: .78rem; margin-top: 3px; }
 .race-row-time { font-family: 'Spline Sans Mono', monospace; font-weight: 800; white-space: nowrap; }
+.race-section-label { margin: 18px 0 8px; color: #2A55F5; font-family: 'Spline Sans Mono', monospace; font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.race-row--saved { margin-bottom: 8px; }
+.race-row-link { color: #2A55F5; font-size: .75rem; font-weight: 800; white-space: nowrap; }
 .events-list { display: flex; flex-direction: column; }
 .event-row {
   display: flex; align-items: center; justify-content: space-between;
