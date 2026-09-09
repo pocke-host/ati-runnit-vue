@@ -11,6 +11,7 @@
 | `follow.js` | followingIds Set, follow/unfollow |
 | `moment.js` | moments feed |
 | `upload.js` | S3 presigned upload helper |
+| `trainingLoad.js` | data (ctl/atl/tsb/acwr/riskLabel), fetchTrainingLoad() — single source of truth for risk framing, backs AdaptivePlanService's own decisions |
 
 ## Auth Store Pattern
 ```js

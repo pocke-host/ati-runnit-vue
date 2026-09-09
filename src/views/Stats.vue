@@ -419,6 +419,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useActivityStore } from '@/stores/activity'
 import { usePRStore } from '@/stores/pr'
+import { useTrainingLoadStore } from '@/stores/trainingLoad'
 import { storeToRefs } from 'pinia'
 import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
@@ -436,7 +437,9 @@ const { classifyActivity } = useWorkoutClassifier()
 
 const activityStore = useActivityStore()
 const prStore = usePRStore()
+const trainingLoadStore = useTrainingLoadStore()
 const { activities, loading } = storeToRefs(activityStore)
+const { data: trainingLoad } = storeToRefs(trainingLoadStore)
 const initializing = ref(true)
 const hasActivities = computed(() => initializing.value || loading.value || activities.value.length > 0)
 
@@ -715,20 +718,22 @@ const jumpTo = (id) => {
 }
 
 // ── ACWR ──────────────────────────────────────────
-const acwrScore = computed(() => {
-  const m = performanceMetrics.value
-  if (!m || m.ctl === 0) return null
-  return Math.round((m.atl / m.ctl) * 100) / 100
-})
+// Sourced from GET /api/training-load — the same TrainingLoadService signal
+// AdaptivePlanService acts on to soften/downgrade upcoming workouts. Single
+// source of truth so this card never disagrees with a real adaptation reason
+// shown on PlanDetail.vue for the same athlete.
+const acwrScore = computed(() => trainingLoad.value?.acwr ?? null)
+
+const RISK_LABEL_INFO = {
+  BUILDING_BASELINE: { label: 'Building Baseline', color: '#767676', desc: 'Log a few more activities for a reliable read' },
+  DETRAINING:        { label: 'Undertraining',     color: '#767676', desc: 'Gradually increase volume to build fitness' },
+  OPTIMAL:           { label: 'Optimal Load',      color: '#2A55F5', desc: 'Good training stimulus — manage recovery' },
+  HIGH_RISK:         { label: 'High Injury Risk',  color: '#ef4444', desc: 'Reduce load or take a rest day now' },
+}
 
 const acwrInfo = computed(() => {
-  const a = acwrScore.value
-  if (a === null) return null
-  if (a < 0.8)  return { label: 'Undertraining',    color: '#767676', desc: 'Gradually increase volume to build fitness' }
-  if (a < 1.0)  return { label: 'Optimal Base',     color: '#2A55F5', desc: 'Solid aerobic foundation, safe to add load' }
-  if (a < 1.3)  return { label: 'Productive Load',  color: '#2A55F5', desc: 'Good training stimulus, manage recovery' }
-  if (a < 1.5)  return { label: 'Caution Zone',     color: '#000000', desc: 'Monitor fatigue — consider an easy day' }
-  return           { label: 'High Injury Risk',  color: '#ef4444', desc: 'Reduce load or take a rest day now' }
+  const label = trainingLoad.value?.riskLabel
+  return label ? (RISK_LABEL_INFO[label] ?? null) : null
 })
 
 // ── Weekly distance data (used for target calc + chart) ───────────
@@ -988,6 +993,7 @@ onMounted(async () => {
   initializing.value = true
   await activityStore.fetchActivities()
   initializing.value = false
+  trainingLoadStore.fetchTrainingLoad()
   await prStore.fetchPRs(activities.value)
   await nextTick()
   initWeeklyChart()
