@@ -34,6 +34,7 @@
             </div>
             <div class="db2-hero-right">
               <span class="db2-phase-badge">{{ trainingBlock.label }} PHASE</span>
+              <span v-if="riskBadge" :class="['db2-risk-badge', riskBadge.modifier]">{{ riskBadge.label }}</span>
               <button class="db2-btn-ghost" type="button" @click="openActivityModal">＋ Log</button>
               <button class="db2-btn-cobalt" type="button" @click="openMomentModal">◉ Moment</button>
             </div>
@@ -245,7 +246,7 @@
                 </div>
                 <div class="db2-insight-cell">
                   <div class="db2-insight-lbl">ACWR</div>
-                  <div class="db2-insight-val">{{ dashInsights.acwr ?? '—' }}</div>
+                  <div class="db2-insight-val">{{ trainingLoad?.acwr ?? '—' }}</div>
                 </div>
               </div>
             </template>
@@ -685,10 +686,10 @@
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
-                <div class="dash-insight-item" v-if="dashInsights.acwr !== null">
+                <div class="dash-insight-item" v-if="trainingLoad?.acwr != null">
                   <span class="dash-insight-key">ACWR</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.acwr < 1.3 ? '#2A55F5' : dashInsights.acwr < 1.5 ? '#767676' : '#ef4444' }">
-                    {{ dashInsights.acwr }}
+                  <span class="dash-insight-val" :style="{ color: trainingLoad.acwr < 1.3 ? '#2A55F5' : trainingLoad.acwr < 1.5 ? '#767676' : '#ef4444' }">
+                    {{ trainingLoad.acwr }}
                   </span>
                 </div>
               </div>
@@ -962,9 +963,9 @@
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
-                <div v-if="dashInsights.acwr !== null" class="dm-insight-row">
+                <div v-if="trainingLoad?.acwr != null" class="dm-insight-row">
                   <span class="dm-insight-key">ACWR</span>
-                  <span class="dm-insight-val">{{ dashInsights.acwr }}</span>
+                  <span class="dm-insight-val">{{ trainingLoad.acwr }}</span>
                 </div>
               </div>
             </div>
@@ -1290,6 +1291,7 @@ import { usePlanStore } from '@/stores/plan'
 import { useAchievementStore } from '@/stores/achievement'
 import { usePRStore } from '@/stores/pr'
 import { useAthleteStore } from '@/stores/athlete'
+import { useTrainingLoadStore } from '@/stores/trainingLoad'
 import AppSpinner from '@/components/AppSpinner.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import StoriesViewer from '@/components/StoriesViewer.vue'
@@ -1334,10 +1336,12 @@ const planStore = usePlanStore()
 const achievementStore = useAchievementStore()
 const prStore = usePRStore()
 const athleteStore = useAthleteStore()
+const trainingLoadStore = useTrainingLoadStore()
 const { activePlan } = storeToRefs(planStore)
 const { latestEarned } = storeToRefs(achievementStore)
 const { topPRs } = storeToRefs(prStore)
 const { myCoach } = storeToRefs(athleteStore)
+const { data: trainingLoad } = storeToRefs(trainingLoadStore)
 const myCoachLoaded = ref(false)
 const fullActivePlan = ref(null)
 const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
@@ -1581,6 +1585,20 @@ const dashInsights = computed(() => {
   const acwr = ctl > 0 ? Math.round((atl / ctl) * 100) / 100 : null
 
   return { fitnessScore, fatigueScore, formScore, acwr }
+})
+
+// Hero "Training Risk" sticker — sourced from GET /api/training-load, the
+// same signal AdaptivePlanService acts on. Hidden while the backend hasn't
+// seen enough activity yet (BUILDING_BASELINE) rather than showing a
+// discouraging badge to a brand-new athlete.
+const RISK_BADGE_INFO = {
+  HIGH_RISK:  { label: 'High Risk ⚠', modifier: 'db2-risk-badge--high' },
+  DETRAINING: { label: 'Low Load',     modifier: 'db2-risk-badge--low' },
+  OPTIMAL:    { label: 'On Track',     modifier: 'db2-risk-badge--optimal' },
+}
+const riskBadge = computed(() => {
+  if (!trainingLoad.value?.hasEnoughData) return null
+  return RISK_BADGE_INFO[trainingLoad.value.riskLabel] ?? null
 })
 
 const todayWorkout = computed(() => {
@@ -2171,6 +2189,7 @@ onMounted(async () => {
   updateCharts()
   await loadData()
   loadTodayWellness()
+  trainingLoadStore.fetchTrainingLoad()
 })
 
 onUnmounted(() => {
@@ -3673,6 +3692,29 @@ textarea.form-control{resize:vertical;min-height:72px}
   padding: 8px 13px;
   border: 2px solid #16130F;
   transform: rotate(-2deg);
+}
+.db2-risk-badge {
+  display: inline-block;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 13px;
+  border: 2px solid #16130F;
+  transform: rotate(2deg);
+}
+.db2-risk-badge--high {
+  background: #FFC53D;
+  color: #16130F;
+}
+.db2-risk-badge--optimal {
+  background: #2A55F5;
+  color: #FBF6EC;
+}
+.db2-risk-badge--low {
+  background: #FBF6EC;
+  color: #16130F;
 }
 .db2-btn-ghost {
   background: transparent;
