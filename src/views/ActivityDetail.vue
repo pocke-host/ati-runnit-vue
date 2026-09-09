@@ -39,6 +39,9 @@
           <span class="top-date">{{ formatDate(activity.performedAt) }}</span>
         </div>
         <div class="top-bar-spacer"></div>
+        <button v-if="isOwn" class="combine-btn" @click="router.push({ path: '/feed', query: { createEvent: '1', activityId: activity.id } })">
+          <i class="bi bi-collection me-1"></i>Combine
+        </button>
       </div>
 
       <!-- USER ROW -->
@@ -1158,6 +1161,7 @@ onMounted(init)
   color: #5A5348;
 }
 .top-bar-spacer { width: 80px; }
+.combine-btn { border: 2px solid #16130F; background: #FFC53D; color: #16130F; padding: 7px 10px; font: 800 .68rem 'Spline Sans Mono', monospace; text-transform: uppercase; cursor: pointer; }
 
 /* USER ROW */
 .user-row-wrap {
