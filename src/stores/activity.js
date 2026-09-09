@@ -158,8 +158,8 @@ export const useActivityStore = defineStore('activity', () => {
     return Array.isArray(data) ? data : []
   }
 
-  async function addComment(id, text) {
-    const { data } = await axios.post(`${API_URL}/activities/${id}/comments`, { text })
+  async function addComment(id, text, options = {}) {
+    const { data } = await axios.post(`${API_URL}/activities/${id}/comments`, { text, ...options })
     return data
   }
 

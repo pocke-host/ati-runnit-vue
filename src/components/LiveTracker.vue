@@ -128,6 +128,11 @@
       <div class="lt-notes-inner">
         <div class="lt-notes-title">WORKOUT SAVED</div>
         <p class="lt-notes-sub">Add a note while it's fresh</p>
+        <div class="lt-listening-fields">
+          <div class="lt-listening-heading"><i class="bi bi-music-note-beamed"></i> Listening to</div>
+          <input v-model="listeningTrack" class="lt-notes-textarea lt-listening-input" placeholder="Track or podcast (optional)" />
+          <input v-model="listeningArtist" class="lt-notes-textarea lt-listening-input" placeholder="Artist / show (optional)" />
+        </div>
         <div class="lt-notes-input-wrap">
           <textarea
             v-model="postNotes"
@@ -356,6 +361,8 @@ watch(showNotesStep, (open) => {
 const savedActivityId  = ref(null)
 const postNotes        = ref('')
 const notesSubmitting  = ref(false)
+const listeningTrack   = ref('')
+const listeningArtist  = ref('')
 
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 const { showToast } = useToast()
@@ -803,7 +810,12 @@ async function finishWithNotes() {
       const token = localStorage.getItem('token')
       await axios.patch(
         `${API_URL}/activities/${savedActivityId.value}`,
-        { notes: postNotes.value.trim() },
+        {
+          notes: postNotes.value.trim(),
+          listeningTrack: listeningTrack.value.trim(),
+          listeningArtist: listeningArtist.value.trim(),
+          listeningProvider: listeningTrack.value.trim() ? 'SPOTIFY' : '',
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       )
     } catch {
