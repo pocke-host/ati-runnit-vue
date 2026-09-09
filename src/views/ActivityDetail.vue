@@ -402,7 +402,7 @@
                       <span class="comment-time">{{ formatTime(c.createdAt) }}</span>
                     </div>
                     <p class="comment-text">{{ c.text }}</p>
-                    <img v-if="c.mediaUrl && c.mediaType === 'IMAGE'" :src="c.mediaUrl" alt="Comment attachment" class="comment-media" loading="lazy" />
+                    <img v-if="c.mediaUrl && ['IMAGE', 'GIF'].includes(c.mediaType)" :src="c.mediaUrl" :alt="c.mediaType === 'GIF' ? 'Comment GIF' : 'Comment attachment'" class="comment-media" loading="lazy" />
                     <a v-else-if="c.mediaUrl" :href="c.mediaUrl" target="_blank" rel="noopener" class="comment-media-link">View attachment</a>
                     <button type="button" class="comment-reply-btn" @click="startReply(c)">Reply</button>
                   </div>
@@ -429,6 +429,7 @@
                 <i class="bi bi-paperclip"></i>
                 <input type="file" accept="image/*" @change="handleCommentMedia" :disabled="commentLoading" />
               </label>
+              <button type="button" class="comment-gif-btn" @click="showGifPicker = !showGifPicker" :disabled="commentLoading" title="Add a GIF">GIF</button>
               <button
                 type="submit"
                 class="comment-submit"
@@ -436,6 +437,20 @@
               >
                 <i class="bi bi-send-fill"></i>
               </button>
+              <div v-if="showGifPicker" class="gif-picker">
+                <div class="gif-search-row">
+                  <input v-model="gifQuery" class="gif-search-input" placeholder="Search GIFs…" @keyup.enter="searchGifs" />
+                  <button type="button" class="gif-search-submit" @click="searchGifs" :disabled="gifLoading"><i class="bi bi-search"></i></button>
+                </div>
+                <div v-if="gifLoading" class="gif-state">Searching…</div>
+                <div v-else-if="gifResults.length" class="gif-grid">
+                  <button v-for="gif in gifResults" :key="gif.id" type="button" class="gif-option" @click="selectGif(gif)">
+                    <img :src="gif.url" :alt="gif.title || 'GIF'" loading="lazy" />
+                  </button>
+                </div>
+                <div v-else class="gif-state">Search for a reaction.</div>
+                <div v-if="commentMediaType === 'GIF'" class="gif-selected">GIF attached ✓</div>
+              </div>
             </form>
           </div>
         </div>
@@ -506,6 +521,10 @@ const replyingTo = ref(null)
 const mentionSuggestions = ref([])
 const commentMediaUrl = ref('')
 const commentMediaType = ref('')
+const showGifPicker = ref(false)
+const gifQuery = ref('')
+const gifResults = ref([])
+const gifLoading = ref(false)
 const reactionLoading = ref(false)
 const userReactions = ref(new Set())
 const reactionCounts = ref({})
@@ -977,6 +996,31 @@ const handleCommentMedia = async (event) => {
     commentMediaType.value = 'IMAGE'
     showToast('Attachment ready.', 'success')
   } catch { showToast('Attachment upload failed.', 'error') }
+}
+
+const searchGifs = async () => {
+  if (!gifQuery.value.trim() || gifLoading.value) return
+  const key = import.meta.env.VITE_GIPHY_API_KEY
+  if (!key) { showToast('GIF search is not configured yet.', 'error'); return }
+  gifLoading.value = true
+  try {
+    const { data } = await axios.get('https://api.giphy.com/v1/gifs/search', {
+      params: { api_key: key, q: gifQuery.value.trim(), limit: 18, rating: 'pg-13' }
+    })
+    gifResults.value = (data.data || []).map(g => ({
+      id: g.id,
+      title: g.title,
+      url: g.images?.fixed_width?.url || g.images?.original?.url
+    })).filter(g => g.url)
+  } catch { showToast('GIF search failed. Try again.', 'error') }
+  finally { gifLoading.value = false }
+}
+
+const selectGif = (gif) => {
+  commentMediaUrl.value = gif.url
+  commentMediaType.value = 'GIF'
+  showGifPicker.value = false
+  showToast('GIF attached.', 'success')
 }
 
 const startReply = (comment) => {
@@ -1601,6 +1645,7 @@ onMounted(init)
 /* Comment form */
 .comment-form {
   position: relative;
+  position: relative;
   display: flex;
   gap: 8px;
   border-top: 2px solid #E7DFCE;
@@ -1639,6 +1684,17 @@ onMounted(init)
 .comment-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 .comment-attach { width: 36px; height: 44px; display: grid; place-items: center; border: 2px solid #16130F; color: #2A55F5; cursor: pointer; }
 .comment-attach input { display: none; }
+.comment-gif-btn { height: 44px; padding: 0 8px; border: 2px solid #16130F; background: #FFC53D; color: #16130F; font: 800 .65rem 'Spline Sans Mono', monospace; cursor: pointer; }
+.comment-gif-btn:disabled { opacity: .45; cursor: not-allowed; }
+.gif-picker { position: absolute; right: 0; bottom: 52px; z-index: 5; width: min(320px, calc(100vw - 32px)); padding: 10px; background: #fff; border: 2px solid #16130F; box-shadow: 4px 4px 0 #16130F; }
+.gif-search-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.gif-search-input { flex: 1; min-width: 0; border: 1px solid #16130F; padding: 7px 8px; font-size: .78rem; }
+.gif-search-submit { width: 34px; border: 1px solid #16130F; background: #2A55F5; color: #fff; }
+.gif-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-height: 220px; overflow-y: auto; }
+.gif-option { border: 0; padding: 0; background: #eee; aspect-ratio: 1.35; overflow: hidden; cursor: pointer; }
+.gif-option img { width: 100%; height: 100%; object-fit: cover; }
+.gif-state { color: #5A5348; font-size: .72rem; padding: 14px 4px; text-align: center; }
+.gif-selected { color: #16803c; font: 700 .7rem 'Spline Sans Mono', monospace; margin-top: 7px; }
 .mention-suggestions { position: absolute; bottom: 58px; left: 0; display: flex; flex-direction: column; background: #fff; border: 2px solid #16130F; z-index: 2; }
 .mention-suggestions button { border: 0; background: #fff; text-align: left; padding: 8px 12px; font-size: .78rem; cursor: pointer; }
 .mention-suggestions button:hover { background: #FBF6EC; }
