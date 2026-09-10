@@ -117,7 +117,18 @@
         <div>
           <div class="hero-eyebrow">Race history</div>
           <h2 class="results-import-title">Official results</h2>
-          <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
+        <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
+        </div>
+        <div class="discovery-panel">
+          <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
+            {{ discovering ? 'Searching official results…' : 'Find my official results' }}
+          </button>
+          <div v-if="discoveredResults.length" class="discovered-results">
+            <div v-for="result in discoveredResults" :key="`${result.provider}-${result.externalResultId}`" class="discovered-result">
+              <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.provider }}</span></div>
+              <button type="button" @click="importDiscovered(result)">Save</button>
+            </div>
+          </div>
         </div>
         <form class="results-import-form" @submit.prevent="importResult">
           <input v-model="resultForm.raceName" required placeholder="Race name" class="result-input" />
@@ -337,6 +348,8 @@ const bookmarkedIds = ref(new Set())
 const bookmarkIdMap = ref({})
 const raceResults = ref([])
 const resultSaving = ref(false)
+const discovering = ref(false)
+const discoveredResults = ref([])
 const resultForm = ref({ raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' })
 
 const loadRaceResults = async () => {
@@ -353,6 +366,25 @@ const importResult = async () => {
     showToast('Official result imported.', 'success')
   } catch (err) { showToast(err.response?.data?.error || 'Result import failed.', 'error') }
   finally { resultSaving.value = false }
+}
+
+const discoverResults = async () => {
+  discovering.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/race-results/discover`, { params: { provider: 'ATHLINKS' } })
+    discoveredResults.value = Array.isArray(data) ? data : []
+    if (!discoveredResults.value.length) showToast('No matching official results found yet.', 'info')
+  } catch (err) { showToast(err.response?.data?.error || 'Official result search is not configured yet.', 'error') }
+  finally { discovering.value = false }
+}
+
+const importDiscovered = async (result) => {
+  try {
+    const { data } = await axios.post(`${API_URL}/race-results/import`, { ...result, source: result.provider, verified: true })
+    raceResults.value.unshift(data)
+    discoveredResults.value = discoveredResults.value.filter(r => r.externalResultId !== result.externalResultId)
+    showToast('Official result saved.', 'success')
+  } catch (err) { showToast(err.response?.data?.error || 'Could not save that result.', 'error') }
 }
 
 const loadBookmarks = async () => {
