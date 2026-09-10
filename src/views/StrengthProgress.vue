@@ -23,6 +23,11 @@
       />
 
       <template v-else>
+        <div v-if="volume" class="sp-volume-strip">
+          <div><strong>{{ formatWeight(volume.totalVolumeKg) }}</strong><span>Volume · {{ volume.days }}d</span></div>
+          <div><strong>{{ volume.totalSets }}</strong><span>Working sets</span></div>
+          <div><strong>{{ volume.sessionCount }}</strong><span>Sessions</span></div>
+        </div>
         <div class="sp-picker-row">
           <select v-model="selectedExercise" class="sp-picker">
             <option v-for="ex in exercises" :key="ex" :value="ex">{{ ex }}</option>
@@ -139,6 +144,7 @@ const exercises = ref([])
 const selectedExercise = ref(null)
 const prs = ref(null)
 const history = ref([])
+const volume = ref(null)
 const loadingExercises = ref(true)
 const loadingData = ref(false)
 const activeMetric = ref('weight')
@@ -161,7 +167,11 @@ const metricField = { weight: 'topWeightKg', volume: 'totalVolumeKg', onerm: 'es
 const fetchExercises = async () => {
   loadingExercises.value = true
   try {
-    const { data } = await axios.get(`${API_URL}/strength/exercises`, { headers: getAuthHeaders() })
+    const [{ data }, volumeRes] = await Promise.all([
+      axios.get(`${API_URL}/strength/exercises`, { headers: getAuthHeaders() }),
+      axios.get(`${API_URL}/strength/volume`, { params: { days: 28 }, headers: getAuthHeaders() }),
+    ])
+    volume.value = volumeRes.data
     // Backend returns these alphabetically (matches the logging form's autocomplete order) —
     // picking the first just avoids landing on a blank page, not a "most recent" claim.
     exercises.value = Array.isArray(data) ? data : []
@@ -290,6 +300,7 @@ onMounted(fetchExercises)
   margin: 0 auto;
   padding: 28px 40px 64px;
 }
+.sp-volume-strip{display:flex;gap:0;border:2px solid #16130f;background:#fff;margin-bottom:22px;box-shadow:4px 4px 0 #16130f}.sp-volume-strip>div{flex:1;padding:15px 16px}.sp-volume-strip>div+div{border-left:1px solid #ddd4c5}.sp-volume-strip strong{display:block;font-size:25px}.sp-volume-strip span{display:block;margin-top:4px;color:#665f55;font:10px 'Spline Sans Mono',monospace;text-transform:uppercase}@media(max-width:600px){.sp-volume-strip strong{font-size:20px}.sp-volume-strip>div{padding:12px 8px}}
 
 .sp-picker-row { margin-bottom: 24px; }
 .sp-picker {
