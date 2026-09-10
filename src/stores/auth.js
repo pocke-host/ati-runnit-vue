@@ -14,13 +14,43 @@ if (_storedToken) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${_storedToken}`
 }
 
-// Global 401 interceptor — stale/invalid token means the user needs to re-login.
-// Without this, every API call silently fails and the app shows all zeros while
-// appearing "logged in" (user object still in localStorage from a previous session).
+// Refresh access JWTs transparently. The refresh token is an httpOnly cookie, so
+// it survives browser restarts without exposing a long-lived credential to JS.
+let refreshPromise = null
+const refreshAccessToken = async () => {
+  if (!refreshPromise) {
+    refreshPromise = axios.post(`${API_URL}/auth/refresh`, {}, {
+      withCredentials: true,
+      _skipAuthRefresh: true,
+    }).then(({ data }) => {
+      if (!data?.token) throw new Error('Refresh response did not include a token')
+      localStorage.setItem('token', data.token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+      return data.token
+    }).finally(() => { refreshPromise = null })
+  }
+  return refreshPromise
+}
+
+// A 401 should only send the user to login after the refresh cookie is also
+// invalid/expired. This prevents the app from appearing to log out every time
+// the short-lived access JWT expires.
 axios.interceptors.response.use(
   res => res,
-  err => {
-    if (err.response?.status === 401) {
+  async err => {
+    const request = err.config
+    const isRefreshRequest = request?._skipAuthRefresh || request?.url?.includes('/auth/refresh')
+    if (err.response?.status === 401 && request && !isRefreshRequest && !request._authRetry) {
+      request._authRetry = true
+      try {
+        const token = await refreshAccessToken()
+        request.headers = { ...(request.headers || {}), Authorization: `Bearer ${token}` }
+        return axios(request)
+      } catch {
+        // Fall through to the existing clean-session behavior below.
+      }
+    }
+    if (err.response?.status === 401 && (isRefreshRequest || request?._authRetry || !request)) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       localStorage.removeItem('runnit_activities_cache')
