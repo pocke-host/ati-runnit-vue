@@ -20,6 +20,7 @@
         <router-link to="/friends" class="nav-link-auth">Friends</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
+        <router-link to="/training-folders" class="nav-link-auth">Folders</router-link>
         <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
       </div>
 
@@ -123,6 +124,9 @@
               </router-link>
               <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-gear"></i> Settings
+              </router-link>
+              <router-link to="/training-folders" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-folder2-open"></i> Training folders
               </router-link>
               <div class="avd-divider"></div>
               <button class="avd-link avd-link-danger" @click="handleLogout">
