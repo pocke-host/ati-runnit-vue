@@ -117,9 +117,12 @@
         <div>
           <div class="hero-eyebrow">Race history</div>
           <h2 class="results-import-title">Official results</h2>
-        <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
+          <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
+          <p v-if="!isSignedIn" class="results-signin-prompt"><router-link to="/signup">Create an account</router-link> to save race history and connect official results.</p>
         </div>
         <div class="discovery-panel">
+          <div v-if="!isSignedIn" class="public-results-gate"><strong>Make race day part of your story.</strong><span>Sign in to discover, review, and save official results.</span><router-link to="/signin">Sign in →</router-link></div>
+          <template v-else>
           <div class="discovery-steps" aria-label="Official result import steps"><span :class="{active: discoveryStage >= 1}">1 · Choose provider</span><span :class="{active: discoveryStage >= 2}">2 · Find results</span><span :class="{active: discoveryStage >= 3}">3 · Review &amp; save</span></div>
           <button type="button" class="result-link-btn" @click="connectRunSignup">{{ runSignupConnected ? 'RunSignup connected ✓' : 'Connect RunSignup' }}</button>
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
@@ -133,7 +136,6 @@
               <button type="button" @click="importDiscovered(result)">Save</button>
             </div>
           </div>
-        </div>
         <details class="manual-import">
           <summary>Enter a result manually <span>Fallback when a provider cannot find your result</span></summary>
           <form class="results-import-form" @submit.prevent="importResult">
@@ -151,6 +153,8 @@
             <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.source }}</span></div>
             <a v-if="result.resultUrl" :href="result.resultUrl" target="_blank" rel="noopener">Verify ↗</a>
           </div>
+        </div>
+          </template>
         </div>
       </div>
     </section>
@@ -349,6 +353,9 @@ import { useToast } from '@/composables/useToast'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const { showToast } = useToast()
+const isSignedIn = computed(() => {
+  try { return !!JSON.parse(localStorage.getItem('user') || 'null') } catch { return false }
+})
 
 /* ─── Bookmarks ───────────────────────────────────────────── */
 const bookmarkedIds = ref(new Set())
@@ -1238,6 +1245,11 @@ watch(zipcode, () => {
 .results-import-inner { display: grid; grid-template-columns: minmax(220px, .8fr) 1.2fr; gap: 24px; align-items: start; }
 .results-import-title { margin: 4px 0; font-size: 2rem; font-weight: 900; text-transform: uppercase; }
 .results-import-copy { max-width: 380px; margin: 0; font-size: .82rem; }
+.results-signin-prompt { max-width: 380px; margin: 12px 0 0; font-size: .78rem; line-height: 1.45; }
+.results-signin-prompt a, .public-results-gate a { color: #16130F; font-weight: 900; text-decoration: underline; }
+.public-results-gate { display: flex; flex-direction: column; gap: 7px; padding: 18px; background: #fff; border: 2px solid #16130F; box-shadow: 4px 4px #16130F; }
+.public-results-gate strong { font-size: 1.05rem; }
+.public-results-gate span { color: #665F55; font-size: .82rem; }
 .results-import-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .result-input { min-width: 0; padding: 10px; border: 2px solid #16130F; background: #fff; font-size: .78rem; }
 .result-submit { grid-column: 1 / -1; border: 2px solid #16130F; padding: 10px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }

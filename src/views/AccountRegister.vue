@@ -21,7 +21,7 @@
           </button>
           <button type="button" class="gr-social-btn" disabled style="opacity:0.45;cursor:not-allowed">
             <i class="bi bi-apple"></i>
-            Continue with Apple
+            Apple sign-up coming soon
           </button>
         </div>
         <div v-if="googleError" class="gr-error-msg">{{ googleError }}</div>
