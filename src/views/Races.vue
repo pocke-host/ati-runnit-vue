@@ -120,6 +120,7 @@
         <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
         </div>
         <div class="discovery-panel">
+          <div class="discovery-steps" aria-label="Official result import steps"><span :class="{active: discoveryStage >= 1}">1 · Choose provider</span><span :class="{active: discoveryStage >= 2}">2 · Find results</span><span :class="{active: discoveryStage >= 3}">3 · Review &amp; save</span></div>
           <button type="button" class="result-link-btn" @click="connectRunSignup">{{ runSignupConnected ? 'RunSignup connected ✓' : 'Connect RunSignup' }}</button>
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
             {{ discovering ? 'Searching official results…' : 'Find my official results' }}
@@ -360,6 +361,7 @@ const runSignupConnected = ref(false)
 const discoveryProvider = ref('ATHLINKS')
 const discoveryRaceId = ref('')
 const discoveryEventId = ref('')
+const discoveryStage = computed(() => discovering.value ? 2 : discoveredResults.value.length ? 3 : 1)
 const resultForm = ref({ raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' })
 
 const connectRunSignup = async () => {
@@ -1241,6 +1243,7 @@ watch(zipcode, () => {
 .result-submit { grid-column: 1 / -1; border: 2px solid #16130F; padding: 10px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .result-submit:disabled { opacity: .5; }
 .result-link-btn { border: 2px solid #16130F; padding: 10px; background: #F5D547; color: #16130F; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.discovery-steps{display:flex;gap:6px;grid-column:1 / -1;margin-bottom:4px}.discovery-steps span{padding:5px 7px;color:#665f55;font:10px 'Spline Sans Mono',monospace;text-transform:uppercase;border:1px solid rgba(22,19,15,.25)}.discovery-steps span.active{background:#fff;border-color:#16130f;color:#16130f;font-weight:700}
 .manual-import { grid-column: 1 / -1; margin-top: 4px; border-top: 1px solid rgba(22,19,15,.35); padding-top: 12px; }
 .manual-import summary { cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: .78rem; }
 .manual-import summary span { display: block; margin-top: 4px; font-size: .7rem; font-weight: 400; text-transform: none; opacity: .75; }

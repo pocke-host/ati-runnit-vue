@@ -72,6 +72,7 @@
                 <div class="gr-stat-cell-val gr-stat-cell-val--yellow">{{ personalRecords ? Object.values(personalRecords).filter(Boolean).length : '—' }}</div>
               </div>
             </div>
+            <router-link v-if="isOwnProfile && upcomingRace" :to="'/races'" class="profile-race-countdown"><span>Next race</span><strong>{{ upcomingRace.raceName }}</strong><em>{{ daysUntilRace(upcomingRace.raceDate) }}</em></router-link>
           </div>
         </div>
       </section>
@@ -472,6 +473,8 @@ const raceActivitiesSource = ref([])
 const racesLoaded = ref(false)
 const racesLoading = ref(false)
 const raceBookmarks = ref([])
+const upcomingRace = computed(() => raceBookmarks.value.filter(r => r.raceDate && new Date(`${r.raceDate}T00:00:00`) >= new Date()).sort((a,b) => new Date(a.raceDate) - new Date(b.raceDate))[0] || null)
+const daysUntilRace = date => { const days = Math.ceil((new Date(`${date}T00:00:00`) - new Date()) / 86400000); return days === 0 ? 'Today' : `${days} day${days === 1 ? '' : 's'} to go` }
 
 const profileId = computed(() => route.params.id)
 const isOwnProfile = computed(() => user.value?.id && String(user.value.id) === String(profileId.value))
@@ -1329,6 +1332,7 @@ onMounted(init)
 .race-section-label { margin: 18px 0 8px; color: #2A55F5; font-family: 'Spline Sans Mono', monospace; font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .race-row--saved { margin-bottom: 8px; }
 .race-row-link { color: #2A55F5; font-size: .75rem; font-weight: 800; white-space: nowrap; }
+.profile-race-countdown{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin-top:18px;padding:11px 13px;background:#FFC53D;border:2px solid #16130F;color:#16130F;text-decoration:none;box-shadow:3px 3px #16130F}.profile-race-countdown span,.profile-race-countdown em{font:10px 'Spline Sans Mono',monospace;text-transform:uppercase}.profile-race-countdown strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profile-race-countdown em{font-style:normal;font-weight:700}.profile-race-countdown:hover{color:#16130F;transform:translateX(2px)}
 .events-list { display: flex; flex-direction: column; }
 .event-row {
   display: flex; align-items: center; justify-content: space-between;
