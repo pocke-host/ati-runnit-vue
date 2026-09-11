@@ -560,7 +560,6 @@ const apiError      = ref('')
 const events        = ref([])
 const usingLiveData = ref(false)
 
-const RUNSIGNUP_BASE = 'https://runsignup.com/Rest/races'
 
 /* ─── Keyword patterns for sport detection ───────────────── */
 const OCR_KEYWORDS       = /spartan|tough.?mudder|warrior.?dash|mud.?run|obstacle.?course|battlefrog|rugged.?maniac|savage.?race|goruck|bonefrog/i
@@ -685,12 +684,8 @@ const fetchEvents = async () => {
   if (zipcode.value.trim()) params.set('zipcode', zipcode.value.trim())
 
   const [rsResult, farResult, bikeResult] = await Promise.allSettled([
-    // 1. RunSignup: try direct first, then proxy
+    // 1. RunSignup: use the backend proxy so API credentials and caller identity stay server-side
     (async () => {
-      try {
-        const { data } = await axios.get(`${RUNSIGNUP_BASE}?${params}`, { timeout: 8000 })
-        return Array.isArray(data) ? data : (data.races || [])
-      } catch { /* CORS — try proxy */ }
       const proxyParams = { page: 1, results_per_page: 100, future_events_only: 'T' }
       if (zipcode.value.trim()) proxyParams.zipcode = zipcode.value.trim()
       const { data } = await axios.get(`${API_URL}/events`, { params: proxyParams, timeout: 8000 })
