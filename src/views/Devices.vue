@@ -9,6 +9,7 @@
           <h1 class="devices-title">Devices &amp; Integrations</h1>
         </div>
       </div>
+      <div class="integrations-intro"><div><div class="devices-kicker">Connected services</div><h2>Bring your training together.</h2></div><p>Connect the tools you already use. RUNNIT keeps the links here so you can see what is active and reconnect when needed.</p></div>
       <ConnectDevices />
 
       <div class="spotify-integration-card">
@@ -17,13 +18,14 @@
           <div>
             <div class="gcal-integration-name">Spotify — Listening history</div>
             <div class="gcal-integration-desc">Connect once and RUNNIT will suggest what you listened to during each run.</div>
-            <div v-if="spotifyConnected" class="spotify-connected"><span></span> CONNECTED</div>
+            <div :class="['spotify-connected', { 'spotify-connected--off': !spotifyConnected }]" ><span></span> {{ spotifyConnected ? 'CONNECTED' : 'NOT CONNECTED' }}</div>
           </div>
         </div>
         <button class="gcal-integration-btn" type="button" @click="connectSpotify" :disabled="spotifyLoading">
           {{ spotifyConnected ? 'Reconnect →' : 'Connect →' }}
         </button>
       </div>
+      <p v-if="spotifyError" class="integration-error" role="alert">{{ spotifyError }}</p>
 
       <!-- Google Calendar integration card -->
       <div class="gcal-integration-card">
@@ -48,16 +50,18 @@ import ConnectDevices from '@/components/ConnectDevices.vue'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const spotifyConnected = ref(false)
 const spotifyLoading = ref(false)
+const spotifyError = ref('')
 const headers = () => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 const connectSpotify = async () => {
   spotifyLoading.value = true
+  spotifyError.value = ''
   try {
     const { data } = await axios.get(`${API_URL}/spotify/connect`, { headers: headers() })
     window.location.href = data.url
-  } finally { spotifyLoading.value = false }
+  } catch (e) { spotifyError.value = e.response?.data?.error || 'Spotify connection is unavailable right now. Try again shortly.'; spotifyLoading.value = false }
 }
 onMounted(async () => {
   try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
@@ -123,6 +127,9 @@ onMounted(async () => {
   margin: 0;
   color: #16130F;
 }
+.integrations-intro { display:flex; justify-content:space-between; align-items:end; gap:24px; margin:0 0 18px; padding:18px 0; border-top:1px solid #ddd4c5; border-bottom:1px solid #ddd4c5; }
+.integrations-intro h2 { margin:6px 0 0; font-size:1.3rem; }
+.integrations-intro p { max-width:420px; margin:0; color:#665f55; font-size:.84rem; line-height:1.5; }
 
 @media (max-width: 640px) {
   .devices-wrap { padding: 28px 18px 80px; }
@@ -184,9 +191,13 @@ onMounted(async () => {
 .spotify-integration-left { display:flex; align-items:center; gap:12px; }
 .spotify-mark { width:34px; height:34px; display:grid; place-items:center; border-radius:50%; background:#1DB954; color:#fff; font-size:20px; }
 .spotify-connected { margin-top:6px; color:#16883f; font:10px 'Spline Sans Mono', monospace; letter-spacing:.08em; }
+.spotify-connected--off { color:#8a8174; }
+.spotify-connected--off span { background:#8a8174; }
 .spotify-connected span { display:inline-block; width:6px; height:6px; border-radius:50%; background:#1DB954; margin-right:4px; }
+.integration-error { margin:8px 0 0; color:#b42318; font-size:.8rem; }
 
 @media (max-width: 600px) {
+  .integrations-intro { align-items:flex-start; flex-direction:column; gap:8px; }
   .gcal-integration-card { flex-direction: column; align-items: flex-start; }
   .gcal-integration-btn { width: 100%; text-align: center; }
   .spotify-integration-card { align-items:flex-start; flex-direction:column; }
