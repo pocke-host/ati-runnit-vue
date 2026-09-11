@@ -32,7 +32,7 @@
               <li><b class="check">✓</b>&nbsp; Basic stats</li>
               <li><b class="check">✓</b>&nbsp; Apple Health sync</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--outline">Start Free</router-link>
+            <router-link to="/signup" class="btn-plan btn-plan--outline">Start Free</router-link>
           </div>
 
           <!-- Pro — featured -->
@@ -85,7 +85,7 @@
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
       <p class="cta-sub">Start free. Upgrade when your training does.</p>
-      <router-link to="/waitlist" class="btn-pill-paper">Start Free</router-link>
+      <router-link to="/signup" class="btn-pill-paper">Start Free</router-link>
     </section>
 
   </main>
