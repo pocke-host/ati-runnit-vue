@@ -43,6 +43,7 @@ const routes = [
   { path: '/challenges',          name: 'Challenges',     component: () => import('@/views/Challenges.vue'),       meta: { requiresAuth: true } },
   { path: '/track',               name: 'Track',          component: () => import('@/views/Track.vue'),            meta: { requiresAuth: true } },
   { path: '/devices',             name: 'Devices',        component: () => import('@/views/Devices.vue') },
+  { path: '/coros-coach',         name: 'CorosCoach',     component: () => import('@/views/CorosCoach.vue'), meta: { requiresAuth: true } },
   { path: '/join-coach/:code',    name: 'JoinCoach',      component: () => import('@/views/JoinCoach.vue') },
   { path: '/join/:code',          name: 'JoinFriend',     component: () => import('@/views/JoinFriend.vue') },
   { path: '/friends',             name: 'FindFriends',    component: () => import('@/views/FindFriends.vue'), meta: { requiresAuth: true } },
