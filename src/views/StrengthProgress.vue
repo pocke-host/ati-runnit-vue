@@ -6,6 +6,7 @@
       <div class="sp-header-inner">
         <p class="sp-eyebrow">Strength</p>
         <h1 class="sp-title">Progress</h1>
+        <p class="sp-subtitle">Track the work behind your miles. Choose an exercise to see your trend and personal records.</p>
       </div>
     </div>
 
@@ -29,7 +30,8 @@
           <div><strong>{{ volume.sessionCount }}</strong><span>Sessions</span></div>
         </div>
         <div class="sp-picker-row">
-          <select v-model="selectedExercise" class="sp-picker">
+          <label class="sp-picker-label" for="strength-exercise">Exercise</label>
+          <select id="strength-exercise" v-model="selectedExercise" class="sp-picker" aria-label="Choose an exercise to view progress">
             <option v-for="ex in exercises" :key="ex" :value="ex">{{ ex }}</option>
           </select>
         </div>
@@ -66,6 +68,7 @@
                   v-for="m in metrics"
                   :key="m.key"
                   :class="['sp-metric-btn', { 'sp-metric-btn--active': activeMetric === m.key }]"
+                  :aria-pressed="activeMetric === m.key"
                   @click="activeMetric = m.key"
                 >{{ m.label }}</button>
               </div>
@@ -294,6 +297,7 @@ onMounted(fetchExercises)
   text-transform: uppercase;
   margin: 0;
 }
+.sp-subtitle { max-width: 520px; margin: 12px 0 0; color: #665f55; font-size: .9rem; line-height: 1.5; }
 
 .sp-body {
   max-width: 900px;
@@ -303,6 +307,7 @@ onMounted(fetchExercises)
 .sp-volume-strip{display:flex;gap:0;border:2px solid #16130f;background:#fff;margin-bottom:22px;box-shadow:4px 4px 0 #16130f}.sp-volume-strip>div{flex:1;padding:15px 16px}.sp-volume-strip>div+div{border-left:1px solid #ddd4c5}.sp-volume-strip strong{display:block;font-size:25px}.sp-volume-strip span{display:block;margin-top:4px;color:#665f55;font:10px 'Spline Sans Mono',monospace;text-transform:uppercase}@media(max-width:600px){.sp-volume-strip strong{font-size:20px}.sp-volume-strip>div{padding:12px 8px}}
 
 .sp-picker-row { margin-bottom: 24px; }
+.sp-picker-label { display: block; margin-bottom: 6px; font: 10px 'Spline Sans Mono', monospace; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #665f55; }
 .sp-picker {
   width: 100%;
   max-width: 360px;
