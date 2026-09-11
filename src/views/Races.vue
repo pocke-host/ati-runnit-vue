@@ -332,6 +332,7 @@ import axios from 'axios'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { useHead } from '@unhead/vue'
+import { trackEvent } from '@/composables/useAnalytics'
 
 useHead({
   title: 'Races — Runnit',
@@ -1233,6 +1234,13 @@ onMounted(() => {
 
 // Re-fetch when zipcode changes (debounced)
 let zipTimer = null
+let searchAnalyticsTimer = null
+watch(q, (value) => {
+  clearTimeout(searchAnalyticsTimer)
+  if (!value.trim()) return
+  searchAnalyticsTimer = setTimeout(() => trackEvent('race_search', { query_length: value.trim().length }), 700)
+})
+
 watch(zipcode, () => {
   clearTimeout(zipTimer)
   zipTimer = setTimeout(fetchEvents, 700)

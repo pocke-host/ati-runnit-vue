@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { nextTick } from 'vue'
+import { trackEvent } from '@/composables/useAnalytics'
 
 // Legal pages (stay in components)
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
@@ -102,7 +103,8 @@ const router = createRouter({
   }
 })
 
-router.afterEach(() => {
+router.afterEach((to) => {
+  trackEvent('page_view', { path: to.fullPath })
   nextTick(() => window.scrollTo({ top: 0, behavior: 'instant' }))
 })
 

@@ -174,6 +174,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import { trackEvent } from '@/composables/useAnalytics'
 import { useStripe } from '@/composables/useStripe'
 
 const router = useRouter()
@@ -226,9 +227,11 @@ const submit = async () => {
   if (!canSubmit.value) return
   loading.value = true
   error.value = ''
+  trackEvent('signup_attempt', { role: role.value })
 
   try {
     await authStore.register(email.value, password.value, displayName.value, role.value)
+    trackEvent('signup_success', { role: role.value, plan: route.query.plan || 'free' })
     const plan = route.query.plan
     const period = route.query.period || 'monthly'
     if (plan) {

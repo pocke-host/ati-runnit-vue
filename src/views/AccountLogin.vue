@@ -122,6 +122,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import { trackEvent } from '@/composables/useAnalytics'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -261,8 +262,10 @@ const onSubmit = async (e) => {
   }
 
   loading.value = true
+  trackEvent('sign_in_attempt', { method: 'email' })
   try {
     await authStore.login(email.value, password.value)
+    trackEvent('sign_in_success', { method: 'email' })
     clearFailures()
     router.push(role.value === 'coach' ? '/coach/dashboard' : '/dashboard')
   } catch (err) {

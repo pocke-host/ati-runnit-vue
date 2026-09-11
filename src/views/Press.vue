@@ -4,7 +4,7 @@
       <div class="ep-hero-inner">
         <div class="ep-kicker">RUNNIT // PRESS</div>
         <h1 class="ep-headline">Media &amp;<br>Press Resources.</h1>
-        <p class="ep-sub">For press inquiries, interviews, and media assets, reach us at <a href="mailto:press@runnit.co" class="hero-link">press@runnit.co</a>.</p>
+        <p class="ep-sub">For press inquiries, interviews, and media assets, reach us at <a href="mailto:press@runnit.live" class="hero-link">press@runnit.live</a>.</p>
       </div>
     </section>
 

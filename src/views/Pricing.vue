@@ -30,9 +30,9 @@
               <li><b class="check">✓</b>&nbsp; Activity tracking</li>
               <li><b class="check">✓</b>&nbsp; Up to 3 crews</li>
               <li><b class="check">✓</b>&nbsp; Basic stats</li>
-              <li><b class="check">✓</b>&nbsp; Apple Health sync</li>
+              <li><b class="check">✓</b>&nbsp; Apple Health sync (iOS)</li>
             </ul>
-            <router-link to="/signup" class="btn-plan btn-plan--outline">Start Free</router-link>
+            <router-link to="/signup" class="btn-plan btn-plan--outline" data-analytics="cta_signup_pricing_free">Start Free</router-link>
           </div>
 
           <!-- Pro — featured -->
@@ -85,7 +85,7 @@
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
       <p class="cta-sub">Start free. Upgrade when your training does.</p>
-      <router-link to="/signup" class="btn-pill-paper">Start Free</router-link>
+      <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_pricing_footer">Start Free</router-link>
     </section>
 
   </main>

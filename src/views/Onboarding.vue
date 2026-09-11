@@ -25,7 +25,7 @@
         </div>
         <h1 class="welcome-headline">Welcome,<br>{{ firstName }}.</h1>
         <p class="welcome-sub" v-if="isCoach">Let's set up your coaching profile in under a minute.</p>
-        <p class="welcome-sub" v-else>Let's set you up in under a minute.</p>
+        <p class="welcome-sub" v-else>Let's set you up in under a minute. First, choose what you’re training for.</p>
         <button class="btn-cta" @click="step = 2">Get started</button>
       </div>
     </div>

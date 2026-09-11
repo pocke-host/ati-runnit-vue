@@ -18,7 +18,7 @@
                 <div class="role-title">{{ role.title }}</div>
                 <div class="role-meta">{{ role.dept }} · {{ role.type }} · {{ role.location }}</div>
               </div>
-              <a href="mailto:quinnhuynh1126@gmail.com" class="btn-apply">Apply</a>
+              <a href="mailto:careers@runnit.live" class="btn-apply">Apply</a>
             </div>
             <p class="role-desc">{{ role.desc }}</p>
           </div>

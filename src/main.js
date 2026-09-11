@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import { injectSpeedInsights } from '@vercel/speed-insights'
+import { trackEvent } from '@/composables/useAnalytics'
 
 // Import Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -20,6 +21,11 @@ const head = createHead()
 app.use(pinia)  // ← THIS MUST COME BEFORE router
 app.use(router)
 app.use(head)
+
+document.addEventListener('click', (event) => {
+  const target = event.target.closest?.('[data-analytics]')
+  if (target?.dataset.analytics) trackEvent(target.dataset.analytics, { path: window.location.pathname })
+})
 
 // Default timeout for all requests — prevents indefinite UI freeze on slow/hung backends
 axios.defaults.timeout = 10000

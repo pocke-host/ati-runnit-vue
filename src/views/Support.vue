@@ -28,7 +28,7 @@
       <div class="sp-content">
         <div class="sp-eyebrow">Browse by topic</div>
         <div class="sp-categories-grid">
-          <a href="#help-faq" class="sp-cat-tile" v-for="cat in categories" :key="cat.title">
+          <a href="#help-faq" :class="['sp-cat-tile', { 'sp-cat-tile--active': activeTopic === cat.title }]" v-for="cat in categories" :key="cat.title" @click.prevent="selectTopic(cat.title)">
             <div class="sp-cat-title">{{ cat.title }}</div>
             <div class="sp-cat-desc">{{ cat.desc }}</div>
           </a>
@@ -54,6 +54,7 @@
             </div>
             <div v-if="openFaq === i" class="sp-faq-a">{{ faq.a }}</div>
           </div>
+          <p v-if="visibleFaqs.length === 0" class="sp-no-results">No matching articles yet. Try another search or <router-link to="/request">submit a request</router-link>.</p>
         </div>
       </div>
     </section>
@@ -99,6 +100,7 @@ useHead({
 
 const openFaq = ref(0)
 const searchQuery = ref('')
+const activeTopic = ref('')
 
 const categories = [
   { title: 'Getting Started', desc: 'Create an account, log your first session, set up your profile.' },
@@ -110,18 +112,28 @@ const categories = [
 ]
 
 const faqs = [
-  { q: 'How do I connect Garmin or COROS?', a: 'Head to Profile → Connected Apps and tap Connect next to your device. You\'ll authorize once, and activities sync automatically from then on — usually within a minute of finishing a session.' },
-  { q: 'Why is my GPS distance slightly off?', a: 'GPS accuracy depends on signal quality, tree cover, and device hardware. For best results, calibrate your device before heading out and give it 30–60 seconds to lock signal.' },
-  { q: 'Can I reschedule a workout in my plan?', a: 'Yes — open the workout in your Training Plans tab, tap the three-dot menu, and choose Reschedule. The plan adapts automatically around your new date.' },
-  { q: 'How do I join or start a crew?', a: 'Go to Clubs in the main nav, browse or search for your crew, and tap Join. To create one, tap the + button and set your privacy and invite settings.' },
-  { q: 'How do I cancel or change my plan?', a: 'Go to Settings → Billing → Manage Subscription. Changes take effect at the end of your current billing cycle.' },
+  { topic: 'Syncing Apps', q: 'How do I connect Garmin or COROS?', a: 'Open Devices & Integrations from your account menu and tap Connect next to your device. You\'ll authorize once, and activities sync automatically from then on — usually within a minute of finishing a session.' },
+  { topic: 'Tracking & GPS', q: 'Why is my GPS distance slightly off?', a: 'GPS accuracy depends on signal quality, tree cover, and device hardware. For best results, calibrate your device before heading out and give it 30–60 seconds to lock signal.' },
+  { topic: 'Training Plans', q: 'Can I reschedule a workout in my plan?', a: 'Yes — open the workout in your Training Plans tab, tap the three-dot menu, and choose Reschedule. The plan adapts automatically around your new date.' },
+  { topic: 'Crews & Social', q: 'How do I join or start a crew?', a: 'Go to Clubs in the main nav, browse or search for your crew, and tap Join. To create one, tap the + button and set your privacy and invite settings.' },
+  { topic: 'Account & Billing', q: 'How do I cancel or change my plan?', a: 'Go to Settings → Billing → Manage Subscription. Changes take effect at the end of your current billing cycle.' },
+  { topic: 'Getting Started', q: 'What should I do after creating my account?', a: 'Complete the short setup, connect a device if you have one, then record your first activity. Runnit uses that context to make your dashboard and training recommendations useful.' },
+  { topic: 'Tracking & GPS', q: 'Can I edit or delete an activity?', a: 'Open the activity from your history, choose the actions menu, and edit its details or delete it. Imported activities keep their original source label.' },
+  { topic: 'Syncing Apps', q: 'What does “last synced” mean?', a: 'It is the most recent successful activity or wellness sync from that service. If a connection needs attention, the integration card will show a reconnect action.' },
+  { topic: 'Crews & Social', q: 'How do privacy settings affect my activities?', a: 'Your profile visibility and activity visibility are separate controls. Review both in Settings before sharing a workout publicly.' },
+  { topic: 'Account & Billing', q: 'How do I reset my password?', a: 'Choose Forgot? on the sign-in page and follow the secure email link. Reset links expire for your protection.' },
 ]
 
 const visibleFaqs = computed(() => {
   const query = searchQuery.value.toLowerCase()
-  if (!query) return faqs
-  return faqs.filter(faq => `${faq.q} ${faq.a}`.toLowerCase().includes(query))
+  return faqs.filter(faq => (!activeTopic.value || faq.topic === activeTopic.value) && (!query || `${faq.q} ${faq.a}`.toLowerCase().includes(query)))
 })
+
+const selectTopic = async (topic) => {
+  activeTopic.value = activeTopic.value === topic ? '' : topic
+  await nextTick()
+  document.getElementById('help-faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 const searchHelp = async () => {
   await nextTick()
@@ -268,7 +280,7 @@ const searchHelp = async () => {
 }
 .sp-cat-tile:nth-child(3n) { border-right: none; }
 .sp-cat-tile:nth-child(4), .sp-cat-tile:nth-child(5), .sp-cat-tile:nth-child(6) { border-bottom: none; }
-.sp-cat-tile:hover { background: #F1EADC; }
+.sp-cat-tile:hover, .sp-cat-tile--active { background: #E6EDFF; }
 .sp-cat-title {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 800;
@@ -288,6 +300,8 @@ const searchHelp = async () => {
   border: 2px solid #16130F;
   background: #fff;
 }
+.sp-no-results { margin: 0; padding: 24px 22px; color: #5a5348; font-size: .9rem; }
+.sp-no-results a { color: #2A55F5; font-weight: 800; }
 .sp-faq-item {
   border-bottom: 2px solid #16130F;
   cursor: pointer;
