@@ -15,10 +15,11 @@
         <span class="sp-hero-badge">Help Center</span>
         <h1 class="sp-hero-headline">How can we help?</h1>
         <p class="sp-hero-sub">Answers on tracking, syncing, plans, and your account.</p>
-        <div class="sp-search-bar">
-          <span class="sp-search-placeholder">Search help articles…</span>
-          <button class="sp-search-btn">Search</button>
-        </div>
+        <form class="sp-search-bar" @submit.prevent="searchHelp">
+          <label class="visually-hidden" for="support-search">Search help articles</label>
+          <input id="support-search" v-model.trim="searchQuery" class="sp-search-input" placeholder="Search help articles…" autocomplete="off">
+          <button class="sp-search-btn" type="submit">Search</button>
+        </form>
       </div>
     </section>
 
@@ -27,7 +28,7 @@
       <div class="sp-content">
         <div class="sp-eyebrow">Browse by topic</div>
         <div class="sp-categories-grid">
-          <a href="#" class="sp-cat-tile" v-for="cat in categories" :key="cat.title">
+          <a href="#help-faq" class="sp-cat-tile" v-for="cat in categories" :key="cat.title">
             <div class="sp-cat-title">{{ cat.title }}</div>
             <div class="sp-cat-desc">{{ cat.desc }}</div>
           </a>
@@ -37,11 +38,11 @@
 
     <!-- FAQ -->
     <section class="sp-section sp-section--faq">
-      <div class="sp-content">
+      <div id="help-faq" class="sp-content">
         <div class="sp-eyebrow">Common questions</div>
         <div class="sp-faq-list">
           <div
-            v-for="(faq, i) in faqs"
+            v-for="(faq, i) in visibleFaqs"
             :key="faq.q"
             class="sp-faq-item"
             :class="{ 'sp-faq-item--open': openFaq === i }"
@@ -67,7 +68,7 @@
           </div>
           <div class="sp-contact-right">
             <a href="mailto:support@runnit.live" class="sp-contact-btn sp-contact-btn--primary">Email Support</a>
-            <a href="#" class="sp-contact-btn sp-contact-btn--outline">Live Chat</a>
+            <router-link to="/request" class="sp-contact-btn sp-contact-btn--outline">Submit a request</router-link>
           </div>
         </div>
       </div>
@@ -77,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 useHead({
   title: 'Support — Runnit',
@@ -97,6 +98,7 @@ useHead({
 })
 
 const openFaq = ref(0)
+const searchQuery = ref('')
 
 const categories = [
   { title: 'Getting Started', desc: 'Create an account, log your first session, set up your profile.' },
@@ -114,6 +116,17 @@ const faqs = [
   { q: 'How do I join or start a crew?', a: 'Go to Clubs in the main nav, browse or search for your crew, and tap Join. To create one, tap the + button and set your privacy and invite settings.' },
   { q: 'How do I cancel or change my plan?', a: 'Go to Settings → Billing → Manage Subscription. Changes take effect at the end of your current billing cycle.' },
 ]
+
+const visibleFaqs = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  if (!query) return faqs
+  return faqs.filter(faq => `${faq.q} ${faq.a}`.toLowerCase().includes(query))
+})
+
+const searchHelp = async () => {
+  await nextTick()
+  document.getElementById('help-faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
 <style scoped>
@@ -204,6 +217,9 @@ const faqs = [
   text-align: left;
   background: #FBF6EC;
 }
+.sp-search-input { flex: 1; min-width: 0; padding: 15px 22px; border: 0; outline: 0; color: #16130F; background: #FBF6EC; font: inherit; font-size: .95rem; }
+.sp-search-input::placeholder { color: #8a8a8a; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .sp-search-btn {
   background: #2A55F5;
   color: #fff;
