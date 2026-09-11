@@ -120,6 +120,7 @@
         <p class="results-import-copy">Import a result from a race organizer or timing provider and keep it with your Runnit race history.</p>
         </div>
         <div class="discovery-panel">
+          <button type="button" class="result-link-btn" @click="connectRunSignup">{{ runSignupConnected ? 'RunSignup connected ✓' : 'Connect RunSignup' }}</button>
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
             {{ discovering ? 'Searching official results…' : 'Find my official results' }}
           </button>
@@ -352,10 +353,18 @@ const raceResults = ref([])
 const resultSaving = ref(false)
 const discovering = ref(false)
 const discoveredResults = ref([])
+const runSignupConnected = ref(false)
 const discoveryProvider = ref('ATHLINKS')
 const discoveryRaceId = ref('')
 const discoveryEventId = ref('')
 const resultForm = ref({ raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' })
+
+const connectRunSignup = async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/runsignup/oauth/connect`)
+    window.location.href = data.url
+  } catch { /* OAuth is optional; API-key discovery remains available. */ }
+}
 
 const loadRaceResults = async () => {
   try { const { data } = await axios.get(`${API_URL}/race-results`); raceResults.value = Array.isArray(data) ? data : [] } catch { /* unauthenticated users can still browse races */ }
@@ -1203,6 +1212,7 @@ const generatePlan = async (event) => {
 }
 
 onMounted(() => {
+  runSignupConnected.value = new URLSearchParams(window.location.search).get('runsignup') === 'connected'
   fetchEvents()
   loadBookmarks()
   loadRaceResults()
@@ -1226,6 +1236,7 @@ watch(zipcode, () => {
 .result-input { min-width: 0; padding: 10px; border: 2px solid #16130F; background: #fff; font-size: .78rem; }
 .result-submit { grid-column: 1 / -1; border: 2px solid #16130F; padding: 10px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .result-submit:disabled { opacity: .5; }
+.result-link-btn { border: 2px solid #16130F; padding: 10px; background: #F5D547; color: #16130F; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .result-history { grid-column: 1 / -1; display: grid; gap: 6px; margin-top: 4px; }
 .result-history-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; background: #fff; border: 2px solid #16130F; font-size: .8rem; }
 .result-history-row span { display: block; color: #5A5348; font-size: .7rem; margin-top: 3px; }
