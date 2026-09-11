@@ -7,7 +7,7 @@
         <input v-model.trim="draft.name" required maxlength="120" placeholder="London Marathon" aria-label="Folder name">
         <input v-model.trim="draft.description" maxlength="240" placeholder="Spring build · April 26" aria-label="Folder description">
         <input v-model="draft.targetDate" type="date" aria-label="Target date">
-        <button :disabled="saving">{{ saving ? 'Saving…' : 'Create folder' }}</button>
+        <RunnitButton type="submit" variant="secondary" :disabled="saving">{{ saving ? 'Saving…' : 'Create folder' }}</RunnitButton>
       </form>
       <p v-if="error" class="folder-error">{{ error }}</p>
       <div v-if="loading" class="folder-empty" role="status">Loading folders…</div>
@@ -26,6 +26,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import RunnitButton from '@/components/RunnitButton.vue'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
 const folders = ref([]), loading = ref(true), saving = ref(false), error = ref('')
