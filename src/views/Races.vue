@@ -123,6 +123,8 @@
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
             {{ discovering ? 'Searching official results…' : 'Find my official results' }}
           </button>
+          <select v-model="discoveryProvider" class="result-input"><option value="ATHLINKS">Athlinks</option><option value="RUNSIGNUP">RunSignup</option></select>
+          <template v-if="discoveryProvider === 'RUNSIGNUP'"><input v-model="discoveryRaceId" class="result-input" placeholder="RunSignup race ID"><input v-model="discoveryEventId" class="result-input" placeholder="RunSignup event ID"></template>
           <div v-if="discoveredResults.length" class="discovered-results">
             <div v-for="result in discoveredResults" :key="`${result.provider}-${result.externalResultId}`" class="discovered-result">
               <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.provider }}</span></div>
@@ -350,6 +352,9 @@ const raceResults = ref([])
 const resultSaving = ref(false)
 const discovering = ref(false)
 const discoveredResults = ref([])
+const discoveryProvider = ref('ATHLINKS')
+const discoveryRaceId = ref('')
+const discoveryEventId = ref('')
 const resultForm = ref({ raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' })
 
 const loadRaceResults = async () => {
@@ -371,7 +376,7 @@ const importResult = async () => {
 const discoverResults = async () => {
   discovering.value = true
   try {
-    const { data } = await axios.get(`${API_URL}/race-results/discover`, { params: { provider: 'ATHLINKS' } })
+    const { data } = await axios.get(`${API_URL}/race-results/discover`, { params: { provider: discoveryProvider.value, raceId: discoveryRaceId.value || undefined, eventId: discoveryEventId.value || undefined } })
     discoveredResults.value = Array.isArray(data) ? data : []
     if (!discoveredResults.value.length) showToast('No matching official results found yet.', 'info')
   } catch (err) { showToast(err.response?.data?.error || 'Official result search is not configured yet.', 'error') }
