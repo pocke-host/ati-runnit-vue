@@ -4,6 +4,7 @@
       <input v-model="query" class="spotify-input" placeholder="Search Spotify…" @keyup.enter="search" />
       <button type="button" class="spotify-search" @click="search" :disabled="loading"><i class="bi bi-search"></i></button>
     </div>
+    <button v-if="!connected" type="button" class="spotify-connect" @click="connect">Connect Spotify for automatic listening history</button>
     <div v-if="error" class="spotify-error">{{ error }}</div>
     <div v-else-if="loading" class="spotify-state">Searching…</div>
     <div v-else-if="tracks.length" class="spotify-results">
@@ -17,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 defineEmits(['select'])
@@ -26,6 +27,21 @@ const query = ref('')
 const tracks = ref([])
 const loading = ref(false)
 const error = ref('')
+const connected = ref(false)
+
+const authHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+const connect = async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/spotify/connect`, { headers: authHeaders() })
+    window.location.href = data.url
+  } catch (err) {
+    error.value = err.response?.data?.error || 'Spotify connection is unavailable.'
+  }
+}
 
 const search = async () => {
   if (!query.value.trim() || loading.value) return
@@ -35,7 +51,7 @@ const search = async () => {
     const token = localStorage.getItem('token')
     const { data } = await axios.get(`${API_URL}/spotify/search`, {
       params: { q: query.value.trim() },
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: authHeaders()
     })
     tracks.value = Array.isArray(data) ? data : []
   } catch (err) {
@@ -43,6 +59,10 @@ const search = async () => {
     tracks.value = []
   } finally { loading.value = false }
 }
+
+onMounted(async () => {
+  try { connected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: authHeaders() })).data.connected } catch {}
+})
 </script>
 
 <style scoped>
@@ -50,6 +70,7 @@ const search = async () => {
 .spotify-search-row { display: flex; gap: 6px; }
 .spotify-input { flex: 1; min-width: 0; border: 1px solid #16130F; padding: 8px; font-size: .78rem; }
 .spotify-search { width: 36px; border: 1px solid #16130F; background: #2A55F5; color: #fff; }
+.spotify-connect { margin-top: 8px; border: 1px solid #16130F; background: #F5D547; padding: 7px 9px; font-size: .68rem; font-weight: 800; cursor: pointer; }
 .spotify-results { display: grid; gap: 4px; margin-top: 8px; max-height: 180px; overflow: auto; }
 .spotify-result { text-align: left; border: 0; border-bottom: 1px solid #E7DFCE; background: transparent; padding: 7px 2px; cursor: pointer; }
 .spotify-result:hover { color: #2A55F5; }
