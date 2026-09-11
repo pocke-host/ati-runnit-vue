@@ -37,7 +37,7 @@
         </button>
         <button type="button" class="lp-social-btn lp-social-btn--disabled" @click="handleAppleSignIn" disabled>
           <i class="bi bi-apple" aria-hidden="true"></i>
-          Continue with Apple
+          Apple sign-in coming soon
         </button>
       </div>
 

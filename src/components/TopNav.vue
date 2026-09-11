@@ -52,6 +52,7 @@
           <router-link to="/features" class="nav-link nav-link-gr">Features</router-link>
           <router-link to="/about" class="nav-link nav-link-gr">About</router-link>
           <router-link to="/pricing" class="nav-link nav-link-gr">Pricing</router-link>
+          <router-link to="/signin" class="nav-link nav-link-gr">Sign in</router-link>
           <router-link to="/signup" class="nav-link nav-link-gr-cta">Join</router-link>
         </div>
 
