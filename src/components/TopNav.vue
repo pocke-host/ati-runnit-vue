@@ -20,7 +20,9 @@
         <router-link to="/friends" class="nav-link-auth">Friends</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
+        <router-link to="/races" class="nav-link-auth">Races</router-link>
         <router-link to="/training-folders" class="nav-link-auth">Folders</router-link>
+        <router-link to="/strength" class="nav-link-auth">Strength</router-link>
         <router-link to="/coros-coach" class="nav-link-auth">COROS Coach</router-link>
         <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
       </div>
@@ -251,6 +253,22 @@
                   <router-link to="/stats" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
                     <span>Stats</span>
+                  </router-link>
+                  <router-link to="/races" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>
+                    <span>Races</span>
+                  </router-link>
+                  <router-link to="/training-folders" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h7l2 2h9v10H3z"/><path d="M3 6V4h7l2 2"/></svg>
+                    <span>Folders</span>
+                  </router-link>
+                  <router-link to="/strength" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 8v8M3 10v4M18 8v8M21 10v4M6 12h12"/></svg>
+                    <span>Strength</span>
+                  </router-link>
+                  <router-link to="/coros-coach" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+                    <span>COROS Coach</span>
                   </router-link>
                 </div>
               </div>

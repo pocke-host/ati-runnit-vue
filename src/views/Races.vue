@@ -1,7 +1,7 @@
 <!-- src/views/Races.vue — All US Sports Edition -->
 <!--
   Data sources (parallel fetch):
-    1. RunSignup REST API: https://runsignup.com/Rest/races?format=json (no auth)
+    1. RunSignup backend integration
     2. FindARace backend proxy: GET /api/events/findarace
     3. BikeReg backend proxy:   GET /api/events/bikereg
   Sport detection is client-side keyword matching against race name/description.
@@ -71,22 +71,22 @@
         <form class="filter-row" @submit.prevent>
           <div class="filter-search">
             <i class="bi bi-search filter-search-icon"></i>
-            <input v-model.trim="q" class="filter-input" placeholder="Search by name or city…" />
+            <input v-model.trim="q" class="filter-input" placeholder="Search by name or city…" aria-label="Search races by name or city" />
           </div>
 
-          <input v-model.trim="zipcode" class="filter-input filter-input--sm" placeholder="ZIP code" maxlength="10" />
+          <input v-model.trim="zipcode" class="filter-input filter-input--sm" placeholder="ZIP code" maxlength="10" aria-label="Filter races by ZIP code" />
 
-          <select v-model="stateFilter" class="filter-select">
+          <select v-model="stateFilter" class="filter-select" aria-label="Filter races by state">
             <option value="">Any state</option>
             <option v-for="st in US_STATES" :key="st.abbr" :value="st.abbr">{{ st.abbr }} — {{ st.name }}</option>
           </select>
 
-          <select v-model="month" class="filter-select">
+          <select v-model="month" class="filter-select" aria-label="Filter races by month">
             <option value="">Any month</option>
             <option v-for="m in months" :key="m.value" :value="m.value">{{ m.label }}</option>
           </select>
 
-          <select v-model="sort" class="filter-select">
+          <select v-model="sort" class="filter-select" aria-label="Sort races">
             <option value="soon">Soonest first</option>
             <option value="name">Name A–Z</option>
           </select>
@@ -124,8 +124,8 @@
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
             {{ discovering ? 'Searching official results…' : 'Find my official results' }}
           </button>
-          <select v-model="discoveryProvider" class="result-input"><option value="ATHLINKS">Athlinks</option><option value="RUNSIGNUP">RunSignup</option></select>
-          <template v-if="discoveryProvider === 'RUNSIGNUP'"><input v-model="discoveryRaceId" class="result-input" placeholder="RunSignup race ID"><input v-model="discoveryEventId" class="result-input" placeholder="RunSignup event ID"></template>
+          <select v-model="discoveryProvider" class="result-input" aria-label="Official results provider"><option value="ATHLINKS">Athlinks</option><option value="RUNSIGNUP">RunSignup</option></select>
+          <template v-if="discoveryProvider === 'RUNSIGNUP'"><input v-model="discoveryRaceId" class="result-input" placeholder="RunSignup race ID" aria-label="RunSignup race ID"><input v-model="discoveryEventId" class="result-input" placeholder="RunSignup event ID" aria-label="RunSignup event ID"></template>
           <div v-if="discoveredResults.length" class="discovered-results">
             <div v-for="result in discoveredResults" :key="`${result.provider}-${result.externalResultId}`" class="discovered-result">
               <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.provider }}</span></div>
@@ -133,15 +133,18 @@
             </div>
           </div>
         </div>
-        <form class="results-import-form" @submit.prevent="importResult">
-          <input v-model="resultForm.raceName" required placeholder="Race name" class="result-input" />
-          <input v-model="resultForm.raceDate" type="date" class="result-input" />
-          <input v-model="resultForm.distance" placeholder="Distance (e.g. Marathon)" class="result-input" />
-          <input v-model.number="resultForm.finishTimeSeconds" type="number" min="1" placeholder="Finish seconds" class="result-input" />
-          <input v-model="resultForm.source" placeholder="Provider (e.g. RunSignup)" class="result-input" />
-          <input v-model="resultForm.resultUrl" type="url" placeholder="Official result URL" class="result-input" />
-          <button class="result-submit" :disabled="resultSaving">{{ resultSaving ? 'Importing…' : 'Import result' }}</button>
-        </form>
+        <details class="manual-import">
+          <summary>Enter a result manually <span>Fallback when a provider cannot find your result</span></summary>
+          <form class="results-import-form" @submit.prevent="importResult">
+            <input v-model="resultForm.raceName" required placeholder="Race name" aria-label="Race name" class="result-input" />
+            <input v-model="resultForm.raceDate" type="date" aria-label="Race date" class="result-input" />
+            <input v-model="resultForm.distance" placeholder="Distance (e.g. Marathon)" aria-label="Race distance" class="result-input" />
+            <input v-model.number="resultForm.finishTimeSeconds" type="number" min="1" placeholder="Finish seconds" aria-label="Finish time in seconds" class="result-input" />
+            <input v-model="resultForm.source" placeholder="Provider (e.g. RunSignup)" aria-label="Result provider" class="result-input" />
+            <input v-model="resultForm.resultUrl" type="url" placeholder="Official result URL" aria-label="Official result URL" class="result-input" />
+            <button class="result-submit" :disabled="resultSaving">{{ resultSaving ? 'Importing…' : 'Import result' }}</button>
+          </form>
+        </details>
         <div v-if="raceResults.length" class="result-history">
           <div v-for="result in raceResults" :key="result.id" class="result-history-row">
             <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.source }}</span></div>
@@ -1237,6 +1240,10 @@ watch(zipcode, () => {
 .result-submit { grid-column: 1 / -1; border: 2px solid #16130F; padding: 10px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .result-submit:disabled { opacity: .5; }
 .result-link-btn { border: 2px solid #16130F; padding: 10px; background: #F5D547; color: #16130F; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.manual-import { grid-column: 1 / -1; margin-top: 4px; border-top: 1px solid rgba(22,19,15,.35); padding-top: 12px; }
+.manual-import summary { cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: .78rem; }
+.manual-import summary span { display: block; margin-top: 4px; font-size: .7rem; font-weight: 400; text-transform: none; opacity: .75; }
+.manual-import[open] summary { margin-bottom: 12px; }
 .result-history { grid-column: 1 / -1; display: grid; gap: 6px; margin-top: 4px; }
 .result-history-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; background: #fff; border: 2px solid #16130F; font-size: .8rem; }
 .result-history-row span { display: block; color: #5A5348; font-size: .7rem; margin-top: 3px; }
