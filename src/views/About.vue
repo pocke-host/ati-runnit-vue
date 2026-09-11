@@ -50,7 +50,7 @@
           </div>
           <div class="build-copy">
             <p class="build-body">Runnit is built and maintained by one person, in the hours around marathon and Ironman training. Every feature earns its place because there's no room for the ones that don't.</p>
-            <p class="build-bold">Beta opens summer 2026 — built in public, shaped by the people on the list.</p>
+            <p class="build-bold">Built in public, shaped by the athletes who use it every day.</p>
           </div>
         </div>
       </div>
@@ -59,8 +59,8 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Come build with us.</h2>
-      <p class="cta-sub">Get on the list and help shape what Runnit becomes.</p>
-      <router-link to="/waitlist" class="btn-pill-paper">Join the Waitlist</router-link>
+      <p class="cta-sub">Create your account and help shape what Runnit becomes.</p>
+      <router-link to="/signup" class="btn-pill-paper">Join Runnit</router-link>
     </section>
 
   </main>

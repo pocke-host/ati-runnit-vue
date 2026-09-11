@@ -6,7 +6,7 @@
       <div class="page-inner hero-inner">
         <span class="gr-eyebrow-badge">Waitlist</span>
         <h1 class="hero-h1">Claim your handle.</h1>
-        <p class="hero-sub">Be first in when we open your city. No spam — just the green light and your @name held.</p>
+        <p class="hero-sub">Stay close to what we’re building. No spam — just useful product updates and your @name held.</p>
       </div>
     </section>
 
@@ -61,7 +61,7 @@
 
               <button type="submit" class="btn-submit" :disabled="loading">
                 <span v-if="loading" class="btn-spinner"></span>
-                <span v-else>Join the Waitlist</span>
+                <span v-else>Get product updates</span>
               </button>
 
             </form>
@@ -69,7 +69,7 @@
 
           <div v-else class="success-block">
             <div class="success-label">You're on the list.</div>
-            <p class="success-body">We'll reach out as soon as beta opens in your city.</p>
+            <p class="success-body">We’ll send occasional product updates and keep your handle reserved.</p>
             <router-link to="/" class="btn-ghost">Back to home</router-link>
           </div>
         </div>
@@ -112,15 +112,15 @@ useHead({
   title: 'Join the Waitlist — Runnit Early Access',
   link: [{ rel: 'canonical', href: 'https://runnit.live/waitlist' }],
   meta: [
-    { name: 'description', content: 'Claim your handle before someone else does. Join the Runnit waitlist and get early access to the training app built for endurance athletes.' },
+    { name: 'description', content: 'Claim your handle and get product updates from Runnit, the training app built for endurance athletes.' },
     { property: 'og:title', content: 'Join the Waitlist — Runnit Early Access' },
-    { property: 'og:description', content: 'Claim your handle before someone else does. Get early access to the training app built for endurance athletes.' },
+    { property: 'og:description', content: 'Claim your handle and get product updates from Runnit.' },
     { property: 'og:url', content: 'https://runnit.live/waitlist' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Join the Waitlist — Runnit Early Access' },
-    { name: 'twitter:description', content: 'Claim your handle before someone else does. Get early access to Runnit.' },
+    { name: 'twitter:description', content: 'Claim your handle and get product updates from Runnit.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
