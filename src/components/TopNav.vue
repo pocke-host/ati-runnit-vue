@@ -20,11 +20,17 @@
         <router-link to="/friends" class="nav-link-auth">Friends</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
-        <router-link to="/races" class="nav-link-auth">Races</router-link>
-        <router-link to="/training-folders" class="nav-link-auth">Folders</router-link>
-        <router-link to="/strength" class="nav-link-auth">Strength</router-link>
-        <router-link to="/coros-coach" class="nav-link-auth">COROS Coach</router-link>
-        <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
+        <div class="training-menu" ref="trainingRef">
+          <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">Training <span aria-hidden="true">⌄</span></button>
+          <div v-if="trainingOpen" class="training-menu-dropdown">
+            <router-link to="/races" @click="trainingOpen = false"><i class="bi bi-flag"></i> Races</router-link>
+            <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i> Plans</router-link>
+            <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i> Folders</router-link>
+            <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i> Strength</router-link>
+            <router-link to="/coros-coach" @click="trainingOpen = false"><i class="bi bi-watch"></i> COROS Coach</router-link>
+            <router-link to="/my-coach" @click="trainingOpen = false"><i class="bi bi-person-badge"></i> Coach</router-link>
+          </div>
+        </div>
       </div>
 
       <!-- RIGHT: icons + coach links + public links + hamburger -->
@@ -378,6 +384,8 @@ const onDrawerTouchEnd = (e) => {
 const notifOpen = ref(false)
 const notifRef = ref(null)
 const avatarOpen = ref(false)
+const trainingOpen = ref(false)
+const trainingRef = ref(null)
 const avatarRef = ref(null)
 const userId = computed(() => user.value?.id)
 const userInitial = computed(() => user.value?.displayName?.charAt(0).toUpperCase() || '?')
@@ -391,6 +399,7 @@ const toggleNotifDropdown = () => {
   notifOpen.value = !notifOpen.value
   if (notifOpen.value) notifStore.fetchNotifications()
 }
+const toggleTrainingMenu = () => { trainingOpen.value = !trainingOpen.value; if (trainingOpen.value) { notifOpen.value = false; avatarOpen.value = false } }
 
 const markAll = () => {
   notifStore.markAllRead()
@@ -454,12 +463,14 @@ const handleNotifClick = async (n) => {
 const handleOutsideClick = (e) => {
   if (notifRef.value && !notifRef.value.contains(e.target)) notifOpen.value = false
   if (avatarRef.value && !avatarRef.value.contains(e.target)) avatarOpen.value = false
+  if (trainingRef.value && !trainingRef.value.contains(e.target)) trainingOpen.value = false
 }
 
 const handleKeydown = (e) => {
   if (e.key === 'Escape') {
     notifOpen.value = false
     avatarOpen.value = false
+    trainingOpen.value = false
     mobileMenuOpen.value = false
   }
 }
@@ -522,9 +533,10 @@ onUnmounted(() => {
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
   margin-left: 20px;
 }
+.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-12px;width:190px;padding:6px;background:#fbf6ec;border:2px solid #16130f;box-shadow:4px 4px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;font:700 11px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:16px;color:#2a55f5;font-size:14px}
 /* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
 .navbar-links--public {
