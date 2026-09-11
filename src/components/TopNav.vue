@@ -128,6 +128,12 @@
               <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-gear"></i> Settings
               </router-link>
+              <router-link to="/devices" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-phone"></i> Devices &amp; integrations
+              </router-link>
+              <router-link to="/plans" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-journal-text"></i> Training plans
+              </router-link>
               <router-link to="/training-folders" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-folder2-open"></i> Training folders
               </router-link>
@@ -269,6 +275,10 @@
                   <router-link to="/coros-coach" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
                     <span>COROS Coach</span>
+                  </router-link>
+                  <router-link to="/plans" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+                    <span>Plans</span>
                   </router-link>
                 </div>
               </div>
