@@ -370,6 +370,7 @@ const notesSubmitting  = ref(false)
 const listeningTrack   = ref('')
 const listeningArtist  = ref('')
 const listeningUrl     = ref('')
+const trackingStartedAt = ref(null)
 
 const { isListening: micListening, isSupported: micSupported, toggleListening } = useVoiceNote()
 const { showToast } = useToast()
@@ -705,6 +706,7 @@ const discardDraft = () => {
 
 const startTracking = async () => {
   gpsError.value = ''
+  if (!trackingStartedAt.value) trackingStartedAt.value = Date.now()
   isTracking.value = true
   hasStarted.value = true
   startEpoch = Date.now() - pausedMs
@@ -796,6 +798,7 @@ const stopTracking = async () => {
     saving.value = false
     clearDraft()
     showNotesStep.value = true
+    await hydrateListeningHistory()
   } catch (err) {
     const status = err?.response?.status
     saveError.value = (status === 401 || status === 403)
@@ -839,6 +842,23 @@ function selectListeningTrack(track) {
   listeningTrack.value = track.name || ''
   listeningArtist.value = track.artist || ''
   listeningUrl.value = track.externalUrl || ''
+}
+
+async function hydrateListeningHistory() {
+  if (listeningTrack.value || !trackingStartedAt.value) return
+  try {
+    const token = localStorage.getItem('token')
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    const status = await axios.get(`${API_URL}/spotify/status`, { headers })
+    if (!status.data?.connected) return
+    const after = Math.max(0, trackingStartedAt.value - 5 * 60 * 1000)
+    const before = Date.now() + 5 * 60 * 1000
+    const { data } = await axios.get(`${API_URL}/spotify/recently-played`, { params: { after, before }, headers })
+    const latest = Array.isArray(data) && data[0]
+    if (latest?.name) selectListeningTrack(latest)
+  } catch {
+    // Automatic history is best-effort; manual search remains available.
+  }
 }
 
 function clearListeningTrack() {

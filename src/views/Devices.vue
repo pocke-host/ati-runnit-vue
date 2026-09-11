@@ -11,6 +11,20 @@
       </div>
       <ConnectDevices />
 
+      <div class="spotify-integration-card">
+        <div class="spotify-integration-left">
+          <div class="spotify-mark"><i class="bi bi-spotify"></i></div>
+          <div>
+            <div class="gcal-integration-name">Spotify — Listening history</div>
+            <div class="gcal-integration-desc">Connect once and RUNNIT will suggest what you listened to during each run.</div>
+            <div v-if="spotifyConnected" class="spotify-connected"><span></span> CONNECTED</div>
+          </div>
+        </div>
+        <button class="gcal-integration-btn" type="button" @click="connectSpotify" :disabled="spotifyLoading">
+          {{ spotifyConnected ? 'Reconnect →' : 'Connect →' }}
+        </button>
+      </div>
+
       <!-- Google Calendar integration card -->
       <div class="gcal-integration-card">
         <div class="gcal-integration-left">
@@ -27,7 +41,27 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
+import axios from 'axios'
 import ConnectDevices from '@/components/ConnectDevices.vue'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const spotifyConnected = ref(false)
+const spotifyLoading = ref(false)
+const headers = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+const connectSpotify = async () => {
+  spotifyLoading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/spotify/connect`, { headers: headers() })
+    window.location.href = data.url
+  } finally { spotifyLoading.value = false }
+}
+onMounted(async () => {
+  try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
+})
 </script>
 
 <style scoped>
@@ -146,9 +180,16 @@ import ConnectDevices from '@/components/ConnectDevices.vue'
   flex-shrink: 0;
 }
 .gcal-integration-btn:hover { background: #1E42D6; text-decoration: none; color: #fff; }
+.spotify-integration-card { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-top:16px; padding:18px 20px; border:2px solid #16130F; background:#fff; box-shadow:4px 4px #16130F; }
+.spotify-integration-left { display:flex; align-items:center; gap:12px; }
+.spotify-mark { width:34px; height:34px; display:grid; place-items:center; border-radius:50%; background:#1DB954; color:#fff; font-size:20px; }
+.spotify-connected { margin-top:6px; color:#16883f; font:10px 'Spline Sans Mono', monospace; letter-spacing:.08em; }
+.spotify-connected span { display:inline-block; width:6px; height:6px; border-radius:50%; background:#1DB954; margin-right:4px; }
 
 @media (max-width: 600px) {
   .gcal-integration-card { flex-direction: column; align-items: flex-start; }
   .gcal-integration-btn { width: 100%; text-align: center; }
+  .spotify-integration-card { align-items:flex-start; flex-direction:column; }
+  .spotify-integration-card .gcal-integration-btn { width:100%; }
 }
 </style>
