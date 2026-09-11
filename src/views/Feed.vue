@@ -348,6 +348,7 @@
                         <span class="comment-time">{{ formatTime(comment.createdAt) }}</span>
                       </div>
                       <p class="comment-text">{{ comment.text }}</p>
+                      <img v-if="comment.mediaUrl" :src="comment.mediaUrl" :alt="comment.mediaType === 'GIF' ? 'Comment GIF' : 'Comment attachment'" class="feed-comment-media" loading="lazy" />
                     </div>
                   </div>
                 </div>
@@ -365,7 +366,13 @@
                   class="comment-input"
                   placeholder="Add a comment..."
                   :disabled="commentLoading"
+                  aria-label="Add a comment"
+                  @input="searchMentionUsers"
                 />
+                <div v-if="mentionSuggestions.length" class="feed-mention-suggestions">
+                  <button v-for="candidate in mentionSuggestions" :key="candidate.id" type="button" @click="selectMention(candidate)">@{{ candidate.user || candidate.displayName }}</button>
+                </div>
+                <button type="button" class="feed-gif-btn" @click="showGifPicker = !showGifPicker" :disabled="commentLoading" aria-label="Add a GIF">GIF</button>
                 <button 
                   type="submit" 
                   class="comment-submit"
@@ -374,6 +381,12 @@
                   <i class="bi bi-send-fill"></i>
                 </button>
               </form>
+              <div v-if="showGifPicker" class="feed-gif-picker">
+                <div class="feed-gif-search"><input v-model="gifQuery" placeholder="Search GIFs…" aria-label="Search GIFs" @keyup.enter="searchGifs"><button type="button" @click="searchGifs" :disabled="gifLoading">Search</button></div>
+                <div v-if="gifLoading" class="feed-gif-state">Searching…</div>
+                <div v-else-if="gifResults.length" class="feed-gif-grid"><button v-for="gif in gifResults" :key="gif.id" type="button" @click="selectGif(gif)"><img :src="gif.url" :alt="gif.title || 'GIF'" loading="lazy"></button></div>
+                <div v-else class="feed-gif-state">Search for a reaction.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -451,6 +464,13 @@ const comments = ref([])
 const commentsLoading = ref(false)
 const newComment = ref('')
 const commentLoading = ref(false)
+const mentionSuggestions = ref([])
+const showGifPicker = ref(false)
+const gifQuery = ref('')
+const gifResults = ref([])
+const gifLoading = ref(false)
+const commentMediaUrl = ref('')
+const commentMediaType = ref('')
 
 const reactionLoading = ref(false)
 const userReaction = ref(null)
@@ -681,11 +701,15 @@ const addComment = async () => {
   try {
     const { data } = await axios.post(
       `${API_URL}/moments/${selectedMoment.value.id}/comments`,
-      { text: newComment.value.trim() },
+      { text: newComment.value.trim(), ...(commentMediaUrl.value ? { mediaUrl: commentMediaUrl.value, mediaType: commentMediaType.value } : {}) },
       { headers: getAuthHeaders() }
     )
     comments.value.push(data)
     newComment.value = ''
+    commentMediaUrl.value = ''
+    commentMediaType.value = ''
+    mentionSuggestions.value = []
+    showGifPicker.value = false
     
     const momentIndex = moments.value.findIndex(m => m.id === selectedMoment.value.id)
     if (momentIndex !== -1) {
@@ -697,6 +721,15 @@ const addComment = async () => {
     commentLoading.value = false
   }
 }
+
+const searchMentionUsers = async () => {
+  const match = newComment.value.match(/(?:^|\s)@([\w.-]{2,30})$/)
+  if (!match) { mentionSuggestions.value = []; return }
+  try { const { data } = await axios.get(`${API_URL}/users/search`, { params: { query: match[1] }, headers: getAuthHeaders() }); mentionSuggestions.value = Array.isArray(data) ? data.slice(0, 5) : [] } catch { mentionSuggestions.value = [] }
+}
+const selectMention = candidate => { const handle = candidate.user || candidate.displayName; newComment.value = newComment.value.replace(/@[\w.-]{2,30}$/, `@${handle} `); mentionSuggestions.value = [] }
+const searchGifs = async () => { if (!gifQuery.value.trim() || gifLoading.value) return; gifLoading.value = true; try { const { data } = await axios.get(`${API_URL}/giphy/search`, { params: { q: gifQuery.value.trim() }, headers: getAuthHeaders() }); gifResults.value = Array.isArray(data) ? data : [] } catch { showToast('GIF search failed. Try again.', 'error') } finally { gifLoading.value = false } }
+const selectGif = gif => { commentMediaUrl.value = gif.url; commentMediaType.value = 'GIF'; showGifPicker.value = false; showToast('GIF attached.', 'success') }
 
 const toggleReaction = async (type) => {
   if (!selectedMoment.value || reactionLoading.value) return
@@ -2008,5 +2041,5 @@ onUnmounted(() => {
   letter-spacing: 0.06em; margin: 0 0 20px;
 }
 
-/* (old reaction btn styles removed — replaced by gr-rxn-btn above) */
+.feed-comment-media{display:block;max-width:180px;max-height:140px;margin-top:8px;object-fit:cover;border:1px solid #ddd4c5}.feed-mention-suggestions{position:absolute;bottom:calc(100% + 8px);left:0;display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#fff;border:2px solid #16130f;box-shadow:3px 3px #16130f;z-index:3}.feed-mention-suggestions button{border:1px solid #16130f;background:#f5d547;padding:6px 8px;font:11px 'Spline Sans Mono',monospace;cursor:pointer}.comment-form{position:relative}.feed-gif-btn{border:0;background:#e6edff;padding:0 8px;font:10px 'Spline Sans Mono',monospace;font-weight:700;cursor:pointer}.feed-gif-btn:disabled{opacity:.5}.feed-gif-picker{margin-top:8px;padding:10px;border:2px solid #16130f;background:#fff}.feed-gif-search{display:flex;gap:6px}.feed-gif-search input{min-width:0;flex:1;border:1px solid #16130f;padding:8px}.feed-gif-search button{border:2px solid #16130f;background:#2a55f5;color:#fff;padding:8px 12px;font-weight:700}.feed-gif-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;max-height:180px;overflow:auto}.feed-gif-grid button{padding:0;border:0;background:none;cursor:pointer}.feed-gif-grid img{display:block;width:100%;height:60px;object-fit:cover}.feed-gif-state{padding:16px;text-align:center;color:#665f55;font-size:.8rem}
 </style>
