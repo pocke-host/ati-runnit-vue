@@ -727,7 +727,8 @@ const fetchEvents = async () => {
   }
 
   if (!rawRaces && farEvents.length === 0 && bikeEvents.length === 0) {
-    events.value    = sampleEvents
+    events.value    = []
+    apiError.value  = 'Live event data is temporarily unavailable. Please try again shortly.'
     usingLiveData.value = false
     loading.value   = false
     return

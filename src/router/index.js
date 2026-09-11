@@ -51,6 +51,7 @@ const routes = [
   { path: '/settings',            name: 'Settings',       component: () => import('@/views/AccountSettings.vue'),  meta: { requiresAuth: true } },
   { path: '/plans',               name: 'Plans',          component: () => import('@/views/TrainingPlans.vue'),    meta: { requiresAuth: true } },
   { path: '/training-folders',    name: 'TrainingFolders', component: () => import('@/views/TrainingFolders.vue'), meta: { requiresAuth: true } },
+  { path: '/training-folders/:id', name: 'TrainingFolderDetail', component: () => import('@/views/TrainingFolderDetail.vue'), meta: { requiresAuth: true } },
   { path: '/plans/:id',           name: 'PlanDetail',     component: () => import('@/views/PlanDetail.vue'),       meta: { requiresAuth: true } },
   { path: '/activities/:id',      name: 'ActivityDetail', component: () => import('@/views/ActivityDetail.vue'),   meta: { requiresAuth: true } },
   { path: '/profile/edit',        redirect: '/settings' }, // merged into Settings — keep old links/bookmarks working
