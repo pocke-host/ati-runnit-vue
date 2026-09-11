@@ -58,6 +58,9 @@
 
           <!-- Action buttons -->
           <div class="plan-header-actions">
+            <button class="btn btn-sm folder-save-btn" @click="openFolderPicker('PLAN', plan.id)">
+              <i class="bi bi-folder-plus me-1"></i>Save to folder
+            </button>
             <button
               v-if="!plan.isActive"
               class="btn btn-primary btn-sm"
@@ -448,6 +451,12 @@
       </Teleport>
 
       <Teleport to="body">
+        <div v-if="folderPicker" class="attach-overlay" @click.self="folderPicker = null">
+          <div class="attach-modal"><div class="attach-modal-head"><strong>Save to training folder</strong><button @click="folderPicker = null">×</button></div>
+            <select v-model="selectedFolderId" class="attach-select"><option value="">Choose a folder…</option><option v-for="f in folders" :key="f.id" :value="String(f.id)">{{ f.name }}</option></select>
+            <button class="attach-save" @click="saveToFolder" :disabled="!selectedFolderId || folderSaving">{{ folderSaving ? 'Saving…' : 'Save to folder' }}</button>
+          </div>
+        </div>
         <div v-if="activityPickerWorkout" class="attach-overlay" @click.self="activityPickerWorkout = null">
           <div class="attach-modal">
             <div class="attach-modal-head"><strong>Attach an activity</strong><button @click="activityPickerWorkout = null">×</button></div>
@@ -474,6 +483,7 @@ import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth.js'
 import { storeToRefs } from 'pinia'
 import { useActivityStore } from '@/stores/activity.js'
+import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -514,8 +524,14 @@ const showDeleteConfirm = ref(false)
 const activityPickerWorkout = ref(null)
 const selectedActivityId = ref('')
 const attachmentSaving = ref(false)
+const folderPicker = ref(null)
+const folders = ref([])
+const selectedFolderId = ref('')
+const folderSaving = ref(false)
 const attachableActivities = computed(() => (activities.value || []).filter(a => a?.id).slice(0, 200))
 const activityLabel = (a) => `${new Date(a.performedAt || a.createdAt || Date.now()).toLocaleDateString()} · ${a.title || a.sportType || 'Activity'}${a.distanceMeters ? ` · ${(a.distanceMeters / 1000).toFixed(1)} km` : ''}`
+const openFolderPicker = async (itemType, itemId) => { folderPicker.value = { itemType, itemId }; selectedFolderId.value = ''; try { folders.value = (await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders`)).data } catch { showToast('Folders did not load.', 'error') } }
+const saveToFolder = async () => { if (!selectedFolderId.value || folderSaving.value) return; folderSaving.value = true; try { await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders/${selectedFolderId.value}/items`, folderPicker.value); folderPicker.value = null; showToast('Saved to training folder.', 'success') } catch { showToast('Could not save to that folder.', 'error') } finally { folderSaving.value = false } }
 
 // Post-completion RPE + notes
 const postCompletion = ref(null) // { id, rpe, notes }

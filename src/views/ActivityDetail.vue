@@ -42,6 +42,7 @@
         <button v-if="isOwn" class="combine-btn" @click="router.push({ path: '/feed', query: { createEvent: '1', activityId: activity.id } })">
           <i class="bi bi-collection me-1"></i>Combine
         </button>
+        <button v-if="isOwn" class="combine-btn" @click="openFolderPicker"><i class="bi bi-folder-plus me-1"></i>Folder</button>
       </div>
 
       <!-- USER ROW -->
@@ -460,6 +461,7 @@
 
       </div>
     </template>
+    <div v-if="folderPicker" class="folder-picker-overlay" @click.self="folderPicker = false"><div class="folder-picker-modal"><strong>Save to training folder</strong><select v-model="selectedFolderId"><option value="">Choose a folder…</option><option v-for="f in folders" :key="f.id" :value="String(f.id)">{{ f.name }}</option></select><button :disabled="!selectedFolderId || folderSaving" @click="saveToFolder">{{ folderSaving ? 'Saving…' : 'Save' }}</button></div></div>
 
     <ConfirmModal
       v-model="showDeleteConfirm"
@@ -669,6 +671,9 @@ const isOwn = computed(() =>
   activity.value?.userId && user.value?.id &&
   String(activity.value.userId) === String(user.value.id)
 )
+const folders = ref([]), folderPicker = ref(false), selectedFolderId = ref(''), folderSaving = ref(false)
+const openFolderPicker = async () => { folderPicker.value = true; try { folders.value = (await axios.get(`${API_URL}/training-folders`)).data } catch { showToast('Folders did not load.', 'error') } }
+const saveToFolder = async () => { if (!selectedFolderId.value) return; folderSaving.value = true; try { await axios.post(`${API_URL}/training-folders/${selectedFolderId.value}/items`, { itemType: 'ACTIVITY', itemId: activity.value.id }); folderPicker.value = false; showToast('Saved to training folder.', 'success') } catch { showToast('Could not save to that folder.', 'error') } finally { folderSaving.value = false } }
 
 const hasCoords = computed(() => {
   const a = activity.value
