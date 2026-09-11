@@ -22,6 +22,25 @@
         <router-link to="/track" class="streak-banner-cta">Track Now</router-link>
       </div>
 
+      <!-- Daily command center: the first decision a logged-in athlete needs to make. -->
+      <section class="daily-focus" aria-labelledby="daily-focus-title">
+        <div class="daily-focus-intro">
+          <p class="daily-focus-kicker">Your day in training</p>
+          <h2 id="daily-focus-title">{{ todayWorkout ? todayWorkout.name || todayWorkout.type : 'Keep the momentum moving.' }}</h2>
+          <p>{{ todayWorkout?.description || (activityToday ? 'Activity logged. See how the rest of your week is shaping up.' : 'No workout is scheduled yet. Start with a plan or log what you do today.') }}</p>
+        </div>
+        <div class="daily-focus-context">
+          <div v-if="daysToRace !== null" class="daily-focus-stat"><span>Next race</span><strong>{{ daysToRace === 0 ? 'Race day' : `${daysToRace} days` }}</strong></div>
+          <div v-if="todayWellness?.recoveryScore != null" class="daily-focus-stat"><span>Recovery</span><strong>{{ todayWellness.recoveryScore }}%</strong></div>
+          <div v-if="riskBadge" class="daily-focus-stat"><span>Training load</span><strong>{{ riskBadge.label }}</strong></div>
+        </div>
+        <div class="daily-focus-actions">
+          <router-link to="/track" class="daily-focus-primary">{{ activityToday ? 'Log another activity' : 'Start today’s workout' }} →</router-link>
+          <router-link v-if="todayWorkout && (fullActivePlan?.id || activePlan?.id)" :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="daily-focus-secondary">View plan</router-link>
+          <router-link v-else to="/plans" class="daily-focus-secondary">Browse plans</router-link>
+        </div>
+      </section>
+
       <!-- ════ DESKTOP V2 BENTO ════ -->
       <div class="db2-desktop">
 
@@ -3652,7 +3671,9 @@ textarea.form-control{resize:vertical;min-height:72px}
 /* ════════════════════════════════════
    DESKTOP V2 BENTO DASHBOARD
    ════════════════════════════════════ */
-.db2-desktop { display: block; }
+.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(220px,1fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-context{display:flex;gap:10px}.daily-focus-stat{min-width:0;padding-left:12px;border-left:2px solid #E7DFCE}.daily-focus-stat span{display:block;color:#665f55;font:9px 'Spline Sans Mono',monospace;text-transform:uppercase}.daily-focus-stat strong{display:block;margin-top:5px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.db2-desktop { display: block; }
+@media(max-width:900px){.daily-focus{grid-template-columns:1fr;gap:14px}.daily-focus-context{order:2}.daily-focus-actions{order:3}.daily-focus-primary{flex:1;text-align:center}}
+@media(max-width:600px){.daily-focus{margin:0 0 14px;padding:16px}.daily-focus-context{overflow:auto}.daily-focus-stat{flex:1}.daily-focus-actions{flex-wrap:wrap}.daily-focus-primary{width:100%}}
 .db2-v1-mobile { display: none !important; }
 
 /* ── HERO ── */
