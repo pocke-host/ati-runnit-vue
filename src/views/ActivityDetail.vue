@@ -1008,18 +1008,14 @@ const handleCommentMedia = async (event) => {
 
 const searchGifs = async () => {
   if (!gifQuery.value.trim() || gifLoading.value) return
-  const key = import.meta.env.VITE_GIPHY_API_KEY
-  if (!key) { showToast('GIF search is not configured yet.', 'error'); return }
   gifLoading.value = true
   try {
-    const { data } = await axios.get('https://api.giphy.com/v1/gifs/search', {
-      params: { api_key: key, q: gifQuery.value.trim(), limit: 18, rating: 'pg-13' }
+    const token = localStorage.getItem('token')
+    const { data } = await axios.get(`${API_URL}/giphy/search`, {
+      params: { q: gifQuery.value.trim() },
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
-    gifResults.value = (data.data || []).map(g => ({
-      id: g.id,
-      title: g.title,
-      url: g.images?.fixed_width?.url || g.images?.original?.url
-    })).filter(g => g.url)
+    gifResults.value = Array.isArray(data) ? data : []
   } catch { showToast('GIF search failed. Try again.', 'error') }
   finally { gifLoading.value = false }
 }
