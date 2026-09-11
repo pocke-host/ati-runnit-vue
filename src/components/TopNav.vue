@@ -23,6 +23,7 @@
         <div class="training-menu" ref="trainingRef">
           <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">Training <span aria-hidden="true">⌄</span></button>
           <div v-if="trainingOpen" class="training-menu-dropdown">
+            <router-link to="/train" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i> Training hub</router-link>
             <router-link to="/races" @click="trainingOpen = false"><i class="bi bi-flag"></i> Races</router-link>
             <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i> Plans</router-link>
             <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i> Folders</router-link>

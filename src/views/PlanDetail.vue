@@ -42,6 +42,9 @@
               <div class="plan-header-meta">
                 {{ plan.totalWeeks }} weeks · {{ plan.daysPerWeek }}x/week · Starts {{ formatDateShort(plan.startDate) }}
               </div>
+              <router-link v-if="upcomingRace" to="/races" class="plan-race-context">
+                <span>Next race</span><strong>{{ upcomingRace.raceName }}</strong><em>{{ daysUntilRace(upcomingRace.raceDate) }}</em>
+              </router-link>
             </div>
           </div>
 
@@ -528,8 +531,10 @@ const folderPicker = ref(null)
 const folders = ref([])
 const selectedFolderId = ref('')
 const folderSaving = ref(false)
+const upcomingRace = ref(null)
 const attachableActivities = computed(() => (activities.value || []).filter(a => a?.id).slice(0, 200))
 const activityLabel = (a) => `${new Date(a.performedAt || a.createdAt || Date.now()).toLocaleDateString()} · ${a.title || a.sportType || 'Activity'}${a.distanceMeters ? ` · ${(a.distanceMeters / 1000).toFixed(1)} km` : ''}`
+const daysUntilRace = (date) => { const days = Math.ceil((new Date(`${date}T00:00:00`) - new Date()) / 86400000); return days < 0 ? 'Past' : days === 0 ? 'Race day' : `${days} days` }
 const openFolderPicker = async (itemType, itemId) => { folderPicker.value = { itemType, itemId }; selectedFolderId.value = ''; try { folders.value = (await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders`)).data } catch { showToast('Folders did not load.', 'error') } }
 const saveToFolder = async () => { if (!selectedFolderId.value || folderSaving.value) return; folderSaving.value = true; try { await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders/${selectedFolderId.value}/items`, folderPicker.value); folderPicker.value = null; showToast('Saved to training folder.', 'success') } catch { showToast('Could not save to that folder.', 'error') } finally { folderSaving.value = false } }
 
@@ -840,6 +845,10 @@ const doDelete = async () => {
 // ── Load ──────────────────────────────────────────
 
 onMounted(async () => {
+  try {
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/race-bookmarks`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+    upcomingRace.value = (Array.isArray(data) ? data : []).filter(r => r.raceDate && new Date(`${r.raceDate}T00:00:00`) >= new Date()).sort((a, b) => new Date(a.raceDate) - new Date(b.raceDate))[0] || null
+  } catch { upcomingRace.value = null }
   loading.value = true
   try {
     const data = await planStore.fetchPlan(route.params.id)
@@ -964,6 +973,11 @@ async function loadWorkoutAdaptations() {
 .ph-badge-active { background: rgba(255,255,255,0.15); color: #fff; display: inline-flex; align-items: center; }
 .plan-header-name { font-weight: 900; font-size: 1.6rem; margin: 0 0 4px; color: white; }
 .plan-header-meta { font-size: 0.88rem; color: rgba(255,255,255,0.70); }
+.plan-race-context { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin-top: 12px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.45); color: #16130F; background: #FFC53D; font-size: .78rem; text-decoration: none; }
+.plan-race-context span, .plan-race-context em { font: 10px 'Spline Sans Mono', monospace; text-transform: uppercase; }
+.plan-race-context strong { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plan-race-context em { font-style: normal; font-weight: 700; }
+.plan-race-context:hover { color: #16130F; background: #fff; }
 
 /* Overall progress bar */
 .plan-overall-progress { max-width: 400px; }

@@ -5,7 +5,8 @@
     <AppSpinner v-if="!user" label="Loading dashboard…" />
 
     <!-- Dashboard Content -->
-    <div v-else class="wrap">
+      <div v-else class="wrap">
+      <MotivationalQuote />
       <!-- Pull-to-refresh indicator (mobile only) -->
       <div class="ptr-indicator" :style="{ height: pullY + 'px', opacity: pullY > 0 ? 1 : 0 }" aria-hidden="true">
         <div :class="['ptr-spinner', { spinning: refreshing }]">
@@ -1318,6 +1319,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
 import StoriesViewer from '@/components/StoriesViewer.vue'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
+import MotivationalQuote from '@/components/MotivationalQuote.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 
 Chart.register(...registerables)
