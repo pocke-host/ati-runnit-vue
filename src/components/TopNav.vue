@@ -21,6 +21,7 @@
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
         <router-link to="/training-folders" class="nav-link-auth">Folders</router-link>
+        <router-link to="/coros-coach" class="nav-link-auth">COROS Coach</router-link>
         <router-link to="/my-coach" class="nav-link-auth">Coach</router-link>
       </div>
 
