@@ -30,7 +30,8 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(garminLastSync) }}
             </div>
-            <div v-if="needsAttention(garminLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
+            <div v-if="syncState(garminLastSync) === 'pending'" class="sync-attention sync-attention--pending" role="status">Awaiting first sync — tap Sync Now to bring in data</div>
+            <div v-else-if="syncState(garminLastSync) === 'stale'" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
             <div v-if="syncCounts.garmin" class="sync-count">{{ syncCounts.garmin }} activities synced</div>
             <button class="btn btn-primary" @click="syncNow" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
@@ -65,7 +66,8 @@
               <div class="last-sync-label">
                 Last synced: {{ relativeTime(appleHealthLastSync) }}
               </div>
-              <div v-if="needsAttention(appleHealthLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
+              <div v-if="syncState(appleHealthLastSync) === 'pending'" class="sync-attention sync-attention--pending" role="status">Awaiting first sync — tap Sync Now to bring in data</div>
+              <div v-else-if="syncState(appleHealthLastSync) === 'stale'" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
               <div v-if="syncCounts.appleHealth" class="sync-count">{{ syncCounts.appleHealth }} activities synced</div>
               <button class="btn btn-primary" @click="syncAppleHealth" :disabled="appleHealthSyncing">
                 <span v-if="appleHealthSyncing" class="spinner"></span>
@@ -110,7 +112,8 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(corosLastSync) }}
             </div>
-            <div v-if="needsAttention(corosLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
+            <div v-if="syncState(corosLastSync) === 'pending'" class="sync-attention sync-attention--pending" role="status">Awaiting first sync — tap Sync Now to bring in data</div>
+            <div v-else-if="syncState(corosLastSync) === 'stale'" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
             <div v-if="syncCounts.coros" class="sync-count">{{ syncCounts.coros }} activities synced</div>
             <button class="btn btn-primary" @click="syncCoros" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
@@ -143,7 +146,8 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(whoopLastSync) }}
             </div>
-            <div v-if="needsAttention(whoopLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
+            <div v-if="syncState(whoopLastSync) === 'pending'" class="sync-attention sync-attention--pending" role="status">Awaiting first sync — tap Sync Now to bring in data</div>
+            <div v-else-if="syncState(whoopLastSync) === 'stale'" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
             <div v-if="syncCounts.whoop" class="sync-count">{{ syncCounts.whoop }} activities synced</div>
             <button class="btn btn-primary" @click="syncWhoop" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
@@ -235,7 +239,10 @@ const relativeTime = (iso) => {
   return `${Math.floor(hrs / 24)}d ago`
 }
 
-const needsAttention = (iso) => !iso || (Date.now() - new Date(iso).getTime()) > 72 * 60 * 60 * 1000
+const syncState = (iso) => {
+  if (!iso) return 'pending'
+  return (Date.now() - new Date(iso).getTime()) > 72 * 60 * 60 * 1000 ? 'stale' : 'healthy'
+}
 
 const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)

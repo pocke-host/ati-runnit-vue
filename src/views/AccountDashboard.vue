@@ -23,6 +23,20 @@
         <router-link to="/track" class="streak-banner-cta">Track Now</router-link>
       </div>
 
+      <!-- First-login handoff: one clear action, with low-pressure next steps. -->
+      <section v-if="showWelcome" class="first-action-card" aria-labelledby="first-action-title">
+        <div class="first-action-copy">
+          <p class="daily-focus-kicker">Welcome to RUNNIT</p>
+          <h2 id="first-action-title">Make your first move.</h2>
+          <p>Record one activity and your dashboard will start shaping itself around your training.</p>
+        </div>
+        <div class="first-action-actions">
+          <router-link to="/track" class="daily-focus-primary" data-analytics="first_action_record">Record an activity →</router-link>
+          <router-link to="/devices" class="daily-focus-secondary" data-analytics="first_action_connect_device">Connect a device</router-link>
+          <button type="button" class="first-action-dismiss" @click="dismissWelcome">I’ll explore first</button>
+        </div>
+      </section>
+
       <!-- Daily command center: the first decision a logged-in athlete needs to make. -->
       <section class="daily-focus" aria-labelledby="daily-focus-title">
         <div class="daily-focus-intro">
@@ -1295,7 +1309,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useActivityStore } from '@/stores/activity'
 import { useMomentStore } from '@/stores/moment'
@@ -1327,6 +1341,7 @@ Chart.register(...registerables)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const activityStore = useActivityStore()
 const momentStore = useMomentStore()
@@ -1374,6 +1389,14 @@ const { isListening: micListening, isSupported: micSupported, toggleListening } 
 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
+const showWelcome = ref(route.query.welcome === '1')
+
+const dismissWelcome = () => {
+  showWelcome.value = false
+  const nextQuery = { ...route.query }
+  delete nextQuery.welcome
+  router.replace({ query: nextQuery })
+}
 
 const activityForm = ref({
   sportType: '',
@@ -3673,8 +3696,9 @@ textarea.form-control{resize:vertical;min-height:72px}
 /* ════════════════════════════════════
    DESKTOP V2 BENTO DASHBOARD
    ════════════════════════════════════ */
-.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(220px,1fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-context{display:flex;gap:10px}.daily-focus-stat{min-width:0;padding-left:12px;border-left:2px solid #E7DFCE}.daily-focus-stat span{display:block;color:#665f55;font:9px 'Spline Sans Mono',monospace;text-transform:uppercase}.daily-focus-stat strong{display:block;margin-top:5px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.db2-desktop { display: block; }
+.first-action-card{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 18px;padding:20px;background:#FFF3D6;border:2px solid #16130F;box-shadow:4px 4px #16130F}.first-action-copy h2{margin:0;font-size:1.5rem;line-height:1}.first-action-copy>p:last-child{margin:8px 0 0;color:#665f55;font-size:.86rem;line-height:1.4}.first-action-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.first-action-dismiss{padding:8px 0;border:0;background:transparent;color:#665f55;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.first-action-dismiss:hover{text-decoration:underline}.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(220px,1fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-context{display:flex;gap:10px}.daily-focus-stat{min-width:0;padding-left:12px;border-left:2px solid #E7DFCE}.daily-focus-stat span{display:block;color:#665f55;font:9px 'Spline Sans Mono',monospace;text-transform:uppercase}.daily-focus-stat strong{display:block;margin-top:5px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.db2-desktop { display: block; }
 @media(max-width:900px){.daily-focus{grid-template-columns:1fr;gap:14px}.daily-focus-context{order:2}.daily-focus-actions{order:3}.daily-focus-primary{flex:1;text-align:center}}
+@media(max-width:900px){.first-action-card{align-items:flex-start;flex-direction:column;gap:16px}.first-action-actions{justify-content:flex-start;width:100%}}
 @media(max-width:600px){.daily-focus{margin:0 0 14px;padding:16px}.daily-focus-context{overflow:auto}.daily-focus-stat{flex:1}.daily-focus-actions{flex-wrap:wrap}.daily-focus-primary{width:100%}}
 .db2-v1-mobile { display: none !important; }
 

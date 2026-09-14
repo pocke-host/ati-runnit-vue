@@ -283,7 +283,7 @@
       </div>
       <div v-if="saveError" class="save-error">{{ saveError }}</div>
       <button class="btn-cta" :disabled="saving" @click="goToDashboard">
-        <span v-if="!saving">Start training</span>
+        <span v-if="!saving">See my first step</span>
         <span v-else><span class="spinner-border spinner-border-sm me-2"></span>Saving...</span>
       </button>
     </div>
@@ -512,7 +512,7 @@ async function goToDashboard() {
     })
     sessionStorage.removeItem('needs_onboarding')
     authStore.completeOnboarding()
-    router.push('/dashboard')
+    router.push('/dashboard?welcome=1')
   } catch {
     saveError.value = "Preferences didn't save. Try again."
   } finally {
