@@ -30,6 +30,7 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(garminLastSync) }}
             </div>
+            <div v-if="needsAttention(garminLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
             <div v-if="syncCounts.garmin" class="sync-count">{{ syncCounts.garmin }} activities synced</div>
             <button class="btn btn-primary" @click="syncNow" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
@@ -64,6 +65,7 @@
               <div class="last-sync-label">
                 Last synced: {{ relativeTime(appleHealthLastSync) }}
               </div>
+              <div v-if="needsAttention(appleHealthLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
               <div v-if="syncCounts.appleHealth" class="sync-count">{{ syncCounts.appleHealth }} activities synced</div>
               <button class="btn btn-primary" @click="syncAppleHealth" :disabled="appleHealthSyncing">
                 <span v-if="appleHealthSyncing" class="spinner"></span>
@@ -108,6 +110,7 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(corosLastSync) }}
             </div>
+            <div v-if="needsAttention(corosLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
             <div v-if="syncCounts.coros" class="sync-count">{{ syncCounts.coros }} activities synced</div>
             <button class="btn btn-primary" @click="syncCoros" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
@@ -140,6 +143,7 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(whoopLastSync) }}
             </div>
+            <div v-if="needsAttention(whoopLastSync)" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
             <div v-if="syncCounts.whoop" class="sync-count">{{ syncCounts.whoop }} activities synced</div>
             <button class="btn btn-primary" @click="syncWhoop" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
@@ -230,6 +234,8 @@ const relativeTime = (iso) => {
   if (hrs < 24) return `${hrs}h ago`
   return `${Math.floor(hrs / 24)}d ago`
 }
+
+const needsAttention = (iso) => !iso || (Date.now() - new Date(iso).getTime()) > 72 * 60 * 60 * 1000
 
 const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
@@ -603,6 +609,7 @@ onMounted(() => {
   letter-spacing: 0.08em;
   color: rgba(15,18,16,0.45);
 }
+.sync-attention { color: #9A3412; font-size: .7rem; font-weight: 800; line-height: 1.3; }
 
 
 .btn-disconnect {

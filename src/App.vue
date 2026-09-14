@@ -137,7 +137,7 @@ const toastIcon = (type) => ({
 
   <!-- Global toast stack -->
   <Teleport to="body">
-    <div class="toast-stack">
+    <div class="toast-stack" aria-live="polite" aria-atomic="true">
       <TransitionGroup name="toast">
         <div
           v-for="t in toasts"
