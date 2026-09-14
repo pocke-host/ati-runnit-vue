@@ -21,6 +21,9 @@
         <router-link to="/plans" class="record-option">
           <i class="bi bi-journal-check"></i><span><strong>Start from a plan</strong><small>Choose today’s scheduled workout</small></span><b>→</b>
         </router-link>
+        <router-link to="/dashboard?log=1" class="record-option">
+          <i class="bi bi-pencil-square"></i><span><strong>Log manually</strong><small>Add an activity from your watch, memory, or notes</small></span><b>→</b>
+        </router-link>
       </section>
 
       <!-- Workout step guide — only shown when launched from a plan workout -->

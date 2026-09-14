@@ -2239,6 +2239,12 @@ const sleepStageBreakdown = computed(() => {
 })
 
 onMounted(async () => {
+  if (route.query.log === '1') {
+    showActivityModal.value = true
+    const nextQuery = { ...route.query }
+    delete nextQuery.log
+    router.replace({ query: nextQuery })
+  }
   // Render empty charts immediately so the canvas elements appear at once
   await nextTick()
   updateCharts()
