@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Runnit</string>
+    <string name="title_activity_main">Runnit</string>
+    <string name="package_name">live.runnit.app</string>
+    <string name="custom_url_scheme">live.runnit.app</string>
+</resources>
