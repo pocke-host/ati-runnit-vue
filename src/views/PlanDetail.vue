@@ -532,11 +532,15 @@ const folders = ref([])
 const selectedFolderId = ref('')
 const folderSaving = ref(false)
 const upcomingRace = ref(null)
+const authHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 const attachableActivities = computed(() => (activities.value || []).filter(a => a?.id).slice(0, 200))
 const activityLabel = (a) => `${new Date(a.performedAt || a.createdAt || Date.now()).toLocaleDateString()} · ${a.title || a.sportType || 'Activity'}${a.distanceMeters ? ` · ${(a.distanceMeters / 1000).toFixed(1)} km` : ''}`
 const daysUntilRace = (date) => { const days = Math.ceil((new Date(`${date}T00:00:00`) - new Date()) / 86400000); return days < 0 ? 'Past' : days === 0 ? 'Race day' : `${days} days` }
-const openFolderPicker = async (itemType, itemId) => { folderPicker.value = { itemType, itemId }; selectedFolderId.value = ''; try { folders.value = (await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders`)).data } catch { showToast('Folders did not load.', 'error') } }
-const saveToFolder = async () => { if (!selectedFolderId.value || folderSaving.value) return; folderSaving.value = true; try { await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders/${selectedFolderId.value}/items`, folderPicker.value); folderPicker.value = null; showToast('Saved to training folder.', 'success') } catch { showToast('Could not save to that folder.', 'error') } finally { folderSaving.value = false } }
+const openFolderPicker = async (itemType, itemId) => { folderPicker.value = { itemType, itemId }; selectedFolderId.value = ''; try { folders.value = (await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders`, { headers: authHeaders() })).data } catch { showToast('Folders did not load.', 'error') } }
+const saveToFolder = async () => { if (!selectedFolderId.value || folderSaving.value) return; folderSaving.value = true; try { await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/training-folders/${selectedFolderId.value}/items`, folderPicker.value, { headers: authHeaders() }); folderPicker.value = null; showToast('Saved to training folder.', 'success') } catch { showToast('Could not save to that folder.', 'error') } finally { folderSaving.value = false } }
 
 // Post-completion RPE + notes
 const postCompletion = ref(null) // { id, rpe, notes }
