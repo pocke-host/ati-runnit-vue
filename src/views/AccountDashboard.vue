@@ -72,7 +72,7 @@
                 {{ daysToRace === 0 ? 'RACE DAY' : `${daysToRace} DAYS TO RACE` }}
               </router-link>
               <span v-if="riskBadge" :class="['db2-risk-badge', riskBadge.modifier]">{{ riskBadge.label }}</span>
-              <button class="db2-btn-ghost" type="button" @click="openActivityModal">＋ Log</button>
+              <button class="db2-btn-ghost db2-btn-record" type="button" @click="openActivityModal">Record activity</button>
               <button class="db2-btn-cobalt" type="button" @click="openMomentModal">◉ Moment</button>
             </div>
           </div>
@@ -199,7 +199,14 @@
             <div class="db2-card-head">
               <div>
                 <div class="db2-card-title">Weekly Training</div>
-                <div v-if="weeklySummary" class="db2-week-summary-sub">{{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span></div>
+                <div v-if="weeklySummary" class="db2-week-summary-sub">
+                  {{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions
+                  <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span>
+                  <span v-if="integrationFreshnessLabel">· {{ integrationFreshnessLabel }}</span>
+                  <router-link to="/feed?time=week" class="db2-week-summary-link">View history →</router-link>
+                  <span v-if="integrationFreshnessLabel" class="db2-week-source">{{ integrationFreshnessLabel }}</span>
+                </div>
+                <div v-if="weeklySummary && weeklySummary.plannedCount" class="db2-week-plan-sub">Planned {{ formatExerciseTime(weeklySummary.plannedDurationMinutes * 60) }} · Completed {{ formatExerciseTime(weeklySummary.completedPlannedDurationMinutes * 60) }}</div>
               </div>
               <div class="db2-view-toggle">
                 <button :class="['db2-toggle-btn', { 'db2-toggle-btn--on': chartView === 'distance' }]" @click="chartView = 'distance'">Distance</button>
@@ -221,7 +228,7 @@
                 </div>
               </div>
               <div class="db2-bars-totals">
-                <div><span class="db2-bars-big">{{ chartView === 'duration' && weeklySummary ? formatExerciseTime(weeklySummary.totalDurationSeconds) : formatDistance(weekDistance) }}</span><span class="db2-bars-meta"> this wk</span></div>
+                <div><span class="db2-bars-big">{{ weeklySummary ? (chartView === 'duration' ? formatExerciseTime(weeklySummary.totalDurationSeconds) : formatDistance(weeklySummary.totalDistanceMeters)) : formatDistance(weekDistance) }}</span><span class="db2-bars-meta"> this wk</span></div>
                 <div><span class="db2-bars-big">{{ weeklySummary?.activityCount ?? weekActivities }}</span><span class="db2-bars-meta"> sessions</span></div>
               </div>
               <div v-if="weeklySummaryError" class="db2-week-summary-error" role="status">
@@ -882,7 +889,7 @@
           <h1 class="dm-hero-h1">{{ greeting }},<br><span class="dm-hero-name">{{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}.</span></h1>
           <div class="dm-hero-actions">
             <span class="dm-phase-badge" :style="{ borderColor: trainingBlock.color, color: trainingBlock.color }">{{ trainingBlock.label }} PHASE</span>
-            <button class="dm-btn-ghost" type="button" @click="openActivityModal">＋ Log</button>
+            <button class="dm-btn-ghost" type="button" @click="openActivityModal">Record activity</button>
             <button class="dm-btn-cobalt" type="button" @click="openMomentModal">◉ Moment</button>
           </div>
           <div class="dm-stats-grid">
@@ -1021,14 +1028,20 @@
             <div class="dm-bars-head">
               <div>
                 <div class="dm-bars-title">Weekly Training</div>
-                <div v-if="weeklySummary" class="dm-week-summary-sub">{{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span></div>
+                <div v-if="weeklySummary" class="dm-week-summary-sub">
+                  {{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions
+                  <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span>
+                  <router-link to="/feed?time=week" class="dm-week-summary-link">History →</router-link>
+                  <span v-if="integrationFreshnessLabel" class="dm-week-source">{{ integrationFreshnessLabel }}</span>
+                </div>
+                <div v-if="weeklySummary && weeklySummary.plannedCount" class="dm-week-plan-sub">Planned {{ formatExerciseTime(weeklySummary.plannedDurationMinutes * 60) }} · Completed {{ formatExerciseTime(weeklySummary.completedPlannedDurationMinutes * 60) }}</div>
               </div>
             </div>
             <div class="dm-bars-chart">
               <div v-for="(day, i) in weekCalendar" :key="day.date" class="dm-bar-col">
                 <div class="dm-bar"
                   :style="{
-                    height: chartView === 'duration' && weeklySummary ? weeklyBarHeight(i) : weeklyChartData[i] > 0 ? Math.max(Math.round(weeklyChartData[i] / Math.max.apply(null, weeklyChartData) * 88), 14) + 'px' : '8px',
+                    height: weeklySummary ? weeklyBarHeight(i) : weeklyChartData[i] > 0 ? Math.max(Math.round(weeklyChartData[i] / Math.max.apply(null, weeklyChartData) * 88), 14) + 'px' : '8px',
                     background: day.isToday && weeklyChartData[i] > 0 ? '#FFC53D' : weeklyChartData[i] > 0 ? '#2A55F5' : '#EDE5D5'
                   }"
                 ></div>
@@ -1408,6 +1421,7 @@ const showWelcome = ref(route.query.welcome === '1')
 const weeklySummary = ref(null)
 const weeklySummaryLoading = ref(false)
 const weeklySummaryError = ref(false)
+const integrationStatuses = ref([])
 
 const dismissWelcome = () => {
   showWelcome.value = false
@@ -2069,7 +2083,7 @@ const dailySummaryBarHeight = (seconds) => {
 }
 
 const weeklyBarHeight = (index) => {
-  const values = weeklySummary.value?.daily?.map(day => day.durationSeconds) || []
+  const values = weeklySummary.value?.daily?.map(day => chartView.value === 'duration' ? day.durationSeconds : day.distanceMeters || 0) || []
   const max = Math.max(...values, 1)
   const seconds = values[index] || 0
   return `${seconds > 0 ? Math.max(Math.round((seconds / max) * 76), 14) : 8}px`
@@ -2092,6 +2106,24 @@ const loadWeeklySummary = async () => {
     weeklySummaryLoading.value = false
   }
 }
+
+const loadIntegrationFreshness = async () => {
+  const providers = ['whoop', 'coros', 'apple-health', 'garmin']
+  const results = await Promise.all(providers.map(provider =>
+    axios.get(`${API_URL}/integrations/${provider}/status`, { headers: getAuthHeaders() }).then(({ data }) => ({ provider, ...data })).catch(() => null)
+  ))
+  integrationStatuses.value = results.filter(Boolean)
+}
+
+const integrationFreshnessLabel = computed(() => {
+  const reconnect = integrationStatuses.value.filter(status => status.needsReconnect)
+  if (reconnect.length) return `${reconnect.map(status => status.provider.replace('-health', ' Health')).join(', ')} needs reconnect`
+  const connected = integrationStatuses.value.filter(status => status.connected)
+  if (!connected.length) return ''
+  const stale = connected.filter(status => !status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000)
+  if (stale.length) return `${stale.map(status => status.provider.replace('-health', ' Health')).join(', ')} needs sync`
+  return `${integrationStatuses.value.length} source${integrationStatuses.value.length === 1 ? '' : 's'} synced`
+})
 
 const handleLogout = () => {
   authStore.logout()
@@ -2243,6 +2275,7 @@ const loadData = async () => {
   await Promise.all([
     activityStore.fetchActivities(),
     loadWeeklySummary(),
+    loadIntegrationFreshness(),
     loadFollowData(),
     planStore.fetchPlans(),
     athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
@@ -4665,9 +4698,13 @@ textarea.form-control{resize:vertical;min-height:72px}
 .db2-upgrade-cta--manage:hover { background: rgba(251,246,236,0.08); color: #FBF6EC; }
 .db2-xp { display: none !important; }
 .db2-week-summary-sub, .dm-week-summary-sub { margin-top: 4px; color: #8A8A8A; font: 600 .62rem 'Spline Sans Mono', monospace; letter-spacing: .03em; }
+.db2-week-summary-link, .dm-week-summary-link { margin-left: 8px; color: #2A55F5; font-weight: 800; text-decoration: underline; white-space: nowrap; }
+.db2-week-source, .dm-week-source { margin-left: 8px; color: #5A5348; }
+.db2-week-plan-sub, .dm-week-plan-sub { margin-top: 8px; color: #5A5348; font: 600 .66rem 'Spline Sans Mono', monospace; text-transform: uppercase; }
 .db2-week-summary-error, .dm-week-summary-error { margin-top: 10px; color: #8A8A8A; font: 600 .68rem 'Spline Sans Mono', monospace; }
 .db2-week-summary-error button, .dm-week-summary-error button { padding: 0; border: 0; background: transparent; color: #2A55F5; font: inherit; font-weight: 800; cursor: pointer; text-decoration: underline; }
 .dm-week-summary-breakdown { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 12px; color: #8A8A8A; font: 600 .62rem 'Spline Sans Mono', monospace; text-transform: uppercase; }
+button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offset: 3px; }
 
 /* ── UNIFIED WEEKLY EXERCISE SUMMARY ── */
 .web-week-summary {

@@ -847,6 +847,7 @@ const { refreshing: feedRefreshing, pullY: feedPullY } = usePullToRefresh(fetchF
 onMounted(() => {
   fetchFeed()
   loadFollowStatus()
+  if (route.query.time === 'week') timePeriod.value = 'week'
   if (route.query.createEvent === '1') showCreateEvent.value = true
   document.addEventListener('keydown', handleKeydown)
 })
