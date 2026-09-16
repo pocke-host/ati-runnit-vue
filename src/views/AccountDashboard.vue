@@ -56,6 +56,40 @@
         </div>
       </section>
 
+      <!-- Unified exercise time from manual and connected providers. -->
+      <section class="web-week-summary" aria-labelledby="web-week-summary-title">
+        <div class="web-week-summary-head">
+          <div>
+            <p class="daily-focus-kicker">Your movement</p>
+            <h2 id="web-week-summary-title">This week in exercise</h2>
+          </div>
+          <span v-if="weeklySummary" class="web-week-summary-count">{{ weeklySummary.activityCount }} session{{ weeklySummary.activityCount === 1 ? '' : 's' }}</span>
+        </div>
+        <div v-if="weeklySummaryLoading" class="web-week-summary-state" aria-live="polite">Loading your week…</div>
+        <div v-else-if="weeklySummaryError" class="web-week-summary-state web-week-summary-state--error" role="status">
+          We couldn’t load your exercise total. <button type="button" @click="loadWeeklySummary">Try again</button>
+        </div>
+        <template v-else-if="weeklySummary">
+          <div class="web-week-summary-total">
+            <strong>{{ formatExerciseTime(weeklySummary.totalDurationSeconds) }}</strong>
+            <span>total exercise</span>
+          </div>
+          <div class="web-week-summary-days" aria-label="Daily exercise duration">
+            <div v-for="day in weeklySummary.daily" :key="day.date" class="web-week-summary-day">
+              <div class="web-week-summary-bar-wrap" :title="`${formatExerciseTime(day.durationSeconds)} on ${day.date}`">
+                <div class="web-week-summary-bar" :style="{ height: `${dailySummaryBarHeight(day.durationSeconds)}px` }"></div>
+              </div>
+              <span>{{ formatWeekday(day.date) }}</span>
+            </div>
+          </div>
+          <div v-if="weeklySummary.bySport?.length" class="web-week-summary-breakdown">
+            <span v-for="sport in weeklySummary.bySport" :key="sport.sport">
+              {{ sport.sport.toLowerCase() }} · {{ formatExerciseTime(sport.durationSeconds) }}
+            </span>
+          </div>
+        </template>
+      </section>
+
       <!-- ════ DESKTOP V2 BENTO ════ -->
       <div class="db2-desktop">
 
@@ -1390,6 +1424,9 @@ const { isListening: micListening, isSupported: micSupported, toggleListening } 
 const showActivityModal = ref(false)
 const showMomentModal = ref(false)
 const showWelcome = ref(route.query.welcome === '1')
+const weeklySummary = ref(null)
+const weeklySummaryLoading = ref(false)
+const weeklySummaryError = ref(false)
 
 const dismissWelcome = () => {
   showWelcome.value = false
@@ -2032,6 +2069,42 @@ const goToFeed = () => {
   router.push('/feed')
 }
 
+const formatExerciseTime = (seconds = 0) => {
+  const totalMinutes = Math.max(0, Math.round(seconds / 60))
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
+}
+
+const formatWeekday = (dateString) => {
+  const date = new Date(`${dateString}T12:00:00`)
+  return new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(date).slice(0, 2).toUpperCase()
+}
+
+const dailySummaryBarHeight = (seconds) => {
+  const values = weeklySummary.value?.daily?.map(day => day.durationSeconds) || []
+  const max = Math.max(...values, 1)
+  return Math.max(seconds > 0 ? 12 : 5, Math.round((seconds / max) * 76))
+}
+
+const loadWeeklySummary = async () => {
+  weeklySummaryLoading.value = true
+  weeklySummaryError.value = false
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    const { data } = await axios.get(`${API_URL}/activities/summary/weekly`, {
+      params: { timezone },
+      headers: getAuthHeaders()
+    })
+    weeklySummary.value = data
+  } catch {
+    weeklySummary.value = null
+    weeklySummaryError.value = true
+  } finally {
+    weeklySummaryLoading.value = false
+  }
+}
+
 const handleLogout = () => {
   authStore.logout()
   router.push('/')
@@ -2181,6 +2254,7 @@ watch(activities, () => {
 const loadData = async () => {
   await Promise.all([
     activityStore.fetchActivities(),
+    loadWeeklySummary(),
     loadFollowData(),
     planStore.fetchPlans(),
     athleteStore.fetchMyCoach().finally(() => { myCoachLoaded.value = true })
@@ -4601,4 +4675,33 @@ textarea.form-control{resize:vertical;min-height:72px}
   box-shadow: 4px 4px 0 rgba(251,246,236,0.15);
 }
 .db2-upgrade-cta--manage:hover { background: rgba(251,246,236,0.08); color: #FBF6EC; }
+
+/* ── UNIFIED WEEKLY EXERCISE SUMMARY ── */
+.web-week-summary {
+  margin: 0 0 18px;
+  padding: 20px;
+  background: #fff;
+  border: 2px solid #16130F;
+  box-shadow: 4px 4px #16130F;
+}
+.web-week-summary-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.web-week-summary-head h2 { margin: 0; font-size: 1.35rem; line-height: 1.1; }
+.web-week-summary-count { color: #665f55; font: 700 10px 'Spline Sans Mono', monospace; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.web-week-summary-total { display: flex; align-items: baseline; gap: 10px; margin: 18px 0 12px; }
+.web-week-summary-total strong { color: #16130F; font: 800 2.35rem/1 'Big Shoulders Display', system-ui, sans-serif; }
+.web-week-summary-total span { color: #665f55; font-size: .85rem; }
+.web-week-summary-days { display: flex; align-items: flex-end; gap: 10px; min-height: 104px; border-bottom: 2px solid #E7DFCE; }
+.web-week-summary-day { display: flex; flex: 1; flex-direction: column; align-items: center; gap: 6px; min-width: 0; color: #8A8A8A; font: 600 9px 'Spline Sans Mono', monospace; text-transform: uppercase; }
+.web-week-summary-bar-wrap { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 78px; }
+.web-week-summary-bar { width: min(28px, 70%); min-height: 5px; background: #2A55F5; border: 1px solid #16130F; transition: height .2s ease; }
+.web-week-summary-day:first-child .web-week-summary-bar { background: #FFC53D; }
+.web-week-summary-breakdown { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; color: #5A5348; font: 600 10px 'Spline Sans Mono', monospace; text-transform: uppercase; }
+.web-week-summary-state { padding: 18px 0 4px; color: #665f55; font-size: .85rem; }
+.web-week-summary-state--error button { padding: 0; border: 0; background: transparent; color: #2A55F5; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
+@media (max-width: 600px) {
+  .web-week-summary { margin-bottom: 14px; padding: 16px; }
+  .web-week-summary-total strong { font-size: 2rem; }
+  .web-week-summary-days { gap: 5px; }
+  .web-week-summary-bar { width: 20px; }
+}
 </style>
