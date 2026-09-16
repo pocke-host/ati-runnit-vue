@@ -56,40 +56,6 @@
         </div>
       </section>
 
-      <!-- Unified exercise time from manual and connected providers. -->
-      <section class="web-week-summary" aria-labelledby="web-week-summary-title">
-        <div class="web-week-summary-head">
-          <div>
-            <p class="daily-focus-kicker">Your movement</p>
-            <h2 id="web-week-summary-title">This week in exercise</h2>
-          </div>
-          <span v-if="weeklySummary" class="web-week-summary-count">{{ weeklySummary.activityCount }} session{{ weeklySummary.activityCount === 1 ? '' : 's' }}</span>
-        </div>
-        <div v-if="weeklySummaryLoading" class="web-week-summary-state" aria-live="polite">Loading your week…</div>
-        <div v-else-if="weeklySummaryError" class="web-week-summary-state web-week-summary-state--error" role="status">
-          We couldn’t load your exercise total. <button type="button" @click="loadWeeklySummary">Try again</button>
-        </div>
-        <template v-else-if="weeklySummary">
-          <div class="web-week-summary-total">
-            <strong>{{ formatExerciseTime(weeklySummary.totalDurationSeconds) }}</strong>
-            <span>total exercise</span>
-          </div>
-          <div class="web-week-summary-days" aria-label="Daily exercise duration">
-            <div v-for="day in weeklySummary.daily" :key="day.date" class="web-week-summary-day">
-              <div class="web-week-summary-bar-wrap" :title="`${formatExerciseTime(day.durationSeconds)} on ${day.date}`">
-                <div class="web-week-summary-bar" :style="{ height: `${dailySummaryBarHeight(day.durationSeconds)}px` }"></div>
-              </div>
-              <span>{{ formatWeekday(day.date) }}</span>
-            </div>
-          </div>
-          <div v-if="weeklySummary.bySport?.length" class="web-week-summary-breakdown">
-            <span v-for="sport in weeklySummary.bySport" :key="sport.sport">
-              {{ sport.sport.toLowerCase() }} · {{ formatExerciseTime(sport.durationSeconds) }}
-            </span>
-          </div>
-        </template>
-      </section>
-
       <!-- ════ DESKTOP V2 BENTO ════ -->
       <div class="db2-desktop">
 
@@ -231,7 +197,10 @@
           <!-- WEEKLY BARS (col-span 2) -->
           <div class="db2-card db2-weekly-bars">
             <div class="db2-card-head">
-              <div class="db2-card-title">Weekly Activity</div>
+              <div>
+                <div class="db2-card-title">Weekly Training</div>
+                <div v-if="weeklySummary" class="db2-week-summary-sub">{{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span></div>
+              </div>
               <div class="db2-view-toggle">
                 <button :class="['db2-toggle-btn', { 'db2-toggle-btn--on': chartView === 'distance' }]" @click="chartView = 'distance'">Distance</button>
                 <button :class="['db2-toggle-btn', { 'db2-toggle-btn--on': chartView === 'duration' }]" @click="chartView = 'duration'">Duration</button>
@@ -241,7 +210,9 @@
               <div class="db2-bars-chart">
                 <div v-for="(day, i) in weekCalendar" :key="day.date" class="db2-bar-col">
                   <div class="db2-bar" :style="{
-                    height: weekDistance > 0
+                    height: chartView === 'duration' && weeklySummary
+                      ? weeklyBarHeight(i)
+                      : weekDistance > 0
                       ? Math.max(day.activities.length > 0 ? 14 : 8, Math.round(day.activities.reduce((s, a) => s + (a.distanceMeters || 0), 0) / weekDistance * 120)) + 'px'
                       : (day.activities.length > 0 ? '14px' : '8px'),
                     background: day.isToday && day.activities.length > 0 ? '#FFC53D' : day.activities.length > 0 ? '#2A55F5' : '#EDE5D5'
@@ -250,8 +221,11 @@
                 </div>
               </div>
               <div class="db2-bars-totals">
-                <div><span class="db2-bars-big">{{ formatDistance(weekDistance) }}</span><span class="db2-bars-meta"> this wk</span></div>
-                <div><span class="db2-bars-big">{{ weekActivities }}</span><span class="db2-bars-meta"> workouts</span></div>
+                <div><span class="db2-bars-big">{{ chartView === 'duration' && weeklySummary ? formatExerciseTime(weeklySummary.totalDurationSeconds) : formatDistance(weekDistance) }}</span><span class="db2-bars-meta"> this wk</span></div>
+                <div><span class="db2-bars-big">{{ weeklySummary?.activityCount ?? weekActivities }}</span><span class="db2-bars-meta"> sessions</span></div>
+              </div>
+              <div v-if="weeklySummaryError" class="db2-week-summary-error" role="status">
+                Weekly total unavailable. <button type="button" @click="loadWeeklySummary">Retry</button>
               </div>
             </div>
           </div>
@@ -1045,18 +1019,25 @@
           <!-- WEEKLY BARS -->
           <div class="dm-bars-card">
             <div class="dm-bars-head">
-              <div class="dm-bars-title">Weekly Activity</div>
+              <div>
+                <div class="dm-bars-title">Weekly Training</div>
+                <div v-if="weeklySummary" class="dm-week-summary-sub">{{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span></div>
+              </div>
             </div>
             <div class="dm-bars-chart">
               <div v-for="(day, i) in weekCalendar" :key="day.date" class="dm-bar-col">
                 <div class="dm-bar"
                   :style="{
-                    height: weeklyChartData[i] > 0 ? Math.max(Math.round(weeklyChartData[i] / Math.max.apply(null, weeklyChartData) * 88), 14) + 'px' : '8px',
+                    height: chartView === 'duration' && weeklySummary ? weeklyBarHeight(i) : weeklyChartData[i] > 0 ? Math.max(Math.round(weeklyChartData[i] / Math.max.apply(null, weeklyChartData) * 88), 14) + 'px' : '8px',
                     background: day.isToday && weeklyChartData[i] > 0 ? '#FFC53D' : weeklyChartData[i] > 0 ? '#2A55F5' : '#EDE5D5'
                   }"
                 ></div>
                 <div class="dm-bar-lbl">{{ day.letter }}</div>
               </div>
+            </div>
+            <div v-if="weeklySummaryError" class="dm-week-summary-error" role="status">Weekly total unavailable. <button type="button" @click="loadWeeklySummary">Retry</button></div>
+            <div v-if="weeklySummary?.bySport?.length" class="dm-week-summary-breakdown">
+              <span v-for="sport in weeklySummary.bySport" :key="sport.sport">{{ sport.sport.toLowerCase() }} · {{ formatExerciseTime(sport.durationSeconds) }}</span>
             </div>
           </div>
 
@@ -2085,6 +2066,13 @@ const dailySummaryBarHeight = (seconds) => {
   const values = weeklySummary.value?.daily?.map(day => day.durationSeconds) || []
   const max = Math.max(...values, 1)
   return Math.max(seconds > 0 ? 12 : 5, Math.round((seconds / max) * 76))
+}
+
+const weeklyBarHeight = (index) => {
+  const values = weeklySummary.value?.daily?.map(day => day.durationSeconds) || []
+  const max = Math.max(...values, 1)
+  const seconds = values[index] || 0
+  return `${seconds > 0 ? Math.max(Math.round((seconds / max) * 76), 14) : 8}px`
 }
 
 const loadWeeklySummary = async () => {
@@ -4675,6 +4663,11 @@ textarea.form-control{resize:vertical;min-height:72px}
   box-shadow: 4px 4px 0 rgba(251,246,236,0.15);
 }
 .db2-upgrade-cta--manage:hover { background: rgba(251,246,236,0.08); color: #FBF6EC; }
+.db2-xp { display: none !important; }
+.db2-week-summary-sub, .dm-week-summary-sub { margin-top: 4px; color: #8A8A8A; font: 600 .62rem 'Spline Sans Mono', monospace; letter-spacing: .03em; }
+.db2-week-summary-error, .dm-week-summary-error { margin-top: 10px; color: #8A8A8A; font: 600 .68rem 'Spline Sans Mono', monospace; }
+.db2-week-summary-error button, .dm-week-summary-error button { padding: 0; border: 0; background: transparent; color: #2A55F5; font: inherit; font-weight: 800; cursor: pointer; text-decoration: underline; }
+.dm-week-summary-breakdown { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 12px; color: #8A8A8A; font: 600 .62rem 'Spline Sans Mono', monospace; text-transform: uppercase; }
 
 /* ── UNIFIED WEEKLY EXERCISE SUMMARY ── */
 .web-week-summary {
