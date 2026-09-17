@@ -46,6 +46,7 @@
             <div class="coach-meta">
               <span class="coach-ath-count">{{ coach.athleteCount || 0 }} athletes</span>
               <span v-if="coach.monthlyRate" class="coach-rate">${{ coach.monthlyRate }}/mo</span>
+              <span v-if="coachReviews[coach.id]?.length" class="coach-rating">★ {{ averageRating(coachReviews[coach.id]) }}</span>
             </div>
             <div class="sports-chips">
               <span v-for="sport in (coach.sportsCoached || [])" :key="sport" class="sport-chip">{{ sport }}</span>
@@ -78,6 +79,7 @@
               </button>
               <button class="btn-hire" @click="hireCoach(coach.id)">Hire Coach</button>
             </template>
+            <button class="btn-report" @click="reportCoach(coach.id)">Report</button>
           </div>
         </div>
       </div>
@@ -102,6 +104,7 @@ const actionLoading = ref(null)
 const requestError = ref('')
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const coachServices = ref({})
+const coachReviews = ref({})
 
 const hireCoach = (coachId) => {
   router.push(`/my-coach?hire=${coachId}`)
@@ -129,10 +132,19 @@ const loadServices = async () => {
   const entries = await Promise.all(coaches.value.map(async coach => {
     try {
       const res = await fetch(`${API}/coaches/${coach.id}/services`, { headers: { Authorization: `Bearer ${token}` } })
+      const reviewsRes = await fetch(`${API}/coaches/${coach.id}/reviews`, { headers: { Authorization: `Bearer ${token}` } })
+      if (reviewsRes.ok) coachReviews.value[coach.id] = await reviewsRes.json()
       return [coach.id, res.ok ? await res.json() : []]
     } catch { return [coach.id, []] }
   }))
   coachServices.value = Object.fromEntries(entries)
+}
+const averageRating = (rows) => (rows.reduce((sum, row) => sum + row.rating, 0) / rows.length).toFixed(1)
+const reportCoach = async (coachId) => {
+  const reason = window.prompt('Why are you reporting this coach?')
+  if (!reason?.trim()) return
+  try { const res = await fetch(`${API}/marketplace/reports`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('token')}`}, body:JSON.stringify({ coachId, reason: reason.trim() }) }); if (!res.ok) throw new Error('Report could not be submitted'); requestError.value = 'Thanks — your report was submitted for review.' }
+  catch (e) { requestError.value = e.message }
 }
 
 const bookService = async (service) => {
@@ -197,6 +209,7 @@ onMounted(async () => {
 .verified-badge { display:inline-block; color:#1E42D6; font: .68rem 'Spline Sans Mono',monospace; text-transform:uppercase; margin-bottom:6px; }
 .coach-meta { font-size: 0.78rem; color: #8A8A8A; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 .coach-rate { font-weight: 700; color: #2A55F5; font-size: 0.78rem; }
+.coach-rating { font-weight:700; color:#B7791F; font-size:.78rem; }
 .sports-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .sport-chip { font-family: 'Spline Sans Mono', ui-monospace, monospace; padding: 3px 10px; border: 2px solid #E7DFCE; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #5A5348; }
 .service-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
@@ -223,6 +236,7 @@ onMounted(async () => {
   padding: 6px 12px; background: #EEF1FF; color: #2A55F5;
   font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
 }
+.btn-report { border:0; background:transparent; color:#8A8A8A; font-size:.7rem; cursor:pointer; padding:8px; }
 
 .request-error { background: rgba(192,57,43,0.08); border: 2px solid rgba(192,57,43,0.20); color: #C0392B; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; }
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 24px; color: #8A8A8A; text-align: center; }
