@@ -16,7 +16,7 @@
       <!-- LEFT: desktop nav links (authenticated athletes, left-aligned after brand) -->
       <div class="navbar-links" v-if="isAuthenticated && role !== 'coach'">
         <router-link to="/feed" class="nav-link-auth">Feed</router-link>
-        <router-link to="/explore" class="nav-link-auth">Explore</router-link>
+        <router-link to="/discover" class="nav-link-auth">Discover</router-link>
         <router-link to="/friends" class="nav-link-auth">Friends</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
