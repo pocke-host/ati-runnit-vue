@@ -51,6 +51,23 @@
         </div>
       </section>
 
+      <section class="section">
+        <div class="section-header"><h2 class="section-title">BOOKING AVAILABILITY</h2></div>
+        <div class="rate-card">
+          <p class="rate-explainer">Set the windows athletes can book. Times use your local timezone.</p>
+          <div class="availability-list">
+            <div v-for="slot in availabilityDraft" :key="slot.weekday" class="availability-row">
+              <label><input v-model="slot.enabled" type="checkbox" /> {{ slot.label }}</label>
+              <input v-model="slot.startTime" type="time" :disabled="!slot.enabled" aria-label="Start time" />
+              <span>to</span>
+              <input v-model="slot.endTime" type="time" :disabled="!slot.enabled" aria-label="End time" />
+            </div>
+          </div>
+          <button class="btn-save-rate" @click="saveAvailability" :disabled="availabilitySaving">{{ availabilitySaving ? 'Saving…' : 'Save availability' }}</button>
+          <div v-if="availabilityStatus" class="rate-status">{{ availabilityStatus }}</div>
+        </div>
+      </section>
+
       <!-- Marketplace services -->
       <section class="section">
         <div class="section-header"><h2 class="section-title">PAID SERVICES</h2></div>
@@ -258,17 +275,27 @@ const marketplaceError = ref('')
 const connectReady = ref(false)
 const earnings = ref({ grossCents: 0, commissionCents: 0, netCents: 0 })
 const bookings = ref([])
+const availabilitySaving = ref(false)
+const availabilityStatus = ref('')
+const availabilityDraft = ref(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map((label, index) => ({ label, weekday: index + 1, enabled: false, startTime: '09:00', endTime: '17:00' })))
 const serviceDraft = ref({ title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' })
 
 const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` })
 const loadMarketplace = async () => {
   try {
-    const [serviceRes, statusRes, earningsRes, bookingsRes] = await Promise.all([fetch(`${API}/coach/services`, { headers: authHeaders() }), fetch(`${API}/coach/connect/status`, { headers: authHeaders() }), fetch(`${API}/coach/earnings`, { headers: authHeaders() }), fetch(`${API}/coach/bookings`, { headers: authHeaders() })])
+    const [serviceRes, statusRes, earningsRes, bookingsRes, availabilityRes] = await Promise.all([fetch(`${API}/coach/services`, { headers: authHeaders() }), fetch(`${API}/coach/connect/status`, { headers: authHeaders() }), fetch(`${API}/coach/earnings`, { headers: authHeaders() }), fetch(`${API}/coach/bookings`, { headers: authHeaders() }), fetch(`${API}/coach/availability`, { headers: authHeaders() })])
     if (serviceRes.ok) services.value = await serviceRes.json()
     if (statusRes.ok) connectReady.value = (await statusRes.json()).connected
     if (earningsRes.ok) earnings.value = await earningsRes.json()
     if (bookingsRes.ok) bookings.value = await bookingsRes.json()
+    if (availabilityRes.ok) { const rows = await availabilityRes.json(); availabilityDraft.value.forEach(slot => { const row = rows.find(item => item.weekday === slot.weekday); if (row) { slot.enabled = true; slot.startTime = String(row.startTime).slice(0,5); slot.endTime = String(row.endTime).slice(0,5) } }) }
   } catch { marketplaceError.value = 'Marketplace details could not load.' }
+}
+const saveAvailability = async () => {
+  availabilitySaving.value = true; availabilityStatus.value = ''
+  try { const rows = availabilityDraft.value.filter(s => s.enabled).map(s => ({ weekday:s.weekday, startTime:`${s.startTime}:00`, endTime:`${s.endTime}:00`, timezone:Intl.DateTimeFormat().resolvedOptions().timeZone })); const res = await fetch(`${API}/coach/availability`, { method:'PUT', headers:authHeaders(), body:JSON.stringify(rows) }); if (!res.ok) throw new Error('Availability could not be saved'); availabilityStatus.value = 'Availability saved.' }
+  catch (e) { availabilityStatus.value = e.message }
+  finally { availabilitySaving.value = false }
 }
 const publishService = async () => {
   serviceSaving.value = true; marketplaceError.value = ''
@@ -592,6 +619,10 @@ onMounted(async () => {
 .earnings-grid small { color:#8A8A8A; font: .68rem 'Spline Sans Mono',monospace; text-transform:uppercase; }
 .earnings-grid strong { font-size:1.25rem; }
 .empty-marketplace { padding:14px 0; color:#8A8A8A; font-size:.85rem; }
+.availability-list { display:grid; gap:8px; margin-bottom:14px; }
+.availability-row { display:grid; grid-template-columns:1fr 120px 24px 120px; align-items:center; gap:8px; font-size:.85rem; }
+.availability-row input[type="time"] { border:1px solid #E7DFCE; padding:7px; font:inherit; }
+@media (max-width:600px) { .availability-row { grid-template-columns:1fr 1fr 18px 1fr; } .availability-row label { grid-column:1/-1; } }
 @media (max-width:600px) { .earnings-grid { grid-template-columns:1fr; } }
 .btn-connect { margin-top: 16px; border: 2px solid #2A55F5; color: #2A55F5; background: #fff; padding: 10px 14px; font-weight: 700; cursor: pointer; }
 .rate-current { display: flex; align-items: baseline; gap: 6px; }
