@@ -37,6 +37,15 @@
         </div>
       </section>
 
+      <section v-if="activityFeedback" class="activity-feedback" aria-live="polite">
+        <div>
+          <p class="daily-focus-kicker">Nice work</p>
+          <strong>{{ activityFeedback.duration }} logged · {{ activityFeedback.sport }}</strong>
+          <p>{{ activityFeedback.message }}</p>
+        </div>
+        <router-link to="/feed" class="daily-focus-secondary">See your activity</router-link>
+      </section>
+
       <!-- Daily command center: the first decision a logged-in athlete needs to make. -->
       <section class="daily-focus" aria-labelledby="daily-focus-title">
         <div class="daily-focus-intro">
@@ -50,7 +59,10 @@
           <div v-if="riskBadge" class="daily-focus-stat"><span>Training load</span><strong>{{ riskBadge.label }}</strong></div>
         </div>
         <div class="daily-focus-actions">
-          <router-link to="/track" class="daily-focus-primary">{{ activityToday ? 'Log another activity' : 'Start today’s workout' }} →</router-link>
+          <router-link v-if="primaryDashboardAction.kind === 'reconnect'" to="/devices" class="daily-focus-primary">{{ primaryDashboardAction.label }} →</router-link>
+          <router-link v-else-if="primaryDashboardAction.kind === 'review'" to="/stats" class="daily-focus-primary">{{ primaryDashboardAction.label }} →</router-link>
+          <button v-else-if="primaryDashboardAction.kind === 'complete'" type="button" class="daily-focus-primary" @click="startPlannedWorkout">{{ primaryDashboardAction.label }} →</button>
+          <router-link v-else to="/track" class="daily-focus-primary">{{ primaryDashboardAction.label }} →</router-link>
           <router-link v-if="todayWorkout && (fullActivePlan?.id || activePlan?.id)" :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="daily-focus-secondary">View plan</router-link>
           <router-link v-else to="/plans" class="daily-focus-secondary">Browse plans</router-link>
         </div>
@@ -1701,6 +1713,23 @@ const todayWorkout = computed(() => {
   return (week.workouts || []).find(w => w.day === todayName) || null
 })
 
+const primaryDashboardAction = computed(() => {
+  if (integrationStatuses.value.some(status => status.needsReconnect)) return { kind: 'reconnect', label: 'Reconnect a device' }
+  if (todayWorkout.value && !todayWorkout.value.isCompleted) return { kind: 'complete', label: 'Complete today’s workout' }
+  if (activityToday.value) return { kind: 'review', label: 'Review your progress' }
+  return { kind: 'record', label: 'Record today’s activity' }
+})
+
+const activityFeedback = ref(null)
+const startPlannedWorkout = () => {
+  const type = String(todayWorkout.value?.type || todayWorkout.value?.sportType || 'RUN').toUpperCase()
+  const sportType = ['RUN', 'BIKE', 'SWIM', 'HIKE', 'WALK', 'STRENGTH'].includes(type) ? type : 'RUN'
+  openActivityModal()
+  activityForm.value.sportType = sportType
+  activityForm.value.title = todayWorkout.value?.name || todayWorkout.value?.title || ''
+  activityForm.value.durationMinutes = todayWorkout.value?.duration || null
+}
+
 const disciplineData = computed(() => useDisciplineScore(activities.value))
 const trainingBlock  = computed(() => useTrainingBlock(activities.value))
 const archetypeData  = computed(() => useArchetype(activities.value))
@@ -1989,8 +2018,16 @@ const handleActivitySubmit = async () => {
       })
     }
 
+    activityFeedback.value = {
+      duration: formatExerciseTime(totalSeconds),
+      sport: f.sportType === 'STRENGTH' ? 'Strength' : f.sportType.charAt(0) + f.sportType.slice(1).toLowerCase(),
+      message: todayWorkout.value && !todayWorkout.value.isCompleted
+        ? 'That counts toward today’s plan. Keep the momentum going.'
+        : 'Your weekly picture is now up to date.'
+    }
     closeActivityModal()
     await activityStore.fetchActivities()
+    await loadWeeklySummary()
     updateCharts()
   } catch (err) {
     activityError.value = err.response?.data?.error || 'Activity didn\'t log — try again.'
@@ -4728,6 +4765,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 .web-week-summary-breakdown { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; color: #5A5348; font: 600 10px 'Spline Sans Mono', monospace; text-transform: uppercase; }
 .web-week-summary-state { padding: 18px 0 4px; color: #665f55; font-size: .85rem; }
 .web-week-summary-state--error button { padding: 0; border: 0; background: transparent; color: #2A55F5; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
+.activity-feedback { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 0 18px; padding: 16px 20px; background: #FFF8DC; border: 2px solid #16130F; box-shadow: 3px 3px #16130F; }
+.activity-feedback p { margin: 5px 0 0; color: #5A5348; font-size: .85rem; }
+.activity-feedback strong { font-size: 1.05rem; }
+@media (max-width: 600px) { .activity-feedback { align-items: flex-start; flex-direction: column; } }
 @media (max-width: 600px) {
   .web-week-summary { margin-bottom: 14px; padding: 16px; }
   .web-week-summary-total strong { font-size: 2rem; }
