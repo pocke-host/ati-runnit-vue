@@ -99,6 +99,7 @@
             <div><small>Your earnings</small><strong>${{ (earnings.netCents / 100).toFixed(2) }}</strong></div>
           </div>
           <p class="rate-explainer">{{ connectReady ? 'Payouts are connected. Completed payments appear here.' : 'Connect payouts before publishing a service athletes can purchase.' }}</p>
+          <div class="privacy-row"><label for="coach-privacy">Training-data privacy</label><select id="coach-privacy" v-model="privacySetting" class="service-input"><option value="PUBLIC">Share with booked athletes</option><option value="PRIVATE">Keep training data private</option></select><button class="btn-save-rate" @click="savePrivacy" :disabled="privacySaving">{{ privacySaving ? 'Saving…' : 'Save' }}</button></div>
           <div v-if="bookings.length" class="service-list">
             <div v-for="booking in bookings.slice(0, 5)" :key="booking.id" class="service-row">
               <span><strong>Booking #{{ booking.id }}</strong><small>{{ booking.status }}<span v-if="booking.scheduledStart"> · {{ new Date(booking.scheduledStart).toLocaleString() }}</span></small></span>
@@ -278,6 +279,8 @@ const bookings = ref([])
 const availabilitySaving = ref(false)
 const availabilityStatus = ref('')
 const availabilityDraft = ref(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map((label, index) => ({ label, weekday: index + 1, enabled: false, startTime: '09:00', endTime: '17:00' })))
+const privacySetting = ref('PUBLIC')
+const privacySaving = ref(false)
 const serviceDraft = ref({ title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' })
 
 const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` })
@@ -296,6 +299,12 @@ const saveAvailability = async () => {
   try { const rows = availabilityDraft.value.filter(s => s.enabled).map(s => ({ weekday:s.weekday, startTime:`${s.startTime}:00`, endTime:`${s.endTime}:00`, timezone:Intl.DateTimeFormat().resolvedOptions().timeZone })); const res = await fetch(`${API}/coach/availability`, { method:'PUT', headers:authHeaders(), body:JSON.stringify(rows) }); if (!res.ok) throw new Error('Availability could not be saved'); availabilityStatus.value = 'Availability saved.' }
   catch (e) { availabilityStatus.value = e.message }
   finally { availabilitySaving.value = false }
+}
+const savePrivacy = async () => {
+  privacySaving.value = true
+  try { const res = await fetch(`${API}/coach/profile`, { method:'PATCH', headers:authHeaders(), body:JSON.stringify({ privacy: privacySetting.value }) }); if (!res.ok) throw new Error('Privacy setting could not be saved'); privacySetting.value = (await res.json()).privacy || privacySetting.value }
+  catch (e) { marketplaceError.value = e.message }
+  finally { privacySaving.value = false }
 }
 const publishService = async () => {
   serviceSaving.value = true; marketplaceError.value = ''
@@ -619,6 +628,8 @@ onMounted(async () => {
 .earnings-grid small { color:#8A8A8A; font: .68rem 'Spline Sans Mono',monospace; text-transform:uppercase; }
 .earnings-grid strong { font-size:1.25rem; }
 .empty-marketplace { padding:14px 0; color:#8A8A8A; font-size:.85rem; }
+.privacy-row { display:flex; align-items:center; gap:10px; margin:12px 0 16px; font-size:.85rem; flex-wrap:wrap; }
+.privacy-row label { font-weight:700; margin-right:auto; }
 .availability-list { display:grid; gap:8px; margin-bottom:14px; }
 .availability-row { display:grid; grid-template-columns:1fr 120px 24px 120px; align-items:center; gap:8px; font-size:.85rem; }
 .availability-row input[type="time"] { border:1px solid #E7DFCE; padding:7px; font:inherit; }
