@@ -6,28 +6,11 @@ const getHeaders = () => {
   return t ? { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' } : {}
 }
 
-const PRICE_IDS = {
-  premium_monthly: import.meta.env.VITE_STRIPE_PRICE_PREMIUM_MONTHLY,
-  premium_annual:  import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ANNUAL,
-  duo_monthly:     import.meta.env.VITE_STRIPE_PRICE_DUO_MONTHLY,
-  duo_annual:      import.meta.env.VITE_STRIPE_PRICE_DUO_ANNUAL,
-}
-
 export const useStripe = () => {
-  const redirectToCheckout = async (tier, period = 'monthly') => {
-    const priceId = PRICE_IDS[`${tier}_${period}`]
-    const { data } = await axios.post(
-      `${API_URL}/billing/checkout-session`,
-      { priceId, tier },
-      { headers: getHeaders() }
-    )
-    window.location.href = data.url
-  }
-
   const openBillingPortal = async () => {
     const { data } = await axios.post(`${API_URL}/billing/portal`, {}, { headers: getHeaders() })
     window.location.href = data.url
   }
 
-  return { redirectToCheckout, openBillingPortal }
+  return { openBillingPortal }
 }

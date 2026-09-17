@@ -23,16 +23,14 @@
         <div class="billing-section">
           <p class="billing-desc">
             <template v-if="subscriptionTier === 'free'">
-              You're on the free plan — consider it a warm-up. Go Pro for route planning, pace insights, and safety tools built for real training.
+              Your complete Runnit athlete experience is free. Coaching services are paid directly to coaches through the marketplace.
             </template>
             <template v-else>
               You're {{ tierLabel }} — full stop. Manage payment, switch plans, or walk away anytime, all from the portal.
             </template>
           </p>
 
-          <div v-if="subscriptionTier === 'free'" class="billing-actions">
-            <router-link to="/subscribe" class="btn-billing-primary">See Premium Plans →</router-link>
-          </div>
+          <div v-if="subscriptionTier === 'free'" class="billing-actions"><router-link to="/coaches" class="btn-billing-primary">Find a Coach →</router-link></div>
 
           <div v-else class="billing-actions">
             <button class="btn-billing-primary" @click="handlePortal" :disabled="portalLoading">
@@ -46,7 +44,7 @@
 
       <div class="billing-footer">
         <router-link to="/dashboard" class="billing-link">← Dashboard</router-link>
-        <router-link to="/subscribe" class="billing-link">View Plans</router-link>
+        <router-link to="/coaches" class="billing-link">Find a Coach</router-link>
       </div>
     </div>
   </main>
