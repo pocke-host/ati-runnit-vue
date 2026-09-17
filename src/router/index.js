@@ -19,6 +19,7 @@ const routes = [
   { path: '/subscribe/success', name: 'CheckoutSuccess', component: () => import('@/views/CheckoutSuccess.vue') },
   { path: '/coaching/booking-success', name: 'CoachingBookingSuccess', component: () => import('@/views/CheckoutSuccess.vue'), meta: { requiresAuth: true } },
   { path: '/coaching/booking-cancelled', name: 'CoachingBookingCancelled', component: () => import('@/views/CheckoutCancel.vue'), meta: { requiresAuth: true } },
+  { path: '/my-bookings', name: 'AthleteBookings', component: () => import('@/views/AthleteBookings.vue'), meta: { requiresAuth: true } },
   { path: '/subscribe/cancel',  name: 'CheckoutCancel',  component: () => import('@/views/CheckoutCancel.vue') },
   { path: '/billing',           name: 'Billing',         component: () => import('@/views/Billing.vue'), meta: { requiresAuth: true } },
   { path: '/maps',           name: 'Map',           component: () => import('@/views/GlobalHeatmap.vue') },

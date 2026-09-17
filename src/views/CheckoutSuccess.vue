@@ -36,7 +36,7 @@
 
       <!-- CTAs -->
       <div class="cta-row">
-        <router-link to="/dashboard" class="btn-dashboard">Go to Dashboard →</router-link>
+        <router-link to="/my-bookings" class="btn-dashboard">View My Booking →</router-link>
         <router-link to="/billing" class="btn-receipt">View Receipt</router-link>
       </div>
 
