@@ -88,10 +88,11 @@
           <button class="modal-close" @click="selectedService = null" aria-label="Close">×</button>
           <div class="banner-label">BOOK A SESSION</div><h2 id="booking-title">{{ selectedService.title }}</h2>
           <p class="modal-help">Choose an available time. Your local timezone is used.</p>
-          <div class="available-times" v-if="availableSlots.length"><button v-for="slot in availableSlots" :key="slot.weekday" class="slot-chip" :class="{ selected: selectedWeekday === slot.weekday }" @click="selectedWeekday = slot.weekday">{{ weekdayNames[slot.weekday - 1] }} · {{ slot.startTime.slice(0,5) }}–{{ slot.endTime.slice(0,5) }}</button></div>
+          <div class="available-times" v-if="availableSlots.length"><button v-for="slot in availableSlots" :key="slot.weekday" class="slot-chip" :class="{ selected: selectedWeekday === slot.weekday }" @click="selectedWeekday = slot.weekday; selectedStartTime = null">{{ weekdayNames[slot.weekday - 1] }} · {{ slot.startTime.slice(0,5) }}–{{ slot.endTime.slice(0,5) }}</button></div>
           <p v-else class="modal-help">This coach accepts async bookings. You can continue without selecting a time.</p>
           <input v-if="availableSlots.length" v-model="selectedDate" type="date" class="booking-date" :min="today" aria-label="Booking date" />
-          <div class="modal-actions"><button class="btn-requested" @click="selectedService = null">Cancel</button><button class="btn-request" @click="confirmBooking" :disabled="bookingLoading || (availableSlots.length && (!selectedDate || !selectedWeekday))">{{ bookingLoading ? 'Starting…' : 'Continue to payment' }}</button></div>
+          <div v-if="selectedDate && timeOptions.length" class="time-options"><span class="time-label">START TIME</span><button v-for="time in timeOptions" :key="time" class="time-chip" :class="{ selected: selectedStartTime === time }" @click="selectedStartTime = time">{{ time }}</button></div>
+          <div class="modal-actions"><button class="btn-requested" @click="selectedService = null">Cancel</button><button class="btn-request" @click="confirmBooking" :disabled="bookingLoading || (availableSlots.length && (!selectedDate || !selectedWeekday || !selectedStartTime))">{{ bookingLoading ? 'Starting…' : 'Continue to payment' }}</button></div>
           <small class="legal-copy">By continuing, you accept the coach’s cancellation policy. Coaching is not medical advice.</small>
         </section>
       </div>
@@ -100,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAthleteStore } from '@/stores/athlete'
@@ -122,9 +123,21 @@ const selectedService = ref(null)
 const availableSlots = ref([])
 const selectedWeekday = ref(null)
 const selectedDate = ref('')
+const selectedStartTime = ref(null)
 const bookingLoading = ref(false)
 const weekdayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
 const today = new Date().toISOString().slice(0,10)
+const timeOptions = computed(() => {
+  if (!selectedDate.value || !selectedWeekday.value || !selectedService.value) return []
+  const slot = availableSlots.value.find(item => item.weekday === selectedWeekday.value)
+  if (!slot) return []
+  const duration = selectedService.value.durationMinutes || 60
+  const result = []
+  let minutes = Number(slot.startTime.slice(0,2)) * 60 + Number(slot.startTime.slice(3,5))
+  const end = Number(slot.endTime.slice(0,2)) * 60 + Number(slot.endTime.slice(3,5))
+  while (minutes + duration <= end) { result.push(`${String(Math.floor(minutes / 60)).padStart(2,'0')}:${String(minutes % 60).padStart(2,'0')}`); minutes += 30 }
+  return result
+})
 
 const hireCoach = (coachId) => {
   router.push(`/my-coach?hire=${coachId}`)
@@ -176,6 +189,7 @@ const bookService = async (service) => {
   availableSlots.value = slots
   selectedWeekday.value = slots[0]?.weekday || null
   selectedDate.value = ''
+  selectedStartTime.value = null
 }
 const confirmBooking = async () => {
   const service = selectedService.value
@@ -184,7 +198,7 @@ const confirmBooking = async () => {
   try {
     const token = localStorage.getItem('token')
     const payload = { serviceId: service.id }
-    if (availableSlots.value.length) { const slot = availableSlots.value.find(item => item.weekday === selectedWeekday.value); const scheduledStart = new Date(`${selectedDate.value}T${slot.startTime}`).toISOString(); payload.scheduledStart = scheduledStart; payload.scheduledEnd = new Date(new Date(scheduledStart).getTime() + (service.durationMinutes || 60) * 60000).toISOString() }
+    if (availableSlots.value.length) { const scheduledStart = new Date(`${selectedDate.value}T${selectedStartTime.value}`).toISOString(); payload.scheduledStart = scheduledStart; payload.scheduledEnd = new Date(new Date(scheduledStart).getTime() + (service.durationMinutes || 60) * 60000).toISOString() }
     const create = await fetch(`${API}/athlete/bookings`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) })
     const booking = await create.json()
     if (!create.ok) throw new Error(booking.error || 'Booking could not be created')
@@ -277,6 +291,10 @@ onMounted(async () => {
 .slot-chip { border:2px solid #2A55F5; background:#fff; color:#2A55F5; padding:8px 10px; font-size:.72rem; cursor:pointer; }
 .slot-chip.selected { background:#2A55F5; color:#fff; }
 .booking-date { width:100%; border:2px solid #E7DFCE; padding:11px; font:inherit; margin-bottom:16px; }
+.time-options { display:flex; flex-wrap:wrap; gap:8px; margin:-4px 0 18px; align-items:center; }
+.time-label { width:100%; color:#8A8A8A; font: .65rem 'Spline Sans Mono',monospace; letter-spacing:.1em; }
+.time-chip { border:1px solid #16130F; background:#fff; padding:8px 11px; cursor:pointer; font: .78rem 'Spline Sans Mono',monospace; }
+.time-chip.selected { background:#16130F; color:#fff; }
 .modal-actions { display:flex; gap:10px; justify-content:flex-end; }
 .legal-copy { display:block; color:#8A8A8A; margin-top:16px; line-height:1.4; }
 
