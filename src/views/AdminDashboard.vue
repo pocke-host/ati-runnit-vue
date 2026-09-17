@@ -56,6 +56,7 @@
               <th>Email</th>
               <th>Provider</th>
               <th>Role</th>
+              <th>Coach verification</th>
               <th>Subscription</th>
               <th>Joined</th>
             </tr>
@@ -78,6 +79,7 @@
                   <option value="admin">Admin</option>
                 </select>
               </td>
+              <td><button v-if="user.role === 'coach'" class="verify-btn" @click="toggleVerification(user)" :disabled="updatingId === user.id">{{ user.coachVerified ? '✓ Verified' : 'Verify coach' }}</button><span v-else>—</span></td>
               <td>
                 <span :class="['sub-badge', user.subscriptionStatus === 'active' ? 'sub-active' : 'sub-none']">
                   {{ user.subscriptionStatus === 'active' ? 'PRO' : user.subscriptionStatus || 'free' }}
@@ -86,7 +88,7 @@
               <td class="col-date">{{ formatDate(user.createdAt) }}</td>
             </tr>
             <tr v-if="!users.length && !loading">
-              <td colspan="7" class="empty-row">No matches.</td>
+              <td colspan="8" class="empty-row">No matches.</td>
             </tr>
           </tbody>
         </table>
@@ -177,6 +179,15 @@ const changeRole = async (user, newRole) => {
   } finally {
     updatingId.value = null
   }
+}
+
+const toggleVerification = async (user) => {
+  updatingId.value = user.id
+  try {
+    const { data } = await axios.patch(`${API_URL}/admin/coaches/${user.id}/verification`, { verified: !user.coachVerified }, { headers: getHeaders() })
+    user.coachVerified = data.coachVerified
+  } catch { error.value = 'Verification did not update.' }
+  finally { updatingId.value = null }
 }
 
 const formatDate = (iso) => {
@@ -361,6 +372,8 @@ onMounted(async () => {
 }
 .role-select:focus { outline: none; border-color: #000; }
 .role-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.verify-btn { border:1px solid #2A55F5; background:#fff; color:#2A55F5; padding:5px 8px; font-size:.7rem; cursor:pointer; }
+.verify-btn:disabled { opacity:.5; cursor:not-allowed; }
 
 .sub-badge {
   font-size: 0.65rem;
