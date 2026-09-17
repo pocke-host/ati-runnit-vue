@@ -49,6 +49,11 @@
             <div class="sports-chips">
               <span v-for="sport in (coach.sportsCoached || [])" :key="sport" class="sport-chip">{{ sport }}</span>
             </div>
+            <div v-if="coachServices[coach.id]?.length" class="service-chips">
+              <button v-for="service in coachServices[coach.id]" :key="service.id" class="service-chip" @click="bookService(service)">
+                {{ service.title }} · ${{ (service.priceCents / 100).toFixed(2) }}
+              </button>
+            </div>
           </div>
           <div class="coach-action">
             <span v-if="myCoach && myCoach.id === coach.id" class="badge-your-coach">Your Coach</span>
@@ -94,6 +99,8 @@ const { coaches, myCoach, requestSentToId, loading } = storeToRefs(athleteStore)
 
 const actionLoading = ref(null)
 const requestError = ref('')
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const coachServices = ref({})
 
 const hireCoach = (coachId) => {
   router.push(`/my-coach?hire=${coachId}`)
@@ -116,9 +123,34 @@ const openDM = () => {
   else dmStore.open()
 }
 
-onMounted(() => {
-  athleteStore.fetchCoaches()
-  athleteStore.fetchMyCoach()
+const loadServices = async () => {
+  const token = localStorage.getItem('token')
+  const entries = await Promise.all(coaches.value.map(async coach => {
+    try {
+      const res = await fetch(`${API}/coaches/${coach.id}/services`, { headers: { Authorization: `Bearer ${token}` } })
+      return [coach.id, res.ok ? await res.json() : []]
+    } catch { return [coach.id, []] }
+  }))
+  coachServices.value = Object.fromEntries(entries)
+}
+
+const bookService = async (service) => {
+  requestError.value = ''
+  try {
+    const token = localStorage.getItem('token')
+    const create = await fetch(`${API}/athlete/bookings`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ serviceId: service.id }) })
+    const booking = await create.json()
+    if (!create.ok) throw new Error(booking.error || 'Booking could not be created')
+    const checkout = await fetch(`${API}/athlete/bookings/${booking.id}/checkout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
+    const data = await checkout.json()
+    if (!checkout.ok) throw new Error(data.error || 'Checkout could not be started')
+    window.location.href = data.url
+  } catch (e) { requestError.value = e.message }
+}
+
+onMounted(async () => {
+  await Promise.all([athleteStore.fetchCoaches(), athleteStore.fetchMyCoach()])
+  await loadServices()
 })
 </script>
 
@@ -161,6 +193,8 @@ onMounted(() => {
 .coach-rate { font-weight: 700; color: #2A55F5; font-size: 0.78rem; }
 .sports-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .sport-chip { font-family: 'Spline Sans Mono', ui-monospace, monospace; padding: 3px 10px; border: 2px solid #E7DFCE; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #5A5348; }
+.service-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.service-chip { border: 2px solid #2A55F5; background: #EEF1FF; color: #2A55F5; padding: 6px 9px; font-size: .72rem; font-weight: 700; cursor: pointer; }
 .coach-action { display: flex; align-items: center; gap: 8px; padding-top: 4px; flex-shrink: 0; }
 .btn-request {
   padding: 10px 20px; background: #2A55F5; color: #fff; border: none;

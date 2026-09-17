@@ -51,6 +51,28 @@
         </div>
       </section>
 
+      <!-- Marketplace services -->
+      <section class="section">
+        <div class="section-header"><h2 class="section-title">PAID SERVICES</h2></div>
+        <div class="rate-card">
+          <p class="rate-explainer">Publish a coaching service athletes can book. Your profile stays free; Runnit takes a commission only after a successful payment.</p>
+          <div class="service-form">
+            <input v-model="serviceDraft.title" class="service-input" placeholder="Service name (e.g. Marathon plan review)" maxlength="160" />
+            <input v-model.number="serviceDraft.priceCents" class="service-input service-price" type="number" min="0" placeholder="Price in cents" />
+            <select v-model="serviceDraft.billingType" class="service-input"><option value="ONE_TIME">One-time</option><option value="MONTHLY">Monthly</option></select>
+            <button class="btn-save-rate" @click="publishService" :disabled="serviceSaving || !serviceDraft.title || serviceDraft.priceCents < 0">{{ serviceSaving ? 'Saving…' : 'Publish' }}</button>
+          </div>
+          <div v-if="marketplaceError" class="rate-status error">{{ marketplaceError }}</div>
+          <div v-if="services.length" class="service-list">
+            <div v-for="service in services" :key="service.id" class="service-row">
+              <span><strong>{{ service.title }}</strong><small>{{ service.billingType === 'MONTHLY' ? 'Monthly' : 'One-time' }}</small></span>
+              <b>${{ (service.priceCents / 100).toFixed(2) }}</b>
+            </div>
+          </div>
+          <button class="btn-connect" @click="startConnect">{{ connectReady ? 'Update payout details' : 'Set up coach payouts' }}</button>
+        </div>
+      </section>
+
       <!-- Pending Requests -->
       <section v-if="pendingRequests.length > 0" class="section">
         <div class="section-header">
@@ -211,6 +233,34 @@ const rateInput = ref(user.value?.monthlyRate ?? null)
 const savingRate = ref(false)
 const rateStatus = ref('')
 const rateStatusType = ref('success')
+const services = ref([])
+const serviceSaving = ref(false)
+const marketplaceError = ref('')
+const connectReady = ref(false)
+const serviceDraft = ref({ title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' })
+
+const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` })
+const loadMarketplace = async () => {
+  try {
+    const [serviceRes, statusRes] = await Promise.all([fetch(`${API}/coach/services`, { headers: authHeaders() }), fetch(`${API}/coach/connect/status`, { headers: authHeaders() })])
+    if (serviceRes.ok) services.value = await serviceRes.json()
+    if (statusRes.ok) connectReady.value = (await statusRes.json()).connected
+  } catch { marketplaceError.value = 'Marketplace details could not load.' }
+}
+const publishService = async () => {
+  serviceSaving.value = true; marketplaceError.value = ''
+  try {
+    const res = await fetch(`${API}/coach/services`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(serviceDraft.value) })
+    if (!res.ok) throw new Error('Service could not be published')
+    services.value.unshift(await res.json()); serviceDraft.value = { title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' }
+  } catch (e) { marketplaceError.value = e.message }
+  finally { serviceSaving.value = false }
+}
+const startConnect = async () => {
+  marketplaceError.value = ''
+  try { const res = await fetch(`${API}/coach/connect/onboard`, { method: 'POST', headers: authHeaders() }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Payout setup unavailable'); window.location.href = data.url }
+  catch (e) { marketplaceError.value = e.message }
+}
 
 const saveRate = async () => {
   savingRate.value = true
@@ -285,7 +335,7 @@ const decline = async (reqId) => {
 }
 
 onMounted(async () => {
-  await Promise.all([coachStore.fetchAthletes(), coachStore.fetchRequests(), loadInviteLink()])
+  await Promise.all([coachStore.fetchAthletes(), coachStore.fetchRequests(), loadInviteLink(), loadMarketplace()])
   // Load compliance for each athlete in parallel (non-blocking)
   athletes.value.forEach(async (athlete) => {
     const weeks = await coachStore.fetchAthleteCompliance(athlete.id, 4)
@@ -501,6 +551,15 @@ onMounted(async () => {
   font-size: 0.84rem;
   line-height: 1.55;
 }
+.service-form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.service-input { min-height: 40px; border: 2px solid #E7DFCE; padding: 8px 10px; font: inherit; background: #fff; }
+.service-input:first-child { flex: 1 1 260px; }
+.service-price { width: 140px; }
+.service-list { border-top: 2px solid #E7DFCE; margin-top: 14px; }
+.service-row { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E7DFCE; }
+.service-row span { display: flex; flex-direction: column; gap: 3px; }
+.service-row small { color: #8A8A8A; font-size: .75rem; }
+.btn-connect { margin-top: 16px; border: 2px solid #2A55F5; color: #2A55F5; background: #fff; padding: 10px 14px; font-weight: 700; cursor: pointer; }
 .rate-current { display: flex; align-items: baseline; gap: 6px; }
 .rate-value { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.6rem; font-weight: 800; color: #2A55F5; line-height: 1; }
 .rate-unit { font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: 0.85rem; font-weight: 600; color: #8A8A8A; }
