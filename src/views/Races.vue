@@ -125,6 +125,7 @@
           <template v-else>
           <div class="discovery-steps" aria-label="Official result import steps"><span :class="{active: discoveryStage >= 1}">1 · Choose provider</span><span :class="{active: discoveryStage >= 2}">2 · Find results</span><span :class="{active: discoveryStage >= 3}">3 · Review &amp; save</span></div>
           <button type="button" class="result-link-btn" @click="connectRunSignup">{{ runSignupConnected ? 'RunSignup connected ✓' : 'Connect RunSignup' }}</button>
+          <p v-if="runSignupError" class="results-signin-prompt" role="alert">{{ runSignupError }}</p>
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
             {{ discovering ? 'Searching official results…' : 'Find my official results' }}
           </button>
@@ -366,17 +367,24 @@ const resultSaving = ref(false)
 const discovering = ref(false)
 const discoveredResults = ref([])
 const runSignupConnected = ref(false)
+const runSignupError = ref('')
 const discoveryProvider = ref('ATHLINKS')
 const discoveryRaceId = ref('')
 const discoveryEventId = ref('')
 const discoveryStage = computed(() => discovering.value ? 2 : discoveredResults.value.length ? 3 : 1)
 const resultForm = ref({ raceName: '', raceDate: '', distance: '', finishTimeSeconds: null, source: 'OFFICIAL', resultUrl: '' })
+const authHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
 const connectRunSignup = async () => {
   try {
-    const { data } = await axios.get(`${API_URL}/integrations/runsignup/oauth/connect`)
+    const { data } = await axios.get(`${API_URL}/integrations/runsignup/oauth/connect`, { headers: authHeaders() })
     window.location.href = data.url
-  } catch { /* OAuth is optional; API-key discovery remains available. */ }
+  } catch (err) {
+    runSignupError.value = err.response?.data?.error || 'RunSignup could not start. Check your account connection and try again.'
+  }
 }
 
 const loadRaceResults = async () => {
@@ -1226,7 +1234,15 @@ const generatePlan = async (event) => {
 }
 
 onMounted(() => {
-  runSignupConnected.value = new URLSearchParams(window.location.search).get('runsignup') === 'connected'
+  const params = new URLSearchParams(window.location.search)
+  runSignupConnected.value = params.get('runsignup') === 'connected'
+  const oauthError = params.get('runsignup_error')
+  if (oauthError) {
+    runSignupError.value = oauthError === 'access_denied'
+      ? 'RunSignup access was cancelled. You can try again whenever you are ready.'
+      : 'RunSignup could not complete the connection. Confirm the redirect URI and OAuth credentials, then try again.'
+    window.history.replaceState({}, '', `${window.location.pathname}${window.location.hash}`)
+  }
   fetchEvents()
   loadBookmarks()
   loadRaceResults()
