@@ -73,6 +73,25 @@
         </div>
       </section>
 
+      <section class="section">
+        <div class="section-header"><h2 class="section-title">MARKETPLACE HEALTH</h2></div>
+        <div class="rate-card marketplace-health">
+          <div class="earnings-grid">
+            <div><small>Gross</small><strong>${{ (earnings.grossCents / 100).toFixed(2) }}</strong></div>
+            <div><small>Runnit commission</small><strong>${{ (earnings.commissionCents / 100).toFixed(2) }}</strong></div>
+            <div><small>Your earnings</small><strong>${{ (earnings.netCents / 100).toFixed(2) }}</strong></div>
+          </div>
+          <p class="rate-explainer">{{ connectReady ? 'Payouts are connected. Completed payments appear here.' : 'Connect payouts before publishing a service athletes can purchase.' }}</p>
+          <div v-if="bookings.length" class="service-list">
+            <div v-for="booking in bookings.slice(0, 5)" :key="booking.id" class="service-row">
+              <span><strong>Booking #{{ booking.id }}</strong><small>{{ booking.status }}<span v-if="booking.scheduledStart"> · {{ new Date(booking.scheduledStart).toLocaleString() }}</span></small></span>
+              <button v-if="booking.status === 'PAID'" class="btn-decline" @click="refundBooking(booking.id)">Refund</button>
+            </div>
+          </div>
+          <div v-else class="empty-marketplace">No bookings yet. Your published services will appear in Find a Coach.</div>
+        </div>
+      </section>
+
       <!-- Pending Requests -->
       <section v-if="pendingRequests.length > 0" class="section">
         <div class="section-header">
@@ -237,14 +256,18 @@ const services = ref([])
 const serviceSaving = ref(false)
 const marketplaceError = ref('')
 const connectReady = ref(false)
+const earnings = ref({ grossCents: 0, commissionCents: 0, netCents: 0 })
+const bookings = ref([])
 const serviceDraft = ref({ title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' })
 
 const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` })
 const loadMarketplace = async () => {
   try {
-    const [serviceRes, statusRes] = await Promise.all([fetch(`${API}/coach/services`, { headers: authHeaders() }), fetch(`${API}/coach/connect/status`, { headers: authHeaders() })])
+    const [serviceRes, statusRes, earningsRes, bookingsRes] = await Promise.all([fetch(`${API}/coach/services`, { headers: authHeaders() }), fetch(`${API}/coach/connect/status`, { headers: authHeaders() }), fetch(`${API}/coach/earnings`, { headers: authHeaders() }), fetch(`${API}/coach/bookings`, { headers: authHeaders() })])
     if (serviceRes.ok) services.value = await serviceRes.json()
     if (statusRes.ok) connectReady.value = (await statusRes.json()).connected
+    if (earningsRes.ok) earnings.value = await earningsRes.json()
+    if (bookingsRes.ok) bookings.value = await bookingsRes.json()
   } catch { marketplaceError.value = 'Marketplace details could not load.' }
 }
 const publishService = async () => {
@@ -259,6 +282,11 @@ const publishService = async () => {
 const startConnect = async () => {
   marketplaceError.value = ''
   try { const res = await fetch(`${API}/coach/connect/onboard`, { method: 'POST', headers: authHeaders() }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Payout setup unavailable'); window.location.href = data.url }
+  catch (e) { marketplaceError.value = e.message }
+}
+const refundBooking = async (id) => {
+  if (!window.confirm('Refund this paid booking?')) return
+  try { const res = await fetch(`${API}/coach/bookings/${id}/refund`, { method: 'POST', headers: authHeaders() }); if (!res.ok) throw new Error('Refund could not be completed'); await loadMarketplace() }
   catch (e) { marketplaceError.value = e.message }
 }
 
@@ -559,6 +587,12 @@ onMounted(async () => {
 .service-row { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #E7DFCE; }
 .service-row span { display: flex; flex-direction: column; gap: 3px; }
 .service-row small { color: #8A8A8A; font-size: .75rem; }
+.earnings-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+.earnings-grid div { border:1px solid #E7DFCE; padding:12px; display:flex; flex-direction:column; gap:4px; }
+.earnings-grid small { color:#8A8A8A; font: .68rem 'Spline Sans Mono',monospace; text-transform:uppercase; }
+.earnings-grid strong { font-size:1.25rem; }
+.empty-marketplace { padding:14px 0; color:#8A8A8A; font-size:.85rem; }
+@media (max-width:600px) { .earnings-grid { grid-template-columns:1fr; } }
 .btn-connect { margin-top: 16px; border: 2px solid #2A55F5; color: #2A55F5; background: #fff; padding: 10px 14px; font-weight: 700; cursor: pointer; }
 .rate-current { display: flex; align-items: baseline; gap: 6px; }
 .rate-value { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.6rem; font-weight: 800; color: #2A55F5; line-height: 1; }

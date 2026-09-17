@@ -15,22 +15,22 @@
       <div class="headline-block">
         <span class="badge-sticker">Payment Confirmed</span>
         <h1 class="success-h1">You're in.</h1>
-        <p class="success-sub">{{ tierLabel }} is live. Go chase something bigger.</p>
+        <p class="success-sub">Your coaching booking is confirmed. Go chase something bigger.</p>
       </div>
 
       <!-- Plan detail card -->
       <div class="plan-card">
         <div class="plan-row">
           <span class="plan-label">Plan</span>
-          <span class="plan-value">{{ planName }}</span>
+          <span class="plan-value">Coaching service</span>
         </div>
         <div class="plan-row">
           <span class="plan-label">Billed</span>
-          <span class="plan-value plan-value--mono">{{ billingAmount }}</span>
+          <span class="plan-value plan-value--mono">Paid securely with Stripe</span>
         </div>
         <div class="plan-row plan-row--last">
-          <span class="plan-label">Next Charge</span>
-          <span class="plan-value plan-value--mono">{{ nextChargeDate }}</span>
+          <span class="plan-label">Next step</span>
+          <span class="plan-value plan-value--mono">Message your coach</span>
         </div>
       </div>
 
@@ -45,29 +45,18 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
 import { useHead } from '@unhead/vue'
 
 useHead({ title: 'Payment Confirmed — Runnit' })
 
 const authStore = useAuthStore()
-const { subscriptionTier } = storeToRefs(authStore)
 
 onMounted(async () => {
   try { await authStore.fetchCurrentUser() } catch { /* proceed regardless */ }
 })
 
-const tierLabel     = computed(() => 'Pro')
-const planName      = computed(() => 'Runnit Pro')
-const billingAmount = computed(() => '$9.00 / mo')
-
-const nextChargeDate = computed(() => {
-  const d = new Date()
-  d.setDate(d.getDate() + 14)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-})
 </script>
 
 <style scoped>

@@ -42,6 +42,7 @@
           <div class="coach-avatar">{{ (coach.displayName || '?')[0].toUpperCase() }}</div>
           <div class="coach-info">
             <div class="coach-name">{{ coach.displayName }}</div>
+            <span v-if="coach.coachVerified" class="verified-badge" title="Verified coach">✓ Verified</span>
             <div class="coach-meta">
               <span class="coach-ath-count">{{ coach.athleteCount || 0 }} athletes</span>
               <span v-if="coach.monthlyRate" class="coach-rate">${{ coach.monthlyRate }}/mo</span>
@@ -136,9 +137,13 @@ const loadServices = async () => {
 
 const bookService = async (service) => {
   requestError.value = ''
+  const scheduledStart = window.prompt('Choose a start time (ISO, e.g. 2026-10-01T17:00:00Z), or leave blank for an async service')
+  if (scheduledStart === null) return
   try {
     const token = localStorage.getItem('token')
-    const create = await fetch(`${API}/athlete/bookings`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ serviceId: service.id }) })
+    const payload = { serviceId: service.id }
+    if (scheduledStart.trim()) { payload.scheduledStart = new Date(scheduledStart).toISOString(); payload.scheduledEnd = new Date(new Date(scheduledStart).getTime() + (service.durationMinutes || 60) * 60000).toISOString() }
+    const create = await fetch(`${API}/athlete/bookings`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) })
     const booking = await create.json()
     if (!create.ok) throw new Error(booking.error || 'Booking could not be created')
     const checkout = await fetch(`${API}/athlete/bookings/${booking.id}/checkout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
@@ -189,6 +194,7 @@ onMounted(async () => {
 .coach-avatar { width: 52px; height: 52px; background: #16130F; color: #FBF6EC; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; flex-shrink: 0; border-radius: 999px; }
 .coach-info { flex: 1; min-width: 0; }
 .coach-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; color: #16130F; }
+.verified-badge { display:inline-block; color:#1E42D6; font: .68rem 'Spline Sans Mono',monospace; text-transform:uppercase; margin-bottom:6px; }
 .coach-meta { font-size: 0.78rem; color: #8A8A8A; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 .coach-rate { font-weight: 700; color: #2A55F5; font-size: 0.78rem; }
 .sports-chips { display: flex; flex-wrap: wrap; gap: 6px; }

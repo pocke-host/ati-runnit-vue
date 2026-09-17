@@ -51,18 +51,18 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes',
+  title: 'Pricing — Runnit | Free training for endurance athletes',
   link: [{ rel: 'canonical', href: 'https://runnit.live/pricing' }],
   meta: [
     { name: 'description', content: 'Runnit is free for athletes. Discover coaches, train with your community, and track your progress without a paywall.' },
-    { property: 'og:title', content: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes' },
-    { property: 'og:description', content: 'Start free. Upgrade to Pro for adaptive training plans, advanced analytics, and coaching tools.' },
+    { property: 'og:title', content: 'Pricing — Runnit | Free training for endurance athletes' },
+    { property: 'og:description', content: 'Every athlete gets the complete Runnit training and social experience for free.' },
     { property: 'og:url', content: 'https://runnit.live/pricing' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes' },
-    { name: 'twitter:description', content: 'Start free. Upgrade to Pro for adaptive training plans, advanced analytics, and coaching tools.' },
+    { name: 'twitter:title', content: 'Pricing — Runnit | Free training for endurance athletes' },
+    { name: 'twitter:description', content: 'Every athlete gets the complete Runnit training and social experience for free.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })

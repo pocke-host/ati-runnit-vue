@@ -175,13 +175,11 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { trackEvent } from '@/composables/useAnalytics'
-import { useStripe } from '@/composables/useStripe'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const { isAuthenticated } = storeToRefs(authStore)
-const { redirectToCheckout } = useStripe()
 
 onMounted(() => {
   if (isAuthenticated.value) {
@@ -232,14 +230,8 @@ const submit = async () => {
   try {
     await authStore.register(email.value, password.value, displayName.value, role.value)
     trackEvent('signup_success', { role: role.value, plan: route.query.plan || 'free' })
-    const plan = route.query.plan
-    const period = route.query.period || 'monthly'
-    if (plan) {
-      await redirectToCheckout(plan, period)
-    } else {
-      sessionStorage.setItem('needs_onboarding', 'true')
-      router.push('/onboard')
-    }
+    sessionStorage.setItem('needs_onboarding', 'true')
+    router.push('/onboard')
   } catch (e) {
     error.value = e?.response?.data?.error || e?.response?.data?.message || e?.message || "Sign-up didn't go through. Try again."
   } finally {
@@ -260,14 +252,8 @@ const initGoogleSignIn = () => {
       googleError.value = ''
       try {
         await authStore.loginWithGoogle(credential)
-        const plan = route.query.plan
-        const period = route.query.period || 'monthly'
-        if (plan) {
-          await redirectToCheckout(plan, period)
-        } else {
-          sessionStorage.setItem('needs_onboarding', 'true')
-          router.push('/onboard')
-        }
+        sessionStorage.setItem('needs_onboarding', 'true')
+        router.push('/onboard')
       } catch {
         googleError.value = "Google sign-in didn't go through. Try again."
       } finally {
