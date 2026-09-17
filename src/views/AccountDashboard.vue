@@ -42,6 +42,7 @@
           <p class="daily-focus-kicker">Nice work</p>
           <strong>{{ activityFeedback.duration }} logged · {{ activityFeedback.sport }}</strong>
           <p>{{ activityFeedback.message }}</p>
+          <div class="activity-feedback-meta">{{ activityFeedback.weeklyTotal }} this week · {{ activityFeedback.goalProgress }}% of your 3h weekly goal<span v-if="activityFeedback.planImpact"> · Plan workout counted</span></div>
         </div>
         <router-link to="/feed" class="daily-focus-secondary">See your activity</router-link>
       </section>
@@ -2021,6 +2022,9 @@ const handleActivitySubmit = async () => {
     activityFeedback.value = {
       duration: formatExerciseTime(totalSeconds),
       sport: f.sportType === 'STRENGTH' ? 'Strength' : f.sportType.charAt(0) + f.sportType.slice(1).toLowerCase(),
+      weeklyTotal: formatExerciseTime((weeklySummary.value?.totalDurationSeconds || 0) + totalSeconds),
+      goalProgress: Math.min(100, Math.round((((weeklySummary.value?.totalDurationSeconds || 0) + totalSeconds) / (3 * 60 * 60)) * 100)),
+      planImpact: Boolean(todayWorkout.value && !todayWorkout.value.isCompleted),
       message: todayWorkout.value && !todayWorkout.value.isCompleted
         ? 'That counts toward today’s plan. Keep the momentum going.'
         : 'Your weekly picture is now up to date.'
@@ -4767,6 +4771,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 .web-week-summary-state--error button { padding: 0; border: 0; background: transparent; color: #2A55F5; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
 .activity-feedback { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 0 18px; padding: 16px 20px; background: #FFF8DC; border: 2px solid #16130F; box-shadow: 3px 3px #16130F; }
 .activity-feedback p { margin: 5px 0 0; color: #5A5348; font-size: .85rem; }
+.activity-feedback-meta { margin-top: 10px; color: #5A5348; font: 600 .68rem 'Spline Sans Mono', monospace; text-transform: uppercase; }
 .activity-feedback strong { font-size: 1.05rem; }
 @media (max-width: 600px) { .activity-feedback { align-items: flex-start; flex-direction: column; } }
 @media (max-width: 600px) {

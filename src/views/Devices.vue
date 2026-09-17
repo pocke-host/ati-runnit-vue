@@ -10,6 +10,15 @@
         </div>
       </div>
       <div class="integrations-intro"><div><div class="devices-kicker">Connected services</div><h2>Bring your training together.</h2></div><p>Connect the tools you already use. RUNNIT keeps the links here so you can see what is active and reconnect when needed.</p></div>
+      <section class="integration-health" aria-labelledby="integration-health-title">
+        <div class="integration-health-head"><div><div class="devices-kicker">At a glance</div><h2 id="integration-health-title">Connection health</h2></div><span v-if="statusLoading">Checking sources…</span><span v-else>{{ connectedCount }} connected</span></div>
+        <div class="integration-health-grid">
+          <div v-for="card in integrationCards" :key="card.key" class="integration-health-card" :class="{ 'integration-health-card--attention': card.needsReconnect || card.stale }">
+            <div class="integration-health-icon"><i :class="card.icon"></i></div><div class="integration-health-copy"><strong>{{ card.name }}</strong><span>{{ card.needsReconnect ? 'Needs reconnect' : card.connected ? (card.stale ? 'Needs a sync' : 'Up to date') : 'Not connected' }}</span><small>{{ card.connected && card.lastSync ? `Last sync ${relativeTime(card.lastSync)}` : card.connected ? 'Waiting for first sync' : 'Permission not granted' }}</small></div>
+            <router-link v-if="card.needsReconnect || !card.connected" to="/devices" class="integration-health-action">{{ card.needsReconnect ? 'Reconnect' : 'Connect' }}</router-link>
+          </div>
+        </div>
+      </section>
       <ConnectDevices />
 
       <div class="spotify-integration-card">
@@ -43,7 +52,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
 import ConnectDevices from '@/components/ConnectDevices.vue'
 
@@ -51,6 +60,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const spotifyConnected = ref(false)
 const spotifyLoading = ref(false)
 const spotifyError = ref('')
+const integrationStatuses = ref([])
+const statusLoading = ref(true)
 const headers = () => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
@@ -63,8 +74,27 @@ const connectSpotify = async () => {
     window.location.href = data.url
   } catch (e) { spotifyError.value = e.response?.data?.error || 'Spotify connection is unavailable right now. Try again shortly.'; spotifyLoading.value = false }
 }
+const relativeTime = value => {
+  if (!value) return ''
+  const minutes = Math.max(1, Math.round((Date.now() - new Date(value).getTime()) / 60000))
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.round(minutes / 60)
+  if (hours < 48) return `${hours}h ago`
+  return `${Math.round(hours / 24)}d ago`
+}
+const integrationCards = computed(() => integrationStatuses.value.map(status => ({
+  ...status,
+  key: status.provider,
+  name: status.provider === 'apple-health' ? 'Apple Health' : status.provider.charAt(0).toUpperCase() + status.provider.slice(1),
+  icon: ({ whoop: 'bi bi-heart-pulse', coros: 'bi bi-watch', garmin: 'bi bi-stopwatch', strava: 'bi bi-bicycle', 'apple-health': 'bi bi-heart' }[status.provider] || 'bi bi-link-45deg'),
+  stale: status.connected && (!status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000),
+})))
+const connectedCount = computed(() => integrationStatuses.value.filter(s => s.connected).length)
 onMounted(async () => {
   try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
+  const providers = ['whoop', 'coros', 'garmin', 'strava', 'apple-health']
+  integrationStatuses.value = (await Promise.all(providers.map(provider => axios.get(`${API_URL}/integrations/${provider}/status`, { headers: headers() }).then(({ data }) => ({ provider, ...data })).catch(() => ({ provider, connected: false })))) )
+  statusLoading.value = false
 })
 </script>
 
@@ -130,6 +160,7 @@ onMounted(async () => {
 .integrations-intro { display:flex; justify-content:space-between; align-items:end; gap:24px; margin:0 0 18px; padding:18px 0; border-top:1px solid #ddd4c5; border-bottom:1px solid #ddd4c5; }
 .integrations-intro h2 { margin:6px 0 0; font-size:1.3rem; }
 .integrations-intro p { max-width:420px; margin:0; color:#665f55; font-size:.84rem; line-height:1.5; }
+.integration-health{margin:0 0 24px;padding:18px;background:#16130F;color:#FBF6EC}.integration-health-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.integration-health-head h2{margin:4px 0 0;color:#FBF6EC;font-size:1.35rem}.integration-health-head span{color:#FFC53D;font:600 .65rem 'Spline Sans Mono',monospace;text-transform:uppercase}.integration-health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.integration-health-card{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;background:#24211c;border:1px solid #4a453c}.integration-health-card--attention{border-color:#FFC53D}.integration-health-icon{display:grid;place-items:center;width:30px;height:30px;background:#2A55F5;color:white}.integration-health-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}.integration-health-copy strong{font-size:.82rem}.integration-health-copy span,.integration-health-copy small{color:#c7bfae;font-size:.68rem}.integration-health-copy small{color:#938b7c}.integration-health-action{color:#FFC53D;font:700 .62rem 'Spline Sans Mono',monospace;text-transform:uppercase}@media(max-width:600px){.integration-health-grid{grid-template-columns:1fr}}
 
 @media (max-width: 640px) {
   .devices-wrap { padding: 28px 18px 80px; }
