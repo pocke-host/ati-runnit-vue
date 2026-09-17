@@ -81,6 +81,7 @@
           <h2 class="section-title">COACHING RATE</h2>
         </div>
         <div class="rate-card">
+          <p class="rate-explainer">Your Runnit profile and coaching tools are free. Set your rate to offer paid services; Runnit takes a commission only when an athlete pays.</p>
           <div class="rate-current">
             <span v-if="user?.monthlyRate" class="rate-value">${{ user.monthlyRate }}<span class="rate-unit">/mo</span></span>
             <span v-else class="rate-unset">Not set — athletes can't hire you yet</span>
@@ -493,6 +494,12 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.rate-explainer {
+  margin: 0 0 16px;
+  color: #5A5348;
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 .rate-current { display: flex; align-items: baseline; gap: 6px; }
 .rate-value { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 1.6rem; font-weight: 800; color: #2A55F5; line-height: 1; }

@@ -96,7 +96,7 @@
             </button>
             <button type="button" class="gr-role-tile" :class="{ 'gr-role-tile--active': role === 'coach' }" @click="role = 'coach'">
               <div class="gr-role-name">Coach</div>
-              <div class="gr-role-sub">Manage athletes &amp; build plans</div>
+              <div class="gr-role-sub">Build plans &amp; earn through coaching</div>
             </button>
           </div>
 

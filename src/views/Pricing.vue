@@ -6,11 +6,7 @@
       <div class="page-inner hero-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
         <h1 class="hero-h1">Core training stays free.</h1>
-        <p class="launch-note">The first 100 Runnit athletes get Pro free for life.</p>
-        <div class="billing-toggle">
-          <button :class="['toggle-opt', !annual ? 'toggle-opt--active' : '']" @click="annual = false">Monthly</button>
-          <button :class="['toggle-opt', annual ? 'toggle-opt--active' : '']" @click="annual = true">Annual · 2 mo free</button>
-        </div>
+        <p class="launch-note">Free for every athlete. Runnit earns when coaches earn.</p>
       </div>
     </section>
 
@@ -26,7 +22,7 @@
               <span class="price-amount">$0</span>
               <span class="price-mo">/MO</span>
             </div>
-            <div class="plan-tagline">For getting started</div>
+            <div class="plan-tagline">Everything athletes need. Free forever.</div>
             <ul class="plan-features">
               <li><b class="check">✓</b>&nbsp; Activity tracking</li>
               <li><b class="check">✓</b>&nbsp; Unlimited activity tracking</li>
@@ -37,27 +33,6 @@
             <router-link to="/signup" class="btn-plan btn-plan--outline" data-analytics="cta_signup_pricing_free">Start Free</router-link>
           </div>
 
-          <!-- Pro — featured -->
-          <div class="price-card price-card--featured">
-            <div class="popular-tag">Most Popular</div>
-            <div class="plan-tier plan-tier--cobalt">Pro</div>
-            <div class="price-row">
-              <span class="price-amount">{{ annual ? '$7' : '$9' }}</span>
-              <span class="price-mo">/MO</span>
-            </div>
-            <div class="plan-tagline">For serious training</div>
-            <ul class="plan-features">
-              <li><b class="check">✓</b>&nbsp; Everything in Free</li>
-              <li><b class="check">✓</b>&nbsp; Adaptive coaching and deeper insights</li>
-              <li><b class="check">✓</b>&nbsp; Unlimited crews and advanced trends</li>
-              <li><b class="check">✓</b>&nbsp; Training recommendations and plan reviews</li>
-              <li><b class="check">✓</b>&nbsp; Priority support</li>
-            </ul>
-            <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
-              {{ checkoutLoading === 'premium' ? 'Redirecting…' : planLabel('premium') }}
-            </button>
-          </div>
-
         </div>
       </div>
     </section>
@@ -65,7 +40,7 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
-      <p class="cta-sub">The community and core training tools stay free. Upgrade only when you want more guidance.</p>
+      <p class="cta-sub">Runnit is free for athletes. Coaches pay only when they earn through the marketplace.</p>
       <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_pricing_footer">Start Free</router-link>
     </section>
 
@@ -73,18 +48,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useAuthStore } from '@/stores/auth'
-import { useStripe } from '@/composables/useStripe'
 
 useHead({
   title: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes',
   link: [{ rel: 'canonical', href: 'https://runnit.live/pricing' }],
   meta: [
-    { name: 'description', content: 'Runnit keeps core training and community features free. Upgrade to Pro for adaptive coaching, deeper insights, and priority support.' },
+    { name: 'description', content: 'Runnit is free for athletes. Discover coaches, train with your community, and track your progress without a paywall.' },
     { property: 'og:title', content: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes' },
     { property: 'og:description', content: 'Start free. Upgrade to Pro for adaptive training plans, advanced analytics, and coaching tools.' },
     { property: 'og:url', content: 'https://runnit.live/pricing' },
@@ -97,39 +67,6 @@ useHead({
   ]
 })
 
-const annual = ref(false)
-const checkoutLoading = ref(null)
-
-const router = useRouter()
-const { isAuthenticated, subscriptionTier } = storeToRefs(useAuthStore())
-const { redirectToCheckout, openBillingPortal } = useStripe()
-
-const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
-
-const planLabel = (tier) => {
-  if (!isAuthenticated.value) return 'Start Pro'
-  if (subscriptionTier.value === tier) return 'Manage Plan'
-  if (hasActiveSub.value) return 'Manage Plan'
-  return 'Start Pro'
-}
-
-const handlePlanClick = async (tier) => {
-  const period = annual.value ? 'annual' : 'monthly'
-  if (!isAuthenticated.value) {
-    router.push({ path: '/signup', query: { plan: tier, period } })
-    return
-  }
-  checkoutLoading.value = tier
-  try {
-    if (hasActiveSub.value) {
-      await openBillingPortal()
-    } else {
-      await redirectToCheckout(tier, period)
-    }
-  } finally {
-    checkoutLoading.value = null
-  }
-}
 </script>
 
 <style scoped>

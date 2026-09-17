@@ -6,11 +6,7 @@
       <div class="page-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
         <h1 class="hero-h1">Core training stays free.</h1>
-        <p class="launch-note">The first 100 Runnit athletes get Pro free for life.</p>
-        <div class="billing-toggle">
-          <button :class="['toggle-opt', { 'toggle-opt--active': billing === 'monthly' }]" @click="billing = 'monthly'">Monthly</button>
-          <button :class="['toggle-opt', { 'toggle-opt--active': billing === 'annual' }]" @click="billing = 'annual'">Annual · 2 mo free</button>
-        </div>
+        <p class="launch-note">Free for every athlete. Runnit earns when coaches earn.</p>
       </div>
     </section>
 
@@ -26,32 +22,13 @@
               <span class="plan-price">$0</span>
               <span class="plan-per">/MO</span>
             </div>
-            <div class="plan-tagline">For lacing up</div>
+            <div class="plan-tagline">Everything athletes need. Free forever.</div>
             <div class="plan-features">
               <div v-for="f in freeFeatures" :key="f" class="plan-feature">
                 <span class="plan-check">✓</span>{{ f }}
               </div>
             </div>
             <router-link to="/signup" class="btn-plan btn-plan--ghost">Lace Up</router-link>
-          </div>
-
-          <!-- Pro (featured) -->
-          <div class="plan-card plan-card--pro">
-            <div class="plan-badge">Front Runner</div>
-            <div class="plan-tier plan-tier--cobalt">Pro</div>
-            <div class="plan-price-row">
-              <span class="plan-price">{{ billing === 'annual' ? '$7' : '$9' }}</span>
-              <span class="plan-per">/MO</span>
-            </div>
-            <div class="plan-tagline">For serious training</div>
-            <div class="plan-features">
-              <div v-for="f in proFeatures" :key="f" class="plan-feature">
-                <span class="plan-check">✓</span>{{ f }}
-              </div>
-            </div>
-            <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
-              {{ checkoutLoading === 'premium' ? 'Redirecting…' : planLabel('premium') }}
-            </button>
           </div>
 
         </div>
@@ -61,7 +38,7 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
-      <p class="cta-sub">The community and core training tools stay free. Upgrade only when you want more guidance.</p>
+      <p class="cta-sub">Runnit is free for athletes. Coaches pay only when they earn through the marketplace.</p>
       <router-link to="/signup" class="btn-pill-paper">Lace Up</router-link>
     </section>
 
@@ -69,55 +46,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
 import { useHead } from '@unhead/vue'
-import { storeToRefs } from 'pinia'
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
-import { useStripe } from '@/composables/useStripe'
 
 useHead({
   title: 'Pricing — Runnit',
   meta: [
-    { name: 'description', content: 'Pick your pace. Straight-up pricing — free to start, Pro when your training does.' },
+    { name: 'description', content: 'Runnit is free for athletes. Discover coaches, train with your community, and track your progress without a paywall.' },
   ]
 })
 
-const router = useRouter()
-const { isAuthenticated, subscriptionTier } = storeToRefs(useAuthStore())
-const { redirectToCheckout, openBillingPortal } = useStripe()
-const billing = ref('monthly')
-const checkoutLoading = ref(null)
-
-const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
-
-const planLabel = (tier) => {
-  if (!isAuthenticated.value) return 'Start Pro'
-  if (subscriptionTier.value === tier) return 'Manage Plan'
-  if (hasActiveSub.value) return 'Manage Plan'
-  return 'Start Pro'
-}
-
 const freeFeatures  = ['Unlimited activity tracking', 'Feed, comments, GIFs, and challenges', 'Plans, folders, races, and strength journal', 'Apple Health and connected devices']
-const proFeatures   = ['Everything in Free', 'Adaptive coaching and deeper insights', 'Unlimited crews and advanced trends', 'Training recommendations and plan reviews', 'Priority support']
-
-const handlePlanClick = async (tier) => {
-  const period = billing.value
-  if (!isAuthenticated.value) {
-    router.push({ path: '/signup', query: { plan: tier, period } })
-    return
-  }
-  checkoutLoading.value = tier
-  try {
-    if (hasActiveSub.value) {
-      await openBillingPortal()
-    } else {
-      await redirectToCheckout(tier, period)
-    }
-  } finally {
-    checkoutLoading.value = null
-  }
-}
 </script>
 
 <style scoped>
