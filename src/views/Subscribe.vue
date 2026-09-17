@@ -5,7 +5,7 @@
     <section class="hero">
       <div class="page-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
-        <h1 class="hero-h1">Pick your pace.</h1>
+        <h1 class="hero-h1">Core training stays free.</h1>
         <div class="billing-toggle">
           <button :class="['toggle-opt', { 'toggle-opt--active': billing === 'monthly' }]" @click="billing = 'monthly'">Monthly</button>
           <button :class="['toggle-opt', { 'toggle-opt--active': billing === 'annual' }]" @click="billing = 'annual'">Annual · 2 mo free</button>
@@ -53,24 +53,6 @@
             </button>
           </div>
 
-          <!-- Elite -->
-          <div class="plan-card">
-            <div class="plan-tier">Elite</div>
-            <div class="plan-price-row">
-              <span class="plan-price">{{ billing === 'annual' ? '$15' : '$19' }}</span>
-              <span class="plan-per">/MO</span>
-            </div>
-            <div class="plan-tagline">For racing</div>
-            <div class="plan-features">
-              <div v-for="f in eliteFeatures" :key="f" class="plan-feature">
-                <span class="plan-check">✓</span>{{ f }}
-              </div>
-            </div>
-            <button class="btn-plan btn-plan--ghost" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
-              {{ checkoutLoading === 'duo' ? 'Redirecting…' : planLabel('duo') }}
-            </button>
-          </div>
-
         </div>
       </div>
     </section>
@@ -78,7 +60,7 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
-      <p class="cta-sub">Start free. Upgrade when your training does.</p>
+      <p class="cta-sub">The community and core training tools stay free. Upgrade only when you want more guidance.</p>
       <router-link to="/signup" class="btn-pill-paper">Lace Up</router-link>
     </section>
 
@@ -109,15 +91,14 @@ const checkoutLoading = ref(null)
 const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
 
 const planLabel = (tier) => {
-  if (!isAuthenticated.value) return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (!isAuthenticated.value) return 'Start Pro'
   if (subscriptionTier.value === tier) return 'Manage Plan'
-  if (hasActiveSub.value) return tier === 'premium' ? 'Switch to Pro' : 'Switch to Elite'
-  return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (hasActiveSub.value) return 'Manage Plan'
+  return 'Start Pro'
 }
 
-const freeFeatures  = ['Activity tracking', 'Up to 3 crews', 'Basic stats', 'Apple Health sync']
-const proFeatures   = ['Everything in Free', 'Adaptive plans', 'Unlimited crews', 'Moments', 'Garmin sync', 'PR tracking']
-const eliteFeatures = ['Everything in Pro', 'Coached plan reviews', 'Advanced analytics', 'Priority live share', 'Early features']
+const freeFeatures  = ['Unlimited activity tracking', 'Feed, comments, GIFs, and challenges', 'Plans, folders, races, and strength journal', 'Apple Health and connected devices']
+const proFeatures   = ['Everything in Free', 'Adaptive coaching and deeper insights', 'Unlimited crews and advanced trends', 'Training recommendations and plan reviews', 'Priority support']
 
 const handlePlanClick = async (tier) => {
   const period = billing.value
@@ -211,8 +192,10 @@ const handlePlanClick = async (tier) => {
 }
 .plan-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  max-width: 760px;
+  margin: 0 auto;
 }
 .plan-card {
   border: 2px solid #16130F;

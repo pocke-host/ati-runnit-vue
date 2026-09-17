@@ -5,7 +5,7 @@
     <section class="hero">
       <div class="page-inner hero-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
-        <h1 class="hero-h1">Pick your pace.</h1>
+        <h1 class="hero-h1">Core training stays free.</h1>
         <div class="billing-toggle">
           <button :class="['toggle-opt', !annual ? 'toggle-opt--active' : '']" @click="annual = false">Monthly</button>
           <button :class="['toggle-opt', annual ? 'toggle-opt--active' : '']" @click="annual = true">Annual · 2 mo free</button>
@@ -28,9 +28,10 @@
             <div class="plan-tagline">For getting started</div>
             <ul class="plan-features">
               <li><b class="check">✓</b>&nbsp; Activity tracking</li>
-              <li><b class="check">✓</b>&nbsp; Up to 3 crews</li>
-              <li><b class="check">✓</b>&nbsp; Basic stats</li>
-              <li><b class="check">✓</b>&nbsp; Apple Health sync (iOS)</li>
+              <li><b class="check">✓</b>&nbsp; Unlimited activity tracking</li>
+              <li><b class="check">✓</b>&nbsp; Feed, comments, GIFs, and challenges</li>
+              <li><b class="check">✓</b>&nbsp; Plans, folders, races, and strength journal</li>
+              <li><b class="check">✓</b>&nbsp; Apple Health and connected devices</li>
             </ul>
             <router-link to="/signup" class="btn-plan btn-plan--outline" data-analytics="cta_signup_pricing_free">Start Free</router-link>
           </div>
@@ -46,34 +47,13 @@
             <div class="plan-tagline">For serious training</div>
             <ul class="plan-features">
               <li><b class="check">✓</b>&nbsp; Everything in Free</li>
-              <li><b class="check">✓</b>&nbsp; Adaptive plans</li>
-              <li><b class="check">✓</b>&nbsp; Unlimited crews</li>
-              <li><b class="check">✓</b>&nbsp; Moments</li>
-              <li><b class="check">✓</b>&nbsp; Garmin sync</li>
-              <li><b class="check">✓</b>&nbsp; PR tracking</li>
+              <li><b class="check">✓</b>&nbsp; Adaptive coaching and deeper insights</li>
+              <li><b class="check">✓</b>&nbsp; Unlimited crews and advanced trends</li>
+              <li><b class="check">✓</b>&nbsp; Training recommendations and plan reviews</li>
+              <li><b class="check">✓</b>&nbsp; Priority support</li>
             </ul>
             <button class="btn-plan btn-plan--cobalt" :disabled="checkoutLoading" @click="handlePlanClick('premium')">
               {{ checkoutLoading === 'premium' ? 'Redirecting…' : planLabel('premium') }}
-            </button>
-          </div>
-
-          <!-- Elite -->
-          <div class="price-card">
-            <div class="plan-tier plan-tier--muted">Elite</div>
-            <div class="price-row">
-              <span class="price-amount">{{ annual ? '$15' : '$19' }}</span>
-              <span class="price-mo">/MO</span>
-            </div>
-            <div class="plan-tagline">For racing</div>
-            <ul class="plan-features">
-              <li><b class="check">✓</b>&nbsp; Everything in Pro</li>
-              <li><b class="check">✓</b>&nbsp; Coached plan reviews</li>
-              <li><b class="check">✓</b>&nbsp; Advanced analytics</li>
-              <li><b class="check">✓</b>&nbsp; Priority live share</li>
-              <li><b class="check">✓</b>&nbsp; Early features</li>
-            </ul>
-            <button class="btn-plan btn-plan--outline" :disabled="checkoutLoading" @click="handlePlanClick('duo')">
-              {{ checkoutLoading === 'duo' ? 'Redirecting…' : planLabel('duo') }}
             </button>
           </div>
 
@@ -84,7 +64,7 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
-      <p class="cta-sub">Start free. Upgrade when your training does.</p>
+      <p class="cta-sub">The community and core training tools stay free. Upgrade only when you want more guidance.</p>
       <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_pricing_footer">Start Free</router-link>
     </section>
 
@@ -103,7 +83,7 @@ useHead({
   title: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes',
   link: [{ rel: 'canonical', href: 'https://runnit.live/pricing' }],
   meta: [
-    { name: 'description', content: 'Start free and log unlimited sessions. Upgrade to Pro for adaptive training plans, advanced analytics, coaching tools, and priority support. Pick your pace.' },
+    { name: 'description', content: 'Runnit keeps core training and community features free. Upgrade to Pro for adaptive coaching, deeper insights, and priority support.' },
     { property: 'og:title', content: 'Pricing — Runnit | Free & Pro Plans for Endurance Athletes' },
     { property: 'og:description', content: 'Start free. Upgrade to Pro for adaptive training plans, advanced analytics, and coaching tools.' },
     { property: 'og:url', content: 'https://runnit.live/pricing' },
@@ -126,10 +106,10 @@ const { redirectToCheckout, openBillingPortal } = useStripe()
 const hasActiveSub = computed(() => subscriptionTier.value && subscriptionTier.value !== 'free')
 
 const planLabel = (tier) => {
-  if (!isAuthenticated.value) return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (!isAuthenticated.value) return 'Start Pro'
   if (subscriptionTier.value === tier) return 'Manage Plan'
-  if (hasActiveSub.value) return tier === 'premium' ? 'Switch to Pro' : 'Switch to Elite'
-  return tier === 'premium' ? 'Start Pro' : 'Go Elite'
+  if (hasActiveSub.value) return 'Manage Plan'
+  return 'Start Pro'
 }
 
 const handlePlanClick = async (tier) => {
@@ -231,8 +211,10 @@ const handlePlanClick = async (tier) => {
 }
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  max-width: 760px;
+  margin: 0 auto;
 }
 .price-card {
   border: 2px solid #16130F;

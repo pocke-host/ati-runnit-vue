@@ -66,8 +66,7 @@ const portalLoading = ref(false)
 const portalError = ref('')
 
 const tierLabel = computed(() => {
-  if (subscriptionTier.value === 'duo') return 'Duo'
-  if (subscriptionTier.value === 'premium') return 'Premium'
+  if (subscriptionTier.value === 'premium' || subscriptionTier.value === 'duo') return 'Pro'
   return 'Free'
 })
 

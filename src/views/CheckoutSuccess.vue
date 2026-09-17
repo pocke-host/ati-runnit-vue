@@ -59,9 +59,9 @@ onMounted(async () => {
   try { await authStore.fetchCurrentUser() } catch { /* proceed regardless */ }
 })
 
-const tierLabel     = computed(() => subscriptionTier.value === 'duo' ? 'Elite' : 'Premium')
-const planName      = computed(() => subscriptionTier.value === 'duo' ? 'Runnit Elite' : 'Runnit Pro')
-const billingAmount = computed(() => subscriptionTier.value === 'duo' ? '$19.00 / mo' : '$9.00 / mo')
+const tierLabel     = computed(() => 'Pro')
+const planName      = computed(() => 'Runnit Pro')
+const billingAmount = computed(() => '$9.00 / mo')
 
 const nextChargeDate = computed(() => {
   const d = new Date()
