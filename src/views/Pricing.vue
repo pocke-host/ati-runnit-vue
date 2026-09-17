@@ -6,6 +6,7 @@
       <div class="page-inner hero-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
         <h1 class="hero-h1">Core training stays free.</h1>
+        <p class="launch-note">The first 100 Runnit athletes get Pro free for life.</p>
         <div class="billing-toggle">
           <button :class="['toggle-opt', !annual ? 'toggle-opt--active' : '']" @click="annual = false">Monthly</button>
           <button :class="['toggle-opt', annual ? 'toggle-opt--active' : '']" @click="annual = true">Annual · 2 mo free</button>
@@ -156,6 +157,12 @@ const handlePlanClick = async (tier) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.launch-note {
+  margin: 0;
+  color: #E7DFCE;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 .gr-eyebrow-badge {
   display: inline-block;
