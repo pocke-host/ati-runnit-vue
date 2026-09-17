@@ -83,6 +83,18 @@
           </div>
         </div>
       </div>
+      <div v-if="selectedService" class="booking-modal-backdrop" @click.self="selectedService = null">
+        <section class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-title">
+          <button class="modal-close" @click="selectedService = null" aria-label="Close">×</button>
+          <div class="banner-label">BOOK A SESSION</div><h2 id="booking-title">{{ selectedService.title }}</h2>
+          <p class="modal-help">Choose an available time. Your local timezone is used.</p>
+          <div class="available-times" v-if="availableSlots.length"><button v-for="slot in availableSlots" :key="slot.weekday" class="slot-chip" :class="{ selected: selectedWeekday === slot.weekday }" @click="selectedWeekday = slot.weekday">{{ weekdayNames[slot.weekday - 1] }} · {{ slot.startTime.slice(0,5) }}–{{ slot.endTime.slice(0,5) }}</button></div>
+          <p v-else class="modal-help">This coach accepts async bookings. You can continue without selecting a time.</p>
+          <input v-if="availableSlots.length" v-model="selectedDate" type="date" class="booking-date" :min="today" aria-label="Booking date" />
+          <div class="modal-actions"><button class="btn-requested" @click="selectedService = null">Cancel</button><button class="btn-request" @click="confirmBooking" :disabled="bookingLoading || (availableSlots.length && (!selectedDate || !selectedWeekday))">{{ bookingLoading ? 'Starting…' : 'Continue to payment' }}</button></div>
+          <small class="legal-copy">By continuing, you accept the coach’s cancellation policy. Coaching is not medical advice.</small>
+        </section>
+      </div>
     </div>
   </main>
 </template>
@@ -105,6 +117,14 @@ const requestError = ref('')
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const coachServices = ref({})
 const coachReviews = ref({})
+const coachAvailability = ref({})
+const selectedService = ref(null)
+const availableSlots = ref([])
+const selectedWeekday = ref(null)
+const selectedDate = ref('')
+const bookingLoading = ref(false)
+const weekdayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+const today = new Date().toISOString().slice(0,10)
 
 const hireCoach = (coachId) => {
   router.push(`/my-coach?hire=${coachId}`)
@@ -133,7 +153,9 @@ const loadServices = async () => {
     try {
       const res = await fetch(`${API}/coaches/${coach.id}/services`, { headers: { Authorization: `Bearer ${token}` } })
       const reviewsRes = await fetch(`${API}/coaches/${coach.id}/reviews`, { headers: { Authorization: `Bearer ${token}` } })
+      const availabilityRes = await fetch(`${API}/coaches/${coach.id}/availability`, { headers: { Authorization: `Bearer ${token}` } })
       if (reviewsRes.ok) coachReviews.value[coach.id] = await reviewsRes.json()
+      if (availabilityRes.ok) coachAvailability.value[coach.id] = await availabilityRes.json()
       return [coach.id, res.ok ? await res.json() : []]
     } catch { return [coach.id, []] }
   }))
@@ -149,12 +171,20 @@ const reportCoach = async (coachId) => {
 
 const bookService = async (service) => {
   requestError.value = ''
-  const scheduledStart = window.prompt('Choose a start time (ISO, e.g. 2026-10-01T17:00:00Z), or leave blank for an async service')
-  if (scheduledStart === null) return
+  selectedService.value = service
+  const slots = coachAvailability.value[service.coachId] || []
+  availableSlots.value = slots
+  selectedWeekday.value = slots[0]?.weekday || null
+  selectedDate.value = ''
+}
+const confirmBooking = async () => {
+  const service = selectedService.value
+  if (!service) return
+  bookingLoading.value = true
   try {
     const token = localStorage.getItem('token')
     const payload = { serviceId: service.id }
-    if (scheduledStart.trim()) { payload.scheduledStart = new Date(scheduledStart).toISOString(); payload.scheduledEnd = new Date(new Date(scheduledStart).getTime() + (service.durationMinutes || 60) * 60000).toISOString() }
+    if (availableSlots.value.length) { const slot = availableSlots.value.find(item => item.weekday === selectedWeekday.value); const scheduledStart = new Date(`${selectedDate.value}T${slot.startTime}`).toISOString(); payload.scheduledStart = scheduledStart; payload.scheduledEnd = new Date(new Date(scheduledStart).getTime() + (service.durationMinutes || 60) * 60000).toISOString() }
     const create = await fetch(`${API}/athlete/bookings`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) })
     const booking = await create.json()
     if (!create.ok) throw new Error(booking.error || 'Booking could not be created')
@@ -162,7 +192,8 @@ const bookService = async (service) => {
     const data = await checkout.json()
     if (!checkout.ok) throw new Error(data.error || 'Checkout could not be started')
     window.location.href = data.url
-  } catch (e) { requestError.value = e.message }
+  } catch (e) { requestError.value = e.message; selectedService.value = null }
+  finally { bookingLoading.value = false }
 }
 
 onMounted(async () => {
@@ -237,6 +268,17 @@ onMounted(async () => {
   font-size: 0.65rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
 }
 .btn-report { border:0; background:transparent; color:#8A8A8A; font-size:.7rem; cursor:pointer; padding:8px; }
+.booking-modal-backdrop { position:fixed; inset:0; z-index:20; background:rgba(22,19,15,.55); display:grid; place-items:center; padding:20px; }
+.booking-modal { position:relative; width:min(520px,100%); background:#FBF6EC; border:2px solid #16130F; padding:28px; box-shadow:8px 8px 0 #16130F; }
+.booking-modal h2 { margin:6px 0 8px; font-size:1.6rem; text-transform:uppercase; }
+.modal-close { position:absolute; top:8px; right:12px; border:0; background:transparent; font-size:1.6rem; cursor:pointer; }
+.modal-help { color:#5A5348; font-size:.86rem; line-height:1.5; }
+.available-times { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.slot-chip { border:2px solid #2A55F5; background:#fff; color:#2A55F5; padding:8px 10px; font-size:.72rem; cursor:pointer; }
+.slot-chip.selected { background:#2A55F5; color:#fff; }
+.booking-date { width:100%; border:2px solid #E7DFCE; padding:11px; font:inherit; margin-bottom:16px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+.legal-copy { display:block; color:#8A8A8A; margin-top:16px; line-height:1.4; }
 
 .request-error { background: rgba(192,57,43,0.08); border: 2px solid rgba(192,57,43,0.20); color: #C0392B; font-size: 0.88rem; font-weight: 600; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; }
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 24px; color: #8A8A8A; text-align: center; }

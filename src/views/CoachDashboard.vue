@@ -79,6 +79,7 @@
             <select v-model="serviceDraft.billingType" class="service-input"><option value="ONE_TIME">One-time</option><option value="MONTHLY">Monthly</option></select>
             <button class="btn-save-rate" @click="publishService" :disabled="serviceSaving || !serviceDraft.title || serviceDraft.priceCents < 0">{{ serviceSaving ? 'Saving…' : 'Publish' }}</button>
           </div>
+          <label class="terms-check"><input v-model="termsAccepted" type="checkbox" /> I agree to the Runnit Coach Marketplace terms, cancellation policy, and medical disclaimer. Stripe provides payment receipts.</label>
           <div v-if="marketplaceError" class="rate-status error">{{ marketplaceError }}</div>
           <div v-if="services.length" class="service-list">
             <div v-for="service in services" :key="service.id" class="service-row">
@@ -282,6 +283,7 @@ const availabilityDraft = ref(['Monday','Tuesday','Wednesday','Thursday','Friday
 const privacySetting = ref('PUBLIC')
 const privacySaving = ref(false)
 const serviceDraft = ref({ title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' })
+const termsAccepted = ref(false)
 
 const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` })
 const loadMarketplace = async () => {
@@ -309,6 +311,8 @@ const savePrivacy = async () => {
 const publishService = async () => {
   serviceSaving.value = true; marketplaceError.value = ''
   try {
+    if (!termsAccepted.value) throw new Error('Accept the Coach Marketplace terms before publishing')
+    await fetch(`${API}/coach/profile`, { method:'PATCH', headers:authHeaders(), body:JSON.stringify({ acceptTerms:true }) })
     const res = await fetch(`${API}/coach/services`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(serviceDraft.value) })
     if (!res.ok) throw new Error('Service could not be published')
     services.value.unshift(await res.json()); serviceDraft.value = { title: '', priceCents: 0, billingType: 'ONE_TIME', serviceType: 'COACHING' }
@@ -630,6 +634,7 @@ onMounted(async () => {
 .empty-marketplace { padding:14px 0; color:#8A8A8A; font-size:.85rem; }
 .privacy-row { display:flex; align-items:center; gap:10px; margin:12px 0 16px; font-size:.85rem; flex-wrap:wrap; }
 .privacy-row label { font-weight:700; margin-right:auto; }
+.terms-check { display:block; color:#5A5348; font-size:.75rem; line-height:1.45; margin:4px 0 14px; }
 .availability-list { display:grid; gap:8px; margin-bottom:14px; }
 .availability-row { display:grid; grid-template-columns:1fr 120px 24px 120px; align-items:center; gap:8px; font-size:.85rem; }
 .availability-row input[type="time"] { border:1px solid #E7DFCE; padding:7px; font:inherit; }
