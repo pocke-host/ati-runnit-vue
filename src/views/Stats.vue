@@ -7,6 +7,11 @@
       <div class="hero-inner">
         <div class="hero-kicker">RUNNIT // PERFORMANCE</div>
         <h1 class="hero-title">YOUR STATS</h1>
+        <p class="hero-deck">A clear read on your training, built from your activity history.</p>
+        <div class="hero-actions">
+          <router-link to="/track" class="hero-action hero-action--primary"><i class="bi bi-record-circle"></i> Record activity</router-link>
+          <button class="hero-action" @click="jumpTo('load')">Review training load <i class="bi bi-arrow-down"></i></button>
+        </div>
 
         <!-- 7-day activity dots -->
         <div class="hero-dots" v-if="!loading && hasActivities">
@@ -50,6 +55,9 @@
             </div>
           </template>
         </div>
+        <div v-if="!loading && hasActivities" class="hero-freshness">
+          {{ activities.length.toLocaleString() }} activities analyzed · updated just now
+        </div>
       </div>
     </section>
 
@@ -72,6 +80,17 @@
     </nav>
 
     <div class="stats-content">
+
+      <div v-if="activityError && activities.length" class="sync-notice" role="status">
+        <i class="bi bi-cloud-slash"></i>
+        <span>Showing your saved stats. We couldn't refresh the latest activities.</span>
+        <button @click="refreshStats">Retry</button>
+      </div>
+      <div v-else-if="activityError && !loading" class="stats-error" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        <div><strong>Stats couldn't load</strong><span>{{ activityError }}</span></div>
+        <button @click="refreshStats">Try again</button>
+      </div>
 
       <!-- EMPTY STATE -->
       <EmptyState
@@ -226,6 +245,10 @@
         </div>
         <div class="chart-card" style="margin-bottom:16px">
           <canvas ref="weeklyChartRef"></canvas>
+        </div>
+        <div v-if="trainingRead" class="training-read" :class="`training-read--${trainingRead.tone}`">
+          <div class="training-read-icon"><i :class="`bi ${trainingRead.icon}`"></i></div>
+          <div><span class="section-kicker">Your training read</span><strong>{{ trainingRead.title }}</strong><p>{{ trainingRead.message }}</p></div>
         </div>
         <div class="insights-row" v-if="acwrInfo || weeklyTargetKm || daysSinceLastActivity !== null">
           <div class="insight-card" v-if="acwrInfo">
@@ -438,7 +461,7 @@ const { classifyActivity } = useWorkoutClassifier()
 const activityStore = useActivityStore()
 const prStore = usePRStore()
 const trainingLoadStore = useTrainingLoadStore()
-const { activities, loading } = storeToRefs(activityStore)
+const { activities, loading, error: activityError } = storeToRefs(activityStore)
 const { data: trainingLoad } = storeToRefs(trainingLoadStore)
 const initializing = ref(true)
 const hasActivities = computed(() => initializing.value || loading.value || activities.value.length > 0)
@@ -793,6 +816,26 @@ const daysSinceLastActivity = computed(() => {
   const latest = acts.reduce((max, a) => { const d = new Date(a.performedAt); return d > max ? d : max }, new Date(0))
   return Math.floor((Date.now() - latest.getTime()) / 86400000)
 })
+
+const trainingRead = computed(() => {
+  const form = performanceMetrics.value?.formScore ?? 0
+  const risk = trainingLoad.value?.riskLabel
+  if (risk === 'HIGH_RISK' || form < -20) return { tone: 'alert', icon: 'bi-exclamation-octagon', title: 'Ease off today', message: 'Your recent load is elevated. Choose recovery or an easy session before adding intensity.' }
+  if (risk === 'DETRAINING' || (daysSinceLastActivity.value !== null && daysSinceLastActivity.value > 5)) return { tone: 'muted', icon: 'bi-arrow-up-right', title: 'Build the habit back', message: 'A short, comfortable session is a better next step than trying to make up missed training.' }
+  if (form > 10) return { tone: 'ready', icon: 'bi-lightning-charge', title: 'You look ready', message: 'Your current form is positive. This is a good window for a quality workout or a race-specific effort.' }
+  return { tone: 'steady', icon: 'bi-check2-circle', title: 'Keep it steady', message: 'Your training is in a manageable range. Consistency is the next performance gain.' }
+})
+
+const refreshStats = async () => {
+  initializing.value = true
+  await activityStore.fetchActivities()
+  await prStore.fetchPRs(activities.value)
+  initializing.value = false
+  await nextTick()
+  initWeeklyChart()
+  initPieChart()
+  initVo2maxChart()
+}
 
 // ── 52-week heatmap ───────────────────────────────
 const heatmapData = computed(() => {
@@ -1844,4 +1887,5 @@ onUnmounted(() => {
   .pr-icon-wrap         { flex-shrink: 0; margin-bottom: 0; }
   .pr-value             { font-size: 1.9rem; }
 }
+.hero-deck{max-width:430px;margin:-14px auto 18px;color:rgba(251,246,236,.68);font-size:.9rem;line-height:1.5}.hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}.hero-action{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(251,246,236,.35);background:transparent;color:#fbf6ec;padding:10px 14px;font:700 .65rem 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none;cursor:pointer}.hero-action--primary{background:#2a55f5;border-color:#2a55f5}.hero-action:hover{border-color:#fbf6ec}.hero-freshness{margin-top:14px;color:rgba(251,246,236,.45);font:600 .62rem 'Spline Sans Mono',monospace;text-transform:uppercase;letter-spacing:.08em}.sync-notice,.stats-error{display:flex;align-items:center;gap:12px;border:2px solid #e7dfce;background:#fff;padding:13px 16px;margin-bottom:28px;color:#665f55;font-size:.86rem}.sync-notice i,.stats-error i{color:#2a55f5;font-size:1.1rem}.sync-notice button,.stats-error button{margin-left:auto;border:0;background:none;color:#2a55f5;text-decoration:underline;font:700 .68rem 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.stats-error{border-color:#c0392b;color:#a33b2a}.stats-error i{color:#c0392b}.stats-error div{display:flex;flex-direction:column;gap:3px}.stats-error button{color:#a33b2a}.training-read{display:flex;align-items:flex-start;gap:14px;border:2px solid #16130f;background:#fff;padding:18px;margin-bottom:20px}.training-read-icon{display:grid;place-items:center;width:40px;height:40px;background:#dce5ff;color:#2a55f5;font-size:1.25rem;flex:none}.training-read strong{display:block;font-size:1.3rem;margin:4px 0}.training-read p{margin:0;color:#665f55;font-size:.88rem;line-height:1.45}.training-read--alert{background:#fff3f0;border-color:#c0392b}.training-read--alert .training-read-icon{background:#f6cbc4;color:#a33b2a}.training-read--muted .training-read-icon{background:#e7dfce;color:#665f55}.training-read--ready .training-read-icon{background:#d8efe4;color:#16804a}.training-read--steady .training-read-icon{background:#dce5ff;color:#2a55f5}@media(max-width:480px){.hero-actions{align-items:stretch;flex-direction:column}.hero-action{justify-content:center}.sync-notice,.stats-error{align-items:flex-start;flex-wrap:wrap}.sync-notice button,.stats-error button{margin-left:28px}}
 </style>
