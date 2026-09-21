@@ -146,6 +146,9 @@
               <router-link to="/training-folders" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-folder2-open"></i> Training folders
               </router-link>
+              <router-link to="/rewards" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-gift"></i> Runnit Rewards
+              </router-link>
               <div class="avd-divider"></div>
               <button class="avd-link avd-link-danger" @click="handleLogout">
                 <i class="bi bi-box-arrow-right"></i> Logout
@@ -297,6 +300,10 @@
                   <router-link to="/achievements" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9a6 6 0 0 0 12 0V3H6Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 21h6M12 15v6"/></svg>
                     <span>Achievements</span>
+                  </router-link>
+                  <router-link to="/rewards" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 7v13M12 7H8.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7ZM12 7h3.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7Z"/></svg>
+                    <span>Rewards</span>
                   </router-link>
                   <router-link to="/clubs" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg>
