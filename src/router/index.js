@@ -63,6 +63,7 @@ const routes = [
   { path: '/profile/:id',         name: 'UserProfile',    component: () => import('@/views/UserProfile.vue'),      meta: { requiresAuth: true } },
   { path: '/achievements',        name: 'Achievements',   component: () => import('@/views/Achievements.vue'),     meta: { requiresAuth: true } },
   { path: '/rewards',             name: 'Rewards',        component: () => import('@/views/Rewards.vue'),          meta: { requiresAuth: true } },
+  { path: '/admin/rewards',       name: 'AdminRewards',   component: () => import('@/views/AdminRewards.vue'),    meta: { requiresAuth: true } },
   { path: '/stats',               name: 'Stats',          component: () => import('@/views/Stats.vue'),            meta: { requiresAuth: true } },
   { path: '/strength',            name: 'Strength',       component: () => import('@/views/StrengthProgress.vue'), meta: { requiresAuth: true } },
   { path: '/explore',             name: 'Explore',        component: () => import('@/views/Explore.vue'),          meta: { requiresAuth: true } },
