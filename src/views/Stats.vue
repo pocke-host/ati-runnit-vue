@@ -302,43 +302,6 @@
         </div>
       </section>
 
-      <!-- TRAINING LOG -->
-      <section id="stats-log" class="section" v-if="heatmapData.length">
-        <div class="section-header">
-          <span class="section-kicker">Training Log</span>
-        </div>
-        <div class="heatmap-card">
-          <div class="heatmap-scroll">
-            <div class="heatmap-months">
-              <span v-for="m in heatmapMonths" :key="m.col" class="heatmap-month" :style="{ gridColumn: m.col + 1 }">{{ m.label }}</span>
-            </div>
-            <div class="heatmap-grid">
-              <div v-for="(week, wi) in heatmapData" :key="wi" class="heatmap-week">
-                <div
-                  v-for="day in week"
-                  :key="day.date"
-                  :class="['heatmap-cell', `heatmap-l${day.level < 0 ? 'x' : day.level}`]"
-                  @mouseenter="showHeatmapTooltip(day, $event)"
-                  @mouseleave="hideHeatmapTooltip"
-                ></div>
-              </div>
-            </div>
-          </div>
-          <div class="heatmap-legend">
-            <span class="heatmap-legend-label">Less</span>
-            <div class="heatmap-cell heatmap-l0"></div>
-            <div class="heatmap-cell heatmap-l1"></div>
-            <div class="heatmap-cell heatmap-l2"></div>
-            <div class="heatmap-cell heatmap-l3"></div>
-            <div class="heatmap-cell heatmap-l4"></div>
-            <span class="heatmap-legend-label">More</span>
-          </div>
-        </div>
-        <Teleport to="body">
-          <div v-if="heatmapTooltip" class="heatmap-tooltip" :style="{ left: heatmapTooltip.x + 'px', top: (heatmapTooltip.y - 44) + 'px' }">{{ heatmapTooltip.text }}</div>
-        </Teleport>
-      </section>
-
       <!-- TRAINING STYLE -->
       <section id="stats-style" class="section">
         <div class="section-header">
@@ -364,45 +327,20 @@
         </div>
       </section>
 
-      <!-- YOUR JOURNEY -->
-      <section id="stats-journey" class="section" v-if="growthTimeline.length">
-        <div class="section-header">
-          <span class="section-kicker">Your Journey</span>
-        </div>
-        <div class="journey-scroll-wrap">
-          <div class="journey-track">
-            <div v-for="(m, i) in growthTimeline" :key="i" class="journey-node">
-              <div class="jnode-icon">{{ m.icon }}</div>
-              <div class="jnode-line" v-if="i < growthTimeline.length - 1"></div>
-              <div class="jnode-label">{{ m.label }}</div>
-              <div class="jnode-date">{{ m.date }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="journey-empty-cta" v-if="growthTimeline.length < 3">
-          <p>Keep logging — the next milestone is closer than you think.</p>
-        </div>
-      </section>
-
-      <!-- SPORT BREAKDOWN -->
-      <section class="section section-split">
-        <div class="split-left">
-          <h2 class="section-title">Sport Breakdown</h2>
-          <div class="chart-card chart-card-doughnut">
+      <!-- SPORT MIX -->
+      <section class="section" v-if="sportBreakdown.length">
+        <div class="section-header"><span class="section-kicker">Sport Mix</span></div>
+        <div class="sport-mix-card">
+          <div class="sport-mix-chart chart-card-doughnut">
             <canvas ref="pieChartRef"></canvas>
+            <div class="sport-mix-total"><strong>{{ activities.length }}</strong><span>activities</span></div>
           </div>
-        </div>
-        <div class="split-right">
-          <h2 class="section-title">Breakdown</h2>
-          <div class="legend-list">
-            <div v-for="s in sportBreakdown" :key="s.type" class="legend-row">
+          <div class="sport-mix-list">
+            <div v-for="s in sportBreakdown" :key="s.type" class="sport-mix-row">
               <div class="legend-dot" :style="{ background: s.color }"></div>
-              <div class="legend-info">
-                <span class="legend-type">{{ s.type }}</span>
-                <span class="legend-count">{{ s.count }} activit{{ s.count === 1 ? 'y' : 'ies' }}</span>
-              </div>
+              <div class="sport-mix-info"><strong>{{ s.type }}</strong><span>{{ s.count }} activit{{ s.count === 1 ? 'y' : 'ies' }} · {{ s.percent }}%</span></div>
+              <div class="sport-mix-stats"><strong>{{ formatDistance(s.distanceMeters) }}</strong><span>{{ formatDuration(s.durationSeconds) }}</span></div>
             </div>
-            <div v-if="!sportBreakdown.length" class="legend-empty">No activities yet</div>
           </div>
         </div>
       </section>
@@ -448,7 +386,6 @@ import { Chart, registerables } from 'chart.js'
 import { useUnits } from '@/composables/useUnits'
 import { useFitnessLoad } from '@/composables/useFitnessLoad'
 import { useArchetype } from '@/composables/useArchetype'
-import { useGrowthTimeline } from '@/composables/useGrowthTimeline'
 import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import FitnessGauge from '@/components/FitnessGauge.vue'
@@ -730,7 +667,6 @@ const vo2maxTrend = computed(() => {
 })
 
 const archetypeData  = computed(() => useArchetype(activities.value))
-const growthTimeline = computed(() => useGrowthTimeline(activities.value))
 
 const activeSection = ref('records')
 
@@ -837,69 +773,6 @@ const refreshStats = async () => {
   initVo2maxChart()
 }
 
-// ── 52-week heatmap ───────────────────────────────
-const heatmapData = computed(() => {
-  const acts  = activities.value || []
-  const today = new Date(); today.setHours(23, 59, 59, 999)
-
-  const dailyKm = {}
-  for (const a of acts) {
-    if (!a.performedAt) continue
-    const key = new Date(a.performedAt).toISOString().slice(0, 10)
-    dailyKm[key] = (dailyKm[key] || 0) + (a.distanceMeters || 0) / 1000
-  }
-
-  const start = new Date(today)
-  start.setDate(start.getDate() - 363)
-  start.setDate(start.getDate() - start.getDay())
-
-  const weeks = []
-  const cur   = new Date(start)
-  while (cur <= today) {
-    const week = []
-    for (let d = 0; d < 7; d++) {
-      const isFuture = new Date(cur) > today
-      const key = new Date(cur).toISOString().slice(0, 10)
-      const km  = isFuture ? 0 : (dailyKm[key] || 0)
-      week.push({
-        date:      key,
-        km,
-        level:     isFuture ? -1 : km === 0 ? 0 : km < 5 ? 1 : km < 10 ? 2 : km < 20 ? 3 : 4,
-        dateLabel: new Date(cur).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-      })
-      cur.setDate(cur.getDate() + 1)
-    }
-    weeks.push(week)
-  }
-  return weeks
-})
-
-const heatmapMonths = computed(() => {
-  const months = []
-  let last = -1
-  heatmapData.value.forEach((week, i) => {
-    if (!week[0]) return
-    const m = new Date(week[0].date).getMonth()
-    if (m !== last) {
-      months.push({ col: i, label: new Date(week[0].date).toLocaleDateString('en-US', { month: 'short' }) })
-      last = m
-    }
-  })
-  return months
-})
-
-const heatmapTooltip = ref(null)
-
-function showHeatmapTooltip(day, event) {
-  if (day.level === -1) return
-  const dist = day.km === 0 ? 'rest' : isImperial.value
-    ? `${(day.km * 0.621371).toFixed(1)} mi`
-    : `${day.km.toFixed(1)} km`
-  heatmapTooltip.value = { text: `${day.dateLabel} — ${dist}`, x: event.clientX, y: event.clientY }
-}
-
-function hideHeatmapTooltip() { heatmapTooltip.value = null }
-
 // ── Sport breakdown ───────────────────────────────
 // Categorical, CVD-validated (node scripts/validate_palette.js from the dataviz
 // skill — passes chroma/CVD/normal-vision checks; OTHER's low chroma is the
@@ -918,7 +791,11 @@ const SPORT_COLORS = {
 const sportBreakdown = computed(() => {
   const map = {}
   for (const a of (activities.value || [])) map[a.sportType] = (map[a.sportType] || 0) + 1
-  return Object.entries(map).map(([type, count]) => ({ type, count, color: SPORT_COLORS[type] || SPORT_COLORS.OTHER }))
+  const total = activities.value?.length || 1
+  return Object.entries(map).map(([type, count]) => {
+    const sportActs = (activities.value || []).filter(a => a.sportType === type)
+    return { type, count, color: SPORT_COLORS[type] || SPORT_COLORS.OTHER, percent: Math.round((count / total) * 100), distanceMeters: sportActs.reduce((sum, a) => sum + (a.distanceMeters || 0), 0), durationSeconds: sportActs.reduce((sum, a) => sum + (a.durationSeconds || 0), 0) }
+  }).sort((a, b) => b.count - a.count)
 })
 
 // Format a PR value for display
@@ -1888,4 +1765,5 @@ onUnmounted(() => {
   .pr-value             { font-size: 1.9rem; }
 }
 .hero-deck{max-width:430px;margin:-14px auto 18px;color:rgba(251,246,236,.68);font-size:.9rem;line-height:1.5}.hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}.hero-action{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(251,246,236,.35);background:transparent;color:#fbf6ec;padding:10px 14px;font:700 .65rem 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none;cursor:pointer}.hero-action--primary{background:#2a55f5;border-color:#2a55f5}.hero-action:hover{border-color:#fbf6ec}.hero-freshness{margin-top:14px;color:rgba(251,246,236,.45);font:600 .62rem 'Spline Sans Mono',monospace;text-transform:uppercase;letter-spacing:.08em}.sync-notice,.stats-error{display:flex;align-items:center;gap:12px;border:2px solid #e7dfce;background:#fff;padding:13px 16px;margin-bottom:28px;color:#665f55;font-size:.86rem}.sync-notice i,.stats-error i{color:#2a55f5;font-size:1.1rem}.sync-notice button,.stats-error button{margin-left:auto;border:0;background:none;color:#2a55f5;text-decoration:underline;font:700 .68rem 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.stats-error{border-color:#c0392b;color:#a33b2a}.stats-error i{color:#c0392b}.stats-error div{display:flex;flex-direction:column;gap:3px}.stats-error button{color:#a33b2a}.training-read{display:flex;align-items:flex-start;gap:14px;border:2px solid #16130f;background:#fff;padding:18px;margin-bottom:20px}.training-read-icon{display:grid;place-items:center;width:40px;height:40px;background:#dce5ff;color:#2a55f5;font-size:1.25rem;flex:none}.training-read strong{display:block;font-size:1.3rem;margin:4px 0}.training-read p{margin:0;color:#665f55;font-size:.88rem;line-height:1.45}.training-read--alert{background:#fff3f0;border-color:#c0392b}.training-read--alert .training-read-icon{background:#f6cbc4;color:#a33b2a}.training-read--muted .training-read-icon{background:#e7dfce;color:#665f55}.training-read--ready .training-read-icon{background:#d8efe4;color:#16804a}.training-read--steady .training-read-icon{background:#dce5ff;color:#2a55f5}@media(max-width:480px){.hero-actions{align-items:stretch;flex-direction:column}.hero-action{justify-content:center}.sync-notice,.stats-error{align-items:flex-start;flex-wrap:wrap}.sync-notice button,.stats-error button{margin-left:28px}}
+.sport-mix-card{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:28px;align-items:center;border:2px solid #16130f;background:#fff;padding:24px;box-shadow:5px 5px 0 #16130f}.sport-mix-chart{position:relative;height:260px;display:grid;place-items:center}.sport-mix-chart canvas{max-width:260px;max-height:260px}.sport-mix-total{position:absolute;display:flex;flex-direction:column;align-items:center;pointer-events:none}.sport-mix-total strong{font:800 2.4rem/1 'Big Shoulders Display',system-ui}.sport-mix-total span{font:700 .6rem 'Spline Sans Mono',monospace;color:#665f55;text-transform:uppercase;letter-spacing:.1em}.sport-mix-list{display:flex;flex-direction:column}.sport-mix-row{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:15px 0;border-bottom:1px solid #e7dfce}.sport-mix-row:last-child{border-bottom:0}.sport-mix-info,.sport-mix-stats{display:flex;flex-direction:column;gap:3px}.sport-mix-info strong{font-size:1rem}.sport-mix-info span,.sport-mix-stats span{font:600 .62rem 'Spline Sans Mono',monospace;color:#665f55;text-transform:uppercase}.sport-mix-stats{text-align:right}.sport-mix-stats strong{font:800 1rem 'Big Shoulders Display',system-ui}@media(max-width:600px){.sport-mix-card{grid-template-columns:1fr;padding:16px}.sport-mix-chart{height:220px}.sport-mix-row{grid-template-columns:10px 1fr auto}}
 </style>
