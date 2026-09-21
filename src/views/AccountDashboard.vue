@@ -217,6 +217,9 @@
                   <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span>
                   <span v-if="integrationFreshnessLabel">· {{ integrationFreshnessLabel }}</span>
                   <router-link to="/feed?time=week" class="db2-week-summary-link">View history →</router-link>
+                  <button type="button" class="db2-export-link" @click="downloadWorkoutExport('week')">Export week</button>
+                  <button type="button" class="db2-export-link" @click="downloadWorkoutExport('month')">Export month</button>
+                  <span v-if="workoutExportError" class="db2-export-error" role="status">{{ workoutExportError }}</span>
                   <span v-if="integrationFreshnessLabel" class="db2-week-source">{{ integrationFreshnessLabel }}</span>
                 </div>
                 <div v-if="weeklySummary && weeklySummary.plannedCount" class="db2-week-plan-sub">Planned {{ formatExerciseTime(weeklySummary.plannedDurationMinutes * 60) }} · Completed {{ formatExerciseTime(weeklySummary.completedPlannedDurationMinutes * 60) }}</div>
@@ -1045,6 +1048,9 @@
                   {{ formatExerciseTime(weeklySummary.totalDurationSeconds) }} total · {{ weeklySummary.activityCount }} sessions
                   <span v-if="weeklySummary.changePercent">· {{ weeklySummary.changePercent > 0 ? '↑' : '↓' }}{{ Math.abs(weeklySummary.changePercent) }}% vs last week</span>
                   <router-link to="/feed?time=week" class="dm-week-summary-link">History →</router-link>
+                  <button type="button" class="dm-export-link" @click="downloadWorkoutExport('week')">Export week</button>
+                  <button type="button" class="dm-export-link" @click="downloadWorkoutExport('month')">Export month</button>
+                  <span v-if="workoutExportError" class="dm-export-error" role="status">{{ workoutExportError }}</span>
                   <span v-if="integrationFreshnessLabel" class="dm-week-source">{{ integrationFreshnessLabel }}</span>
                 </div>
                 <div v-if="weeklySummary && weeklySummary.plannedCount" class="dm-week-plan-sub">Planned {{ formatExerciseTime(weeklySummary.plannedDurationMinutes * 60) }} · Completed {{ formatExerciseTime(weeklySummary.completedPlannedDurationMinutes * 60) }}</div>
@@ -1434,6 +1440,7 @@ const showWelcome = ref(route.query.welcome === '1')
 const weeklySummary = ref(null)
 const weeklySummaryLoading = ref(false)
 const weeklySummaryError = ref(false)
+const workoutExportError = ref('')
 const integrationStatuses = ref([])
 
 const dismissWelcome = () => {
@@ -2145,6 +2152,28 @@ const loadWeeklySummary = async () => {
     weeklySummaryError.value = true
   } finally {
     weeklySummaryLoading.value = false
+  }
+}
+
+const downloadWorkoutExport = async (period) => {
+  workoutExportError.value = ''
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    const response = await axios.get(`${API_URL}/activities/export`, {
+      params: { period, timezone },
+      headers: getAuthHeaders(),
+      responseType: 'blob'
+    })
+    const url = URL.createObjectURL(response.data)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `runnit-workouts-${period}.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  } catch {
+    workoutExportError.value = 'Couldn’t export workouts. Try again.'
   }
 }
 
@@ -4740,6 +4769,8 @@ textarea.form-control{resize:vertical;min-height:72px}
 .db2-xp { display: none !important; }
 .db2-week-summary-sub, .dm-week-summary-sub { margin-top: 4px; color: #8A8A8A; font: 600 .62rem 'Spline Sans Mono', monospace; letter-spacing: .03em; }
 .db2-week-summary-link, .dm-week-summary-link { margin-left: 8px; color: #2A55F5; font-weight: 800; text-decoration: underline; white-space: nowrap; }
+.db2-export-link, .dm-export-link { margin-left: 8px; padding: 0; border: 0; background: transparent; color: #2A55F5; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; white-space: nowrap; }
+.db2-export-error, .dm-export-error { margin-left: 8px; color: #A33B2A; font: 600 .62rem 'Spline Sans Mono', monospace; }
 .db2-week-source, .dm-week-source { margin-left: 8px; color: #5A5348; }
 .db2-week-plan-sub, .dm-week-plan-sub { margin-top: 8px; color: #5A5348; font: 600 .66rem 'Spline Sans Mono', monospace; text-transform: uppercase; }
 .db2-week-summary-error, .dm-week-summary-error { margin-top: 10px; color: #8A8A8A; font: 600 .68rem 'Spline Sans Mono', monospace; }
