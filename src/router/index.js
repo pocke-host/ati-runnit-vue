@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { nextTick } from 'vue'
 import { trackEvent } from '@/composables/useAnalytics'
 
 // Legal pages (stay in components)
@@ -105,13 +104,13 @@ const router = createRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) return savedPosition
-    return { top: 0 }
+    if (to.hash) return { el: to.hash, top: 76, behavior: 'smooth' }
+    return { left: 0, top: 0 }
   }
 })
 
 router.afterEach((to) => {
   trackEvent('page_view', { path: to.fullPath })
-  nextTick(() => window.scrollTo({ top: 0, behavior: 'instant' }))
 })
 
 router.beforeEach((to, from, next) => {
