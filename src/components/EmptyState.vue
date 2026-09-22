@@ -5,17 +5,19 @@
     <div class="empty-state-title">{{ title }}</div>
     <p v-if="message" class="empty-state-message">{{ message }}</p>
     <template v-if="actionLabel">
-      <router-link v-if="actionTo" :to="actionTo" class="empty-state-btn">
+      <RunnitButton v-if="actionTo" :to="actionTo" variant="quiet">
         {{ actionLabel }}
-      </router-link>
-      <button v-else class="empty-state-btn" @click="$emit('action')">
+      </RunnitButton>
+      <RunnitButton v-else variant="quiet" @click="$emit('action')">
         {{ actionLabel }}
-      </button>
+      </RunnitButton>
     </template>
   </div>
 </template>
 
 <script setup>
+import RunnitButton from '@/components/RunnitButton.vue'
+
 defineProps({
   icon: { type: String, default: 'bi-inbox' },
   title: { type: String, required: true },
@@ -58,27 +60,4 @@ defineEmits(['action'])
   margin: 0 0 24px;
 }
 
-.empty-state-btn {
-  display: inline-flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 24px;
-  border: 2px solid var(--rk-signal, #2A55F5);
-  background: transparent;
-  color: var(--rk-signal, #2A55F5);
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  cursor: pointer;
-  text-decoration: none;
-  border-radius: 0;
-  transition: background 0.15s, color 0.15s;
-  font-family: inherit;
-}
-
-.empty-state-btn:hover {
-  background: var(--rk-signal, #2A55F5);
-  color: #fff;
-}
 </style>

@@ -1,5 +1,6 @@
 /* src/assets/main.css */
 @import './base.css';
+@import './ui.css';
 
 html, body, #app { height:100%; width:100%; margin:0; padding:0; overflow-x:hidden; }
 
