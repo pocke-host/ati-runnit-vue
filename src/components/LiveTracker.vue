@@ -452,7 +452,7 @@ const initializeMap = () => {
       data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } },
     })
 
-    // White halo — lifts the route off the map (Strava style)
+    // White halo lifts the route off the map.
     map.value.addLayer({
       id: 'route-halo',
       type: 'line',

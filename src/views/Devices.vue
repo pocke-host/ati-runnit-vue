@@ -91,13 +91,13 @@ const integrationCards = computed(() => integrationStatuses.value.map(status => 
   ...status,
   key: status.provider,
   name: status.provider === 'apple-health' ? 'Apple Health' : status.provider.charAt(0).toUpperCase() + status.provider.slice(1),
-  icon: ({ whoop: 'bi bi-heart-pulse', oura: 'bi bi-circle', fitbit: 'bi bi-activity', coros: 'bi bi-watch', garmin: 'bi bi-stopwatch', strava: 'bi bi-bicycle', 'apple-health': 'bi bi-heart' }[status.provider] || 'bi bi-link-45deg'),
+  icon: ({ whoop: 'bi bi-heart-pulse', oura: 'bi bi-circle', fitbit: 'bi bi-activity', coros: 'bi bi-watch', garmin: 'bi bi-stopwatch', 'apple-health': 'bi bi-heart' }[status.provider] || 'bi bi-link-45deg'),
   stale: status.connected && (!status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000),
 })))
 const connectedCount = computed(() => integrationStatuses.value.filter(s => s.connected).length)
 onMounted(async () => {
   try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
-  const providers = ['whoop', 'oura', 'fitbit', 'coros', 'garmin', 'strava', 'apple-health']
+  const providers = ['whoop', 'oura', 'fitbit']
   integrationStatuses.value = (await Promise.all(providers.map(provider => axios.get(`${API_URL}/integrations/${provider}/status`, { headers: headers() }).then(({ data }) => ({ provider, ...data })).catch(() => ({ provider, connected: false })))) )
   statusLoading.value = false
 })

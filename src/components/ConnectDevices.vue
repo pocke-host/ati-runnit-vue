@@ -9,7 +9,7 @@
 
     <div class="devices-grid">
       <!-- Garmin -->
-      <div class="device-card">
+      <div class="device-card device-card--disabled" aria-disabled="true">
         <div class="device-icon-circle">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         </div>
@@ -43,7 +43,7 @@
       </div>
 
       <!-- Apple Health -->
-      <div class="device-card">
+      <div class="device-card device-card--disabled" aria-disabled="true">
         <div class="device-icon-circle">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z"/></svg>
         </div>
@@ -91,7 +91,7 @@
       </div>
 
       <!-- COROS -->
-      <div class="device-card">
+      <div class="device-card device-card--disabled" aria-disabled="true">
         <div class="device-icon-circle">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
         </div>
@@ -590,6 +590,8 @@ onMounted(() => {
   padding: 20px;
   text-align: center;
 }
+.device-card--disabled { position: relative; filter: grayscale(1); opacity: .58; pointer-events: none; }
+.device-card--disabled::after { content: 'TEMPORARILY UNAVAILABLE'; position: absolute; top: 14px; right: 14px; padding: 4px 7px; border: 1px solid currentColor; color: #665f55; font: 700 .56rem 'Spline Sans Mono', monospace; letter-spacing: .06em; }
 
 .device-coming-soon {
   opacity: 0.45;
