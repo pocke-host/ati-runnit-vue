@@ -23,14 +23,20 @@
         <div class="training-menu" ref="trainingRef">
           <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">Training <span aria-hidden="true">⌄</span></button>
           <div v-if="trainingOpen" class="training-menu-dropdown">
-            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Training hub</strong><small>See everything in one place</small></span><b>→</b></router-link>
-            <div class="training-menu-label">Plan &amp; race</div>
-            <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i> Plans</router-link>
-            <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i> Folders</router-link>
-            <router-link to="/races" @click="trainingOpen = false"><i class="bi bi-flag"></i> Races</router-link>
+            <div class="training-menu-eyebrow">Your training system</div>
+            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Training hub</strong><small>Plans, folders, races &amp; progress</small></span><b>→</b></router-link>
+            <div class="training-menu-label">Plan</div>
+            <div class="training-menu-grid">
+              <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i><span>Plans</span></router-link>
+              <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i><span>Folders</span></router-link>
+            </div>
+            <div class="training-menu-label">Race day</div>
+            <router-link to="/races" class="training-menu-race" @click="trainingOpen = false"><i class="bi bi-flag"></i><span><strong>Races</strong><small>Find events and track your build</small></span><b>→</b></router-link>
             <div class="training-menu-label">Build &amp; connect</div>
-            <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i> Strength</router-link>
-            <router-link to="/coros-coach" @click="trainingOpen = false"><i class="bi bi-watch"></i> COROS Coach</router-link>
+            <div class="training-menu-grid">
+              <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i><span>Strength</span></router-link>
+              <router-link to="/coros-coach" @click="trainingOpen = false"><i class="bi bi-watch"></i><span>COROS Coach</span></router-link>
+            </div>
           </div>
         </div>
       </div>
@@ -51,6 +57,7 @@
         <!-- Public nav links -->
         <div class="navbar-links navbar-links--public" v-if="!isAuthenticated">
           <router-link to="/features" class="nav-link nav-link-gr">Features</router-link>
+          <router-link to="/races" class="nav-link nav-link-gr">Races</router-link>
           <router-link to="/about" class="nav-link nav-link-gr">About</router-link>
           <router-link to="/pricing" class="nav-link nav-link-gr">Pricing</router-link>
           <router-link to="/signin" class="nav-link nav-link-gr">Sign in</router-link>
@@ -344,6 +351,7 @@
         <template v-else>
           <nav class="drawer-nav">
             <router-link to="/features" class="drawer-link" @click="mobileMenuOpen = false">Features</router-link>
+            <router-link to="/races" class="drawer-link" @click="mobileMenuOpen = false">Races</router-link>
             <router-link to="/about" class="drawer-link" @click="mobileMenuOpen = false">About</router-link>
             <router-link to="/pricing" class="drawer-link" @click="mobileMenuOpen = false">Pricing</router-link>
           </nav>
@@ -546,7 +554,7 @@ onUnmounted(() => {
   gap: clamp(14px, 1.8vw, 24px);
   margin-left: 20px;
 }
-.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-18px;width:238px;padding:8px;background:#fbf6ec;border:2px solid #16130f;box-shadow:4px 4px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;font:700 11px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:16px;color:#2a55f5;font-size:14px}.training-menu-featured{gap:10px!important;background:#ffc53d;margin-bottom:8px;border:1px solid #16130f}.training-menu-featured span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong{font:700 11px 'Spline Sans Mono',monospace}.training-menu-featured small{font:10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b{font-size:15px}.training-menu-label{padding:9px 11px 4px;color:#665f55;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
+.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-28px;width:286px;padding:12px;background:#fbf6ec;border:2px solid #16130f;box-shadow:5px 5px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:16px;color:#2a55f5;font-size:14px}.training-menu-eyebrow{padding:1px 3px 10px;color:#665f55;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-featured{gap:10px!important;background:#ffc53d;margin-bottom:7px;border:1px solid #16130f}.training-menu-featured span,.training-menu-race span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-race strong{font:700 10px 'Spline Sans Mono',monospace}.training-menu-featured small,.training-menu-race small{font:10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-race b{font-size:15px}.training-menu-label{padding:10px 3px 4px;color:#665f55;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.12em;text-transform:uppercase}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}.training-menu-grid a{border:1px solid transparent}.training-menu-race{border:1px solid #16130f;background:#fff}.training-menu-race:hover{background:#e6edff!important}
 /* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
 .navbar-links--public {

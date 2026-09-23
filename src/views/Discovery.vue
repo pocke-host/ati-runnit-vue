@@ -9,7 +9,8 @@
         <input v-model.trim="query" aria-label="Search Runnit" placeholder="Search athletes, plans, folders, clubs, or workouts…" @input="debouncedSearch" @keyup.enter="search" />
         <button v-if="query" type="button" @click="query = ''; results = []">Clear</button>
       </div>
-      <div v-if="loading" class="discovery-state">Searching Runnit…</div>
+      <div v-if="recommendationError" class="discovery-alert" role="status">Personalized recommendations are temporarily unavailable. You can still explore below.</div>
+      <div v-if="loading" class="discovery-state">Personalizing your discovery feed…</div>
       <div v-else-if="query.length >= 2" class="discovery-results">
         <p v-if="!results.length" class="discovery-state">No matches yet. Try a name, sport, or training goal.</p>
         <router-link v-for="item in results" :key="`${item.type}-${item.id}`" :to="item.path" class="discovery-result">
@@ -33,7 +34,7 @@
 import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-const query = ref(''); const results = ref([]); const recommendations = ref({}); const loading = ref(false)
+const query = ref(''); const results = ref([]); const recommendations = ref({}); const loading = ref(true); const recommendationError = ref(false)
 const headers = () => { const token = localStorage.getItem('token'); return token ? { Authorization: `Bearer ${token}` } : {} }
 let timer
 const search = async () => { if (query.value.length < 2) return; loading.value = true; try { results.value = (await axios.get(`${API_URL}/discovery/search`, { params: { q: query.value }, headers: headers() })).data.results || [] } catch { results.value = [] } finally { loading.value = false } }
@@ -43,11 +44,22 @@ const sections = computed(() => [
   { key: 'plans', title: 'Training plans', path: '/plans', label: 'Plan', items: recommendations.value.plans },
   { key: 'clubs', title: 'Crews to join', path: '/clubs', label: 'Club', items: recommendations.value.clubs },
   { key: 'races', title: 'Next start line', path: '/races', label: 'Race', items: recommendations.value.races },
+  { key: 'start', title: 'Start exploring', label: 'Runnit', items: [
+    { type: 'RACE', id: 'explore-races', title: 'Find a race', subtitle: 'Browse upcoming events', path: '/races' },
+    { type: 'ATHLETE', id: 'find-friends', title: 'Find your people', subtitle: 'Follow athletes and friends', path: '/friends' },
+    { type: 'PLAN', id: 'browse-plans', title: 'Browse training', subtitle: 'Choose a plan or folder', path: '/train' },
+    { type: 'CLUB', id: 'join-clubs', title: 'Join a crew', subtitle: 'Discover clubs and groups', path: '/clubs' },
+  ] },
 ])
 const iconFor = type => ({ ATHLETE: 'bi bi-person', CLUB: 'bi bi-people', PLAN: 'bi bi-calendar-check', FOLDER: 'bi bi-folder', ACTIVITY: 'bi bi-activity', RACE: 'bi bi-flag' }[type] || 'bi bi-compass')
-onMounted(async () => { try { recommendations.value = (await axios.get(`${API_URL}/discovery/recommendations`, { headers: headers() })).data } catch {} })
+onMounted(async () => {
+  try { recommendations.value = (await axios.get(`${API_URL}/discovery/recommendations`, { headers: headers() })).data }
+  catch { recommendationError.value = true }
+  finally { loading.value = false }
+})
 </script>
 
 <style scoped>
 .discovery-page{min-height:100vh;background:#FBF6EC;color:#16130F;padding:calc(var(--page-top) + 30px) 20px 80px}.discovery-wrap{max-width:980px;margin:auto}.discovery-header{margin-bottom:24px}.discovery-kicker{margin:0 0 6px;color:#2A55F5;font:700 .65rem 'Spline Sans Mono',monospace;letter-spacing:.14em;text-transform:uppercase}.discovery-header h1{margin:0;font:900 clamp(2.8rem,8vw,5rem)/.85 'Big Shoulders Display',sans-serif;text-transform:uppercase}.discovery-header p:last-child{color:#665f55}.discovery-search{display:flex;align-items:center;gap:12px;padding:4px 14px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.discovery-search input{flex:1;min-width:0;border:0;outline:0;padding:14px 0;background:transparent;font:inherit}.discovery-search button{border:0;background:none;color:#2A55F5;font-weight:800}.discovery-state{padding:28px 0;color:#665f55}.discovery-section{margin-top:38px}.discovery-section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:14px}.discovery-section-head h2{margin:0;font-size:1.5rem}.discovery-section-head a{color:#2A55F5;font-weight:800}.discovery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.discovery-card,.discovery-result{background:#fff;border:2px solid #16130F;color:#16130F;text-decoration:none}.discovery-card{display:flex;flex-direction:column;gap:8px;padding:16px;min-height:130px}.discovery-card:hover,.discovery-result:hover{background:#FFF1A8}.discovery-card-icon,.discovery-result-icon{display:grid;place-items:center;width:34px;height:34px;background:#2A55F5;color:#fff}.discovery-card span,.discovery-result span{color:#665f55;font-size:.78rem}.discovery-results{display:grid;gap:8px;margin-top:24px}.discovery-result{display:flex;align-items:center;gap:14px;padding:13px}.discovery-result>i:last-child{margin-left:auto;color:#2A55F5}.discovery-primary{display:inline-block;padding:12px 16px;background:#2A55F5;color:#fff;font-weight:800;text-decoration:none;border:2px solid #16130F;box-shadow:3px 3px #16130F}.discovery-empty{margin-top:40px;padding:26px;background:#fff;border:2px solid #16130F}.discovery-empty p{color:#665f55}@media(max-width:680px){.discovery-grid{grid-template-columns:repeat(2,1fr)}.discovery-card{min-height:110px}}
+.discovery-alert{margin-top:18px;padding:12px 14px;background:#FFF1A8;border:1px solid #16130F;font-size:.82rem}
 </style>
