@@ -12,12 +12,7 @@
       <div class="integrations-intro"><div><div class="devices-kicker">Connected services</div><h2>Bring your training together.</h2></div><p>Connect the tools you already use. RUNNIT keeps the links here so you can see what is active and reconnect when needed.</p></div>
       <section class="integration-health" aria-labelledby="integration-health-title">
         <div class="integration-health-head"><div><div class="devices-kicker">At a glance</div><h2 id="integration-health-title">Connection health</h2></div><span v-if="statusLoading">Checking sources…</span><span v-else>{{ connectedCount }} connected</span></div>
-        <div class="integration-health-grid">
-          <div v-for="card in integrationCards" :key="card.key" class="integration-health-card" :class="{ 'integration-health-card--attention': card.needsReconnect || card.stale }">
-            <div class="integration-health-icon"><i :class="card.icon"></i></div><div class="integration-health-copy"><strong>{{ card.name }}</strong><span>{{ card.needsReconnect ? 'Needs reconnect' : card.connected ? (card.stale ? 'Needs a sync' : 'Up to date') : 'Not connected' }}</span><small>{{ card.connected && card.lastSync ? `Last sync ${relativeTime(card.lastSync)}` : card.connected ? 'Waiting for first sync' : 'Permission not granted' }}</small></div>
-            <router-link v-if="card.needsReconnect || !card.connected" to="/devices" class="integration-health-action">{{ card.needsReconnect ? 'Reconnect' : 'Connect' }}</router-link>
-          </div>
-        </div>
+        <div class="integration-health-grid"><IntegrationStatusCard v-for="card in integrationCards" :key="card.key" v-bind="card" /></div>
       </section>
       <ConnectDevices />
 
@@ -55,6 +50,7 @@
 import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
 import ConnectDevices from '@/components/ConnectDevices.vue'
+import IntegrationStatusCard from '@/components/IntegrationStatusCard.vue'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const spotifyConnected = ref(false)

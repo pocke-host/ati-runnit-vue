@@ -71,7 +71,9 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'vendor-vue':    ['vue', 'vue-router', 'pinia'],
-          'vendor-map':    ['mapbox-gl'],
+          // Mapbox is imported only by map-capable routes/components. Leave it
+          // out of the global vendor bucket so the rest of the app never pays
+          // for the map runtime on first load.
           'vendor-charts': ['chart.js'],
           'vendor-stripe': ['@stripe/stripe-js'],
         },

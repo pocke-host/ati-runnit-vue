@@ -126,6 +126,7 @@
     <!-- Post-workout Notes Overlay -->
     <div v-if="showNotesStep" class="lt-notes-overlay" :style="{ paddingBottom: keyboardOffset + 'px' }">
       <div class="lt-notes-inner">
+        <PostWorkoutSummary :duration="elapsedTime" :distance="totalDistance" :pace="avgPaceMinPerKm" />
         <div class="lt-notes-title">WORKOUT SAVED</div>
         <p class="lt-notes-sub">Add a note while it's fresh</p>
         <div class="lt-listening-fields">
@@ -304,6 +305,7 @@ import { useToast } from '@/composables/useToast'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import axios from 'axios'
 import SpotifyTrackPicker from '@/components/SpotifyTrackPicker.vue'
+import PostWorkoutSummary from '@/components/PostWorkoutSummary.vue'
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
 
