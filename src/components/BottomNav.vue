@@ -87,6 +87,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   justify-content: space-around;
   padding: 0 8px env(safe-area-inset-bottom, 0px);
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  min-height: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px));
 }
 
 @media (max-width: 768px) {
@@ -100,7 +101,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   justify-content: center;
   gap: 2px;
   flex: 1;
-  padding: 6px 2px;
+  padding: 8px 2px 6px;
   min-height: var(--tab-h, 64px);
   text-decoration: none;
   color: #A3A69F;

@@ -525,7 +525,7 @@ onUnmounted(() => {
 
 .navbar-content {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
   height: 66px;
@@ -543,7 +543,7 @@ onUnmounted(() => {
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: clamp(14px, 1.8vw, 24px);
   margin-left: 20px;
 }
 .training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-18px;width:238px;padding:8px;background:#fbf6ec;border:2px solid #16130f;box-shadow:4px 4px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;font:700 11px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:16px;color:#2a55f5;font-size:14px}.training-menu-featured{gap:10px!important;background:#ffc53d;margin-bottom:8px;border:1px solid #16130f}.training-menu-featured span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong{font:700 11px 'Spline Sans Mono',monospace}.training-menu-featured small{font:10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b{font-size:15px}.training-menu-label{padding:9px 11px 4px;color:#665f55;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
