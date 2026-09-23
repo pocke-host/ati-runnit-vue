@@ -121,8 +121,8 @@
             <div class="gr-stat-strip-lbl">Dist</div>
           </div>
           <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
-            <div class="gr-stat-strip-num">{{ computedPace }}</div>
-            <div class="gr-stat-strip-lbl">Pace</div>
+            <div class="gr-stat-strip-num">{{ computedMetric }}</div>
+            <div class="gr-stat-strip-lbl">{{ metricLabel }}</div>
           </div>
           <div class="gr-stat-strip-cell gr-stat-strip-cell--div">
             <div class="gr-stat-strip-num">{{ formatDuration(activity.durationSeconds) }}</div>
@@ -158,7 +158,7 @@
               </div>
               <div class="stat-box">
                 <div class="stat-label">Cadence</div>
-                <div class="stat-val">{{ activity.cadence ? activity.cadence + ' spm' : '—' }}</div>
+                <div class="stat-val">{{ activity.averageCadence || activity.cadence ? `${activity.averageCadence || activity.cadence} ${activity.sportType === 'BIKE' ? 'rpm' : 'spm'}` : '—' }}</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label">Calories</div>
@@ -684,9 +684,24 @@ const hasCoords = computed(() => {
   )
 })
 
-const computedPace = computed(() => {
+const metricLabel = computed(() => {
+  if (activity.value?.sportType === 'SWIM') return 'Pace /100m'
+  if (activity.value?.sportType === 'BIKE') return 'Speed'
+  return 'Pace'
+})
+
+const computedMetric = computed(() => {
   if (!activity.value?.distanceMeters || !activity.value?.durationSeconds) return '—'
-  const minPerKm = (activity.value.durationSeconds / 60) / (activity.value.distanceMeters / 1000)
+  const speedMps = activity.value.averagePace || (activity.value.distanceMeters / activity.value.durationSeconds)
+  if (activity.value.sportType === 'SWIM') {
+    const secondsPer100m = 100 / speedMps
+    return `${Math.floor(secondsPer100m / 60)}:${String(Math.round(secondsPer100m % 60)).padStart(2, '0')} /100m`
+  }
+  if (activity.value.sportType === 'BIKE') {
+    const speed = isImperial.value ? speedMps * 2.236936 : speedMps * 3.6
+    return `${speed.toFixed(1)} ${isImperial.value ? 'mph' : 'km/h'}`
+  }
+  const minPerKm = 1 / speedMps * (1000 / 60)
   return formatPace(minPerKm)
 })
 

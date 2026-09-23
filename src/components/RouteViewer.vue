@@ -28,8 +28,8 @@
         </div>
         <div class="rs-divider"></div>
         <div class="rs-item">
-          <div class="rs-label">Avg Pace</div>
-          <div class="rs-value">{{ formatPace(activity.averagePace) }}</div>
+          <div class="rs-label">{{ metricLabel }}</div>
+          <div class="rs-value">{{ metricValue }}</div>
         </div>
         <template v-if="activity.elevationGain">
           <div class="rs-divider"></div>
@@ -336,11 +336,24 @@ const formatDuration = (s) => {
   const h = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60)
   return h > 0 ? `${h}h ${min}m` : `${min}m`
 }
-const formatPace = (p) => {
-  if (!p) return '—'
-  const min = Math.floor(p), sec = Math.round((p - min) * 60)
+const metricLabel = computed(() => {
+  if (props.activity.sportType === 'SWIM') return 'Pace /100m'
+  if (props.activity.sportType === 'BIKE') return 'Speed'
+  return 'Avg Pace'
+})
+const metricValue = computed(() => {
+  const { distanceMeters, durationSeconds, averagePace, sportType } = props.activity
+  if (!distanceMeters || !durationSeconds) return '—'
+  const speedMps = averagePace || distanceMeters / durationSeconds
+  if (sportType === 'SWIM') {
+    const seconds = 100 / speedMps
+    return `${Math.floor(seconds / 60)}:${String(Math.round(seconds % 60)).padStart(2, '0')} /100m`
+  }
+  if (sportType === 'BIKE') return `${(speedMps * 3.6).toFixed(1)} km/h`
+  const minPerKm = 1 / speedMps * (1000 / 60)
+  const min = Math.floor(minPerKm), sec = Math.round((minPerKm - min) * 60)
   return `${min}:${sec.toString().padStart(2, '0')} /km`
-}
+})
 
 onMounted(initializeMap)
 onUnmounted(() => { map.value?.remove() })

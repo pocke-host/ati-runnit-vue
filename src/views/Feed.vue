@@ -147,8 +147,8 @@
                   </div>
                   <template v-if="item.durationSeconds && item.distanceMeters">
                     <div class="gr-stat-block gr-stat-block--div">
-                      <div class="gr-stat-num">{{ ((s,d) => { const n=s/(d/1000); return `${Math.floor(n/60)}:${String(Math.round(n%60)).padStart(2,'0')}` })(item.durationSeconds, item.distanceMeters) }}</div>
-                      <div class="gr-pace-lbl">/KM</div>
+                      <div class="gr-stat-num">{{ activityMetric(item) }}</div>
+                      <div class="gr-pace-lbl">{{ activityMetricLabel(item) }}</div>
                     </div>
                     <div class="gr-stat-block gr-stat-block--div">
                       <div class="gr-stat-num">{{ formatDuration(item.durationSeconds) }}</div>
@@ -575,6 +575,19 @@ const sortedFeedItems = computed(() => {
     })
   }
 })
+
+const activityMetricLabel = (item) => item.sportType === 'SWIM' ? '/100M' : item.sportType === 'BIKE' ? 'SPEED' : '/KM'
+const activityMetric = (item) => {
+  const speed = item.averagePace || (item.distanceMeters / item.durationSeconds)
+  if (!speed) return '—'
+  if (item.sportType === 'SWIM') {
+    const seconds = 100 / speed
+    return `${Math.floor(seconds / 60)}:${String(Math.round(seconds % 60)).padStart(2, '0')}`
+  }
+  if (item.sportType === 'BIKE') return `${(speed * 3.6).toFixed(1)} km/h`
+  const min = (1 / speed * 1000) / 60
+  return `${Math.floor(min)}:${String(Math.round((min % 1) * 60)).padStart(2, '0')}`
+}
 
 const getTotalReactions = (moment) => {
   if (!moment.reactions) return 0
