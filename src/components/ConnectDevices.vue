@@ -181,14 +181,24 @@
         </template>
       </div>
 
-      <!-- Fitbit (Coming Soon) -->
-      <div class="device-card device-coming-soon">
-        <div class="device-icon-circle">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
-        </div>
+      <!-- Fitbit through Google Health API -->
+      <div class="device-card">
+        <div class="device-icon-circle"><i class="bi bi-activity" aria-hidden="true"></i></div>
         <h3>Fitbit</h3>
-        <p>Sync steps, runs, and wellness data</p>
-        <div class="coming-soon-badge">COMING SOON</div>
+        <p>Sync Fitbit workouts, sleep, and activity through Google Health</p>
+        <template v-if="!fitbitConnected">
+          <button class="btn btn-primary" @click="connectFitbit" :disabled="loading">Connect Fitbit</button>
+        </template>
+        <template v-else>
+          <div class="connected-state">
+            <div class="connected-chip"><span class="green-dot"></span>CONNECTED</div>
+            <div class="last-sync-label">Last synced: {{ relativeTime(fitbitLastSync) }}</div>
+            <div v-if="syncState(fitbitLastSync) === 'pending'" class="sync-attention sync-attention--pending" role="status">Awaiting first sync — tap Sync Now to bring in data</div>
+            <div v-else-if="syncState(fitbitLastSync) === 'stale'" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
+            <button class="btn btn-primary" @click="syncFitbit" :disabled="syncing"><span v-if="syncing" class="spinner"></span>{{ syncing ? 'Syncing…' : 'Sync Now' }}</button>
+            <button class="btn-disconnect" @click="disconnectFitbit">Disconnect</button>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -220,6 +230,8 @@ const whoopConnected = ref(false)
 const whoopLastSync = ref(null)
 const ouraConnected = ref(false)
 const ouraLastSync = ref(null)
+const fitbitConnected = ref(false)
+const fitbitLastSync = ref(null)
 const loading = ref(false)
 const syncing = ref(false)
 const gpxImporting = ref(false)
@@ -229,9 +241,9 @@ const syncCounts = ref({ garmin: 0, coros: 0, whoop: 0, appleHealth: 0 })
 
 const { showToast } = useToast()
 const showDisconnectConfirm = ref(false)
-const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'whoop' | 'oura' | 'appleHealth'
+const pendingDisconnect = ref(null) // 'garmin' | 'coros' | 'whoop' | 'oura' | 'fitbit' | 'appleHealth'
 
-const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', whoop: 'WHOOP', oura: 'Oura', appleHealth: 'Apple Health' }
+const disconnectLabels = { garmin: 'Garmin', coros: 'COROS', whoop: 'WHOOP', oura: 'Oura', fitbit: 'Fitbit', appleHealth: 'Apple Health' }
 
 const appleHealth = useAppleHealth()
 const appleHealthAvailable = appleHealth.isAvailable
@@ -270,11 +282,12 @@ const safeFetch = (url) =>
   axios.get(url, { headers: getAuthHeaders() }).catch(() => null)
 
 const checkConnectionStatus = async () => {
-  const [garminRes, corosRes, whoopRes, ouraRes, appleHealthRes, countsRes] = await Promise.all([
+  const [garminRes, corosRes, whoopRes, ouraRes, fitbitRes, appleHealthRes, countsRes] = await Promise.all([
     safeFetch(`${API_URL}/integrations/garmin/status`),
     safeFetch(`${API_URL}/integrations/coros/status`),
     safeFetch(`${API_URL}/integrations/whoop/status`),
     safeFetch(`${API_URL}/integrations/oura/status`),
+    safeFetch(`${API_URL}/integrations/fitbit/status`),
     safeFetch(`${API_URL}/integrations/apple-health/status`),
     safeFetch(`${API_URL}/integrations/sync-counts`),
   ])
@@ -293,6 +306,10 @@ const checkConnectionStatus = async () => {
   if (ouraRes) {
     ouraConnected.value = ouraRes.data.connected
     ouraLastSync.value = ouraRes.data.lastSync || null
+  }
+  if (fitbitRes) {
+    fitbitConnected.value = fitbitRes.data.connected
+    fitbitLastSync.value = fitbitRes.data.lastSync || null
   }
   if (appleHealthRes) {
     appleHealthConnected.value = appleHealthRes.data.connected
@@ -319,6 +336,7 @@ const disconnectGarmin = () => { pendingDisconnect.value = 'garmin'; showDisconn
 const disconnectCoros  = () => { pendingDisconnect.value = 'coros';  showDisconnectConfirm.value = true }
 const disconnectWhoop  = () => { pendingDisconnect.value = 'whoop';  showDisconnectConfirm.value = true }
 const disconnectOura   = () => { pendingDisconnect.value = 'oura'; showDisconnectConfirm.value = true }
+const disconnectFitbit = () => { pendingDisconnect.value = 'fitbit'; showDisconnectConfirm.value = true }
 const disconnectAppleHealth = () => { pendingDisconnect.value = 'appleHealth'; showDisconnectConfirm.value = true }
 
 const doDisconnect = async () => {
@@ -334,6 +352,7 @@ const doDisconnect = async () => {
     if (service === 'coros')       { corosConnected.value       = false; corosLastSync.value       = null }
     if (service === 'whoop')       { whoopConnected.value       = false; whoopLastSync.value       = null }
     if (service === 'oura')        { ouraConnected.value        = false; ouraLastSync.value        = null }
+    if (service === 'fitbit')      { fitbitConnected.value      = false; fitbitLastSync.value      = null }
     if (service === 'appleHealth') { appleHealthConnected.value = false; appleHealthLastSync.value = null }
     showToast(`${disconnectLabels[service]} disconnected.`, 'info')
   } catch {
@@ -421,6 +440,25 @@ const syncOura = async () => {
     showStatus(`Oura sync complete — ${data.imported || 0} workouts and ${data.wellnessDays || 0} wellness days synced.`)
     await checkConnectionStatus()
   } catch { showStatus("Oura sync didn't take. Try again.", 'error') }
+  finally { syncing.value = false }
+}
+
+const connectFitbit = async () => {
+  loading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/fitbit/connect`, { headers: getAuthHeaders() })
+    window.location.href = data.url
+  } catch { showStatus("Couldn't connect Fitbit. Try again.", 'error') }
+  finally { loading.value = false }
+}
+
+const syncFitbit = async () => {
+  syncing.value = true
+  try {
+    const { data } = await axios.post(`${API_URL}/integrations/fitbit/sync`, {}, { headers: getAuthHeaders() })
+    showStatus(`Fitbit sync complete — ${data.imported || 0} workouts and ${data.wellnessDays || 0} sleep days synced.`)
+    await checkConnectionStatus()
+  } catch { showStatus("Fitbit sync didn't take. Try again.", 'error') }
   finally { syncing.value = false }
 }
 
