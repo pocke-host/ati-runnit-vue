@@ -853,11 +853,18 @@ async function hydrateListeningHistory() {
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
     const status = await axios.get(`${API_URL}/spotify/status`, { headers })
     if (!status.data?.connected) return
+    // Spotify returns the newest plays first. Keep the matching window tied to
+    // this activity so a song played later cannot be attributed to the workout.
     const after = Math.max(0, trackingStartedAt.value - 5 * 60 * 1000)
     const before = Date.now() + 5 * 60 * 1000
     const { data } = await axios.get(`${API_URL}/spotify/recently-played`, { params: { after, before }, headers })
-    const latest = Array.isArray(data) && data[0]
-    if (latest?.name) selectListeningTrack(latest)
+    const matching = (Array.isArray(data) ? data : [])
+      .filter(track => {
+        const playedAt = Date.parse(track?.playedAt || '')
+        return track?.name && Number.isFinite(playedAt) && playedAt >= after && playedAt <= before
+      })
+      .sort((a, b) => Date.parse(b.playedAt) - Date.parse(a.playedAt))
+    if (matching[0]) selectListeningTrack(matching[0])
   } catch {
     // Automatic history is best-effort; manual search remains available.
   }

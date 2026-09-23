@@ -39,6 +39,7 @@
         </button>
       </div>
       <p v-if="spotifyError" class="integration-error" role="alert">{{ spotifyError }}</p>
+      <p v-if="spotifyNotice" class="integration-success" role="status" aria-live="polite">{{ spotifyNotice }}</p>
 
       <!-- Google Calendar integration card -->
       <div class="gcal-integration-card">
@@ -65,6 +66,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const spotifyConnected = ref(false)
 const spotifyLoading = ref(false)
 const spotifyError = ref('')
+const spotifyNotice = ref('')
 const integrationStatuses = ref([])
 const statusLoading = ref(true)
 const headers = () => {
@@ -96,6 +98,14 @@ const integrationCards = computed(() => integrationStatuses.value.map(status => 
 })))
 const connectedCount = computed(() => integrationStatuses.value.filter(s => s.connected).length)
 onMounted(async () => {
+  const callbackStatus = new URLSearchParams(window.location.search).get('spotify')
+  const callbackReason = new URLSearchParams(window.location.search).get('reason')
+  if (callbackStatus === 'connected') spotifyNotice.value = 'Spotify connected. We’ll suggest listening history after your next activity.'
+  if (callbackStatus === 'error') {
+    spotifyError.value = callbackReason === 'access_denied'
+      ? 'Spotify connection was cancelled. You can try again whenever you’re ready.'
+      : 'Spotify could not be connected. Check your Spotify app settings and try again.'
+  }
   try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
   const providers = ['whoop', 'oura', 'fitbit']
   integrationStatuses.value = (await Promise.all(providers.map(provider => axios.get(`${API_URL}/integrations/${provider}/status`, { headers: headers() }).then(({ data }) => ({ provider, ...data })).catch(() => ({ provider, connected: false })))) )
@@ -232,6 +242,7 @@ onMounted(async () => {
 .spotify-connected--off span { background:#8a8174; }
 .spotify-connected span { display:inline-block; width:6px; height:6px; border-radius:50%; background:#1DB954; margin-right:4px; }
 .integration-error { margin:8px 0 0; color:#b42318; font-size:.8rem; }
+.integration-success { margin:8px 0 0; color:#16883f; font-size:.8rem; }
 
 @media (max-width: 600px) {
   .integrations-intro { align-items:flex-start; flex-direction:column; gap:8px; }
