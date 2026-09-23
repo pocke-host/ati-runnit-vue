@@ -69,6 +69,10 @@
           <router-link to="/privacy" class="rk-footer-link">Privacy Policy</router-link>
           <router-link to="/terms" class="rk-footer-link">Terms of Service</router-link>
           <router-link to="/cookies" class="rk-footer-link">Cookie Policy</router-link>
+          <router-link to="/refund-policy" class="rk-footer-link">Refund Policy</router-link>
+          <router-link to="/medical-disclaimer" class="rk-footer-link">Medical Disclaimer</router-link>
+          <router-link to="/coach-agreement" class="rk-footer-link">Coach Agreement</router-link>
+          <router-link to="/coach-commission" class="rk-footer-link">Coach Commission</router-link>
         </div>
       </nav>
     </div>

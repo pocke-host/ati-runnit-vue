@@ -79,7 +79,7 @@
             <select v-model="serviceDraft.billingType" class="service-input"><option value="ONE_TIME">One-time</option><option value="MONTHLY">Monthly</option></select>
             <button class="btn-save-rate" @click="publishService" :disabled="serviceSaving || !serviceDraft.title || serviceDraft.priceCents < 0">{{ serviceSaving ? 'Saving…' : 'Publish' }}</button>
           </div>
-          <label class="terms-check"><input v-model="termsAccepted" type="checkbox" /> I agree to the Runnit Coach Marketplace terms, cancellation policy, and medical disclaimer. Stripe provides payment receipts.</label>
+          <label class="terms-check"><input v-model="termsAccepted" type="checkbox" /> I agree to the <router-link to="/coach-agreement" target="_blank">Coach Agreement</router-link>, <router-link to="/coach-commission" target="_blank">Commission Terms</router-link>, <router-link to="/refund-policy" target="_blank">Refund Policy</router-link>, and <router-link to="/medical-disclaimer" target="_blank">Medical Disclaimer</router-link>. Stripe provides payment receipts.</label>
           <div v-if="marketplaceError" class="rate-status error">{{ marketplaceError }}</div>
           <div v-if="services.length" class="service-list">
             <div v-for="service in services" :key="service.id" class="service-row">

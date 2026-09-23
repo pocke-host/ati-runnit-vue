@@ -1,0 +1,21 @@
+<template>
+  <main class="legal-page">
+    <section class="legal-hero"><div class="legal-wrap"><p class="legal-eyebrow">RUNNIT / LEGAL</p><h1>{{ title }}</h1><p class="legal-meta">Effective {{ effectiveDate }}</p></div></section>
+    <section class="legal-content"><div class="legal-layout">
+      <aside class="legal-toc" aria-label="On this page"><p>ON THIS PAGE</p><a v-for="section in sections" :key="section.id" :href="`#${section.id}`">{{ section.title }}</a></aside>
+      <article class="legal-body"><p v-if="intro" class="legal-intro">{{ intro }}</p>
+        <section v-for="section in sections" :id="section.id" :key="section.id" class="legal-section"><h2>{{ section.title }}</h2>
+          <template v-for="(block, index) in section.blocks" :key="index"><h3 v-if="block.heading">{{ block.heading }}</h3><p v-if="block.text">{{ block.text }}</p><ul v-if="block.list"><li v-for="item in block.list" :key="item">{{ item }}</li></ul></template>
+        </section>
+        <div class="legal-contact"><strong>Questions or requests?</strong><p>Contact <a href="mailto:legal@runnit.live">legal@runnit.live</a>. For privacy requests, use <a href="mailto:privacy@runnit.live">privacy@runnit.live</a>.</p></div>
+        <p class="legal-review">This page is a product draft and is not legal, medical, tax, or financial advice. Runnit should have qualified counsel review the final text, governing entity, jurisdiction, disclosures, and marketplace terms before launch.</p>
+      </article>
+    </div></section>
+  </main>
+</template>
+<script setup>
+defineProps({ title: { type: String, required: true }, effectiveDate: { type: String, default: 'September 23, 2026' }, intro: { type: String, default: '' }, sections: { type: Array, required: true } })
+</script>
+<style scoped>
+.legal-page{min-height:100vh;background:#FBF6EC;color:#16130F;font-family:'Hanken Grotesk',system-ui,sans-serif;padding-top:var(--nav-h,66px)}.legal-hero{background:#16130F;color:#FBF6EC;padding:70px 24px 54px}.legal-wrap,.legal-layout{max-width:1120px;margin:0 auto}.legal-eyebrow{color:#AAB9FF;font:700 .68rem 'Spline Sans Mono',monospace;letter-spacing:.16em;margin:0 0 14px}.legal-hero h1{font:900 clamp(3rem,8vw,6rem)/.88 'Big Shoulders Display',system-ui,sans-serif;text-transform:uppercase;margin:0}.legal-meta{font:700 .75rem 'Spline Sans Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#C9C3B8;margin:20px 0 0}.legal-content{padding:52px 24px 90px}.legal-layout{display:grid;grid-template-columns:220px minmax(0,760px);gap:64px}.legal-toc{position:sticky;top:92px;align-self:start;border-left:2px solid #E7DFCE;padding-left:18px}.legal-toc p{font:700 .64rem 'Spline Sans Mono',monospace;letter-spacing:.12em;color:#8A8A8A;margin:0 0 14px}.legal-toc a{display:block;color:#5A5348;text-decoration:none;font-size:.8rem;line-height:1.35;margin:0 0 11px}.legal-toc a:hover{color:#2A55F5}.legal-intro{font-size:1.05rem;line-height:1.7;color:#5A5348;margin:0 0 38px}.legal-section{border-top:2px solid #E7DFCE;padding:28px 0 8px;scroll-margin-top:88px}.legal-section h2{font:900 clamp(1.55rem,3vw,2.25rem)/1 'Big Shoulders Display',system-ui,sans-serif;text-transform:uppercase;margin:0 0 18px}.legal-section h3{font-size:1rem;margin:20px 0 7px}.legal-section p,.legal-section li{font-size:.94rem;line-height:1.72;color:#5A5348}.legal-section p{margin:0 0 12px}.legal-section ul{padding-left:22px;margin:8px 0 16px}.legal-section li{margin:5px 0}.legal-contact{margin-top:38px;padding:22px 24px;background:#16130F;color:#FBF6EC;border-left:5px solid #2A55F5}.legal-contact strong{font:900 1.5rem 'Big Shoulders Display',system-ui,sans-serif;text-transform:uppercase}.legal-contact p{margin:7px 0 0;color:#C9C3B8;font-size:.9rem;line-height:1.6}.legal-contact a{color:#AAB9FF}.legal-review{font-size:.75rem;line-height:1.6;color:#8A8A8A;margin:26px 0 0}@media(max-width:760px){.legal-hero{padding:52px 18px 42px}.legal-content{padding:34px 18px 64px}.legal-layout{display:block}.legal-toc{position:static;margin-bottom:34px;padding:16px 0 5px;border-left:0;border-top:2px solid #E7DFCE;border-bottom:2px solid #E7DFCE;display:flex;gap:12px;overflow:auto;white-space:nowrap}.legal-toc p{display:none}.legal-toc a{font-size:.68rem;margin:0}.legal-section h2{font-size:1.8rem}.legal-section p,.legal-section li{font-size:.9rem}}
+</style>

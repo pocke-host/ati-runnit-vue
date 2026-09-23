@@ -5,6 +5,10 @@ import { trackEvent } from '@/composables/useAnalytics'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TermsOfService from '@/components/TermsOfService.vue'
 import CookiePolicy from '@/components/CookiePolicy.vue'
+import RefundPolicy from '@/views/RefundPolicy.vue'
+import CoachAgreement from '@/views/CoachAgreement.vue'
+import MedicalDisclaimer from '@/views/MedicalDisclaimer.vue'
+import CoachCommissionTerms from '@/views/CoachCommissionTerms.vue'
 
 const routes = [
   // Public pages
@@ -38,6 +42,10 @@ const routes = [
   { path: '/privacy',  name: 'PrivacyPolicy',   component: PrivacyPolicy },
   { path: '/terms',    name: 'TermsOfService',  component: TermsOfService },
   { path: '/cookies',  name: 'CookiePolicy',    component: CookiePolicy },
+  { path: '/refund-policy', name: 'RefundPolicy', component: RefundPolicy },
+  { path: '/coach-agreement', name: 'CoachAgreement', component: CoachAgreement },
+  { path: '/medical-disclaimer', name: 'MedicalDisclaimer', component: MedicalDisclaimer },
+  { path: '/coach-commission', name: 'CoachCommissionTerms', component: CoachCommissionTerms },
 
   // Auth-required app pages
   { path: '/dashboard',           name: 'Dashboard',      component: () => import('@/views/AccountDashboard.vue'), meta: { requiresAuth: true } },

@@ -1,0 +1,13 @@
+<template><LegalPage title="Refund Policy" effective-date="September 23, 2026" intro="Runnit athlete access is free. This policy explains the limited paid transactions that may occur through coaching, apparel rewards, partner products, or other clearly labeled checkout flows." :sections="sections" /></template>
+<script setup>
+import { useHead } from '@unhead/vue'
+import LegalPage from '@/components/LegalPage.vue'
+useHead({ title:'Refund Policy — Runnit' })
+const sections = [
+  { id:'free', title:'1. Free Runnit access', blocks:[{ text:'Core athlete access is free. There is no athlete subscription fee to refund unless a checkout page expressly says otherwise.' }]},
+  { id:'coaching', title:'2. Coaching bookings', blocks:[{ text:'The coach’s cancellation policy is shown before payment. Unless the listing states a more generous policy, an athlete may request a full refund at least 24 hours before the scheduled start. Late cancellations, missed sessions, and partially delivered services may be ineligible.' },{ text:'If a coach cancels, fails to attend, or cannot deliver the purchased service, contact support promptly. Runnit may issue a refund or other remedy after reviewing the booking and communications. A refund can reverse the coach’s payout and Runnit’s commission.' },{ text:'Refund requests do not remove rights that cannot lawfully be waived. Stripe or another payment provider may control the timing of the credit.' }]},
+  { id:'apparel', title:'3. Apparel and physical rewards', blocks:[{ text:'Unfulfilled apparel rewards can be cancelled before shipment. Once shipped, contact support about the stated return or replacement window. We will replace or refund an item that is wrong, damaged on arrival, or materially different from the listing when reported with reasonable evidence.' },{ text:'Shipping fees, customs, taxes, and return shipping are shown when applicable. Reward availability, sizes, colors, and delivery dates are not guaranteed.' }]},
+  { id:'digital', title:'4. Digital rewards and partner purchases', blocks:[{ text:'Badges, points, achievements, and other digital rewards have no cash value and are not refundable. Partner products, affiliate purchases, and third-party checkout transactions are subject to the seller’s refund terms shown at checkout.' }]},
+  { id:'request', title:'5. How to request help', blocks:[{ text:'Email support@runnit.live with your account email, booking or order reference, the issue, and the remedy requested. Do not include full payment card numbers. We may ask for reasonable information to verify the transaction and prevent abuse.' }]}
+]
+</script>
