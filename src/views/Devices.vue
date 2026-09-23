@@ -41,6 +41,27 @@
       <p v-if="spotifyError" class="integration-error" role="alert">{{ spotifyError }}</p>
       <p v-if="spotifyNotice" class="integration-success" role="status" aria-live="polite">{{ spotifyNotice }}</p>
 
+      <div class="strava-integration-card">
+        <div class="strava-integration-left">
+          <div class="strava-mark"><i class="bi bi-bicycle"></i></div>
+          <div>
+            <div class="gcal-integration-name">Strava — Activity history</div>
+            <div class="gcal-integration-desc">Import your past runs, rides, swims, walks, and routes into Runnit.</div>
+            <div :class="['spotify-connected', { 'spotify-connected--off': !stravaConnected }]" ><span></span> {{ stravaConnected ? 'CONNECTED' : 'NOT CONNECTED' }}</div>
+            <div v-if="stravaConnected && stravaLastSync" class="strava-last-sync">Last synced {{ relativeTime(stravaLastSync) }}</div>
+          </div>
+        </div>
+        <div class="strava-actions">
+          <button v-if="!stravaConnected" class="gcal-integration-btn" type="button" @click="connectStrava" :disabled="stravaLoading">{{ stravaLoading ? 'Connecting…' : 'Connect →' }}</button>
+          <template v-else>
+            <button class="gcal-integration-btn" type="button" @click="syncStrava" :disabled="stravaLoading">{{ stravaLoading ? 'Syncing…' : 'Sync now' }}</button>
+            <button class="strava-disconnect" type="button" @click="disconnectStrava">Disconnect</button>
+          </template>
+        </div>
+      </div>
+      <p v-if="stravaError" class="integration-error" role="alert">{{ stravaError }}</p>
+      <p v-if="stravaNotice" class="integration-success" role="status" aria-live="polite">{{ stravaNotice }}</p>
+
       <!-- Google Calendar integration card -->
       <div class="gcal-integration-card">
         <div class="gcal-integration-left">
@@ -67,6 +88,11 @@ const spotifyConnected = ref(false)
 const spotifyLoading = ref(false)
 const spotifyError = ref('')
 const spotifyNotice = ref('')
+const stravaConnected = ref(false)
+const stravaLoading = ref(false)
+const stravaError = ref('')
+const stravaNotice = ref('')
+const stravaLastSync = ref(null)
 const integrationStatuses = ref([])
 const statusLoading = ref(true)
 const headers = () => {
@@ -80,6 +106,29 @@ const connectSpotify = async () => {
     const { data } = await axios.get(`${API_URL}/spotify/connect`, { headers: headers() })
     window.location.href = data.url
   } catch (e) { spotifyError.value = e.response?.data?.error || 'Spotify connection is unavailable right now. Try again shortly.'; spotifyLoading.value = false }
+}
+const connectStrava = async () => {
+  stravaLoading.value = true
+  stravaError.value = ''
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/strava/connect`, { headers: headers() })
+    window.location.href = data.url
+  } catch (e) { stravaError.value = e.response?.data?.error || 'Strava connection is unavailable right now.'; stravaLoading.value = false }
+}
+const syncStrava = async () => {
+  stravaLoading.value = true
+  stravaError.value = ''
+  try {
+    const { data } = await axios.post(`${API_URL}/integrations/strava/sync`, {}, { headers: headers() })
+    stravaNotice.value = data.message || 'Strava activities synced.'
+    stravaLastSync.value = new Date().toISOString()
+  } catch (e) { stravaError.value = e.response?.data?.error || 'Strava sync failed. Try again shortly.' }
+  finally { stravaLoading.value = false }
+}
+const disconnectStrava = async () => {
+  if (!window.confirm('Disconnect Strava? Existing imported activities will remain in Runnit.')) return
+  try { await axios.delete(`${API_URL}/integrations/strava/disconnect`, { headers: headers() }); stravaConnected.value = false; stravaLastSync.value = null }
+  catch (e) { stravaError.value = e.response?.data?.error || 'Could not disconnect Strava.' }
 }
 const relativeTime = value => {
   if (!value) return ''
@@ -106,7 +155,16 @@ onMounted(async () => {
       ? 'Spotify connection was cancelled. You can try again whenever you’re ready.'
       : 'Spotify could not be connected. Check your Spotify app settings and try again.'
   }
+  const stravaStatus = new URLSearchParams(window.location.search).get('strava')
+  const stravaErrorReason = new URLSearchParams(window.location.search).get('error')
+  if (stravaStatus === 'connected') stravaNotice.value = 'Strava connected. Your recent activity history is being imported.'
+  if (stravaErrorReason?.startsWith('strava_')) stravaError.value = 'Strava could not be connected. Check the app settings and try again.'
   try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/strava/status`, { headers: headers() })
+    stravaConnected.value = Boolean(data.connected)
+    stravaLastSync.value = data.lastSync || null
+  } catch {}
   const providers = ['whoop', 'oura', 'fitbit']
   integrationStatuses.value = (await Promise.all(providers.map(provider => axios.get(`${API_URL}/integrations/${provider}/status`, { headers: headers() }).then(({ data }) => ({ provider, ...data })).catch(() => ({ provider, connected: false })))) )
   statusLoading.value = false
@@ -243,6 +301,12 @@ onMounted(async () => {
 .spotify-connected span { display:inline-block; width:6px; height:6px; border-radius:50%; background:#1DB954; margin-right:4px; }
 .integration-error { margin:8px 0 0; color:#b42318; font-size:.8rem; }
 .integration-success { margin:8px 0 0; color:#16883f; font-size:.8rem; }
+.strava-integration-card { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-top:16px; padding:18px 20px; border:2px solid #16130F; background:#fff; box-shadow:4px 4px #16130F; }
+.strava-integration-left { display:flex; align-items:center; gap:12px; }
+.strava-mark { width:34px; height:34px; display:grid; place-items:center; border-radius:50%; background:#fc4c02; color:#fff; font-size:20px; }
+.strava-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.strava-disconnect { border:0; background:transparent; color:#8a8174; font:700 10px 'Spline Sans Mono',monospace; text-transform:uppercase; cursor:pointer; }
+.strava-last-sync { margin-top:5px; color:#665f55; font-size:.7rem; }
 
 @media (max-width: 600px) {
   .integrations-intro { align-items:flex-start; flex-direction:column; gap:8px; }
@@ -250,5 +314,8 @@ onMounted(async () => {
   .gcal-integration-btn { width: 100%; text-align: center; }
   .spotify-integration-card { align-items:flex-start; flex-direction:column; }
   .spotify-integration-card .gcal-integration-btn { width:100%; }
+  .strava-integration-card { align-items:flex-start; flex-direction:column; }
+  .strava-actions { width:100%; }
+  .strava-actions .gcal-integration-btn { flex:1; }
 }
 </style>
