@@ -5,10 +5,10 @@
     <div class="empty-state-title">{{ title }}</div>
     <p v-if="message" class="empty-state-message">{{ message }}</p>
     <template v-if="actionLabel">
-      <RunnitButton v-if="actionTo" :to="actionTo" variant="quiet">
+      <RunnitButton v-if="actionTo" :to="actionTo" variant="primary">
         {{ actionLabel }}
       </RunnitButton>
-      <RunnitButton v-else variant="quiet" @click="$emit('action')">
+      <RunnitButton v-else variant="primary" @click="$emit('action')">
         {{ actionLabel }}
       </RunnitButton>
     </template>

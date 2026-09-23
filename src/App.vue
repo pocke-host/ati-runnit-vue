@@ -180,6 +180,9 @@ const toastIcon = (type) => ({
   pointer-events: all;
   font-family: Futura, "Avenir Next", system-ui, sans-serif;
   box-shadow: none;
+  max-width: min(92vw, 560px);
+  white-space: normal;
+  text-align: center;
 }
 
 .app-toast--info    { background: #000; color: #fff; }
@@ -203,6 +206,12 @@ const toastIcon = (type) => ({
   body {
     padding-bottom: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px));
   }
+  .toast-stack { bottom: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px) + 12px); width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active, .page-leave-active, [data-reveal], [data-stagger] > * { transition: none !important; }
+  [data-reveal], [data-stagger] > * { opacity: 1 !important; transform: none !important; }
 }
 /* ── Scroll Reveal ── */
 [data-reveal] {
