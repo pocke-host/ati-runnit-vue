@@ -2,7 +2,7 @@
   <article class="integration-card" :class="{ 'integration-card--attention': needsReconnect || stale }">
     <div class="integration-card__icon"><i :class="icon" aria-hidden="true"></i></div>
     <div class="integration-card__copy"><strong>{{ name }}</strong><span>{{ needsReconnect ? 'Needs reconnect' : connected ? (stale ? 'Needs a sync' : 'Connected') : 'Not connected' }}</span><small>{{ connected && lastSync ? `Last sync ${relativeTime(lastSync)}` : connected ? 'Waiting for first sync' : 'Permission not granted' }}</small></div>
-    <router-link v-if="needsReconnect || !connected" to="/devices" class="integration-card__action">{{ needsReconnect ? 'Reconnect' : 'Connect' }}</router-link><span v-else class="integration-card__ok" aria-label="Connected">✓</span>
+    <a v-if="needsReconnect || !connected" href="#connectors" class="integration-card__action">{{ needsReconnect ? 'Reconnect' : 'Connect' }}</a><span v-else class="integration-card__ok" aria-label="Connected">✓</span>
   </article>
 </template>
 <script setup>

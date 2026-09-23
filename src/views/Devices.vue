@@ -14,7 +14,16 @@
         <div class="integration-health-head"><div><div class="devices-kicker">At a glance</div><h2 id="integration-health-title">Connection health</h2></div><span v-if="statusLoading">Checking sources…</span><span v-else>{{ connectedCount }} connected</span></div>
         <div class="integration-health-grid"><IntegrationStatusCard v-for="card in integrationCards" :key="card.key" v-bind="card" /></div>
       </section>
-      <ConnectDevices />
+      <section id="connectors" class="connectors-section" aria-labelledby="connectors-title">
+        <div class="connectors-section-head">
+          <div>
+            <div class="devices-kicker">Available connections</div>
+            <h2 id="connectors-title">Connect your training tools</h2>
+          </div>
+          <p>Choose a service below. Your connection status and sync controls will stay here.</p>
+        </div>
+        <ConnectDevices />
+      </section>
 
       <div class="spotify-integration-card">
         <div class="spotify-integration-left">
@@ -157,6 +166,7 @@ onMounted(async () => {
 .integrations-intro h2 { margin:6px 0 0; font-size:1.3rem; }
 .integrations-intro p { max-width:420px; margin:0; color:#665f55; font-size:.84rem; line-height:1.5; }
 .integration-health{margin:0 0 24px;padding:18px;background:#16130F;color:#FBF6EC}.integration-health-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.integration-health-head h2{margin:4px 0 0;color:#FBF6EC;font-size:1.35rem}.integration-health-head span{color:#FFC53D;font:600 .65rem 'Spline Sans Mono',monospace;text-transform:uppercase}.integration-health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.integration-health-card{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;background:#24211c;border:1px solid #4a453c}.integration-health-card--attention{border-color:#FFC53D}.integration-health-icon{display:grid;place-items:center;width:30px;height:30px;background:#2A55F5;color:white}.integration-health-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}.integration-health-copy strong{font-size:.82rem}.integration-health-copy span,.integration-health-copy small{color:#c7bfae;font-size:.68rem}.integration-health-copy small{color:#938b7c}.integration-health-action{color:#FFC53D;font:700 .62rem 'Spline Sans Mono',monospace;text-transform:uppercase}@media(max-width:600px){.integration-health-grid{grid-template-columns:1fr}}
+.connectors-section{margin-top:28px}.connectors-section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:14px}.connectors-section-head h2{margin:4px 0 0;font-size:1.35rem}.connectors-section-head p{max-width:360px;margin:0;color:#665f55;font-size:.82rem;line-height:1.45}@media(max-width:640px){.connectors-section-head{display:block}.connectors-section-head p{margin-top:8px}}
 
 @media (max-width: 640px) {
   .devices-wrap { padding: 28px 18px 80px; }
