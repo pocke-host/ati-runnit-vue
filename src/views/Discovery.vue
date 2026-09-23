@@ -18,12 +18,14 @@
         </router-link>
       </div>
       <template v-else>
-        <section v-for="section in sections" :key="section.key" v-if="section.items?.length" class="discovery-section">
-          <div class="discovery-section-head"><div><p class="discovery-kicker">For you</p><h2>{{ section.title }}</h2></div><router-link v-if="section.path" :to="section.path">See all →</router-link></div>
-          <div class="discovery-grid">
-            <router-link v-for="item in section.items" :key="`${section.key}-${item.id || item.path}`" :to="item.path" class="discovery-card"><div class="discovery-card-icon"><i :class="iconFor(item.type)"></i></div><strong>{{ item.title }}</strong><span>{{ item.subtitle || section.label }}</span></router-link>
-          </div>
-        </section>
+        <template v-for="section in sections" :key="section.key">
+          <section v-if="section.items?.length" class="discovery-section">
+            <div class="discovery-section-head"><div><p class="discovery-kicker">For you</p><h2>{{ section.title }}</h2></div><router-link v-if="section.path" :to="section.path">See all →</router-link></div>
+            <div class="discovery-grid">
+              <router-link v-for="item in section.items" :key="`${section.key}-${item.id || item.path}`" :to="item.path" class="discovery-card"><div class="discovery-card-icon"><i :class="iconFor(item.type)"></i></div><strong>{{ item.title }}</strong><span>{{ item.subtitle || section.label }}</span></router-link>
+            </div>
+          </section>
+        </template>
         <div v-if="!sections.some(s => s.items?.length) && !loading" class="discovery-empty"><strong>Your discovery feed is getting ready.</strong><p>Complete your profile or record an activity so we can make better recommendations.</p><router-link to="/track" class="discovery-primary">Record an activity →</router-link></div>
       </template>
     </div>
