@@ -17,6 +17,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { isAuthenticated } = storeToRefs(authStore)
 const { toasts, dismissToast, showToast } = useToast()
+const isOnline = ref(typeof navigator === 'undefined' ? true : navigator.onLine)
+const updateOnlineState = () => { isOnline.value = navigator.onLine }
 
 const showChrome = computed(() => route.path !== '/onboard')
 
@@ -75,6 +77,8 @@ const { init: initDeepLinks, cleanup: cleanupDeepLinks } = useDeepLinks()
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
+  window.addEventListener('online', updateOnlineState)
+  window.addEventListener('offline', updateOnlineState)
   if (sessionStorage.getItem('session_corrupted') === 'true') {
     sessionStorage.removeItem('session_corrupted')
     showToast('Your session data was corrupted and you were signed out. Please sign in again.', 'error')
@@ -111,6 +115,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  window.removeEventListener('online', updateOnlineState)
+  window.removeEventListener('offline', updateOnlineState)
   IDLE_EVENTS.forEach(e => window.removeEventListener(e, resetIdleTimer))
   clearTimeout(idleTimer)
   clearInterval(jwtInterval)
@@ -126,6 +132,10 @@ const toastIcon = (type) => ({
 </script>
 
 <template>
+  <div v-if="!isOnline" class="offline-banner" role="status" aria-live="polite">
+    <i class="bi bi-wifi-off" aria-hidden="true"></i>
+    <span>You’re offline. Some actions may be unavailable until you reconnect.</span>
+  </div>
   <TopNav v-if="showChrome" />
   <BottomNav v-if="showChrome" />
   <router-view v-slot="{ Component }">
@@ -167,6 +177,7 @@ const toastIcon = (type) => ({
   gap: 8px;
   pointer-events: none;
 }
+.offline-banner{position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;align-items:center;justify-content:center;gap:9px;padding:9px 14px;background:#16130F;color:#fff;font:700 .78rem 'Spline Sans Mono',monospace;text-align:center}
 
 .app-toast {
   display: flex;
