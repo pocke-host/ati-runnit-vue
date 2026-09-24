@@ -59,7 +59,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 const props = defineProps({
@@ -73,6 +72,7 @@ const mapContainer = ref(null)
 const map          = ref(null)
 const loading      = ref(true)
 const error        = ref(null)
+let mapboxgl
 const currentStyle = ref('runnit')
 const startMarker  = ref(null)
 const endMarker    = ref(null)
@@ -235,7 +235,9 @@ const placeMarkers = (mapInst, coordinates) => {
 }
 
 // ── Map init ─────────────────────────────────────────
-const initializeMap = () => {
+const initializeMap = async () => {
+  const module = await import('mapbox-gl')
+  mapboxgl = module.default
   if (!props.activity.routePolyline) {
     error.value = 'No route on record for this one.'
     loading.value = false

@@ -15,12 +15,12 @@
 </template>
 
 <script setup>
-import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import axios from 'axios'
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || ''
+let mapboxgl
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const mapContainer = ref(null)
@@ -34,6 +34,8 @@ let map
 const SOURCE_ID = 'runnit-activities'
 
 onMounted(async () => {
+  mapboxgl = (await import('mapbox-gl')).default
+  mapboxgl.accessToken = MAPBOX_TOKEN
   map = new mapboxgl.Map({
     container: mapContainer.value,
     style: 'mapbox://styles/quinn-runnit/cmml6ynyy000701suetifc5y0',

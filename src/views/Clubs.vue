@@ -412,7 +412,6 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, watch } from 'vue'
-import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useToast } from '@/composables/useToast'
 
@@ -420,6 +419,7 @@ const { showToast } = useToast()
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
+let mapboxgl
 const appOrigin = window.location.origin
 
 const getAuthHeaders = () => ({
@@ -722,8 +722,9 @@ async function loadMapClubs() {
   }
 }
 
-function initClubMap(clubs) {
+async function initClubMap(clubs) {
   if (!MAPBOX_TOKEN || !clubMapContainer.value) return
+  mapboxgl = (await import('mapbox-gl')).default
   if (clubMap.value) { clubMap.value.remove(); clubMap.value = null }
 
   mapboxgl.accessToken = MAPBOX_TOKEN

@@ -133,12 +133,12 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import mapboxgl from 'mapbox-gl'
 import { useUnits } from '@/composables/useUnits'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
+let mapboxgl
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const router = useRouter()
@@ -305,7 +305,9 @@ function relativeDate(iso) {
 }
 
 // ── Lifecycle ─────────────────────────────────────────────────────
-onMounted(() => {
+onMounted(async () => {
+  mapboxgl = (await import('mapbox-gl')).default
+  mapboxgl.accessToken = MAPBOX_TOKEN
   navigator.geolocation.getCurrentPosition(
     pos => {
       userLat.value = pos.coords.latitude

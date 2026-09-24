@@ -296,7 +296,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useUnits } from '@/composables/useUnits'
 import { useActivityStore } from '@/stores/activity'
@@ -316,6 +315,7 @@ const isNative = Capacitor.isNativePlatform()
 
 const DRAFT_KEY   = 'runnit_tracking_draft'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
+let mapboxgl
 
 const router = useRouter()
 const activityStore = useActivityStore()
@@ -410,7 +410,8 @@ const avgPaceMinPerKm = computed(() => {
 
 // ── Map ─────────────────────────────────────────────────────────────────────
 
-const initializeMap = () => {
+const initializeMap = async () => {
+  mapboxgl = (await import('mapbox-gl')).default
   if (!MAPBOX_TOKEN) {
     gpsError.value = 'Mapbox token missing'
     return

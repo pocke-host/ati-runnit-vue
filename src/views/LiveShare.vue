@@ -40,7 +40,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import axios from 'axios'
 
@@ -49,6 +48,7 @@ const token = route.params.token
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || ''
+let mapboxgl
 
 const mapContainer = ref(null)
 const share = ref(null)
@@ -130,6 +130,7 @@ async function fetchShare() {
 
 onMounted(async () => {
   if (MAPBOX_TOKEN) {
+    mapboxgl = (await import('mapbox-gl')).default
     mapboxgl.accessToken = MAPBOX_TOKEN
     map = new mapboxgl.Map({
       container: mapContainer.value,
