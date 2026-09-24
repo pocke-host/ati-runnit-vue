@@ -129,8 +129,8 @@
           <button type="button" class="result-submit" :disabled="discovering" @click="discoverResults">
             {{ discovering ? 'Searching official results…' : 'Find my official results' }}
           </button>
-          <select v-model="discoveryProvider" class="result-input" aria-label="Official results provider"><option value="ATHLINKS">Athlinks</option><option value="RUNSIGNUP">RunSignup</option></select>
-          <template v-if="discoveryProvider === 'RUNSIGNUP'"><input v-model="discoveryRaceId" class="result-input" placeholder="RunSignup race ID" aria-label="RunSignup race ID"><input v-model="discoveryEventId" class="result-input" placeholder="RunSignup event ID" aria-label="RunSignup event ID"></template>
+          <select v-model="discoveryProvider" class="result-input" aria-label="Official results provider"><option v-for="provider in resultProviders" :key="provider" :value="provider">{{ providerLabel(provider) }}</option></select>
+          <template v-if="discoveryProvider === 'RUNSIGNUP' || discoveryProvider === 'RACEROSTER'"><input v-model="discoveryRaceId" class="result-input" :placeholder="discoveryProvider === 'RACEROSTER' ? 'Race Roster results race ID' : 'RunSignup race ID'" aria-label="Results race ID"><input v-model="discoveryEventId" class="result-input" :placeholder="discoveryProvider === 'RACEROSTER' ? 'Race Roster event ID' : 'RunSignup event ID'" aria-label="Results event ID"></template>
           <div v-if="discoveredResults.length" class="discovered-results">
             <div v-for="result in discoveredResults" :key="`${result.provider}-${result.externalResultId}`" class="discovered-result">
               <div><strong>{{ result.raceName }}</strong><span>{{ result.raceDate || 'Date TBD' }} · {{ result.distance || 'Race' }} · {{ result.provider }}</span></div>
@@ -369,6 +369,7 @@ const discoveredResults = ref([])
 const runSignupConnected = ref(false)
 const runSignupError = ref('')
 const discoveryProvider = ref('ATHLINKS')
+const resultProviders = ref(['ATHLINKS', 'RUNSIGNUP'])
 const discoveryRaceId = ref('')
 const discoveryEventId = ref('')
 const discoveryStage = computed(() => discovering.value ? 2 : discoveredResults.value.length ? 3 : 1)
@@ -389,6 +390,17 @@ const connectRunSignup = async () => {
 
 const loadRaceResults = async () => {
   try { const { data } = await axios.get(`${API_URL}/race-results`); raceResults.value = Array.isArray(data) ? data : [] } catch { /* unauthenticated users can still browse races */ }
+}
+
+const providerLabel = (provider) => ({ ATHLINKS: 'Athlinks', RUNSIGNUP: 'RunSignup', RACEROSTER: 'Race Roster' }[provider] || provider)
+const loadResultProviders = async () => {
+  try {
+    const { data } = await axios.get(`${API_URL}/race-results/providers`)
+    if (Array.isArray(data) && data.length) {
+      resultProviders.value = data
+      if (!data.includes(discoveryProvider.value)) discoveryProvider.value = data[0]
+    }
+  } catch { /* keep the safe built-in provider list */ }
 }
 
 const importResult = async () => {
@@ -1246,6 +1258,7 @@ onMounted(() => {
   fetchEvents()
   loadBookmarks()
   loadRaceResults()
+  loadResultProviders()
 })
 
 // Re-fetch when zipcode changes (debounced)
