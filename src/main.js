@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import { injectSpeedInsights } from '@vercel/speed-insights'
+import * as Sentry from '@sentry/vue'
 import { trackEvent } from '@/composables/useAnalytics'
 
 // Import Bootstrap CSS
@@ -17,6 +18,25 @@ import '@/assets/main.css'
 const app = createApp(App)
 const pinia = createPinia()
 const head = createHead()
+
+// Error tracking and performance monitoring. The DSN is publishable; secrets
+// must never be placed in frontend code. Replay masks input fields by default.
+Sentry.init({
+  app,
+  dsn: import.meta.env.VITE_SENTRY_DSN || 'https://07155da613da9de6e9d3377fbc396268@o4512142249492480.ingest.us.sentry.io/4512142258929664',
+  integrations: [
+    Sentry.browserTracingIntegration({ router }),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
+  tracePropagationTargets: [
+    'localhost',
+    /^https:\/\/ati-runnit-java\.onrender\.com\/api\//,
+    /\/api\//,
+  ],
+  replaysSessionSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
+  replaysOnErrorSampleRate: 1.0,
+})
 
 app.use(pinia)  // ← THIS MUST COME BEFORE router
 app.use(router)
