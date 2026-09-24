@@ -5,7 +5,7 @@ import { config } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 
 // Stub heavy third-party modules that don't run in jsdom
-vi.mock('mapbox-gl', () => ({
+vi.mock('maplibre-gl', () => ({
   default: { Map: vi.fn(), NavigationControl: vi.fn(), GeolocateControl: vi.fn() },
   Map: vi.fn(),
 }))

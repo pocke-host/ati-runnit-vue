@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 const props = defineProps({
   activity: { type: Object, required: true },
@@ -80,10 +80,10 @@ const endMarker    = ref(null)
 // ── Style definitions ────────────────────────────────
 // terrain: true enables the 3D DEM + sky atmosphere on that style
 const MAP_STYLES = {
-  runnit:    { url: 'mapbox://styles/quinn-runnit/cmml6ynyy000701suetifc5y0', label: 'Runnit',    terrain: false },
-  terrain:   { url: 'mapbox://styles/mapbox/outdoors-v12',                    label: 'Terrain',   terrain: true  },
-  satellite: { url: 'mapbox://styles/mapbox/satellite-streets-v12',           label: 'Satellite', terrain: false },
-  dark:      { url: 'mapbox://styles/mapbox/dark-v11',                        label: 'Night',     terrain: false },
+  runnit:    { url: `https://api.mapbox.com/styles/v1/quinn-runnit/cmml6ynyy000701suetifc5y0?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`, label: 'Runnit',    terrain: false },
+  terrain:   { url: `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,                    label: 'Terrain',   terrain: true  },
+  satellite: { url: `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,           label: 'Satellite', terrain: false },
+  dark:      { url: `https://api.mapbox.com/styles/v1/mapbox/dark-v11?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,                        label: 'Night',     terrain: false },
 }
 const STYLE_ORDER = ['runnit', 'terrain', 'satellite', 'dark']
 
@@ -190,7 +190,7 @@ const addTerrain = (mapInst) => {
   if (!mapInst.getSource('mapbox-dem')) {
     mapInst.addSource('mapbox-dem', {
       type: 'raster-dem',
-      url:  'mapbox://mapbox.mapbox-terrain-dem-v1',
+      url:  `https://api.mapbox.com/v4/mapbox.mapbox-terrain-dem-v1.json?secure&access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,
       tileSize: 512,
       maxzoom:  14,
     })
@@ -236,7 +236,7 @@ const placeMarkers = (mapInst, coordinates) => {
 
 // ── Map init ─────────────────────────────────────────
 const initializeMap = async () => {
-  const module = await import('mapbox-gl')
+  const module = await import('maplibre-gl')
   mapboxgl = module.default
   if (!props.activity.routePolyline) {
     error.value = 'No route on record for this one.'
@@ -534,9 +534,9 @@ watch(() => props.activity, () => {
   backdrop-filter: blur(4px);
 }
 
-/* Hide default Mapbox UI chrome */
-:deep(.mapboxgl-ctrl-logo),
-:deep(.mapboxgl-ctrl-attrib) { display: none !important; }
+/* Hide default map UI chrome */
+:deep(.maplibregl-ctrl-logo),
+:deep(.maplibregl-ctrl-attrib) { display: none !important; }
 
 @media (max-width: 600px) {
   .rs-label  { font-size: 0.50rem; }

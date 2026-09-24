@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // Map surfaces lazy-load Mapbox. Do not make every PWA install download
         // the ~1.7 MB map runtime before a user opens a map.
-        globIgnores: ['**/mapbox-gl-*.js'],
+        globIgnores: ['**/mapbox-gl-*.js', '**/maplibre-gl-*.js'],
         // Network-first for API calls (always fresh, fall back to cache on failure)
         runtimeCaching: [
           {

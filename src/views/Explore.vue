@@ -182,7 +182,7 @@ const nearbyAthletes = computed(() => {
 function initMap(lat, lng) {
   map = new mapboxgl.Map({
     container: mapContainer.value,
-    style: 'mapbox://styles/mapbox/light-v11',
+    style: `https://api.mapbox.com/styles/v1/mapbox/light-v11?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,
     center: [lng, lat],
     zoom: 11,
   })
@@ -306,7 +306,7 @@ function relativeDate(iso) {
 
 // ── Lifecycle ─────────────────────────────────────────────────────
 onMounted(async () => {
-  mapboxgl = (await import('mapbox-gl')).default
+  mapboxgl = (await import('maplibre-gl')).default
   mapboxgl.accessToken = MAPBOX_TOKEN
   navigator.geolocation.getCurrentPosition(
     pos => {
