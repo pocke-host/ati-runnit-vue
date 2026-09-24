@@ -41,6 +41,18 @@
       <!-- Error state -->
       <div v-if="error" class="error-bar">{{ error }}</div>
 
+      <section class="moderation-panel" aria-labelledby="moderation-title">
+        <div class="moderation-head"><div><div class="admin-kicker">Trust &amp; safety</div><h2 id="moderation-title">Coach reports</h2></div><button class="page-btn" type="button" @click="fetchReports">Refresh</button></div>
+        <div v-if="reportsLoading" class="loading-state">Loading reports…</div>
+        <div v-else-if="!reports.length" class="moderation-empty">No open coach reports.</div>
+        <div v-else class="report-list">
+          <article v-for="report in reports" :key="report.id" class="report-row">
+            <div><strong>{{ report.reason }}</strong><span>Coach #{{ report.coachId }} · {{ formatDate(report.createdAt) }}</span><p v-if="report.details">{{ report.details }}</p></div>
+            <div class="report-actions"><span class="provider-badge">{{ report.status }}</span><button v-if="report.status === 'OPEN'" class="verify-btn" type="button" @click="resolveReport(report, 'REVIEWED')">Mark reviewed</button><button v-if="report.status !== 'DISMISSED'" class="page-btn" type="button" @click="resolveReport(report, 'DISMISSED')">Dismiss</button></div>
+          </article>
+        </div>
+      </section>
+
       <!-- Loading -->
       <div v-if="loading && !users.length" class="loading-state">
         <span class="spinner"></span> Loading users…
@@ -56,7 +68,7 @@
               <th>Email</th>
               <th>Provider</th>
               <th>Role</th>
-              <th>Coach verification</th>
+              <th>Coach moderation</th>
               <th>Subscription</th>
               <th>Joined</th>
             </tr>
@@ -79,7 +91,7 @@
                   <option value="admin">Admin</option>
                 </select>
               </td>
-              <td><button v-if="user.role === 'coach'" class="verify-btn" @click="toggleVerification(user)" :disabled="updatingId === user.id">{{ user.coachVerified ? '✓ Verified' : 'Verify coach' }}</button><span v-else>—</span></td>
+              <td><template v-if="user.role === 'coach'"><button class="verify-btn" @click="toggleVerification(user)" :disabled="updatingId === user.id">{{ user.coachVerified ? '✓ Verified' : 'Verify coach' }}</button><button class="suspend-btn" @click="toggleSuspension(user)" :disabled="updatingId === user.id">{{ user.coachSuspended ? 'Unsuspend' : 'Suspend' }}</button></template><span v-else>—</span></td>
               <td>
                 <span :class="['sub-badge', user.subscriptionStatus === 'active' ? 'sub-active' : 'sub-none']">
                   {{ user.subscriptionStatus === 'active' ? 'PRO' : user.subscriptionStatus || 'free' }}
@@ -118,6 +130,8 @@ const search = ref('')
 const page = ref(0)
 const totalPages = ref(1)
 const updatingId = ref(null)
+const reports = ref([])
+const reportsLoading = ref(false)
 let searchTimeout = null
 
 const getHeaders = () => {
@@ -190,13 +204,34 @@ const toggleVerification = async (user) => {
   finally { updatingId.value = null }
 }
 
+const toggleSuspension = async user => {
+  updatingId.value = user.id
+  try {
+    const { data } = await axios.patch(`${API_URL}/admin/coaches/${user.id}/suspension`, { suspended: !user.coachSuspended }, { headers: getHeaders() })
+    user.coachSuspended = data.coachSuspended
+  } catch { error.value = 'Coach suspension did not update.' }
+  finally { updatingId.value = null }
+}
+
+const fetchReports = async () => {
+  reportsLoading.value = true
+  try { reports.value = (await axios.get(`${API_URL}/admin/coach-reports`, { headers: getHeaders(), params: { status: 'OPEN' } })).data || [] }
+  catch { error.value = 'Coach reports did not load.' }
+  finally { reportsLoading.value = false }
+}
+
+const resolveReport = async (report, status) => {
+  try { await axios.patch(`${API_URL}/admin/coach-reports/${report.id}`, { status }, { headers: getHeaders() }); reports.value = reports.value.filter(item => item.id !== report.id) }
+  catch { error.value = 'Report status did not update.' }
+}
+
 const formatDate = (iso) => {
   if (!iso) return '—'
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 onMounted(async () => {
-  await Promise.all([fetchStats(), fetchUsers()])
+  await Promise.all([fetchStats(), fetchUsers(), fetchReports()])
 })
 </script>
 
@@ -206,6 +241,7 @@ onMounted(async () => {
   background: #fff;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
+.moderation-panel{max-width:1200px;margin:0 auto;padding:24px;background:#FBF6EC;border:2px solid #16130F}.moderation-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.moderation-head h2{margin:0;font-size:1.35rem}.moderation-empty{color:#665f55;padding:12px 0}.report-list{display:grid;gap:8px}.report-row{display:flex;justify-content:space-between;gap:16px;padding:13px;background:#fff;border:1px solid #E5E5E5}.report-row span,.report-row p{display:block;color:#665f55;font-size:.8rem;margin:4px 0 0}.report-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.suspend-btn{display:block;margin-top:5px;border:1px solid #C0392B;background:#fff;color:#C0392B;padding:5px 7px;font-size:.7rem}@media(max-width:680px){.report-row{flex-direction:column}.report-actions{justify-content:flex-start}}
 
 /* Header */
 .admin-header {
