@@ -529,7 +529,7 @@ const performanceMetrics = computed(() => {
   today.setHours(23, 59, 59, 999)
   const dayMs = 86400000
 
-  const { fitnessScore, fatigueScore, formScore } = useFitnessLoad(acts)
+  const { fitnessScore, fatigueScore, formScore, ctl, atl } = useFitnessLoad(acts)
 
   // Recent runs for VO2max + race predictions
   const recentRuns = acts
@@ -935,6 +935,7 @@ onUnmounted(() => {
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
+  overflow-x: hidden;
 }
 
 /* ── HERO ───────────────────────────────────────── */
@@ -1135,7 +1136,7 @@ onUnmounted(() => {
   margin: 0 auto;
   padding: 40px 24px 80px;
 }
-.section { margin-bottom: 52px; }
+.section { margin-bottom: 52px; scroll-margin-top: calc(var(--nav-h, 66px) + 54px); }
 .section-header {
   margin-bottom: 20px;
   display: flex;
@@ -1749,6 +1750,9 @@ onUnmounted(() => {
   .hero                 { padding: 48px 16px 36px; }
   .stats-content        { padding: 20px 12px 80px; }
   .jumpnav-inner        { padding: 0 12px; }
+  .hero-dots            { gap: 4px; }
+  .hero-dot-col          { min-width: 0; flex: 1; }
+  .hero-dot              { width: 28px; height: 28px; }
   .heatmap-cell         { width: 8px; height: 8px; }
   .heatmap-months       { grid-auto-columns: 10px; }
   .heatmap-grid         { gap: 1px; }

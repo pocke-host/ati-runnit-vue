@@ -13,7 +13,7 @@ const IF_BY_TYPE = {
 
 export function useFitnessLoad(activities, sportFilter = null) {
   const acts = (activities || []).filter(a => !sportFilter || sportFilter.includes(a.sportType))
-  if (!acts.length) return { fitnessScore: 0, fatigueScore: 0, formScore: 0 }
+  if (!acts.length) return { fitnessScore: 0, fatigueScore: 0, formScore: 0, ctl: 0, atl: 0 }
 
   const today = new Date()
   today.setHours(23, 59, 59, 999)
@@ -43,5 +43,5 @@ export function useFitnessLoad(activities, sportFilter = null) {
   const fatigueScore = Math.min(100, Math.round(atl))
   const formScore = Math.round(fitnessScore - fatigueScore)
 
-  return { fitnessScore, fatigueScore, formScore }
+  return { fitnessScore, fatigueScore, formScore, ctl, atl }
 }
