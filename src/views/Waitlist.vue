@@ -5,8 +5,8 @@
     <section class="hero">
       <div class="page-inner hero-inner">
         <span class="gr-eyebrow-badge">Waitlist</span>
-        <h1 class="hero-h1">Claim your handle.</h1>
-        <p class="hero-sub">Stay close to what we’re building. No spam — just useful product updates and your @name held.</p>
+        <h1 class="hero-h1">Get early access.</h1>
+        <p class="hero-sub">One email. No spam. We’ll let you know when Runnit is ready for you.</p>
       </div>
     </section>
 
@@ -29,39 +29,18 @@
                   :class="{ 'field-input--error': errors.email }"
                   placeholder="you@email.com"
                   autocomplete="email"
+                  required
+                  :aria-invalid="Boolean(errors.email)"
+                  :aria-describedby="errors.email ? 'wl-email-error' : undefined"
                 />
-                <p v-if="errors.email" class="field-err">{{ errors.email }}</p>
+                <p v-if="errors.email" id="wl-email-error" class="field-err" role="alert">{{ errors.email }}</p>
               </div>
 
-              <div class="field-group">
-                <label class="field-label" for="wl-handle">Desired Handle</label>
-                <input
-                  id="wl-handle"
-                  v-model.trim="form.handle"
-                  type="text"
-                  class="field-input"
-                  placeholder="@yourname"
-                  autocomplete="username"
-                />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="wl-city">City</label>
-                <input
-                  id="wl-city"
-                  v-model.trim="form.city"
-                  type="text"
-                  class="field-input"
-                  placeholder="Where you run"
-                  autocomplete="address-level2"
-                />
-              </div>
-
-              <p v-if="serverError" class="server-error">{{ serverError }}</p>
+              <p v-if="serverError" class="server-error" role="alert" aria-live="polite">{{ serverError }}</p>
 
               <button type="submit" class="btn-submit" :disabled="loading">
                 <span v-if="loading" class="btn-spinner"></span>
-                <span v-else>Get product updates</span>
+                <span v-else>Join the waitlist</span>
               </button>
 
             </form>
@@ -69,31 +48,31 @@
 
           <div v-else class="success-block">
             <div class="success-label">You're on the list.</div>
-            <p class="success-body">We’ll send occasional product updates and keep your handle reserved.</p>
+            <p class="success-body">We’ll email you when early access opens. Until then, keep putting in the miles.</p>
             <router-link to="/" class="btn-ghost">Back to home</router-link>
           </div>
         </div>
 
         <!-- Right: syncs + stats -->
         <div class="syncs-col">
-          <div class="syncs-label">Syncs with</div>
+          <div class="syncs-label">What you’ll get</div>
           <div class="sync-list">
-            <div class="sync-item">Garmin</div>
-            <div class="sync-item">Apple Health</div>
-            <div class="sync-item">COROS</div>
+            <div class="sync-item">Early access</div>
+            <div class="sync-item">Product updates</div>
+            <div class="sync-item">A better training home</div>
           </div>
           <div class="proof-strip">
             <div class="proof-cell">
-              <div class="proof-lbl">On List</div>
-              <div class="proof-val">12,400</div>
+              <div class="proof-lbl">Field</div>
+              <div class="proof-val">1 email</div>
             </div>
             <div class="proof-cell">
-              <div class="proof-lbl">Cities</div>
-              <div class="proof-val">38</div>
+              <div class="proof-lbl">Spam</div>
+              <div class="proof-val">None</div>
             </div>
             <div class="proof-cell proof-cell--last">
-              <div class="proof-lbl">Launch</div>
-              <div class="proof-val">S'26</div>
+              <div class="proof-lbl">Next</div>
+              <div class="proof-val">Invite</div>
             </div>
           </div>
         </div>
@@ -112,22 +91,22 @@ useHead({
   title: 'Join the Waitlist — Runnit Early Access',
   link: [{ rel: 'canonical', href: 'https://runnit.live/waitlist' }],
   meta: [
-    { name: 'description', content: 'Claim your handle and get product updates from Runnit, the training app built for endurance athletes.' },
+    { name: 'description', content: 'Join the Runnit waitlist for early access to the training app built for endurance athletes.' },
     { property: 'og:title', content: 'Join the Waitlist — Runnit Early Access' },
-    { property: 'og:description', content: 'Claim your handle and get product updates from Runnit.' },
+    { property: 'og:description', content: 'Join the Runnit waitlist for early access.' },
     { property: 'og:url', content: 'https://runnit.live/waitlist' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Join the Waitlist — Runnit Early Access' },
-    { name: 'twitter:description', content: 'Claim your handle and get product updates from Runnit.' },
+    { name: 'twitter:description', content: 'Join the Runnit waitlist for early access.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
-const form = reactive({ email: '', handle: '', city: '' })
+const form = reactive({ email: '' })
 const errors = reactive({ email: '' })
 const loading = ref(false)
 const submitted = ref(false)
@@ -148,11 +127,7 @@ async function submit() {
     const res = await fetch(`${API_URL}/newsletter/waitlist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: form.email,
-        name: form.handle || undefined,
-        city: form.city || undefined,
-      }),
+      body: JSON.stringify({ email: form.email }),
     })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
