@@ -387,6 +387,16 @@ const connectRunSignup = async () => {
   }
 }
 
+const loadRunSignupStatus = async () => {
+  if (!isSignedIn.value) return
+  try {
+    const { data } = await axios.get(`${API_URL}/integrations/runsignup/oauth/status`, { headers: authHeaders() })
+    runSignupConnected.value = Boolean(data.connected)
+  } catch {
+    runSignupConnected.value = false
+  }
+}
+
 const loadRaceResults = async () => {
   try { const { data } = await axios.get(`${API_URL}/race-results`); raceResults.value = Array.isArray(data) ? data : [] } catch { /* unauthenticated users can still browse races */ }
 }
@@ -1043,6 +1053,7 @@ onMounted(() => {
   loadBookmarks()
   loadRaceResults()
   loadResultProviders()
+  loadRunSignupStatus()
 })
 
 // Re-fetch when zipcode changes (debounced)
