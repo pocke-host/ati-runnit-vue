@@ -30,12 +30,15 @@
             <div class="last-sync-label">
               Last synced: {{ relativeTime(garminLastSync) }}
             </div>
-            <div v-if="syncState(garminLastSync) === 'pending'" class="sync-attention sync-attention--pending" role="status">Awaiting first sync — tap Sync Now to bring in data</div>
-            <div v-else-if="syncState(garminLastSync) === 'stale'" class="sync-attention" role="status">Needs attention — sync again to refresh</div>
+            <div v-if="garminNeedsReconnect" class="sync-attention" role="alert">Garmin needs to be reconnected to resume syncing.</div>
+            <div v-else-if="garminDeliveryMode === 'push' && !garminHistoricalImportSupported" class="sync-attention sync-attention--pending" role="status">New data appears after your device syncs with Garmin Connect. Historical backfill is not included in this Garmin access tier.</div>
             <div v-if="syncCounts.garmin" class="sync-count">{{ syncCounts.garmin }} activities synced</div>
-            <button class="btn btn-primary" @click="syncNow" :disabled="syncing">
+            <button v-if="garminNeedsReconnect" class="btn btn-primary" @click="connectGarmin" :disabled="loading">
+              Reconnect Garmin
+            </button>
+            <button v-else class="btn btn-primary" @click="syncNow" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
-              {{ syncing ? 'Syncing…' : 'Sync Now' }}
+              {{ syncing ? 'Refreshing…' : 'Refresh status' }}
             </button>
             <button class="btn-disconnect" @click="disconnectGarmin">Disconnect</button>
           </div>
@@ -224,6 +227,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 const garminConnected = ref(false)
 const garminLastSync = ref(null)
+const garminNeedsReconnect = ref(false)
+const garminDeliveryMode = ref('push')
+const garminHistoricalImportSupported = ref(false)
 const corosConnected = ref(false)
 const corosLastSync = ref(null)
 const whoopConnected = ref(false)
@@ -294,6 +300,9 @@ const checkConnectionStatus = async () => {
   if (garminRes) {
     garminConnected.value = garminRes.data.connected
     garminLastSync.value = garminRes.data.lastSync || null
+    garminNeedsReconnect.value = Boolean(garminRes.data.needsReconnect)
+    garminDeliveryMode.value = garminRes.data.deliveryMode || 'push'
+    garminHistoricalImportSupported.value = Boolean(garminRes.data.historicalImportSupported)
   }
   if (corosRes) {
     corosConnected.value = corosRes.data.connected
