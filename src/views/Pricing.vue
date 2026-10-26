@@ -6,13 +6,18 @@
       <div class="page-inner hero-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
         <h1 class="hero-h1">Core training stays free.</h1>
-        <p class="launch-note">Free for every athlete. Runnit earns when coaches earn.</p>
+        <p class="launch-note">Free for every athlete. Optional depth when you want it.</p>
       </div>
     </section>
 
     <!-- PRICING CARDS -->
     <section class="cards-section">
       <div class="page-inner">
+        <div class="pricing-intro">
+          <span class="section-kicker">One free core. Three ways to grow.</span>
+          <h2>Train free. Go deeper when it matters.</h2>
+          <p>Keep your training, data, and community in one place. RUNNIT Pro adds advanced guidance when you are ready, while coaches earn through the marketplace.</p>
+        </div>
         <div class="cards-grid">
 
           <!-- Free -->
@@ -33,6 +38,42 @@
             <router-link to="/signup" class="btn-plan btn-plan--outline" data-analytics="cta_signup_pricing_free">Start Free</router-link>
           </div>
 
+          <!-- RUNNIT Pro -->
+          <div class="price-card price-card--featured">
+            <span class="popular-tag">Planned</span>
+            <div class="plan-tier plan-tier--cobalt">RUNNIT Pro</div>
+            <div class="price-row">
+              <span class="price-amount">$8.99</span>
+              <span class="price-mo">/MO</span>
+            </div>
+            <div class="plan-tagline">Advanced training intelligence. Target: $79/year.</div>
+            <ul class="plan-features">
+              <li><b class="check">✓</b>&nbsp; Adaptive event coaching</li>
+              <li><b class="check">✓</b>&nbsp; Recovery-aware plan adjustments</li>
+              <li><b class="check">✓</b>&nbsp; Race predictions and pacing strategy</li>
+              <li><b class="check">✓</b>&nbsp; Advanced trends, reports, and exports</li>
+              <li><b class="check">✓</b>&nbsp; Deeper route and training analysis</li>
+            </ul>
+            <router-link to="/waitlist" class="btn-plan btn-plan--cobalt" data-analytics="cta_waitlist_pro">Join Pro interest list</router-link>
+          </div>
+
+          <!-- Coach Marketplace -->
+          <div class="price-card">
+            <div class="plan-tier plan-tier--muted">Coach Marketplace</div>
+            <div class="price-row">
+              <span class="price-amount">$0</span>
+              <span class="price-mo">TO JOIN</span>
+            </div>
+            <div class="plan-tagline">Coaches pay only when they earn.</div>
+            <ul class="plan-features">
+              <li><b class="check">✓</b>&nbsp; Free coach profile and service listings</li>
+              <li><b class="check">✓</b>&nbsp; Booking, messaging, and scheduling</li>
+              <li><b class="check">✓</b>&nbsp; Stripe Connect payouts</li>
+              <li><b class="check">✓</b>&nbsp; 15% RUNNIT commission on completed paid bookings</li>
+            </ul>
+            <router-link to="/signup" class="btn-plan btn-plan--outline" data-analytics="cta_signup_coach_pricing">Become a coach</router-link>
+          </div>
+
         </div>
       </div>
     </section>
@@ -40,7 +81,7 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
-      <p class="cta-sub">Runnit is free for athletes. Coaches pay only when they earn through the marketplace.</p>
+      <p class="cta-sub">The athlete core stays free. Premium guidance and coaching create the next layer of value.</p>
       <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_pricing_footer">Start Free</router-link>
     </section>
 
@@ -155,10 +196,36 @@ useHead({
 }
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  max-width: 760px;
+  max-width: 1100px;
   margin: 0 auto;
+}
+.pricing-intro {
+  max-width: 720px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+.section-kicker {
+  color: #2A55F5;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.pricing-intro h2 {
+  font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  font-size: clamp(42px, 6vw, 64px);
+  line-height: 0.88;
+  margin: 10px 0 14px;
+  text-transform: uppercase;
+}
+.pricing-intro p {
+  color: #5a5348;
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
 }
 .price-card {
   border: 2px solid #16130F;

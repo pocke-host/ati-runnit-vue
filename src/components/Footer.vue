@@ -4,23 +4,10 @@
     <!-- CTA cap -->
     <div class="rk-footer-cta">
       <div class="rk-footer-cta-headline">Lace Up.</div>
-      <div class="rk-footer-cta-sub">Claim your @handle and bring the friend who always flakes.</div>
-      <form class="rk-footer-cta-form" @submit.prevent="submitEmail" @click.stop>
-        <input
-          v-model.trim="email"
-          type="email"
-          class="rk-footer-cta-input"
-          placeholder="you@email.com"
-          aria-label="Email address"
-          autocomplete="email"
-          :disabled="submitting || submitted"
-        />
-        <button type="submit" class="rk-footer-cta-btn" :disabled="submitting || submitted">
-          <span v-if="submitted">On the list ✓</span>
-          <span v-else>{{ submitting ? '...' : 'Join →' }}</span>
-        </button>
-      </form>
-      <p v-if="errorMsg" class="rk-footer-cta-err">{{ errorMsg }}</p>
+      <div class="rk-footer-cta-sub">One training home for the data you already collect.</div>
+      <router-link to="/waitlist" class="rk-footer-cta-btn" data-analytics="cta_waitlist_footer">
+        Join the waitlist →
+      </router-link>
     </div>
 
     <!-- Ticker seam -->
@@ -51,7 +38,7 @@
         <div class="rk-footer-col">
           <div class="rk-footer-col-label">Product</div>
           <router-link to="/features" class="rk-footer-link">Features</router-link>
-          <router-link to="/subscribe" class="rk-footer-link">Pricing</router-link>
+          <router-link to="/pricing" class="rk-footer-link">Pricing</router-link>
           <router-link to="/waitlist" class="rk-footer-link">Join Waitlist</router-link>
           <router-link to="/dashboard" class="rk-footer-link">Dashboard</router-link>
           <router-link to="/feed" class="rk-footer-link">Feed</router-link>
@@ -97,42 +84,7 @@ export default {
 </script>
 
 <script setup>
-import { ref } from 'vue'
-
 const year = new Date().getFullYear()
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-const email = ref('')
-const submitting = ref(false)
-const submitted = ref(false)
-const errorMsg = ref('')
-
-async function submitEmail() {
-  errorMsg.value = ''
-  if (!email.value) return
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    errorMsg.value = 'Enter a valid email.'
-    return
-  }
-  submitting.value = true
-  try {
-    const res = await fetch(`${API_URL}/newsletter/waitlist`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value }),
-    })
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
-      errorMsg.value = data.error || "Didn't go through. Try again."
-      return
-    }
-    submitted.value = true
-  } catch {
-    errorMsg.value = 'Network hiccup. Try again.'
-  } finally {
-    submitting.value = false
-  }
-}
 </script>
 
 <style scoped>
@@ -167,29 +119,8 @@ async function submitEmail() {
   color: rgba(255, 255, 255, 0.85);
   margin: 14px 0 22px;
 }
-.rk-footer-cta-form {
-  display: inline-flex;
-  max-width: 520px;
-  width: 100%;
-  border: 2px solid #16130F;
-  background: #FBF6EC;
-}
-.rk-footer-cta-input {
-  flex: 1;
-  min-width: 0;
-  padding: 15px 18px;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: #16130F;
-  text-align: left;
-  background: transparent;
-  border: none;
-  outline: none;
-}
-.rk-footer-cta-input::placeholder { color: #8a8a8a; }
-.rk-footer-cta-input:disabled { opacity: 0.6; }
 .rk-footer-cta-btn {
+  display: inline-block;
   background: #16130F;
   color: #FBF6EC;
   padding: 15px 24px;
@@ -199,21 +130,11 @@ async function submitEmail() {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  border: none;
+  border: 2px solid #16130F;
   flex-shrink: 0;
-  cursor: pointer;
   transition: opacity 0.15s;
 }
 .rk-footer-cta-btn:hover { opacity: 0.8; }
-.rk-footer-cta-btn:disabled { cursor: not-allowed; opacity: 0.7; }
-.rk-footer-cta-err {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #FFC53D;
-  margin: 12px 0 0;
-}
 
 /* ── Ticker Seam ── */
 .rk-footer-ticker-wrap {

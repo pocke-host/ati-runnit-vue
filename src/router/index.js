@@ -18,7 +18,7 @@ const routes = [
   { path: '/features',       name: 'Features',      component: () => import('@/views/Features.vue') },
   { path: '/about',          name: 'About',         component: () => import('@/views/About.vue') },
   { path: '/pricing',        name: 'Pricing',       component: () => import('@/views/Pricing.vue') },
-  { path: '/subscribe',         name: 'Subscribe',       component: () => import('@/views/Subscribe.vue') },
+  { path: '/subscribe',         name: 'Subscribe',       redirect: '/pricing' },
   { path: '/subscribe/success', name: 'CheckoutSuccess', component: () => import('@/views/CheckoutSuccess.vue') },
   { path: '/coaching/booking-success', name: 'CoachingBookingSuccess', component: () => import('@/views/CheckoutSuccess.vue'), meta: { requiresAuth: true } },
   { path: '/coaching/booking-cancelled', name: 'CoachingBookingCancelled', component: () => import('@/views/CheckoutCancel.vue'), meta: { requiresAuth: true } },
