@@ -53,6 +53,11 @@
           <p class="daily-focus-kicker">Your day in training</p>
           <h2 id="daily-focus-title">{{ todayWorkout ? todayWorkout.name || todayWorkout.type : 'Keep the momentum moving.' }}</h2>
           <p>{{ todayWorkout?.description || (activityToday ? 'Activity logged. See how the rest of your week is shaping up.' : 'No workout is scheduled yet. Start with a plan or log what you do today.') }}</p>
+          <div v-if="todayTrainingCall" class="daily-focus-call" role="status">
+            <span class="daily-focus-call-label">{{ todayTrainingCall.label }}</span>
+            <strong>{{ todayTrainingCall.title }}</strong>
+            <span>{{ todayTrainingCall.message }}</span>
+          </div>
         </div>
         <div class="daily-focus-context">
           <div v-if="daysToRace !== null" class="daily-focus-stat"><span>Next race</span><strong>{{ daysToRace === 0 ? 'Race day' : `${daysToRace} days` }}</strong></div>
@@ -328,7 +333,7 @@
           <div class="db2-card db2-recovery" v-if="todayWellness">
             <div class="db2-card-head">
               <div class="db2-card-title">Recovery</div>
-              <div class="db2-recovery-date">Today</div>
+              <div class="db2-recovery-date">Today · {{ wellnessSourceLabel }}</div>
             </div>
 
             <!-- Rings: Recovery + Strain -->
@@ -364,6 +369,27 @@
               <div class="db2-recovery-stat" v-if="todayWellness.totalSleepMinutes != null">
                 <span class="db2-recovery-stat-lbl">Time Asleep</span>
                 <span class="db2-recovery-stat-val">{{ Math.floor(todayWellness.totalSleepMinutes / 60) }}<span class="db2-recovery-unit">h</span> {{ todayWellness.totalSleepMinutes % 60 }}<span class="db2-recovery-unit">m</span></span>
+              </div>
+            </div>
+
+            <!-- Garmin Health signals. These stay compact so the card remains useful
+                 when a user has several connected providers. -->
+            <div v-if="todayWellness.source === 'GARMIN' && garminHealthMetricCount" class="db2-garmin-health-grid">
+              <div class="db2-recovery-stat" v-if="todayWellness.steps != null">
+                <span class="db2-recovery-stat-lbl">Steps</span>
+                <span class="db2-recovery-stat-val">{{ todayWellness.steps.toLocaleString() }}</span>
+              </div>
+              <div class="db2-recovery-stat" v-if="todayWellness.bodyBattery != null">
+                <span class="db2-recovery-stat-lbl">Body Battery</span>
+                <span class="db2-recovery-stat-val">{{ todayWellness.bodyBattery }}<span class="db2-recovery-unit">/100</span></span>
+              </div>
+              <div class="db2-recovery-stat" v-if="todayWellness.averageStress != null">
+                <span class="db2-recovery-stat-lbl">Stress</span>
+                <span class="db2-recovery-stat-val">{{ Math.round(todayWellness.averageStress) }}</span>
+              </div>
+              <div class="db2-recovery-stat" v-if="todayWellness.activeKilocalories != null">
+                <span class="db2-recovery-stat-lbl">Active kcal</span>
+                <span class="db2-recovery-stat-val">{{ todayWellness.activeKilocalories }}</span>
               </div>
             </div>
 
@@ -2386,6 +2412,54 @@ const recoveryColor = computed(() => {
   return '#ef4444'
 })
 
+const wellnessSourceLabel = computed(() => {
+  const source = todayWellness.value?.source
+  if (!source) return 'Wellness'
+  const labels = { GARMIN: 'Garmin', WHOOP: 'WHOOP', OURA: 'Oura', FITBIT: 'Fitbit' }
+  return labels[source] || source
+})
+
+const garminHealthMetricCount = computed(() => {
+  const wellness = todayWellness.value
+  if (!wellness || wellness.source !== 'GARMIN') return 0
+  return ['steps', 'bodyBattery', 'averageStress', 'activeKilocalories']
+    .filter(key => wellness[key] != null).length
+})
+
+const todayTrainingCall = computed(() => {
+  const wellness = todayWellness.value
+  if (!wellness) return null
+
+  const recovery = wellness.recoveryScore
+  const battery = wellness.bodyBattery
+  const stress = wellness.averageStress
+  const needsEase = (recovery != null && recovery < 34)
+    || (battery != null && battery < 25)
+    || (stress != null && stress >= 70)
+  const supportsBuild = (recovery != null && recovery >= 67)
+    || (battery != null && battery >= 70 && (stress == null || stress < 50))
+
+  if (needsEase) {
+    return {
+      label: `${wellnessSourceLabel.value} signal`,
+      title: 'Keep today easy.',
+      message: 'Your recovery signals point to lighter movement or extra recovery.'
+    }
+  }
+  if (supportsBuild) {
+    return {
+      label: `${wellnessSourceLabel.value} signal`,
+      title: 'Good day to build.',
+      message: 'Your signals support the planned session—stay aligned with your training block.'
+    }
+  }
+  return {
+    label: `${wellnessSourceLabel.value} signal`,
+    title: 'Stay controlled.',
+    message: 'Follow the plan, keep effort measured, and reassess how you feel.'
+  }
+})
+
 // WHOOP's own strain bands — 0-21 scale (Borg-based, not a percentage)
 const strainBand = computed(() => {
   const s = todayWellness.value?.strain
@@ -3872,7 +3946,7 @@ textarea.form-control{resize:vertical;min-height:72px}
 /* ════════════════════════════════════
    DESKTOP V2 BENTO DASHBOARD
    ════════════════════════════════════ */
-.first-action-card{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 18px;padding:20px;background:#FFF3D6;border:2px solid #16130F;box-shadow:4px 4px #16130F}.first-action-copy h2{margin:0;font-size:1.5rem;line-height:1}.first-action-copy>p:last-child{margin:8px 0 0;color:#665f55;font-size:.86rem;line-height:1.4}.first-action-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.first-action-dismiss{padding:8px 0;border:0;background:transparent;color:#665f55;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.first-action-dismiss:hover{text-decoration:underline}.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(220px,1fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-context{display:flex;gap:10px}.daily-focus-stat{min-width:0;padding-left:12px;border-left:2px solid #E7DFCE}.daily-focus-stat span{display:block;color:#665f55;font:9px 'Spline Sans Mono',monospace;text-transform:uppercase}.daily-focus-stat strong{display:block;margin-top:5px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.db2-desktop { display: block; }
+.first-action-card{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 18px;padding:20px;background:#FFF3D6;border:2px solid #16130F;box-shadow:4px 4px #16130F}.first-action-copy h2{margin:0;font-size:1.5rem;line-height:1}.first-action-copy>p:last-child{margin:8px 0 0;color:#665f55;font-size:.86rem;line-height:1.4}.first-action-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.first-action-dismiss{padding:8px 0;border:0;background:transparent;color:#665f55;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.first-action-dismiss:hover{text-decoration:underline}.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(220px,1fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-call{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:10px;border-top:1px solid #E7DFCE;color:#665f55;font-size:.76rem;line-height:1.35}.daily-focus-call-label{color:#2A55F5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.daily-focus-call strong{color:#16130F}.daily-focus-context{display:flex;gap:10px}.daily-focus-stat{min-width:0;padding-left:12px;border-left:2px solid #E7DFCE}.daily-focus-stat span{display:block;color:#665f55;font:9px 'Spline Sans Mono',monospace;text-transform:uppercase}.daily-focus-stat strong{display:block;margin-top:5px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.db2-desktop { display: block; }
 @media(max-width:900px){.daily-focus{grid-template-columns:1fr;gap:14px}.daily-focus-context{order:2}.daily-focus-actions{order:3}.daily-focus-primary{flex:1;text-align:center}}
 @media(max-width:900px){.first-action-card{align-items:flex-start;flex-direction:column;gap:16px}.first-action-actions{justify-content:flex-start;width:100%}}
 @media(max-width:600px){.daily-focus{margin:0 0 14px;padding:16px}.daily-focus-context{overflow:auto}.daily-focus-stat{flex:1}.daily-focus-actions{flex-wrap:wrap}.daily-focus-primary{width:100%}}
@@ -4519,6 +4593,14 @@ textarea.form-control{resize:vertical;min-height:72px}
   grid-template-columns: 1fr 1fr;
   gap: 10px 18px;
   padding: 0 18px 16px;
+}
+.db2-garmin-health-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+  padding: 0 18px 16px;
+  border-top: 1px solid #E7DFCE;
+  padding-top: 14px;
 }
 .db2-recovery-stat { display: flex; flex-direction: column; }
 .db2-recovery-stat-lbl {
