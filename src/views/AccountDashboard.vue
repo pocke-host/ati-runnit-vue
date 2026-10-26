@@ -81,7 +81,7 @@
             </div>
             <div class="db2-hero-right">
               <span class="db2-phase-badge">{{ trainingBlock.label }} PHASE</span>
-              <router-link v-if="daysToRace !== null" :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="db2-race-countdown">
+              <router-link v-if="daysToRace !== null" :to="raceTargetRoute" class="db2-race-countdown">
                 {{ daysToRace === 0 ? 'RACE DAY' : `${daysToRace} DAYS TO RACE` }}
               </router-link>
               <span v-if="riskBadge" :class="['db2-risk-badge', riskBadge.modifier]">{{ riskBadge.label }}</span>
@@ -1742,12 +1742,17 @@ const disciplineData = computed(() => useDisciplineScore(activities.value))
 const trainingBlock  = computed(() => useTrainingBlock(activities.value))
 const archetypeData  = computed(() => useArchetype(activities.value))
 const daysToRace = computed(() => {
-  const target = fullActivePlan.value?.targetRaceDate || activePlan.value?.targetRaceDate
+  const target = fullActivePlan.value?.targetRaceDate || activePlan.value?.targetRaceDate || user.value?.targetEventDate
   if (!target) return null
   const today = new Date(); today.setHours(0, 0, 0, 0)
   const race = new Date(`${target}T00:00:00`)
   const days = Math.ceil((race - today) / 86400000)
   return days >= 0 ? days : null
+})
+
+const raceTargetRoute = computed(() => {
+  const planId = fullActivePlan.value?.id || activePlan.value?.id
+  return planId ? `/plans/${planId}` : '/races'
 })
 
 const greeting = computed(() => {

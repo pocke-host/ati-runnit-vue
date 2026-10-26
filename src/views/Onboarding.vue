@@ -5,8 +5,8 @@
       <div class="progress-bar-fill" :style="{ width: progressWidth }"></div>
     </div>
 
-    <!-- Header row (steps 2–6, athlete only) -->
-    <div class="onboard-header" v-if="!isCoach && step >= 2 && step <= 6">
+    <!-- Header row (steps 2–7, athlete only) -->
+    <div class="onboard-header" v-if="!isCoach && step >= 2 && step <= 7">
       <button class="btn-back" @click="back">← Back</button>
       <span class="step-counter">{{ String(step - 1).padStart(2, '0') }} / 06</span>
     </div>
@@ -117,8 +117,39 @@
       </button>
     </div>
 
-    <!-- ── Step 2: Sport ── -->
+    <!-- ── Step 2: Target event ── -->
     <div v-else-if="step === 2" class="step-container">
+      <p class="step-kicker">Your next chapter</p>
+      <h2 class="step-question">What are you<br>training for?</h2>
+      <p class="step-helper">Choose a live event to give your week a finish line. You can add one later if you’re building consistency first.</p>
+
+      <div v-if="selectedEvent" class="event-choice event-choice--selected">
+        <div><span class="event-choice-label">Your target event</span><strong>{{ selectedEvent.name }}</strong><span>{{ formatEventMeta(selectedEvent) }}</span></div>
+        <button type="button" class="event-choice-change" @click="selectedEvent = null">Change</button>
+      </div>
+
+      <template v-else>
+        <label class="event-search-label" for="onboarding-event-search">Find a live race</label>
+        <input id="onboarding-event-search" v-model.trim="eventQuery" class="event-search-input" placeholder="Search by race or city" autocomplete="off" />
+        <div v-if="eventLoading" class="event-loading" role="status">Loading live events…</div>
+        <div v-else-if="eventError" class="event-inline-error" role="alert">{{ eventError }} <button type="button" @click="loadOnboardingEvents">Retry</button></div>
+        <div v-else-if="filteredOnboardingEvents.length" class="event-choice-list">
+          <button v-for="event in filteredOnboardingEvents" :key="event.id" type="button" class="event-choice" @click="chooseEvent(event)">
+            <span class="event-choice-date">{{ formatEventDate(event.date) }}</span>
+            <span class="event-choice-main"><strong>{{ event.name }}</strong><span>{{ formatEventMeta(event) }}</span></span>
+            <span class="event-choice-arrow">→</span>
+          </button>
+        </div>
+        <div v-else class="event-empty">No live events match that search. You can add your goal later or browse the full race calendar.</div>
+        <button type="button" class="event-later-btn" @click="chooseNoEvent">I’m building consistency first →</button>
+      </template>
+
+      <button class="btn-cta mt-auto" :disabled="!selectedEvent" @click="step = 3">Continue</button>
+    </div>
+
+    <!-- ── Step 3: Sport ── -->
+    <div v-else-if="step === 3" class="step-container">
+      <button class="btn-back standalone" @click="back">← Back</button>
       <h2 class="step-question">What do you<br>primarily train?</h2>
       <div class="tile-grid">
         <button
@@ -132,26 +163,7 @@
           <span class="tile-label">{{ opt.label }}</span>
         </button>
       </div>
-      <button class="btn-cta mt-auto" :disabled="!selections.sport" @click="step = 3">Continue</button>
-    </div>
-
-    <!-- ── Step 3: Goal ── -->
-    <div v-else-if="step === 3" class="step-container">
-      <button class="btn-back standalone" @click="back">← Back</button>
-      <h2 class="step-question">What are you<br>working toward?</h2>
-      <div class="tile-grid">
-        <button
-          v-for="opt in goalOptions"
-          :key="opt.value"
-          class="tile"
-          :class="{ selected: selections.goal === opt.value }"
-          @click="select('goal', opt.value)"
-        >
-          <span class="tile-emoji">{{ opt.emoji }}</span>
-          <span class="tile-label">{{ opt.label }}</span>
-        </button>
-      </div>
-      <button class="btn-cta mt-auto" :disabled="!selections.goal" @click="step = 4">Continue</button>
+      <button class="btn-cta mt-auto" :disabled="!selections.sport" @click="step = 4">Continue</button>
     </div>
 
     <!-- ── Step 4: Level ── -->
@@ -291,7 +303,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
@@ -326,6 +338,12 @@ const coachSelections = reactive({
   sports: [],
   athleteCount: ''
 })
+
+const eventLoading = ref(false)
+const eventError = ref('')
+const eventQuery = ref('')
+const onboardingEvents = ref([])
+const selectedEvent = ref(null)
 
 const firstName = computed(() => {
   const name = user.value?.displayName || user.value?.name || 'Athlete'
@@ -396,7 +414,7 @@ const selectedSportLabel = computed(() =>
   sportOptions.find(o => o.value === selections.sport)?.label || ''
 )
 const selectedGoalLabel = computed(() =>
-  goalOptions.find(o => o.value === selections.goal)?.label || ''
+  selectedEvent.value?.name || goalOptions.find(o => o.value === selections.goal)?.label || ''
 )
 const selectedLevelLabel = computed(() =>
   levelOptions.find(o => o.value === selections.level)?.label || ''
@@ -413,6 +431,89 @@ function back() {
 function finish() {
   step.value = 8
 }
+
+const normalizeOnboardingEvent = (race, provider = race.provider || 'RUNSIGNUP') => {
+  const r = race.race || race
+  const rawDate = String(r.next_date || r.date || r.startDate || '')
+  const date = /^\d{4}-\d{2}-\d{2}/.test(rawDate)
+    ? rawDate.slice(0, 10)
+    : rawDate.includes('/')
+      ? (() => { const [month, day, year] = rawDate.split('/'); return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` })()
+      : rawDate.slice(0, 10)
+  return {
+    id: String(r.race_id || r.id || `${provider}-${r.name || 'event'}-${date}`),
+    name: r.name || r.title || 'Untitled event',
+    date: String(date).slice(0, 10),
+    sport: r.sport || '',
+    provider,
+    url: r.url || r.registerUrl || '',
+    city: r.address?.city || r.city || '',
+    state: r.address?.state || r.state || '',
+  }
+}
+
+const filteredOnboardingEvents = computed(() => {
+  const query = eventQuery.value.toLowerCase()
+  return onboardingEvents.value
+    .filter(event => !query || `${event.name} ${event.city} ${event.state}`.toLowerCase().includes(query))
+    .slice(0, 6)
+})
+
+const formatEventDate = value => value
+  ? new Date(`${value}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  : 'Date TBD'
+
+const formatEventMeta = event => [formatEventDate(event.date), [event.city, event.state].filter(Boolean).join(', '), event.provider].filter(Boolean).join(' · ')
+
+function chooseEvent(event) {
+  selectedEvent.value = event
+  selections.goal = 'race'
+}
+
+function chooseNoEvent() {
+  selectedEvent.value = null
+  selections.goal = 'consistency'
+  step.value = 3
+}
+
+async function loadOnboardingEvents() {
+  eventLoading.value = true
+  eventError.value = ''
+  try {
+    const [runSignupResult, findARaceResult] = await Promise.allSettled([
+      axios.get(`${API_URL}/events`, {
+        params: { page: 1, results_per_page: 30, future_events_only: 'T' },
+        timeout: 10000,
+      }),
+      axios.get(`${API_URL}/events/findarace`, { timeout: 12000 }),
+    ])
+    const runSignupData = runSignupResult.status === 'fulfilled' ? runSignupResult.value.data : []
+    const runSignupRaces = Array.isArray(runSignupData) ? runSignupData : (runSignupData?.races || [])
+    const findARaceEvents = findARaceResult.status === 'fulfilled' && Array.isArray(findARaceResult.value.data)
+      ? findARaceResult.value.data
+      : []
+    onboardingEvents.value = [
+      ...runSignupRaces.map(race => normalizeOnboardingEvent(race, 'RunSignup')),
+      ...findARaceEvents.map(event => normalizeOnboardingEvent(event, 'FindARace')),
+    ]
+      .filter(event => event.date && new Date(`${event.date}T00:00:00`) >= new Date())
+      .filter((event, index, all) => all.findIndex(other => `${other.name}|${other.date}` === `${event.name}|${event.date}`) === index)
+      .sort((a, b) => a.date.localeCompare(b.date))
+    if (!onboardingEvents.value.length) throw new Error('No live events returned')
+  } catch {
+    eventError.value = 'Live event data is temporarily unavailable.'
+  } finally {
+    eventLoading.value = false
+  }
+}
+
+onMounted(() => {
+  if (!isCoach.value) loadOnboardingEvents()
+})
+
+watch(step, value => {
+  if (value === 2 && !isCoach.value && !onboardingEvents.value.length && !eventLoading.value) loadOnboardingEvents()
+})
 
 // ── City autocomplete (Mapbox geocoding) ──────────────────────────────────
 const citySuggestions = ref([])
@@ -499,9 +600,20 @@ async function goToDashboard() {
   authStore.setUnitSystem(selections.units)
   try {
     // Set city + sport + compute archetype via new onboarding endpoint
-    await axios.post(`${API_URL}/auth/onboarding`, {
+    const { data: onboardingUser } = await axios.post(`${API_URL}/auth/onboarding`, {
       city: selections.city || '',
       sport: selections.sport,
+      goal: selections.goal,
+      level: selections.level,
+      trainingDays: selections.days,
+      targetEventId: selectedEvent.value?.id || '',
+      targetEventProvider: selectedEvent.value?.provider || '',
+      targetEventName: selectedEvent.value?.name || '',
+      targetEventDate: selectedEvent.value?.date || '',
+      targetEventSport: selectedEvent.value?.sport || selections.sport,
+      targetEventUrl: selectedEvent.value?.url || '',
+      targetEventCity: selectedEvent.value?.city || '',
+      targetEventState: selectedEvent.value?.state || '',
     })
     // Save training preferences separately
     await axios.patch(`${API_URL}/users/me/preferences`, {
@@ -510,6 +622,7 @@ async function goToDashboard() {
       level: selections.level,
       trainingDays: selections.days,
     })
+    authStore.setAuth(onboardingUser)
     sessionStorage.removeItem('needs_onboarding')
     authStore.completeOnboarding()
     router.push('/dashboard?welcome=1')
@@ -669,6 +782,167 @@ async function goToDashboard() {
   line-height: 0.9;
   color: #16130F;
   margin: 0 0 40px;
+}
+
+.step-kicker {
+  margin: 0 0 10px;
+  color: #2A55F5;
+  font: 700 0.68rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.step-helper {
+  margin: -22px 0 24px;
+  color: #5A5348;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.event-search-label {
+  margin-bottom: 8px;
+  color: #5A5348;
+  font: 700 0.68rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.event-search-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #16130F;
+  border-radius: 0;
+  background: #fff;
+  color: #16130F;
+  font-size: 0.92rem;
+  outline: none;
+}
+
+.event-search-input:focus {
+  border-color: #2A55F5;
+  box-shadow: 0 0 0 3px rgba(42, 85, 245, 0.16);
+}
+
+.event-choice-list {
+  display: grid;
+  gap: 8px;
+  max-height: 250px;
+  margin: 12px 0 14px;
+  overflow-y: auto;
+}
+
+.event-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #16130F;
+  background: #fff;
+  color: #16130F;
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-choice:hover,
+.event-choice:focus-visible {
+  border-color: #2A55F5;
+  background: #EEF1FF;
+  outline: none;
+}
+
+.event-choice--selected {
+  justify-content: space-between;
+  margin-bottom: 18px;
+  background: #16130F;
+  color: #FBF6EC;
+}
+
+.event-choice-date {
+  flex: 0 0 48px;
+  color: #2A55F5;
+  font: 700 0.7rem 'Spline Sans Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+}
+
+.event-choice-main,
+.event-choice--selected > div {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-choice-main strong,
+.event-choice--selected strong {
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-choice-main span,
+.event-choice--selected span {
+  color: #665F55;
+  font-size: 0.72rem;
+}
+
+.event-choice--selected span,
+.event-choice--selected .event-choice-label {
+  color: #BEB6A7;
+}
+
+.event-choice-label {
+  font: 700 0.62rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.event-choice-arrow {
+  color: #2A55F5;
+  font-size: 1.1rem;
+}
+
+.event-choice-change,
+.event-later-btn,
+.event-inline-error button {
+  border: 0;
+  background: transparent;
+  color: #2A55F5;
+  cursor: pointer;
+  font: 700 0.68rem 'Spline Sans Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+}
+
+.event-choice--selected .event-choice-change {
+  color: #FFC53D;
+}
+
+.event-loading,
+.event-empty,
+.event-inline-error {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px dashed #9C9384;
+  color: #665F55;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.event-inline-error button {
+  margin-left: 4px;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.event-later-btn {
+  align-self: flex-start;
+  margin-bottom: 24px;
+  padding: 0;
+  color: #16130F;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ── Tile grid ── */

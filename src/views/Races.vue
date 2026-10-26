@@ -177,8 +177,7 @@
             <span class="results-count">
               {{ filteredEvents.length }} Event{{ filteredEvents.length !== 1 ? 's' : '' }}
             </span>
-            <span v-if="usingLiveData" class="live-badge"><span class="live-dot"></span>Live</span>
-            <span v-else class="sample-badge">Sample data</span>
+            <span v-if="usingLiveData" class="live-badge"><span class="live-dot"></span>Live provider data</span>
           </div>
 
           <EmptyState
@@ -709,6 +708,7 @@ const normalizeRace = (race) => {
     url:         r.url || '',
     registerUrl: r.url || '',
     image:       r.logo_url || '',
+    provider:    'RunSignup',
   }
 }
 
@@ -778,13 +778,8 @@ const fetchEvents = async () => {
     }
   }
 
-  // If live data came back sparse, supplement with sample events
-  if (merged.length < 10) {
-    for (const s of sampleEvents) {
-      const key = `${s.name}|${s.date}`
-      if (!seen.has(key)) { seen.add(key); merged.push(s) }
-    }
-  }
+  // Live-only rule: sparse provider data is still more trustworthy than
+  // synthetic races. The UI shows an honest empty state when nothing is live.
 
   events.value = merged
   loading.value = false
@@ -877,217 +872,6 @@ const getCardStyle = (event) => {
   return { background: '#111' }
 }
 
-/* ─── Sample / fallback data — all 10 sport types ────────── */
-const sampleEvents = [
-  // ── RUNNING ──
-  {
-    id: 's-run-1', name: 'LA Marathon', date: '2026-03-15', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running', city: 'Los Angeles', state: 'CA',
-    distances: ['Marathon', 'Half Marathon'],
-    summary: 'Iconic 26.2-mile course through LA neighborhoods — Dodger Stadium to Santa Monica.',
-    url: 'https://www.lamarathon.com', registerUrl: 'https://www.lamarathon.com', image: '',
-  },
-  {
-    id: 's-run-2', name: 'Boston Marathon', date: '2026-04-20', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running', city: 'Boston', state: 'MA',
-    distances: ['Marathon'],
-    summary: "The world's oldest annual marathon. Hopkinton to Boylston Street — qualification required.",
-    url: 'https://www.baa.org', registerUrl: 'https://www.baa.org', image: '',
-  },
-  {
-    id: 's-run-3', name: 'Big Sur International Marathon', date: '2026-04-26', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running', city: 'Big Sur', state: 'CA',
-    distances: ['Marathon', '21 mi', '10.6 mi', '5K'],
-    summary: 'Point-to-point along Highway 1 — the most scenic marathon in America.',
-    url: 'https://www.bsim.org', registerUrl: 'https://www.bsim.org', image: '',
-  },
-  {
-    id: 's-run-4', name: 'Chicago Marathon', date: '2026-10-11', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running', city: 'Chicago', state: 'IL',
-    distances: ['Marathon'],
-    summary: 'World Marathon Major through 29 neighborhoods of Chicago. Flat, fast, legendary.',
-    url: 'https://www.chicagomarathon.com', registerUrl: 'https://www.chicagomarathon.com', image: '',
-  },
-  {
-    id: 's-run-5', name: 'NYC Marathon', date: '2026-11-01', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running', city: 'New York', state: 'NY',
-    distances: ['Marathon'],
-    summary: 'The world\'s largest marathon — 26.2 miles through all five boroughs of New York City.',
-    url: 'https://www.nyrr.org/tcsnycmarathon', registerUrl: 'https://www.nyrr.org/tcsnycmarathon', image: '',
-  },
-  {
-    id: 's-run-6', name: 'Run Wild Missoula Half Marathon', date: '2026-07-04', sport: 'running',
-    sportEmoji: '🏃', sportLabel: 'Running', city: 'Missoula', state: 'MT',
-    distances: ['Half Marathon', '10K', '5K'],
-    summary: 'Beloved summer race through the streets of downtown Missoula. All distances welcome.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  // ── TRAIL ──
-  {
-    id: 's-trail-1', name: 'Western States 100', date: '2026-06-27', sport: 'trail',
-    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Squaw Valley', state: 'CA',
-    distances: ['100mi'],
-    summary: 'The most storied 100-mile trail run in the world. Squaw Valley to Auburn through the Sierra Nevada.',
-    url: 'https://www.wser.org', registerUrl: 'https://www.wser.org', image: '',
-  },
-  {
-    id: 's-trail-2', name: 'Leadville Trail 100', date: '2026-08-15', sport: 'trail',
-    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Leadville', state: 'CO',
-    distances: ['100mi', '50mi'],
-    summary: 'Run through the clouds. 100 miles at altitude — the "Race Across the Sky."',
-    url: 'https://www.leadvilleraceseries.com', registerUrl: 'https://www.leadvilleraceseries.com', image: '',
-  },
-  {
-    id: 's-trail-3', name: 'Hardrock 100', date: '2026-07-11', sport: 'trail',
-    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Silverton', state: 'CO',
-    distances: ['100mi'],
-    summary: '100-mile loop through the San Juan Mountains with over 33,000 ft of gain. Lottery entry.',
-    url: 'https://www.hardrock100.com', registerUrl: 'https://www.hardrock100.com', image: '',
-  },
-  {
-    id: 's-trail-4', name: 'Sean O\'Brien 100K', date: '2026-02-01', sport: 'trail',
-    sportEmoji: '🏔️', sportLabel: 'Trail', city: 'Malibu', state: 'CA',
-    distances: ['100K', '50K', '50mi'],
-    summary: 'A premier WSER-qualifier through the hills above Malibu. Multi-distance options available.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  // ── CYCLING ──
-  {
-    id: 's-cyc-1', name: 'Tour of the Battenkill', date: '2026-04-19', sport: 'cycling',
-    sportEmoji: '🚴', sportLabel: 'Cycling', city: 'Cambridge', state: 'NY',
-    distances: ['50mi', '66mi'],
-    summary: 'America\'s Queen of the Classics — rolling roads and gravel through the New York countryside.',
-    url: 'https://www.mybattenkill.com', registerUrl: 'https://www.mybattenkill.com', image: '',
-  },
-  {
-    id: 's-cyc-2', name: 'Red Rocks Gran Fondo', date: '2026-06-06', sport: 'cycling',
-    sportEmoji: '🚴', sportLabel: 'Cycling', city: 'Morrison', state: 'CO',
-    distances: ['Gran Fondo', 'Metric Century', '50mi'],
-    summary: 'Climb through Red Rocks Amphitheatre and the Colorado foothills. Breathtaking views all route.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  {
-    id: 's-cyc-3', name: 'Chicago Criterium', date: '2026-07-18', sport: 'cycling',
-    sportEmoji: '🚴', sportLabel: 'Cycling', city: 'Chicago', state: 'IL',
-    distances: ['Criterium'],
-    summary: 'Urban circuit race through downtown Chicago. Cat 1–5 fields, spectator-friendly course.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  // ── GRAVEL / MTB ──
-  {
-    id: 's-grv-1', name: 'Unbound Gravel', date: '2026-06-06', sport: 'gravel',
-    sportEmoji: '🪨', sportLabel: 'Gravel/MTB', city: 'Emporia', state: 'KS',
-    distances: ['200mi', '100mi', '50mi', '25mi'],
-    summary: 'The world\'s premier gravel race. 200 miles of unforgiving Kansas dirt — brutal and iconic.',
-    url: 'https://www.unboundgravel.com', registerUrl: 'https://www.unboundgravel.com', image: '',
-  },
-  {
-    id: 's-grv-2', name: 'Belgian Waffle Ride', date: '2026-04-05', sport: 'gravel',
-    sportEmoji: '🪨', sportLabel: 'Gravel/MTB', city: 'San Marcos', state: 'CA',
-    distances: ['130mi', '71mi', '35mi'],
-    summary: 'Cobbles, climbs, and chaos — California\'s answer to the Classics. Gravel in the hills of Palomar.',
-    url: 'https://www.belgianwaffleride.bike', registerUrl: 'https://www.belgianwaffleride.bike', image: '',
-  },
-  {
-    id: 's-grv-3', name: 'SBT GRVL', date: '2026-08-09', sport: 'gravel',
-    sportEmoji: '🪨', sportLabel: 'Gravel/MTB', city: 'Steamboat Springs', state: 'CO',
-    distances: ['144mi', '60mi', '36mi'],
-    summary: 'Mountain gravel racing through Routt County — stunning Colorado scenery, serious altitude.',
-    url: 'https://www.sbtgrvl.com', registerUrl: 'https://www.sbtgrvl.com', image: '',
-  },
-  // ── TRIATHLON ──
-  {
-    id: 's-tri-1', name: 'IRONMAN 70.3 Oceanside', date: '2026-03-28', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon', city: 'Oceanside', state: 'CA',
-    distances: ['70.3'],
-    summary: 'Swim, bike, and run along the Southern California coast. One of the most popular 70.3s in the US.',
-    url: 'https://www.ironman.com', registerUrl: 'https://www.ironman.com', image: '',
-  },
-  {
-    id: 's-tri-2', name: 'Escape From Alcatraz Triathlon', date: '2026-06-07', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon', city: 'San Francisco', state: 'CA',
-    distances: ['Olympic'],
-    summary: 'Swim from the island, bike the Marin Headlands, run the coastal trails. A true bucket-list race.',
-    url: 'https://www.escapealcatraztri.com', registerUrl: 'https://www.escapealcatraztri.com', image: '',
-  },
-  {
-    id: 's-tri-3', name: 'IRONMAN Coeur d\'Alene', date: '2026-06-28', sport: 'triathlon',
-    sportEmoji: '🏊', sportLabel: 'Triathlon', city: 'Coeur d\'Alene', state: 'ID',
-    distances: ['Ironman'],
-    summary: '2.4-mile swim, 112-mile bike, 26.2-mile run through Idaho\'s panhandle. Full-distance glory.',
-    url: 'https://www.ironman.com', registerUrl: 'https://www.ironman.com', image: '',
-  },
-  // ── DUATHLON ──
-  {
-    id: 's-du-1', name: 'USAT Duathlon Nationals', date: '2026-09-12', sport: 'duathlon',
-    sportEmoji: '🔁', sportLabel: 'Duathlon', city: 'Tucson', state: 'AZ',
-    distances: ['Sprint', 'Standard'],
-    summary: 'Run-bike-run on fast desert roads. USAT Age Group National Championship — qualifier required.',
-    url: 'https://www.usatriathlon.org', registerUrl: 'https://www.usatriathlon.org', image: '',
-  },
-  {
-    id: 's-du-2', name: 'Powerman Alabama', date: '2026-04-18', sport: 'duathlon',
-    sportEmoji: '🔁', sportLabel: 'Duathlon', city: 'Auburn', state: 'AL',
-    distances: ['Long Course', 'Standard', 'Sprint'],
-    summary: 'Run-bike-run through the rolling hills of Auburn. Part of the Powerman World Series.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  // ── OPEN WATER ──
-  {
-    id: 's-ow-1', name: 'Great Chesapeake Bay Swim', date: '2026-06-13', sport: 'openwater',
-    sportEmoji: '🌊', sportLabel: 'Open Water', city: 'Annapolis', state: 'MD',
-    distances: ['4.4mi'],
-    summary: 'Cross the Chesapeake Bay from Sandy Point to Kent Island — 4.4 miles of open water.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  {
-    id: 's-ow-2', name: 'Horsetooth Open Water Swim', date: '2026-08-08', sport: 'openwater',
-    sportEmoji: '🌊', sportLabel: 'Open Water', city: 'Fort Collins', state: 'CO',
-    distances: ['10K', '5K', '2.5K', '1K'],
-    summary: 'Mountain reservoir racing in Colorado. Multiple distances from 1K to the 10K championship.',
-    url: '#', registerUrl: '#', image: '',
-  },
-  // ── OCR ──
-  {
-    id: 's-ocr-1', name: 'Spartan Race World Championship', date: '2026-10-03', sport: 'ocr',
-    sportEmoji: '🪖', sportLabel: 'OCR', city: 'Lake Tahoe', state: 'CA',
-    distances: ['13mi', '5mi'],
-    summary: 'Elite and age group athletes converge on Tahoe for the ultimate Spartan showdown.',
-    url: 'https://www.spartan.com', registerUrl: 'https://www.spartan.com', image: '',
-  },
-  {
-    id: 's-ocr-2', name: 'Tough Mudder Chicago', date: '2026-05-16', sport: 'ocr',
-    sportEmoji: '🪖', sportLabel: 'OCR', city: 'Joliet', state: 'IL',
-    distances: ['5mi', '3mi'],
-    summary: 'Team-oriented mud and obstacles through the Illinois countryside. All fitness levels welcome.',
-    url: 'https://www.toughmudder.com', registerUrl: 'https://www.toughmudder.com', image: '',
-  },
-  {
-    id: 's-ocr-3', name: 'Savage Race Southeast', date: '2026-04-04', sport: 'ocr',
-    sportEmoji: '🪖', sportLabel: 'OCR', city: 'Plant City', state: 'FL',
-    distances: ['5mi'],
-    summary: 'Savage Race packs more obstacles per mile than any other OCR. Challenging and creative course design.',
-    url: 'https://www.savagerace.com', registerUrl: 'https://www.savagerace.com', image: '',
-  },
-  // ── NORDIC / SKI ──
-  {
-    id: 's-nor-1', name: 'American Birkebeiner', date: '2026-02-21', sport: 'nordic',
-    sportEmoji: '⛷️', sportLabel: 'Nordic/Ski', city: 'Hayward', state: 'WI',
-    distances: ['50K', '25K', '10K', '5K'],
-    summary: 'North America\'s largest cross-country ski marathon — the "Birkie." 55 km through the Northwoods.',
-    url: 'https://www.birkie.com', registerUrl: 'https://www.birkie.com', image: '',
-  },
-  {
-    id: 's-nor-2', name: 'Craftsbury Marathon', date: '2026-01-17', sport: 'nordic',
-    sportEmoji: '⛷️', sportLabel: 'Nordic/Ski', city: 'Craftsbury Common', state: 'VT',
-    distances: ['50K', '25K', '10K'],
-    summary: 'Classic New England nordic skiing through Vermont\'s Northeast Kingdom. Groomed trails, stunning scenery.',
-    url: '#', registerUrl: '#', image: '',
-  },
-]
-
-/* ─── Race Detail Drawer ──────────────────────────────────── */
-const drawerRace     = ref(null)
 const goalTimeInput  = ref('')
 const paceDistance   = ref('Marathon')
 const splits         = ref([])

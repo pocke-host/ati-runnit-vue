@@ -47,7 +47,7 @@
           <div>
             <div class="gcal-integration-name">Strava — Activity history</div>
             <div class="gcal-integration-desc">Import your past runs, rides, swims, walks, and routes into Runnit.</div>
-            <div :class="['spotify-connected', { 'spotify-connected--off': !stravaConnected }]" ><span></span> {{ stravaConnected ? 'CONNECTED' : 'NOT CONNECTED' }}</div>
+            <div :class="['spotify-connected', { 'spotify-connected--off': !stravaConnected }]" ><span></span> {{ stravaSyncing ? 'IMPORTING HISTORY' : stravaConnected ? 'CONNECTED' : 'NOT CONNECTED' }}</div>
             <div v-if="stravaConnected && stravaLastSync" class="strava-last-sync">Last synced {{ relativeTime(stravaLastSync) }}</div>
           </div>
         </div>
@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import ConnectDevices from '@/components/ConnectDevices.vue'
 import IntegrationStatusCard from '@/components/IntegrationStatusCard.vue'
@@ -93,8 +93,11 @@ const stravaLoading = ref(false)
 const stravaError = ref('')
 const stravaNotice = ref('')
 const stravaLastSync = ref(null)
+const stravaSyncing = ref(false)
 const integrationStatuses = ref([])
 const statusLoading = ref(true)
+const syncingProvider = ref('')
+let syncPollTimer = null
 const headers = () => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
@@ -117,13 +120,14 @@ const connectStrava = async () => {
 }
 const syncStrava = async () => {
   stravaLoading.value = true
+  stravaSyncing.value = true
   stravaError.value = ''
   try {
     const { data } = await axios.post(`${API_URL}/integrations/strava/sync`, {}, { headers: headers() })
     stravaNotice.value = data.message || 'Strava activities synced.'
     stravaLastSync.value = new Date().toISOString()
   } catch (e) { stravaError.value = e.response?.data?.error || 'Strava sync failed. Try again shortly.' }
-  finally { stravaLoading.value = false }
+  finally { stravaLoading.value = false; stravaSyncing.value = false }
 }
 const disconnectStrava = async () => {
   if (!window.confirm('Disconnect Strava? Existing imported activities will remain in Runnit.')) return
@@ -143,9 +147,51 @@ const integrationCards = computed(() => integrationStatuses.value.map(status => 
   key: status.provider,
   name: status.provider === 'apple-health' ? 'Apple Health' : status.provider.charAt(0).toUpperCase() + status.provider.slice(1),
   icon: ({ whoop: 'bi bi-heart-pulse', oura: 'bi bi-circle', fitbit: 'bi bi-activity', coros: 'bi bi-watch', garmin: 'bi bi-stopwatch', 'apple-health': 'bi bi-heart' }[status.provider] || 'bi bi-link-45deg'),
+  syncing: syncingProvider.value === status.provider,
   stale: status.connected && (!status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000),
 })))
 const connectedCount = computed(() => integrationStatuses.value.filter(s => s.connected).length)
+
+const loadIntegrationStatuses = async () => {
+  const providers = ['whoop', 'oura', 'fitbit', 'coros', 'garmin', 'apple-health']
+  integrationStatuses.value = await Promise.all(providers.map(provider =>
+    axios.get(`${API_URL}/integrations/${provider}/status`, { headers: headers() })
+      .then(({ data }) => ({ provider, ...data }))
+      .catch(() => ({ provider, connected: false }))
+  ))
+  statusLoading.value = false
+  if (syncingProvider.value) {
+    const status = integrationStatuses.value.find(item => item.provider === syncingProvider.value)
+    if (status?.lastSync) {
+      syncingProvider.value = ''
+    }
+  }
+}
+
+const pollInitialSync = () => {
+  if (!syncingProvider.value && !stravaSyncing.value) return
+  let attempts = 0
+  const poll = async () => {
+    attempts += 1
+    if (stravaSyncing.value) {
+      try {
+        const { data } = await axios.get(`${API_URL}/integrations/strava/status`, { headers: headers() })
+        stravaConnected.value = Boolean(data.connected)
+        stravaLastSync.value = data.lastSync || null
+        if (data.lastSync) stravaSyncing.value = false
+      } catch {}
+    }
+    await loadIntegrationStatuses()
+    if ((!syncingProvider.value && !stravaSyncing.value) || attempts >= 8) {
+      if (attempts >= 8 && syncingProvider.value) syncingProvider.value = ''
+      if (attempts >= 8) stravaSyncing.value = false
+      return
+    }
+    syncPollTimer = window.setTimeout(poll, 4000)
+  }
+  poll()
+}
+
 onMounted(async () => {
   const callbackStatus = new URLSearchParams(window.location.search).get('spotify')
   const callbackReason = new URLSearchParams(window.location.search).get('reason')
@@ -159,15 +205,22 @@ onMounted(async () => {
   const stravaErrorReason = new URLSearchParams(window.location.search).get('error')
   if (stravaStatus === 'connected') stravaNotice.value = 'Strava connected. Your recent activity history is being imported.'
   if (stravaErrorReason?.startsWith('strava_')) stravaError.value = 'Strava could not be connected. Check the app settings and try again.'
+  const callbackProviders = ['whoop', 'oura', 'fitbit', 'coros', 'garmin', 'strava']
+  const connectedProvider = callbackProviders.find(provider => new URLSearchParams(window.location.search).get(provider) === 'connected')
+  if (connectedProvider === 'strava') stravaSyncing.value = true
+  else if (connectedProvider) syncingProvider.value = connectedProvider
   try { spotifyConnected.value = (await axios.get(`${API_URL}/spotify/status`, { headers: headers() })).data.connected } catch {}
   try {
     const { data } = await axios.get(`${API_URL}/integrations/strava/status`, { headers: headers() })
     stravaConnected.value = Boolean(data.connected)
     stravaLastSync.value = data.lastSync || null
   } catch {}
-  const providers = ['whoop', 'oura', 'fitbit']
-  integrationStatuses.value = (await Promise.all(providers.map(provider => axios.get(`${API_URL}/integrations/${provider}/status`, { headers: headers() }).then(({ data }) => ({ provider, ...data })).catch(() => ({ provider, connected: false })))) )
-  statusLoading.value = false
+  await loadIntegrationStatuses()
+  pollInitialSync()
+})
+
+onUnmounted(() => {
+  if (syncPollTimer) window.clearTimeout(syncPollTimer)
 })
 </script>
 

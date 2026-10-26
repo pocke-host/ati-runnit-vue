@@ -9,7 +9,7 @@
         </div>
         <div class="snapshot-grid">
           <article class="snapshot-card snapshot-card--primary"><p class="snapshot-label">Active plan</p><h3>{{ activePlan?.name || 'No active plan yet' }}</h3><p>{{ activePlan ? `${activePlan.progress || 0}% complete${activePlan.targetRaceDate ? ` · ${formatTarget(activePlan.targetRaceDate)}` : ''}` : 'Choose a plan to give your week a rhythm.' }}</p><router-link :to="activePlan?.id ? `/plans/${activePlan.id}` : '/plans'" class="snapshot-link">{{ activePlan ? 'Open plan →' : 'Find a plan →' }}</router-link></article>
-          <article class="snapshot-card"><p class="snapshot-label">Next race</p><h3>{{ nextRace?.raceName || (activePlan?.targetRaceDate ? 'Target race' : 'No race saved') }}</h3><p>{{ nextRace ? `${formatTarget(nextRace.raceDate)} · ${nextRace.distance || 'Race'}` : activePlan?.targetRaceDate ? formatTarget(activePlan.targetRaceDate) : 'Save a race to keep the countdown visible.' }}</p><router-link to="/races" class="snapshot-link">{{ nextRace ? 'View races →' : 'Find a race →' }}</router-link></article>
+          <article class="snapshot-card"><p class="snapshot-label">Next race</p><h3>{{ goalRace?.raceName || (activePlan?.targetRaceDate ? 'Target race' : 'No race saved') }}</h3><p>{{ goalRace ? `${formatTarget(goalRace.raceDate)} · ${goalRace.distance || 'Race'}` : activePlan?.targetRaceDate ? formatTarget(activePlan.targetRaceDate) : 'Choose an event to keep the countdown visible.' }}</p><router-link to="/races" class="snapshot-link">{{ goalRace ? 'View races →' : 'Find a race →' }}</router-link></article>
           <article class="snapshot-card"><p class="snapshot-label">Strength journal</p><h3>{{ strengthSummary?.sessionCount || 0 }} sessions</h3><p>{{ strengthSummary?.totalSets || 0 }} working sets in the last 28 days</p><router-link to="/strength" class="snapshot-link">View progress →</router-link></article>
           <article class="snapshot-card"><p class="snapshot-label">Connected context</p><h3>{{ connectedIntegrations }} active</h3><p>{{ integrationsNeedingAttention }} need attention</p><router-link to="/devices" class="snapshot-link">Manage integrations →</router-link></article>
         </div>
@@ -26,10 +26,15 @@
 import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
 import MotivationalQuote from '@/components/MotivationalQuote.vue'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 const API_URL=import.meta.env.VITE_API_URL||'http://localhost:8080/api'
 const headers=()=>({Authorization:`Bearer ${localStorage.getItem('token')}`})
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 const folders=ref([]), plans=ref([]), nextRace=ref(null), strengthSummary=ref(null), integrationStatuses=ref([]), snapshotLoading=ref(true)
 const activePlan=computed(()=>plans.value.find(p=>p.isActive)||plans.value[0]||null)
+const goalRace=computed(()=>nextRace.value|| (user.value?.targetEventName&&user.value?.targetEventDate ? {raceName:user.value.targetEventName,raceDate:user.value.targetEventDate,distance:user.value.targetEventSport||'Event'}:null))
 const connectedIntegrations=computed(()=>integrationStatuses.value.filter(s=>s.connected).length)
 const integrationsNeedingAttention=computed(()=>integrationStatuses.value.filter(s=>s.connected&&(!s.lastSync||(Date.now()-new Date(s.lastSync).getTime()>72*60*60*1000))).length)
 const tools=[{path:'/plans',icon:'bi-journal-text',kicker:'Plan',title:'Training plans',copy:'A week that bends around your real life.'},{path:'/races',icon:'bi-flag',kicker:'Goal',title:'Races',copy:'Find a start line and keep your results together.'},{path:'/training-folders',icon:'bi-folder2-open',kicker:'Block',title:'Training folders',copy:'Group every workout for one race or season.'},{path:'/strength',icon:'bi-lightning-charge',kicker:'Support',title:'Strength journal',copy:'Build the durability behind your distance.'},{path:'/coros-coach',icon:'bi-watch',kicker:'Context',title:'COROS Coach',copy:'Turn recovery and load into your next decision.'},{path:'/calendar',icon:'bi-calendar3',kicker:'Rhythm',title:'Calendar',copy:'See the work, the rest, and what comes next.'}]
