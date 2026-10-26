@@ -1,21 +1,60 @@
 <template>
   <main class="waitlist-page">
 
-    <!-- HERO — ink, centered -->
+    <!-- HERO -->
     <section class="hero">
-      <div class="page-inner hero-inner">
-        <span class="gr-eyebrow-badge">Waitlist</span>
-        <h1 class="hero-h1">Get early access.</h1>
-        <p class="hero-sub">One email. No spam. We’ll let you know when Runnit is ready for you.</p>
+      <div class="page-inner hero-grid">
+        <div class="hero-copy">
+          <div class="hero-kicker"><span class="hero-kicker-dot"></span> RUNNIT / EARLY ACCESS</div>
+          <h1 class="hero-h1">Your training,<br><span>one home.</span></h1>
+          <p class="hero-sub">Bring your workouts, recovery, race goals, and people together in one place — then make the next week count.</p>
+          <div class="hero-note"><span>01</span> Built for committed athletes training for something.</div>
+        </div>
+
+        <div class="hero-visual" aria-label="A preview of the Runnit training hub">
+          <div class="orbit orbit--one"></div>
+          <div class="orbit orbit--two"></div>
+          <div class="preview-card preview-card--back">
+            <span>WEEK 08</span>
+            <strong>BUILD<br>WITH INTENT.</strong>
+          </div>
+          <div class="preview-card preview-card--front">
+            <div class="preview-topline"><span class="preview-live"><i></i> TRAINING HUB</span><span>MON 08</span></div>
+            <div class="preview-title">London Marathon</div>
+            <div class="preview-progress"><span></span></div>
+            <div class="preview-meta"><span><b>42</b> DAYS OUT</span><span><b>68%</b> COMPLETE</span></div>
+            <div class="preview-quote">“The work adds up.”</div>
+          </div>
+          <span class="hero-sticker hero-sticker--yellow">SHOW UP<br>AGAIN.</span>
+          <span class="hero-sticker hero-sticker--cobalt">+ 1 WEEK<br>STRONGER</span>
+        </div>
       </div>
     </section>
 
-    <!-- FORM + SYNCS -->
+    <!-- PROMISE STRIP -->
+    <section class="promise-section">
+      <div class="page-inner promise-grid">
+        <div class="promise-intro">
+          <span class="section-label">The idea</span>
+          <h2>Less tab-hopping.<br><em>More training.</em></h2>
+        </div>
+        <div class="promise-list">
+          <div class="promise-item"><span class="promise-index">01</span><div><strong>Bring it together.</strong><p>One home for the data you already collect.</p></div></div>
+          <div class="promise-item"><span class="promise-index">02</span><div><strong>Train toward something.</strong><p>Make your race or goal the center of the week.</p></div></div>
+          <div class="promise-item"><span class="promise-index">03</span><div><strong>Keep each other moving.</strong><p>Progress feels better when your people see it.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WAITLIST FORM -->
     <section class="form-section">
       <div class="page-inner form-grid">
 
         <!-- Form card -->
         <div class="form-card">
+          <div class="form-kicker">Be first through the door</div>
+          <h2 class="form-title">Save your spot.</h2>
+          <p class="form-sub">We’ll send one email when early access opens. That’s it.</p>
           <div v-if="!submitted">
             <form @submit.prevent="submit" novalidate>
 
@@ -57,14 +96,14 @@
         <div class="syncs-col">
           <div class="syncs-label">What you’ll get</div>
           <div class="sync-list">
-            <div class="sync-item">Early access</div>
-            <div class="sync-item">Product updates</div>
-            <div class="sync-item">A better training home</div>
+            <div class="sync-item"><span class="sync-icon">↗</span><div><strong>Early access</strong><small>See the training hub before the crowd.</small></div></div>
+            <div class="sync-item"><span class="sync-icon">◌</span><div><strong>Product updates</strong><small>Useful notes, never a noisy newsletter.</small></div></div>
+            <div class="sync-item"><span class="sync-icon">✦</span><div><strong>A better training home</strong><small>Your data, your goal, your people.</small></div></div>
           </div>
           <div class="proof-strip">
             <div class="proof-cell">
-              <div class="proof-lbl">Field</div>
-              <div class="proof-val">1 email</div>
+              <div class="proof-lbl">Form</div>
+              <div class="proof-val">1 field</div>
             </div>
             <div class="proof-cell">
               <div class="proof-lbl">Spam</div>
@@ -72,7 +111,7 @@
             </div>
             <div class="proof-cell proof-cell--last">
               <div class="proof-lbl">Next</div>
-              <div class="proof-val">Invite</div>
+              <div class="proof-val">Invite you</div>
             </div>
           </div>
         </div>
@@ -356,5 +395,145 @@ async function submit() {
   .page-inner { padding: 0 22px; }
   .hero { padding: 56px 0 44px; }
   .form-section { padding: 36px 0; }
+}
+
+/* ── Launch polish ── */
+.waitlist-page {
+  padding-top: calc(var(--nav-h, 66px) + var(--spec-h, 35px));
+  overflow: hidden;
+}
+.hero {
+  padding: 82px 0 88px;
+  text-align: left;
+  position: relative;
+  isolation: isolate;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 540px;
+  height: 540px;
+  right: -160px;
+  top: -230px;
+  border: 1px solid rgba(251,246,236,0.18);
+  border-radius: 50%;
+  box-shadow: 0 0 0 42px rgba(251,246,236,0.04), 0 0 0 84px rgba(251,246,236,0.035);
+  z-index: -1;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(420px, 1.06fr);
+  gap: 44px;
+  align-items: center;
+}
+.hero-copy { max-width: 560px; }
+.hero-kicker, .hero-note, .section-label, .form-kicker, .syncs-label, .proof-lbl {
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+}
+.hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #FFC53D;
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+}
+.hero-kicker-dot { width: 8px; height: 8px; background: #FFC53D; border-radius: 50%; box-shadow: 0 0 0 5px rgba(255,197,61,.14); }
+.hero-h1 {
+  font-size: clamp(68px, 9vw, 116px);
+  line-height: .78;
+  letter-spacing: -.015em;
+  margin: 22px 0 25px;
+}
+.hero-h1 > span { display: inline-block; color: #2A55F5; transform: translateX(.16em); }
+.hero-sub { max-width: 470px; margin: 0; color: rgba(251,246,236,.72); font-size: 1.02rem; line-height: 1.6; }
+.hero-note { display: flex; align-items: center; gap: 12px; color: rgba(251,246,236,.58); font-size: .62rem; font-weight: 700; letter-spacing: .12em; margin-top: 34px; }
+.hero-note span { color: #FFC53D; font-size: .68rem; border: 1px solid rgba(255,197,61,.65); padding: 6px 7px; }
+.hero-visual { min-height: 405px; position: relative; display: grid; place-items: center; }
+.orbit { position: absolute; border: 1px solid rgba(251,246,236,.2); border-radius: 50%; transform: rotate(-16deg); }
+.orbit--one { width: 390px; height: 225px; }
+.orbit--two { width: 440px; height: 300px; transform: rotate(28deg); }
+.preview-card { border: 2px solid #16130F; position: absolute; width: min(100%, 370px); }
+.preview-card--back { background: #FFC53D; color: #16130F; padding: 24px; transform: translate(-36px,-42px) rotate(-7deg); box-shadow: 5px 5px 0 #2A55F5; }
+.preview-card--back span { font: 700 .63rem 'Spline Sans Mono', monospace; letter-spacing: .16em; }
+.preview-card--back strong { display: block; font: 900 clamp(2.6rem,5vw,4rem)/.8 'Big Shoulders Display', sans-serif; margin-top: 48px; }
+.preview-card--front { background: #FBF6EC; color: #16130F; padding: 20px 20px 18px; transform: translate(22px,30px) rotate(4deg); box-shadow: 7px 7px 0 #16130F; z-index: 2; }
+.preview-topline, .preview-meta { display: flex; align-items: center; justify-content: space-between; font: 700 .58rem 'Spline Sans Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: #665f55; }
+.preview-live { color: #2A55F5; }
+.preview-live i { display: inline-block; width: 6px; height: 6px; margin-right: 5px; background: #2A55F5; border-radius: 50%; vertical-align: 1px; }
+.preview-title { font: 900 2.35rem/.9 'Big Shoulders Display', sans-serif; text-transform: uppercase; margin: 28px 0 18px; }
+.preview-progress { height: 12px; border: 2px solid #16130F; background: #fff; padding: 2px; }
+.preview-progress span { display: block; width: 68%; height: 100%; background: #2A55F5; }
+.preview-meta { margin-top: 12px; color: #16130F; }
+.preview-meta b { color: #2A55F5; }
+.preview-quote { border-top: 1px solid #d7cfbf; margin-top: 19px; padding-top: 14px; font: italic 600 .9rem 'Hanken Grotesk', sans-serif; }
+.hero-sticker { position: absolute; z-index: 3; border: 2px solid #16130F; padding: 8px 10px; font: 800 .62rem/1.05 'Spline Sans Mono', monospace; letter-spacing: .06em; text-transform: uppercase; box-shadow: 3px 3px 0 #16130F; }
+.hero-sticker--yellow { background: #FFC53D; left: 1%; bottom: 12px; transform: rotate(-8deg); }
+.hero-sticker--cobalt { background: #2A55F5; color: #fff; right: 1%; top: 28px; transform: rotate(7deg); }
+
+.promise-section { background: #FBF6EC; border-bottom: 2px solid #16130F; padding: 64px 0 70px; }
+.promise-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 70px; align-items: start; }
+.section-label { color: #2A55F5; font-size: .66rem; font-weight: 800; letter-spacing: .14em; }
+.promise-intro h2 { font: 900 clamp(3rem,6vw,5.2rem)/.82 'Big Shoulders Display', sans-serif; margin: 14px 0 0; text-transform: uppercase; }
+.promise-intro em { color: #2A55F5; font-style: normal; }
+.promise-list { border-top: 2px solid #16130F; }
+.promise-item { display: grid; grid-template-columns: 44px 1fr; gap: 16px; padding: 20px 0; border-bottom: 1px solid #cfc6b5; }
+.promise-index { color: #2A55F5; font: 700 .68rem 'Spline Sans Mono', monospace; }
+.promise-item strong { font-size: 1.05rem; }
+.promise-item p { color: #665f55; line-height: 1.45; margin: 5px 0 0; }
+
+.form-section { padding: 70px 0 78px; background: #E7DFCE; border-bottom: 2px solid #16130F; }
+.form-grid { grid-template-columns: 1.08fr .92fr; gap: 52px; align-items: center; }
+.form-card { padding: 34px; background: #fff; box-shadow: 8px 8px 0 #16130F; }
+.form-kicker { color: #2A55F5; font-size: .64rem; font-weight: 800; letter-spacing: .14em; }
+.form-title { font: 900 clamp(3.2rem,6vw,5rem)/.82 'Big Shoulders Display', sans-serif; margin: 13px 0 12px; text-transform: uppercase; }
+.form-sub { color: #665f55; line-height: 1.5; margin: 0 0 26px; }
+.field-input { transition: border-color .15s, box-shadow .15s; }
+.field-input:focus { border-color: #2A55F5; box-shadow: 4px 4px 0 rgba(42,85,245,.2); }
+.btn-submit { transition: background .15s, transform .15s, box-shadow .15s; }
+.btn-submit:hover:not(:disabled) { transform: translate(2px,2px); box-shadow: 2px 2px 0 #16130F; }
+.syncs-label { color: #5A5348; font-size: .64rem; font-weight: 800; letter-spacing: .14em; }
+.sync-item { display: flex; align-items: flex-start; gap: 13px; border: none; border-bottom: 1px solid #bfb5a4; padding: 14px 0; }
+.sync-icon { color: #2A55F5; font: 900 1.2rem 'Big Shoulders Display', sans-serif; line-height: 1; }
+.sync-item strong { display: block; font-size: 1rem; }
+.sync-item small { display: block; color: #665f55; font-size: .82rem; line-height: 1.4; margin-top: 4px; }
+.proof-strip { background: #FBF6EC; }
+.proof-val { font-size: .9rem; font-weight: 700; }
+
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .hero-h1, .btn-spinner { animation: none; } .btn-submit { transition: none; } }
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 38px; }
+  .hero-copy { max-width: 640px; }
+  .hero-visual { min-height: 370px; }
+  .promise-grid { gap: 42px; }
+  .form-grid { gap: 36px; }
+}
+@media (max-width: 768px) {
+  .promise-grid, .form-grid { grid-template-columns: 1fr; }
+  .promise-section { padding: 48px 0 54px; }
+  .form-section { padding: 52px 0 60px; }
+  .syncs-col { max-width: 560px; }
+}
+@media (max-width: 640px) {
+  .page-inner { padding: 0 22px; }
+  .hero { padding: 60px 0 72px; }
+  .hero-h1 { font-size: clamp(62px,18vw,92px); }
+  .hero-h1 > span { transform: none; }
+  .hero-visual { min-height: 310px; margin-top: 8px; }
+  .orbit--one { width: 290px; height: 180px; }
+  .orbit--two { width: 330px; height: 230px; }
+  .preview-card { width: min(90vw,330px); }
+  .preview-card--back { transform: translate(-20px,-30px) rotate(-7deg); }
+  .preview-card--front { transform: translate(15px,25px) rotate(4deg); }
+  .hero-sticker { font-size: .54rem; }
+  .hero-sticker--yellow { left: 0; bottom: 0; }
+  .hero-sticker--cobalt { right: 0; top: 5px; }
+  .promise-intro h2 { font-size: 3.5rem; }
+  .form-card { padding: 26px 22px; box-shadow: 5px 5px 0 #16130F; }
+  .proof-cell { padding: 14px 6px; }
+  .proof-val { font-size: .72rem; }
 }
 </style>
