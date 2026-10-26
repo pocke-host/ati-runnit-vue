@@ -41,6 +41,38 @@
       <!-- Error state -->
       <div v-if="error" class="error-bar">{{ error }}</div>
 
+      <!-- Waitlist -->
+      <section class="waitlist-panel" aria-labelledby="waitlist-title">
+        <div class="waitlist-head">
+          <div>
+            <div class="admin-kicker">Launch operations</div>
+            <h2 id="waitlist-title">Waitlist <span v-if="waitlistTotal !== null">({{ waitlistTotal.toLocaleString() }})</span></h2>
+            <p>Recent signups are stored in RUNNIT. Export the full list for invites or email outreach.</p>
+          </div>
+          <div class="waitlist-actions">
+            <button class="page-btn" type="button" @click="fetchWaitlist">Refresh</button>
+            <button class="verify-btn" type="button" :disabled="waitlistDownloading" @click="downloadWaitlist">
+              {{ waitlistDownloading ? 'Preparing…' : 'Download CSV' }}
+            </button>
+          </div>
+        </div>
+        <div v-if="waitlistLoading" class="loading-state">Loading waitlist…</div>
+        <div v-else-if="!waitlist.length" class="moderation-empty">No waitlist signups yet.</div>
+        <div v-else class="waitlist-table-wrap">
+          <table class="waitlist-table">
+            <thead><tr><th>Email</th><th>Training for</th><th>Joined</th></tr></thead>
+            <tbody>
+              <tr v-for="entry in waitlist" :key="entry.id">
+                <td>{{ entry.email }}</td>
+                <td>{{ entry.trainingFor || '—' }}</td>
+                <td>{{ formatDate(entry.createdAt) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-if="waitlistTotal > waitlist.length" class="waitlist-note">Showing the 100 most recent signups. Download CSV for the full list.</p>
+        </div>
+      </section>
+
       <section class="moderation-panel" aria-labelledby="moderation-title">
         <div class="moderation-head"><div><div class="admin-kicker">Trust &amp; safety</div><h2 id="moderation-title">Coach reports</h2></div><button class="page-btn" type="button" @click="fetchReports">Refresh</button></div>
         <div v-if="reportsLoading" class="loading-state">Loading reports…</div>
@@ -132,6 +164,10 @@ const totalPages = ref(1)
 const updatingId = ref(null)
 const reports = ref([])
 const reportsLoading = ref(false)
+const waitlist = ref([])
+const waitlistTotal = ref(null)
+const waitlistLoading = ref(false)
+const waitlistDownloading = ref(false)
 let searchTimeout = null
 
 const getHeaders = () => {
@@ -220,6 +256,30 @@ const fetchReports = async () => {
   finally { reportsLoading.value = false }
 }
 
+const fetchWaitlist = async () => {
+  waitlistLoading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/admin/waitlist`, { headers: getHeaders() })
+    waitlist.value = data.entries || []
+    waitlistTotal.value = data.total ?? waitlist.value.length
+  } catch { error.value = 'Waitlist did not load.' }
+  finally { waitlistLoading.value = false }
+}
+
+const downloadWaitlist = async () => {
+  waitlistDownloading.value = true
+  try {
+    const { data } = await axios.get(`${API_URL}/admin/waitlist/export`, { headers: getHeaders(), responseType: 'blob' })
+    const url = URL.createObjectURL(new Blob([data], { type: 'text/csv' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'RUNNIT-waitlist.csv'
+    link.click()
+    URL.revokeObjectURL(url)
+  } catch { error.value = 'Waitlist export did not download.' }
+  finally { waitlistDownloading.value = false }
+}
+
 const resolveReport = async (report, status) => {
   try { await axios.patch(`${API_URL}/admin/coach-reports/${report.id}`, { status }, { headers: getHeaders() }); reports.value = reports.value.filter(item => item.id !== report.id) }
   catch { error.value = 'Report status did not update.' }
@@ -231,7 +291,7 @@ const formatDate = (iso) => {
 }
 
 onMounted(async () => {
-  await Promise.all([fetchStats(), fetchUsers(), fetchReports()])
+  await Promise.all([fetchStats(), fetchUsers(), fetchReports(), fetchWaitlist()])
 })
 </script>
 
@@ -242,6 +302,7 @@ onMounted(async () => {
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
 .moderation-panel{max-width:1200px;margin:0 auto;padding:24px;background:#FBF6EC;border:2px solid #16130F}.moderation-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}.moderation-head h2{margin:0;font-size:1.35rem}.moderation-empty{color:#665f55;padding:12px 0}.report-list{display:grid;gap:8px}.report-row{display:flex;justify-content:space-between;gap:16px;padding:13px;background:#fff;border:1px solid #E5E5E5}.report-row span,.report-row p{display:block;color:#665f55;font-size:.8rem;margin:4px 0 0}.report-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.suspend-btn{display:block;margin-top:5px;border:1px solid #C0392B;background:#fff;color:#C0392B;padding:5px 7px;font-size:.7rem}@media(max-width:680px){.report-row{flex-direction:column}.report-actions{justify-content:flex-start}}
+.waitlist-panel{max-width:1200px;margin:0 auto 24px;padding:24px;background:#fff;border:2px solid #16130F}.waitlist-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}.waitlist-head h2{margin:0;font-size:1.35rem}.waitlist-head p{margin:6px 0 0;color:#665f55;font-size:.85rem}.waitlist-actions{display:flex;gap:8px;flex-wrap:wrap}.waitlist-table-wrap{overflow-x:auto}.waitlist-table{width:100%;border-collapse:collapse;font-size:.84rem}.waitlist-table th{text-align:left;font:700 .65rem 'Spline Sans Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#665f55;padding:9px 10px;border-bottom:2px solid #16130F}.waitlist-table td{padding:11px 10px;border-bottom:1px solid #e5e5e5}.waitlist-table td:last-child{white-space:nowrap;color:#665f55}.waitlist-note{margin:12px 0 0;color:#665f55;font-size:.78rem}@media(max-width:680px){.waitlist-head{align-items:flex-start;flex-direction:column}.waitlist-actions{width:100%}}
 
 /* Header */
 .admin-header {
