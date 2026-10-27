@@ -25,7 +25,7 @@
           <div class="hero-copy">
             <div class="hero-eyebrow">Event Calendar</div>
             <h1 class="hero-headline">Every sport.<br>Every start line.</h1>
-            <p class="hero-lead">Running, cycling, trail, triathlon, OCR, open water, nordic — every race in America, in one place.</p>
+            <p class="hero-lead">Running, cycling, trail, triathlon, OCR, open water, nordic — every race in America, in one place. Browse freely; sign in only when you want to save a race or import your result.</p>
           </div>
           <div class="hero-panel-wrap d-none d-lg-block" aria-hidden="true">
             <div class="hero-panel">
@@ -1122,7 +1122,7 @@ watch(zipcode, () => {
   min-height: 100vh;
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-  padding-top: var(--nav-h, 66px);
+  padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
   color: #16130F;
 }
 

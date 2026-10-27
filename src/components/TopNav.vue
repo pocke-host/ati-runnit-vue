@@ -533,6 +533,7 @@ onUnmounted(() => {
 .navbar {
   background: #FBF6EC;
   border-bottom: 2px solid #16130F;
+  padding: 0;
 }
 
 .navbar-content {
@@ -1080,6 +1081,7 @@ onUnmounted(() => {
   background: #2A55F5;
   color: #fff !important;
   border: none;
+  min-height: 44px;
   padding: 8px 14px;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.62rem;
@@ -1096,8 +1098,8 @@ onUnmounted(() => {
 /* Mobile toggle */
 .mobile-menu-toggle {
   display: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   border-radius: 0;

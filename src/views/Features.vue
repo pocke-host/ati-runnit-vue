@@ -175,7 +175,7 @@ const kitItems = [
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
-  padding-top: var(--nav-h, 66px);
+  padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
 }
 .page-inner {
   max-width: 1040px;
