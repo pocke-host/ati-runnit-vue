@@ -148,7 +148,9 @@ const integrationCards = computed(() => integrationStatuses.value.map(status => 
   name: status.provider === 'apple-health' ? 'Apple Health' : status.provider.charAt(0).toUpperCase() + status.provider.slice(1),
   icon: ({ whoop: 'bi bi-heart-pulse', oura: 'bi bi-circle', fitbit: 'bi bi-activity', coros: 'bi bi-watch', garmin: 'bi bi-stopwatch', 'apple-health': 'bi bi-heart' }[status.provider] || 'bi bi-link-45deg'),
   syncing: syncingProvider.value === status.provider,
-  stale: status.connected && (!status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000),
+  stale: status.connected && (status.provider === 'garmin'
+    ? status.syncState === 'stale'
+    : (!status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000)),
 })))
 const connectedCount = computed(() => integrationStatuses.value.filter(s => s.connected).length)
 
@@ -162,7 +164,7 @@ const loadIntegrationStatuses = async () => {
   statusLoading.value = false
   if (syncingProvider.value) {
     const status = integrationStatuses.value.find(item => item.provider === syncingProvider.value)
-    if (status?.lastSync) {
+    if (status?.lastSync || status?.userIdLinked || status?.syncState === 'healthy') {
       syncingProvider.value = ''
     }
   }

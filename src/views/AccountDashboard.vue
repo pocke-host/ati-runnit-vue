@@ -2221,9 +2221,17 @@ const integrationFreshnessLabel = computed(() => {
   if (reconnect.length) return `${reconnect.map(status => status.provider.replace('-health', ' Health')).join(', ')} needs reconnect`
   const connected = integrationStatuses.value.filter(status => status.connected)
   if (!connected.length) return ''
-  const stale = connected.filter(status => !status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000)
-  if (stale.length) return `${stale.map(status => status.provider.replace('-health', ' Health')).join(', ')} needs sync`
-  return `${integrationStatuses.value.length} source${integrationStatuses.value.length === 1 ? '' : 's'} synced`
+  const garminWaiting = connected.some(status =>
+    status.provider === 'garmin' && status.deliveryMode === 'push' &&
+    ['identity_pending', 'waiting_for_delivery'].includes(status.syncState)
+  )
+  const stale = connected.filter(status => {
+    if (status.provider === 'garmin' && status.deliveryMode === 'push') return status.syncState === 'stale'
+    return !status.lastSync || (Date.now() - new Date(status.lastSync).getTime()) > 72 * 60 * 60 * 1000
+  })
+  if (garminWaiting) return 'Garmin ready — sync Garmin Connect'
+  if (stale.length) return `${stale.map(status => status.provider.replace('-health', ' Health')).join(', ')} delivery delayed`
+  return `${connected.length} source${connected.length === 1 ? '' : 's'} synced`
 })
 
 const handleLogout = () => {

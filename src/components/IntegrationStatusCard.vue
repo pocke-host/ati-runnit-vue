@@ -1,12 +1,52 @@
 <template>
   <article class="integration-card" :class="{ 'integration-card--attention': needsReconnect || stale }">
     <div class="integration-card__icon"><i :class="icon" aria-hidden="true"></i></div>
-    <div class="integration-card__copy"><strong>{{ name }}</strong><span>{{ syncing ? 'Importing history' : needsReconnect ? 'Needs reconnect' : connected ? (stale ? 'Needs a sync' : 'Connected') : 'Not connected' }}</span><small>{{ syncing ? 'Your recent data is on its way' : connected && lastSync ? `Last sync ${relativeTime(lastSync)}` : connected ? 'Waiting for first sync' : 'Permission not granted' }}</small></div>
+    <div class="integration-card__copy"><strong>{{ name }}</strong><span>{{ statusLabel }}</span><small>{{ statusDetail }}</small></div>
     <a v-if="needsReconnect || !connected" href="#connectors" class="integration-card__action">{{ needsReconnect ? 'Reconnect' : 'Connect' }}</a><span v-else class="integration-card__ok" aria-label="Connected">✓</span>
   </article>
 </template>
 <script setup>
-defineProps({ name: { type: String, required: true }, icon: { type: String, default: 'bi bi-link-45deg' }, connected: Boolean, needsReconnect: Boolean, stale: Boolean, syncing: Boolean, lastSync: { type: [String, Number], default: '' } })
+import { computed } from 'vue'
+
+const props = defineProps({
+  provider: { type: String, default: '' },
+  name: { type: String, required: true },
+  icon: { type: String, default: 'bi bi-link-45deg' },
+  connected: Boolean,
+  needsReconnect: Boolean,
+  stale: Boolean,
+  syncing: Boolean,
+  deliveryMode: { type: String, default: '' },
+  syncState: { type: String, default: '' },
+  lastSync: { type: [String, Number], default: '' },
+})
+
+const garminWaitingForDelivery = computed(() =>
+  props.provider === 'garmin' && props.deliveryMode === 'push' &&
+  ['identity_pending', 'waiting_for_delivery'].includes(props.syncState)
+)
+
+const statusLabel = computed(() => {
+  if (props.syncing) return 'Importing history'
+  if (props.needsReconnect) return 'Needs reconnect'
+  if (!props.connected) return 'Not connected'
+  if (garminWaitingForDelivery.value) return 'Ready for Garmin Connect'
+  if (props.provider === 'garmin' && props.syncState === 'stale') return 'Delivery delayed'
+  return props.stale ? 'Needs a sync' : 'Connected'
+})
+
+const statusDetail = computed(() => {
+  if (props.syncing) return 'Your recent data is on its way'
+  if (garminWaitingForDelivery.value) {
+    return props.syncState === 'identity_pending'
+      ? 'Finish setup, then sync your device in Garmin Connect'
+      : 'Sync your device in Garmin Connect to send new activities'
+  }
+  if (props.provider === 'garmin' && props.syncState === 'stale') return 'Open Garmin Connect and sync your device'
+  if (props.connected && props.lastSync) return `Last sync ${relativeTime(props.lastSync)}`
+  return props.connected ? 'Waiting for first sync' : 'Permission not granted'
+})
+
 const relativeTime = value => { const minutes = Math.max(1, Math.round((Date.now() - new Date(value).getTime()) / 60000)); if (minutes < 60) return `${minutes}m ago`; const hours = Math.round(minutes / 60); if (hours < 48) return `${hours}h ago`; return `${Math.round(hours / 24)}d ago` }
 </script>
 <style scoped>

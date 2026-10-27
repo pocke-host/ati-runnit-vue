@@ -36,7 +36,9 @@ const folders=ref([]), plans=ref([]), nextRace=ref(null), strengthSummary=ref(nu
 const activePlan=computed(()=>plans.value.find(p=>p.isActive)||plans.value[0]||null)
 const goalRace=computed(()=>nextRace.value|| (user.value?.targetEventName&&user.value?.targetEventDate ? {raceName:user.value.targetEventName,raceDate:user.value.targetEventDate,distance:user.value.targetEventSport||'Event'}:null))
 const connectedIntegrations=computed(()=>integrationStatuses.value.filter(s=>s.connected).length)
-const integrationsNeedingAttention=computed(()=>integrationStatuses.value.filter(s=>s.connected&&(!s.lastSync||(Date.now()-new Date(s.lastSync).getTime()>72*60*60*1000))).length)
+const integrationsNeedingAttention=computed(()=>integrationStatuses.value.filter(s=>s.connected&&(
+  s.needsReconnect || (s.provider === 'garmin' ? s.syncState === 'stale' : (!s.lastSync || Date.now()-new Date(s.lastSync).getTime()>72*60*60*1000))
+)).length)
 const tools=[{path:'/plans',icon:'bi-journal-text',kicker:'Plan',title:'Training plans',copy:'A week that bends around your real life.'},{path:'/races',icon:'bi-flag',kicker:'Goal',title:'Races',copy:'Find a start line and keep your results together.'},{path:'/training-folders',icon:'bi-folder2-open',kicker:'Block',title:'Training folders',copy:'Group every workout for one race or season.'},{path:'/strength',icon:'bi-lightning-charge',kicker:'Support',title:'Strength journal',copy:'Build the durability behind your distance.'},{path:'/fuel',icon:'bi-lightning-charge',kicker:'Fuel',title:'Fuel journal',copy:'See what supports the work and recovery.'},{path:'/coros-coach',icon:'bi-watch',kicker:'Context',title:'COROS Coach',copy:'Turn recovery and load into your next decision.'},{path:'/calendar',icon:'bi-calendar3',kicker:'Rhythm',title:'Calendar',copy:'See the work, the rest, and what comes next.'}]
 const daysUntil=d=>{const days=Math.ceil((new Date(`${d}T00:00:00`)-new Date())/86400000);return days<0?'past target':days===0?'race day':`${days} days to go`}
 const formatTarget=d=>new Date(`${d}T00:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
@@ -56,7 +58,12 @@ onMounted(async()=>{
   const planData=value(1); plans.value=Array.isArray(planData)?planData:(planData?.content||[])
   const bookmarks=value(2)||[]; nextRace.value=bookmarks.filter(r=>r.raceDate&&new Date(`${r.raceDate}T00:00:00`)>new Date()).sort((a,b)=>new Date(a.raceDate)-new Date(b.raceDate))[0]||null
   strengthSummary.value=value(3)
-  integrationStatuses.value=[value(4),value(5),value(6),value(7)].filter(Boolean)
+  integrationStatuses.value=[
+    ['garmin', value(4)],
+    ['coros', value(5)],
+    ['whoop', value(6)],
+    ['apple-health', value(7)],
+  ].filter(([, status]) => status).map(([provider, status]) => ({ provider, ...status }))
   snapshotLoading.value=false
 })
 </script>

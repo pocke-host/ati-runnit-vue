@@ -31,13 +31,17 @@
               Last synced: {{ relativeTime(garminLastSync) }}
             </div>
             <div v-if="garminNeedsReconnect" class="sync-attention" role="alert">Garmin needs to be reconnected to resume syncing.</div>
-            <div v-else-if="!garminUserIdLinked" class="sync-attention" role="alert">Garmin authorization is connected, but the Garmin profile is not linked yet. Reconnect Garmin to finish setup.</div>
+            <div v-else-if="!garminUserIdLinked" class="sync-attention sync-attention--pending" role="status">Garmin is connected, but setup is still finishing. RUNNIT will link the profile before the next delivery.</div>
             <div v-else-if="garminDeliveryMode === 'push' && !garminLastSync" class="sync-attention sync-attention--pending" role="status">Waiting for Garmin Connect delivery. Record an activity, sync your device in Garmin Connect, and RUNNIT will add it automatically.</div>
             <div v-else-if="garminDeliveryMode === 'push' && garminSyncState === 'stale'" class="sync-attention" role="status">No Garmin delivery in the last 72 hours. Open Garmin Connect and sync your device to resume activity delivery.</div>
             <div v-else-if="garminDeliveryMode === 'push' && !garminHistoricalImportSupported" class="sync-attention sync-attention--pending" role="status">New activities arrive after your device syncs with Garmin Connect. Historical backfill is not included in this Garmin access tier.</div>
             <div v-if="syncCounts.garmin" class="sync-count">{{ syncCounts.garmin }} activities synced</div>
-            <button v-if="garminNeedsReconnect || !garminUserIdLinked" class="btn btn-primary" @click="connectGarmin" :disabled="loading">
-              {{ garminNeedsReconnect ? 'Reconnect Garmin' : 'Finish Garmin setup' }}
+            <button v-if="garminNeedsReconnect" class="btn btn-primary" @click="connectGarmin" :disabled="loading">
+              Reconnect Garmin
+            </button>
+            <button v-else-if="!garminUserIdLinked" class="btn btn-primary" @click="syncNow" :disabled="syncing">
+              <span v-if="syncing" class="spinner"></span>
+              {{ syncing ? 'Finishing setup…' : 'Finish Garmin setup' }}
             </button>
             <button v-else class="btn btn-primary" @click="syncNow" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
