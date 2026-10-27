@@ -31,14 +31,17 @@
               Last synced: {{ relativeTime(garminLastSync) }}
             </div>
             <div v-if="garminNeedsReconnect" class="sync-attention" role="alert">Garmin needs to be reconnected to resume syncing.</div>
-            <div v-else-if="garminDeliveryMode === 'push' && !garminHistoricalImportSupported" class="sync-attention sync-attention--pending" role="status">New data appears after your device syncs with Garmin Connect. Historical backfill is not included in this Garmin access tier.</div>
+            <div v-else-if="!garminUserIdLinked" class="sync-attention" role="alert">Garmin authorization is connected, but the Garmin profile is not linked yet. Reconnect Garmin to finish setup.</div>
+            <div v-else-if="garminDeliveryMode === 'push' && !garminLastSync" class="sync-attention sync-attention--pending" role="status">Waiting for Garmin Connect delivery. Record an activity, sync your device in Garmin Connect, and RUNNIT will add it automatically.</div>
+            <div v-else-if="garminDeliveryMode === 'push' && garminSyncState === 'stale'" class="sync-attention" role="status">No Garmin delivery in the last 72 hours. Open Garmin Connect and sync your device to resume activity delivery.</div>
+            <div v-else-if="garminDeliveryMode === 'push' && !garminHistoricalImportSupported" class="sync-attention sync-attention--pending" role="status">New activities arrive after your device syncs with Garmin Connect. Historical backfill is not included in this Garmin access tier.</div>
             <div v-if="syncCounts.garmin" class="sync-count">{{ syncCounts.garmin }} activities synced</div>
-            <button v-if="garminNeedsReconnect" class="btn btn-primary" @click="connectGarmin" :disabled="loading">
-              Reconnect Garmin
+            <button v-if="garminNeedsReconnect || !garminUserIdLinked" class="btn btn-primary" @click="connectGarmin" :disabled="loading">
+              {{ garminNeedsReconnect ? 'Reconnect Garmin' : 'Finish Garmin setup' }}
             </button>
             <button v-else class="btn btn-primary" @click="syncNow" :disabled="syncing">
               <span v-if="syncing" class="spinner"></span>
-              {{ syncing ? 'Refreshing…' : 'Refresh status' }}
+              {{ syncing ? 'Checking…' : 'Check for new delivery' }}
             </button>
             <button class="btn-disconnect" @click="disconnectGarmin">Disconnect</button>
           </div>
@@ -230,6 +233,8 @@ const garminLastSync = ref(null)
 const garminNeedsReconnect = ref(false)
 const garminDeliveryMode = ref('push')
 const garminHistoricalImportSupported = ref(false)
+const garminUserIdLinked = ref(false)
+const garminSyncState = ref('pending')
 const corosConnected = ref(false)
 const corosLastSync = ref(null)
 const whoopConnected = ref(false)
@@ -303,6 +308,8 @@ const checkConnectionStatus = async () => {
     garminNeedsReconnect.value = Boolean(garminRes.data.needsReconnect)
     garminDeliveryMode.value = garminRes.data.deliveryMode || 'push'
     garminHistoricalImportSupported.value = Boolean(garminRes.data.historicalImportSupported)
+    garminUserIdLinked.value = Boolean(garminRes.data.userIdLinked)
+    garminSyncState.value = garminRes.data.syncState || syncState(garminLastSync.value)
   }
   if (corosRes) {
     corosConnected.value = corosRes.data.connected
@@ -357,7 +364,7 @@ const doDisconnect = async () => {
     } else {
       await axios.delete(`${API_URL}/integrations/${service}/disconnect`, { headers: getAuthHeaders() })
     }
-    if (service === 'garmin')      { garminConnected.value      = false; garminLastSync.value      = null }
+    if (service === 'garmin')      { garminConnected.value      = false; garminLastSync.value      = null; garminUserIdLinked.value = false; garminSyncState.value = 'disconnected' }
     if (service === 'coros')       { corosConnected.value       = false; corosLastSync.value       = null }
     if (service === 'whoop')       { whoopConnected.value       = false; whoopLastSync.value       = null }
     if (service === 'oura')        { ouraConnected.value        = false; ouraLastSync.value        = null }
@@ -372,8 +379,8 @@ const doDisconnect = async () => {
 const syncNow = async () => {
   syncing.value = true
   try {
-    await axios.post(`${API_URL}/integrations/garmin/sync`, {}, { headers: getAuthHeaders() })
-    showStatus('Sync triggered — activities will appear shortly.')
+    const { data } = await axios.post(`${API_URL}/integrations/garmin/sync`, {}, { headers: getAuthHeaders() })
+    showStatus(data?.message || 'Waiting for Garmin Connect to deliver new activity data.')
     await checkConnectionStatus()
   } catch {
     showStatus("Sync didn't take. Try again.", 'error')
