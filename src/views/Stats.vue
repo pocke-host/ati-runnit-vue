@@ -217,6 +217,98 @@
         </div>
       </section>
 
+      <!-- DEVICE COMPARISON -->
+      <section id="stats-comparison" class="section">
+        <div class="section-header-row">
+          <div>
+            <span class="section-kicker">Device comparison</span>
+            <p class="comparison-deck">See what Garmin and WHOOP are telling you about the same training window.</p>
+          </div>
+          <button class="comparison-refresh" type="button" @click="loadDeviceComparison" :disabled="comparisonLoading">
+            <i class="bi bi-arrow-clockwise"></i> {{ comparisonLoading ? 'Refreshing' : 'Refresh' }}
+          </button>
+        </div>
+
+        <div v-if="comparisonLoading && !comparison" class="comparison-loading" role="status">
+          <AppSpinner label="Comparing your device data…" />
+        </div>
+        <div v-else-if="comparisonError" class="comparison-state comparison-state--error" role="alert">
+          <i class="bi bi-cloud-slash"></i>
+          <div><strong>Comparison unavailable</strong><span>{{ comparisonError }}</span></div>
+          <button type="button" @click="loadDeviceComparison">Try again</button>
+        </div>
+        <div v-else-if="!comparisonHasBoth" class="comparison-state">
+          <i class="bi bi-bar-chart-line"></i>
+          <div>
+            <strong>Connect Garmin and WHOOP to compare them</strong>
+            <span>RUNNIT will line up matching workouts and recovery days once both sources have data.</span>
+          </div>
+          <router-link to="/devices">Manage devices <i class="bi bi-arrow-right"></i></router-link>
+        </div>
+        <template v-else>
+          <div class="comparison-source-grid">
+            <div v-for="source in ['WHOOP', 'GARMIN']" :key="source" class="comparison-source-card">
+              <div class="comparison-source-top">
+                <span class="comparison-source-dot" :class="`comparison-source-dot--${source.toLowerCase()}`"></span>
+                <strong>{{ sourceLabel(source) }}</strong>
+              </div>
+              <div class="comparison-source-stat"><strong>{{ comparisonSources[source]?.activityCount || 0 }}</strong><span>activities</span></div>
+              <div class="comparison-source-meta">
+                {{ Math.round((comparisonSources[source]?.durationSeconds || 0) / 3600 * 10) / 10 }}h training ·
+                {{ Math.round((comparisonSources[source]?.wellnessDays || 0)) }} wellness days
+              </div>
+              <router-link to="/devices" class="comparison-source-link">View sync status <i class="bi bi-arrow-up-right"></i></router-link>
+            </div>
+            <div class="comparison-window-card">
+              <span class="comparison-window-label">Matched window</span>
+              <strong>{{ comparison.daysWithBothWellness || 0 }} days</strong>
+              <span>of the last {{ comparison.daysRequested }} days had recovery data from both</span>
+            </div>
+          </div>
+
+          <div v-if="comparison.activityMetrics?.length" class="comparison-metrics-card">
+            <div class="comparison-card-heading">
+              <div><strong>Workout totals</strong><span>Imported in the last {{ comparison.daysRequested }} days</span></div>
+              <span class="comparison-card-badge comparison-card-badge--muted">Activity data</span>
+            </div>
+            <div v-for="metric in comparison.activityMetrics" :key="metric.key" class="comparison-metric-row">
+              <div class="comparison-metric-label"><strong>{{ metric.label }}</strong><span>Source totals, not a sensor accuracy score</span></div>
+              <div class="comparison-metric-value comparison-metric-value--whoop"><small>WHOOP</small><strong>{{ formatComparisonValue(metric.whoop, metric.unit) }}</strong></div>
+              <div class="comparison-metric-value comparison-metric-value--garmin"><small>GARMIN</small><strong>{{ formatComparisonValue(metric.garmin, metric.unit) }}</strong></div>
+              <div class="comparison-metric-diff">{{ formatComparisonDifference(metric.difference, metric.unit) }}</div>
+            </div>
+          </div>
+
+          <div v-if="comparison.metrics?.length" class="comparison-metrics-card">
+            <div class="comparison-card-heading">
+              <div><strong>Same-day signals</strong><span>30-day average across matching dates</span></div>
+              <span class="comparison-card-badge">Comparable</span>
+            </div>
+            <div v-for="metric in comparison.metrics" :key="metric.key" class="comparison-metric-row">
+              <div class="comparison-metric-label"><strong>{{ metric.label }}</strong><span>{{ metric.whoopDays }}–{{ metric.garminDays }} days with data</span></div>
+              <div class="comparison-metric-value comparison-metric-value--whoop"><small>WHOOP</small><strong>{{ formatComparisonValue(metric.whoop, metric.unit) }}</strong></div>
+              <div class="comparison-metric-value comparison-metric-value--garmin"><small>GARMIN</small><strong>{{ formatComparisonValue(metric.garmin, metric.unit) }}</strong></div>
+              <div class="comparison-metric-diff">{{ formatComparisonDifference(metric.difference, metric.unit) }}</div>
+            </div>
+          </div>
+
+          <div v-if="comparison.contextSignals?.length" class="comparison-context-card">
+            <div class="comparison-card-heading">
+              <div><strong>Recovery context</strong><span>Useful together, but not a direct score comparison</span></div>
+              <span class="comparison-card-badge comparison-card-badge--muted">Different scales</span>
+            </div>
+            <div v-for="signal in comparison.contextSignals" :key="signal.key" class="comparison-context-row">
+              <strong>{{ signal.label }}</strong>
+              <span>WHOOP <b>{{ signal.whoop == null ? '—' : Math.round(signal.whoop) + signal.unit }}</b></span>
+              <span>Garmin <b>{{ signal.garmin == null ? '—' : Math.round(signal.garmin) + signal.unit }}</b></span>
+              <em>{{ signal.note }}</em>
+            </div>
+          </div>
+
+          <p class="comparison-footnote"><i class="bi bi-info-circle"></i> RUNNIT shows provider data side-by-side; it does not decide which device is “right.” Differences can come from sensors, timing, algorithms, and missing days.</p>
+        </template>
+      </section>
+
       <!-- SPORT FITNESS -->
       <section id="stats-sport-fitness" class="section" v-if="sportFitness.length">
         <div class="section-header">
@@ -378,6 +470,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import axios from 'axios'
 import { useActivityStore } from '@/stores/activity'
 import { usePRStore } from '@/stores/pr'
 import { useTrainingLoadStore } from '@/stores/trainingLoad'
@@ -402,6 +495,46 @@ const { activities, loading, error: activityError } = storeToRefs(activityStore)
 const { data: trainingLoad } = storeToRefs(trainingLoadStore)
 const initializing = ref(true)
 const hasActivities = computed(() => initializing.value || loading.value || activities.value.length > 0)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const comparison = ref(null)
+const comparisonLoading = ref(false)
+const comparisonError = ref('')
+
+const authHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+const loadDeviceComparison = async () => {
+  comparisonLoading.value = true
+  comparisonError.value = ''
+  try {
+    const { data } = await axios.get(`${API_URL}/wellness/compare`, {
+      headers: authHeaders(),
+      params: { days: 30 },
+    })
+    comparison.value = data
+  } catch (error) {
+    comparisonError.value = error.response?.data?.error || 'Device comparison is temporarily unavailable.'
+  } finally {
+    comparisonLoading.value = false
+  }
+}
+
+const sourceLabel = source => source === 'WHOOP' ? 'WHOOP' : source === 'GARMIN' ? 'Garmin' : source
+const formatComparisonValue = (value, unit) => {
+  if (value == null) return '—'
+  const rounded = unit === 'min' || unit === 'bpm' ? Math.round(value) : Number(value).toFixed(1)
+  return `${rounded}${unit === '%' ? '%' : unit === '/100' ? '' : ` ${unit}`}`
+}
+const formatComparisonDifference = (value, unit) => {
+  if (value == null) return 'Need both sources'
+  const sign = value > 0 ? '+' : ''
+  const rounded = unit === 'min' || unit === 'bpm' ? Math.round(value) : Number(value).toFixed(1)
+  return `${sign}${rounded}${unit === '%' ? ' pts' : ` ${unit}`}`
+}
+const comparisonSources = computed(() => comparison.value?.sourceSummary || {})
+const comparisonHasBoth = computed(() => (comparison.value?.sources || []).every(source => comparisonSources.value[source]?.activityCount > 0 || comparisonSources.value[source]?.wellnessDays > 0))
 
 const {
   isImperial,
@@ -915,6 +1048,7 @@ onMounted(async () => {
   initializing.value = false
   trainingLoadStore.fetchTrainingLoad()
   await prStore.fetchPRs(activities.value)
+  await loadDeviceComparison()
   await nextTick()
   initWeeklyChart()
   initPieChart()
@@ -1770,4 +1904,7 @@ onUnmounted(() => {
 }
 .hero-deck{max-width:430px;margin:-14px auto 18px;color:rgba(251,246,236,.68);font-size:.9rem;line-height:1.5}.hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}.hero-action{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(251,246,236,.35);background:transparent;color:#fbf6ec;padding:10px 14px;font:700 .65rem 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none;cursor:pointer}.hero-action--primary{background:#2a55f5;border-color:#2a55f5}.hero-action:hover{border-color:#fbf6ec}.hero-freshness{margin-top:14px;color:rgba(251,246,236,.45);font:600 .62rem 'Spline Sans Mono',monospace;text-transform:uppercase;letter-spacing:.08em}.sync-notice,.stats-error{display:flex;align-items:center;gap:12px;border:2px solid #e7dfce;background:#fff;padding:13px 16px;margin-bottom:28px;color:#665f55;font-size:.86rem}.sync-notice i,.stats-error i{color:#2a55f5;font-size:1.1rem}.sync-notice button,.stats-error button{margin-left:auto;border:0;background:none;color:#2a55f5;text-decoration:underline;font:700 .68rem 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.stats-error{border-color:#c0392b;color:#a33b2a}.stats-error i{color:#c0392b}.stats-error div{display:flex;flex-direction:column;gap:3px}.stats-error button{color:#a33b2a}.training-read{display:flex;align-items:flex-start;gap:14px;border:2px solid #16130f;background:#fff;padding:18px;margin-bottom:20px}.training-read-icon{display:grid;place-items:center;width:40px;height:40px;background:#dce5ff;color:#2a55f5;font-size:1.25rem;flex:none}.training-read strong{display:block;font-size:1.3rem;margin:4px 0}.training-read p{margin:0;color:#665f55;font-size:.88rem;line-height:1.45}.training-read--alert{background:#fff3f0;border-color:#c0392b}.training-read--alert .training-read-icon{background:#f6cbc4;color:#a33b2a}.training-read--muted .training-read-icon{background:#e7dfce;color:#665f55}.training-read--ready .training-read-icon{background:#d8efe4;color:#16804a}.training-read--steady .training-read-icon{background:#dce5ff;color:#2a55f5}@media(max-width:480px){.hero-actions{align-items:stretch;flex-direction:column}.hero-action{justify-content:center}.sync-notice,.stats-error{align-items:flex-start;flex-wrap:wrap}.sync-notice button,.stats-error button{margin-left:28px}}
 .sport-mix-card{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:28px;align-items:center;border:2px solid #16130f;background:#fff;padding:24px;box-shadow:5px 5px 0 #16130f}.sport-mix-chart{position:relative;height:260px;display:grid;place-items:center}.sport-mix-chart canvas{max-width:260px;max-height:260px}.sport-mix-total{position:absolute;display:flex;flex-direction:column;align-items:center;pointer-events:none}.sport-mix-total strong{font:800 2.4rem/1 'Big Shoulders Display',system-ui}.sport-mix-total span{font:700 .6rem 'Spline Sans Mono',monospace;color:#665f55;text-transform:uppercase;letter-spacing:.1em}.sport-mix-list{display:flex;flex-direction:column}.sport-mix-row{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:15px 0;border-bottom:1px solid #e7dfce}.sport-mix-row:last-child{border-bottom:0}.sport-mix-info,.sport-mix-stats{display:flex;flex-direction:column;gap:3px}.sport-mix-info strong{font-size:1rem}.sport-mix-info span,.sport-mix-stats span{font:600 .62rem 'Spline Sans Mono',monospace;color:#665f55;text-transform:uppercase}.sport-mix-stats{text-align:right}.sport-mix-stats strong{font:800 1rem 'Big Shoulders Display',system-ui}@media(max-width:600px){.sport-mix-card{grid-template-columns:1fr;padding:16px}.sport-mix-chart{height:220px}.sport-mix-row{grid-template-columns:10px 1fr auto}}
+.comparison-deck{margin:6px 0 0;color:#665f55;font-size:.88rem;line-height:1.45}.comparison-refresh{border:1px solid #16130f;background:transparent;color:#16130f;padding:9px 12px;font:700 .64rem 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.comparison-refresh:disabled{opacity:.5;cursor:wait}.comparison-loading,.comparison-state{border:2px solid #16130f;background:#fff;padding:22px;display:flex;align-items:center;gap:14px}.comparison-state>i{font-size:1.35rem;color:#2a55f5}.comparison-state>div{display:flex;flex-direction:column;gap:4px;flex:1}.comparison-state strong{font-size:1rem}.comparison-state span{color:#665f55;font-size:.84rem;line-height:1.4}.comparison-state a,.comparison-state button{border:0;background:none;color:#2a55f5;font:700 .66rem 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none;cursor:pointer;white-space:nowrap}.comparison-state--error{border-color:#c0392b}.comparison-state--error>i,.comparison-state--error a,.comparison-state--error button{color:#c0392b}.comparison-source-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}.comparison-source-card,.comparison-window-card,.comparison-metrics-card,.comparison-context-card{border:2px solid #16130f;background:#fff;padding:18px}.comparison-source-card{box-shadow:4px 4px 0 #16130f}.comparison-source-top{display:flex;align-items:center;gap:8px;font:700 .72rem 'Spline Sans Mono',monospace;text-transform:uppercase}.comparison-source-dot{width:9px;height:9px;border-radius:50%;background:#16130f}.comparison-source-dot--whoop{background:#d85c43}.comparison-source-dot--garmin{background:#2a55f5}.comparison-source-stat{display:flex;align-items:baseline;gap:7px;margin:20px 0 4px}.comparison-source-stat strong{font:800 2.25rem/1 'Big Shoulders Display',system-ui}.comparison-source-stat span,.comparison-source-meta,.comparison-window-card span{color:#665f55;font-size:.76rem}.comparison-source-meta{line-height:1.45}.comparison-source-link{display:inline-block;margin-top:16px;color:#2a55f5;font:700 .62rem 'Spline Sans Mono',monospace;text-decoration:none;text-transform:uppercase}.comparison-window-card{display:flex;flex-direction:column;justify-content:center;gap:8px}.comparison-window-label{font:700 .62rem 'Spline Sans Mono',monospace;text-transform:uppercase;letter-spacing:.08em}.comparison-window-card strong{font:800 2rem/1 'Big Shoulders Display',system-ui}.comparison-metrics-card,.comparison-context-card{padding:0;margin-bottom:14px}.comparison-card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #e7dfce}.comparison-card-heading>div{display:flex;flex-direction:column;gap:3px}.comparison-card-heading strong{font-size:1rem}.comparison-card-heading span:not(.comparison-card-badge){font-size:.74rem;color:#665f55}.comparison-card-badge{background:#d8efe4;color:#16804a;padding:5px 8px;font:700 .6rem 'Spline Sans Mono',monospace;text-transform:uppercase;white-space:nowrap}.comparison-card-badge--muted{background:#e7dfce;color:#665f55}.comparison-metric-row{display:grid;grid-template-columns:minmax(170px,1fr) 110px 110px 125px;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid #e7dfce}.comparison-metric-row:last-child{border-bottom:0}.comparison-metric-label{display:flex;flex-direction:column;gap:4px}.comparison-metric-label strong{font-size:.88rem}.comparison-metric-label span{font:600 .6rem 'Spline Sans Mono',monospace;color:#665f55}.comparison-metric-value{display:flex;flex-direction:column;gap:3px}.comparison-metric-value small{font:700 .58rem 'Spline Sans Mono',monospace;color:#665f55}.comparison-metric-value strong{font:800 1rem 'Big Shoulders Display',system-ui}.comparison-metric-value--whoop strong{color:#b64c37}.comparison-metric-value--garmin strong{color:#2a55f5}.comparison-metric-diff{font:700 .68rem 'Spline Sans Mono',monospace;color:#665f55;text-align:right}.comparison-context-row{display:grid;grid-template-columns:1.25fr .8fr .8fr 2fr;gap:14px;align-items:center;padding:16px 18px}.comparison-context-row>strong{font-size:.88rem}.comparison-context-row span{font-size:.76rem;color:#665f55}.comparison-context-row b{color:#16130f}.comparison-context-row em{font-size:.72rem;line-height:1.35;color:#665f55}.comparison-footnote{margin:12px 0 0;color:#665f55;font-size:.72rem;line-height:1.45}.comparison-footnote i{color:#2a55f5;margin-right:5px}
+@media(max-width:800px){.comparison-source-grid{grid-template-columns:1fr 1fr}.comparison-window-card{grid-column:1/-1}.comparison-metric-row{grid-template-columns:1fr 1fr 1fr}.comparison-metric-label{grid-column:1/-1}.comparison-metric-diff{text-align:left}.comparison-context-row{grid-template-columns:1fr 1fr}.comparison-context-row>strong,.comparison-context-row em{grid-column:1/-1}}
+@media(max-width:520px){.comparison-source-grid{grid-template-columns:1fr}.comparison-window-card{grid-column:auto}.comparison-card-heading{align-items:flex-start;flex-direction:column}.comparison-metric-row{grid-template-columns:1fr 1fr}.comparison-metric-diff{grid-column:1/-1}.comparison-refresh{padding:8px}.comparison-state{align-items:flex-start;flex-wrap:wrap}.comparison-state a,.comparison-state button{margin-left:31px}}
 </style>
