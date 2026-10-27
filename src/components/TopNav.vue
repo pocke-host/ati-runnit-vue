@@ -23,20 +23,17 @@
         <div class="training-menu" ref="trainingRef">
           <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">Training <span aria-hidden="true">⌄</span></button>
           <div v-if="trainingOpen" class="training-menu-dropdown">
-            <div class="training-menu-eyebrow">Your training system</div>
-            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Training hub</strong><small>Plans, folders, races &amp; progress</small></span><b>→</b></router-link>
-            <div class="training-menu-label">Plan</div>
+            <div class="training-menu-heading"><span class="training-menu-eyebrow">Your training system</span><strong>Make the next move.</strong><small>Goal, week, and fuel in one place.</small></div>
+            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Training hub</strong><small>See the whole build at a glance</small></span><b>→</b></router-link>
             <div class="training-menu-grid">
-              <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i><span>Plans</span></router-link>
-              <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i><span>Folders</span></router-link>
+              <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i><span><strong>Plans</strong><small>Structure the week</small></span></router-link>
+              <router-link to="/calendar" @click="trainingOpen = false"><i class="bi bi-calendar3"></i><span><strong>Calendar</strong><small>See what comes next</small></span></router-link>
+              <router-link to="/races" @click="trainingOpen = false"><i class="bi bi-flag"></i><span><strong>Races</strong><small>Find your start line</small></span></router-link>
+              <router-link to="/fuel" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i><span><strong>Fuel</strong><small>Support the work</small></span></router-link>
+              <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i><span><strong>Folders</strong><small>Keep a block together</small></span></router-link>
+              <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-barbell"></i><span><strong>Strength</strong><small>Build durability</small></span></router-link>
             </div>
-            <div class="training-menu-label">Race day</div>
-            <router-link to="/races" class="training-menu-race" @click="trainingOpen = false"><i class="bi bi-flag"></i><span><strong>Races</strong><small>Find events and track your build</small></span><b>→</b></router-link>
-            <div class="training-menu-label">Build &amp; connect</div>
-            <div class="training-menu-grid">
-              <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i><span>Strength</span></router-link>
-              <router-link to="/coros-coach" @click="trainingOpen = false"><i class="bi bi-watch"></i><span>COROS Coach</span></router-link>
-            </div>
+            <router-link to="/coros-coach" class="training-menu-context" @click="trainingOpen = false"><i class="bi bi-watch"></i><span><strong>COROS Coach</strong><small>Recovery and load context</small></span><b>→</b></router-link>
           </div>
         </div>
       </div>
@@ -149,6 +146,9 @@
               </router-link>
               <router-link to="/plans" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-journal-text"></i> Training plans
+              </router-link>
+              <router-link to="/fuel" class="avd-link" @click="avatarOpen = false">
+                <i class="bi bi-lightning-charge"></i> Fuel journal
               </router-link>
               <router-link to="/training-folders" class="avd-link" @click="avatarOpen = false">
                 <i class="bi bi-folder2-open"></i> Training folders
@@ -298,6 +298,10 @@
                   <router-link to="/plans" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
                     <span>Plans</span>
+                  </router-link>
+                  <router-link to="/fuel" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2 5 13h6l-1 9 8-11h-6z"/></svg>
+                    <span>Fuel</span>
                   </router-link>
                 </div>
               </div>
@@ -554,7 +558,7 @@ onUnmounted(() => {
   gap: clamp(14px, 1.8vw, 24px);
   margin-left: 20px;
 }
-.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-28px;width:286px;padding:12px;background:#fbf6ec;border:2px solid #16130f;box-shadow:5px 5px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:16px;color:#2a55f5;font-size:14px}.training-menu-eyebrow{padding:1px 3px 10px;color:#665f55;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-featured{gap:10px!important;background:#ffc53d;margin-bottom:7px;border:1px solid #16130f}.training-menu-featured span,.training-menu-race span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-race strong{font:700 10px 'Spline Sans Mono',monospace}.training-menu-featured small,.training-menu-race small{font:10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-race b{font-size:15px}.training-menu-label{padding:10px 3px 4px;color:#665f55;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.12em;text-transform:uppercase}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}.training-menu-grid a{border:1px solid transparent}.training-menu-race{border:1px solid #16130f;background:#fff}.training-menu-race:hover{background:#e6edff!important}
+.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-34px;width:352px;padding:14px;background:#fbf6ec;border:2px solid #16130f;box-shadow:5px 5px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:18px;color:#2a55f5;font-size:15px}.training-menu-heading{display:grid;gap:3px;padding:2px 4px 13px}.training-menu-eyebrow{color:#2a55f5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-heading>strong{font:900 25px/.9 'Big Shoulders Display',sans-serif;text-transform:uppercase}.training-menu-heading>small{color:#665f55;font:400 11px 'Hanken Grotesk',system-ui,sans-serif}.training-menu-featured,.training-menu-context{gap:10px!important;border:2px solid #16130f!important}.training-menu-featured{background:#ffc53d;margin-bottom:10px}.training-menu-context{margin-top:10px;background:#fff}.training-menu-featured span,.training-menu-context span,.training-menu-grid span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-context strong,.training-menu-grid strong{font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase}.training-menu-featured small,.training-menu-context small,.training-menu-grid small{color:#665f55;font:400 10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-context b{font-size:15px}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.training-menu-grid a{align-items:flex-start;min-height:64px;border:1px solid #e7dfce}.training-menu-grid a:hover{border-color:#16130f}
 /* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
 .navbar-links--public {
