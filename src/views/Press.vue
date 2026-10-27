@@ -2,24 +2,36 @@
   <main class="editorial-page">
     <section class="ep-hero">
       <div class="ep-hero-inner">
-        <div class="ep-kicker">RUNNIT // PRESS</div>
-        <h1 class="ep-headline">Media &amp;<br>Press Resources.</h1>
-        <p class="ep-sub">For press inquiries, interviews, and media assets, reach us at <a href="mailto:press@runnit.live" class="hero-link">press@runnit.live</a>.</p>
+        <div>
+          <div class="ep-kicker">RUNNIT // PRESS</div>
+          <h1 class="ep-headline">The training home<br>for what comes next.</h1>
+          <p class="ep-sub">RUNNIT brings workouts, race goals, recovery, and community into one place. For press inquiries, interviews, or assets, reach <a href="mailto:press@runnit.live" class="hero-link">press@runnit.live</a>.</p>
+        </div>
+        <div class="ep-hero-card" aria-hidden="true">
+          <span>ONE HOME</span>
+          <strong>TRAIN<br>TOGETHER.</strong>
+          <small>RUNNIT / ATHLETE PLATFORM</small>
+        </div>
       </div>
     </section>
 
     <section class="ep-section">
       <div class="ep-content">
         <h2 class="ep-section-title">About Runnit</h2>
-        <p class="boilerplate">Runnit is a training platform for athletes — runners, cyclists, swimmers, and hikers alike. Founded in 2025, it combines GPS activity tracking, a social crew, and adaptive training plans in one app. Athletes on Runnit have logged over 1 million miles across 50+ countries.</p>
+        <p class="boilerplate">RUNNIT is the training home for athletes preparing for something. It connects the data people already collect with the race, plan, recovery, and people that give that data meaning — across running, cycling, swimming, triathlon, and more.</p>
 
-        <h2 class="ep-section-title" style="margin-top:48px;">Coverage</h2>
-        <div class="press-list">
-          <div class="press-item" v-for="item in coverage" :key="item.pub">
-            <div class="press-pub">{{ item.pub }}</div>
-            <div class="press-headline">{{ item.headline }}</div>
-            <div class="press-date">{{ item.date }}</div>
-          </div>
+        <h2 class="ep-section-title ep-section-title-spaced">Press kit</h2>
+        <div class="press-kit-grid">
+          <a class="press-kit-card" href="/og-image.png" download="runnit-press-image.png">
+            <span class="press-kit-label">Brand image</span>
+            <strong>Download the RUNNIT press image</strong>
+            <small>1200 × 630 PNG · for articles and social previews</small>
+          </a>
+          <a class="press-kit-card" href="mailto:press@runnit.live?subject=RUNNIT%20press%20inquiry">
+            <span class="press-kit-label">Media contact</span>
+            <strong>Request an interview or asset</strong>
+            <small>press@runnit.live · We’ll get back to you soon</small>
+          </a>
         </div>
 
       </div>
@@ -27,11 +39,23 @@
 
     <section class="ep-section ep-section-dark">
       <div class="ep-content">
-        <h2 class="ep-section-title ep-section-title-light">Key Facts</h2>
+        <h2 class="ep-section-title ep-section-title-light">At a glance</h2>
         <div class="facts-grid">
-          <div class="fact-item" v-for="f in facts" :key="f.stat">
-            <div class="fact-stat">{{ f.stat }}</div>
-            <div class="fact-label">{{ f.label }}</div>
+          <div class="fact-item">
+            <div class="fact-stat">01</div>
+            <div class="fact-label">One training home</div>
+          </div>
+          <div class="fact-item">
+            <div class="fact-stat">ALL</div>
+            <div class="fact-label">Endurance sports</div>
+          </div>
+          <div class="fact-item">
+            <div class="fact-stat">FREE</div>
+            <div class="fact-label">Athlete core</div>
+          </div>
+          <div class="fact-item">
+            <div class="fact-stat">GO</div>
+            <div class="fact-label">Train toward something</div>
           </div>
         </div>
       </div>
@@ -76,7 +100,7 @@ const facts = [
 
 <style scoped>
 .editorial-page {
-  padding-top: var(--nav-h, 66px);
+  padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
   min-height: 100vh;
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
@@ -85,11 +109,15 @@ const facts = [
 .ep-hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 80px 24px 72px;
+  padding: 72px 24px 72px;
 }
 .ep-hero-inner {
-  max-width: 800px;
+  max-width: 1040px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+  gap: 48px;
+  align-items: center;
 }
 .ep-kicker {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
@@ -117,6 +145,28 @@ const facts = [
   margin: 0;
 }
 .hero-link { color: #FFC53D; font-weight: 700; }
+.ep-hero-card {
+  min-height: 250px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2px solid #FBF6EC;
+  background: #2A55F5;
+  color: #FBF6EC;
+  box-shadow: 6px 6px 0 #FFC53D;
+  transform: rotate(2deg);
+}
+.ep-hero-card span,
+.ep-hero-card small {
+  font: 700 0.62rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.12em;
+}
+.ep-hero-card strong {
+  font: 900 clamp(2.5rem, 6vw, 4.2rem)/.82 'Big Shoulders Display', system-ui, sans-serif;
+  text-transform: uppercase;
+}
+.ep-hero-card small { color: rgba(251,246,236,0.7); }
 
 .ep-section { padding: 64px 24px; }
 .ep-section-dark { background: #16130F; color: #FBF6EC; }
@@ -131,6 +181,7 @@ const facts = [
   margin: 0 0 24px;
 }
 .ep-section-title-light { color: rgba(251,246,236,0.45); }
+.ep-section-title-spaced { margin-top: 48px; }
 
 .boilerplate {
   font-size: 1rem;
@@ -139,23 +190,27 @@ const facts = [
   margin: 0;
 }
 
-/* Press list */
-.press-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: #E7DFCE;
-  border: 2px solid #16130F;
-}
-.press-item {
-  background: #FBF6EC;
-  padding: 20px 24px;
+.press-kit-grid {
   display: grid;
-  grid-template-columns: 120px 1fr auto;
-  align-items: center;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
-.press-pub {
+.press-kit-card {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  background: #fff;
+  border: 2px solid #16130F;
+  color: #16130F;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 #16130F;
+}
+.press-kit-card:hover {
+  color: #16130F;
+  background: #EEF1FF;
+  text-decoration: none;
+}
+.press-kit-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.65rem;
   font-weight: 700;
@@ -163,17 +218,8 @@ const facts = [
   text-transform: uppercase;
   color: #8A8A8A;
 }
-.press-headline {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #16130F;
-}
-.press-date {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  color: #8A8A8A;
-  white-space: nowrap;
-}
+.press-kit-card strong { font-size: 1rem; }
+.press-kit-card small { color: #5A5348; line-height: 1.45; }
 
 /* Facts */
 .facts-grid {
@@ -206,8 +252,9 @@ const facts = [
 }
 
 @media (max-width: 700px) {
-  .press-item { grid-template-columns: 1fr; gap: 4px; }
-  .press-date { display: none; }
+  .ep-hero-inner { grid-template-columns: 1fr; gap: 32px; }
+  .ep-hero-card { min-height: 210px; max-width: 340px; }
+  .press-kit-grid { grid-template-columns: 1fr; }
   .facts-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>

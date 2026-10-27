@@ -3,19 +3,26 @@
 
     <!-- HERO — ink -->
     <section class="hero">
-      <div class="page-inner">
-        <span class="gr-eyebrow-badge">Our story</span>
-        <h1 class="hero-h1">We built the app<br>we wanted to use.</h1>
+      <div class="page-inner hero-grid">
+        <div class="hero-copy">
+          <span class="gr-eyebrow-badge">Our story</span>
+          <h1 class="hero-h1">Your training,<br>one home.</h1>
+          <p class="hero-sub">RUNNIT brings the workouts, race goals, recovery, and people you already rely on into one clearer week.</p>
+        </div>
+        <div class="hero-photo" role="img" aria-label="Athletes training together on a road">
+          <div class="hero-photo-stamp">BUILT FOR THE<br>WORK BETWEEN<br>THE BIG MOMENTS.</div>
+          <div class="hero-photo-meta">RUNNIT / ATHLETE STORY</div>
+        </div>
       </div>
     </section>
 
     <!-- LEAD + 2-col story -->
     <section class="story-section">
       <div class="page-inner">
-        <p class="story-lead">Most apps track your workout. Runnit is where your training lives.</p>
+        <p class="story-lead">Your training is scattered across five apps. RUNNIT is where it all lives.</p>
         <div class="story-grid">
-          <p class="story-body">Runnit started as one athlete's frustration: the apps that tracked everything somehow felt like nothing. Numbers without a story. A feed full of strangers' splits and sponsored shoes.</p>
-          <p class="story-body">So it got built — solo, in the hours around training — into the place a run actually lives. The photo. The route. The people who were there when your legs gave out at mile twenty.</p>
+          <p class="story-body">Training data is everywhere: a watch for the workout, an app for recovery, a calendar for the plan, and a group chat for accountability. The pieces are useful. The stitching is exhausting.</p>
+          <p class="story-body">RUNNIT gives the whole block a home. See what you did, what is next, and who is in it with you — whether you are chasing a race, building a habit, or just trying to show up again.</p>
         </div>
       </div>
     </section>
@@ -35,31 +42,10 @@
       </div>
     </section>
 
-    <!-- HOW IT'S BUILT — 2-col -->
-    <section class="build-section">
-      <div class="page-inner">
-        <div class="build-grid">
-          <div>
-            <div class="gr-eyebrow">How it's built</div>
-            <div class="stack-list">
-              <div v-for="(item, i) in stackItems" :key="item" class="stack-row">
-                <span class="stack-num">{{ String(i + 1).padStart(2, '0') }}</span>
-                <span class="stack-name">{{ item }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="build-copy">
-            <p class="build-body">Runnit is built and maintained by one person, in the hours around marathon and Ironman training. Every feature earns its place because there's no room for the ones that don't.</p>
-            <p class="build-bold">Built in public, shaped by the athletes who use it every day.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- CTA — cobalt -->
     <section class="final-cta">
-      <h2 class="cta-h2">Come build with us.</h2>
-      <p class="cta-sub">Create your account and help shape what Runnit becomes.</p>
+      <h2 class="cta-h2">Make the next week count.</h2>
+      <p class="cta-sub">Bring your training home and find the people who keep you moving.</p>
       <router-link to="/signup" class="btn-pill-paper">Join Runnit</router-link>
     </section>
 
@@ -103,6 +89,7 @@ const stackItems = [
 <style scoped>
 .about-page {
   min-height: 100vh;
+  padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
   background: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   color: #16130F;
@@ -117,8 +104,60 @@ const stackItems = [
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 80px 0 64px;
+  padding: 72px 0 64px;
   border-bottom: 2px solid #16130F;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 48px;
+  align-items: center;
+}
+.hero-copy { min-width: 0; }
+.hero-sub {
+  max-width: 510px;
+  margin: 24px 0 0;
+  color: rgba(251,246,236,0.72);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+.hero-photo {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border: 2px solid #FBF6EC;
+  box-shadow: 6px 6px 0 #2A55F5;
+  background-color: #5A5348;
+  background-image: url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=700&fit=crop&q=85');
+  background-size: cover;
+  background-position: center;
+}
+.hero-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(22,19,15,0.28);
+}
+.hero-photo-stamp {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  bottom: 18px;
+  padding: 10px 12px;
+  background: #FFC53D;
+  color: #16130F;
+  border: 2px solid #16130F;
+  font: 700 0.66rem/1.35 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.08em;
+}
+.hero-photo-meta {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  right: 14px;
+  color: #FBF6EC;
+  font: 700 0.62rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.12em;
 }
 .gr-eyebrow-badge {
   display: inline-block;
@@ -213,38 +252,6 @@ const stackItems = [
 .belief-body { color: #5A5348; line-height: 1.6; font-size: 0.9rem; margin: 0; }
 
 /* ── BUILD ── */
-.build-section {
-  padding: 52px 0;
-  background: #FBF6EC;
-  border-bottom: 2px solid #16130F;
-}
-.build-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 36px;
-  align-items: center;
-}
-.stack-list { margin-top: 16px; }
-.stack-row {
-  display: flex;
-  gap: 14px;
-  align-items: baseline;
-  font-weight: 800;
-  font-size: 1.1rem;
-  border-top: 1px solid #E7DFCE;
-  padding: 14px 0;
-}
-.stack-row:last-child { border-bottom: 1px solid #E7DFCE; }
-.stack-num {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: #5A5348;
-}
-.build-copy { display: flex; flex-direction: column; gap: 16px; }
-.build-body { color: #5A5348; line-height: 1.7; font-size: 1rem; margin: 0; }
-.build-bold { color: #16130F; line-height: 1.7; font-size: 1rem; font-weight: 800; margin: 0; }
-
 /* ── CTA ── */
 .final-cta {
   background: #2A55F5;
@@ -286,16 +293,17 @@ const stackItems = [
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .hero-photo { min-height: 280px; max-width: 420px; }
   .story-grid { grid-template-columns: 1fr; }
   .beliefs-grid { grid-template-columns: 1fr; }
   .belief-card { border-right: none; border-bottom: 2px solid #16130F; }
   .belief-card:last-child { border-bottom: none; }
-  .build-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .page-inner { padding: 0 22px; }
   .hero { padding: 60px 0 44px; }
-  .story-section, .beliefs-section, .build-section { padding: 40px 0; }
+  .story-section, .beliefs-section { padding: 40px 0; }
   .final-cta { padding: 48px 22px; }
 }
 </style>
