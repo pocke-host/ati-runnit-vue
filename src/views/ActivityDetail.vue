@@ -210,6 +210,43 @@
             </div>
           </div>
 
+          <!-- PROVIDER COMPARISON -->
+          <div v-if="activity.sourceComparisons?.length > 1" class="det-card source-comparison-card">
+            <div class="source-comparison-header">
+              <div>
+                <div class="source-comparison-eyebrow">Same session · different sensors</div>
+                <h3 class="det-section-title">Compare your data</h3>
+              </div>
+              <span class="source-comparison-count">{{ activity.sourceComparisons.length }} SOURCES</span>
+            </div>
+            <p class="source-comparison-copy">
+              RUNNIT keeps each provider’s original reading so you can compare how your connected sources measured the same workout.
+            </p>
+            <div class="source-comparison-grid">
+              <div v-for="source in activity.sourceComparisons" :key="source.source" class="source-column">
+                <div class="source-column-head">
+                  <span class="source-name">{{ source.source === 'GARMIN' ? 'Garmin' : source.source === 'WHOOP' ? 'WHOOP' : source.source.replaceAll('_', ' ') }}</span>
+                  <span v-if="source.source === 'GARMIN'" class="source-attribution">Garmin device data</span>
+                  <span v-else class="source-attribution">Connected source</span>
+                </div>
+                <div class="source-metric"><span>Distance</span><strong>{{ formatDistance(source.distanceMeters) || '—' }}</strong></div>
+                <div class="source-metric"><span>Time</span><strong>{{ formatDuration(source.durationSeconds) }}</strong></div>
+                <div class="source-metric"><span>{{ source.sportType === 'BIKE' ? 'Speed' : source.sportType === 'SWIM' ? 'Pace /100m' : 'Pace' }}</span><strong>
+                  <template v-if="source.averagePace && source.sportType === 'BIKE'">{{ (source.averagePace * (isImperial ? 2.236936 : 3.6)).toFixed(1) }} {{ isImperial ? 'mph' : 'km/h' }}</template>
+                  <template v-else-if="source.averagePace && source.sportType === 'SWIM'">{{ formatPace((1 / source.averagePace) * (100 / 60)) }} /100m</template>
+                  <template v-else-if="source.averagePace">{{ formatPace((1 / source.averagePace) * (1000 / 60)) }}</template>
+                  <template v-else>—</template>
+                </strong></div>
+                <div class="source-metric"><span>Avg HR</span><strong>{{ source.averageHeartRate ? `${source.averageHeartRate} bpm` : '—' }}</strong></div>
+                <div class="source-metric"><span>Max HR</span><strong>{{ source.maxHeartRate ? `${source.maxHeartRate} bpm` : '—' }}</strong></div>
+                <div class="source-metric"><span>Cadence</span><strong>{{ source.averageCadence ? `${source.averageCadence} ${source.sportType === 'BIKE' ? 'rpm' : 'spm'}` : '—' }}</strong></div>
+                <div class="source-metric"><span>Calories</span><strong>{{ source.calories ? `${source.calories} kcal` : '—' }}</strong></div>
+                <div class="source-metric"><span>Elevation</span><strong>{{ source.elevationGain != null ? formatElevation(source.elevationGain) : '—' }}</strong></div>
+              </div>
+            </div>
+            <div class="source-comparison-note"><i class="bi bi-info-circle me-1"></i>Measurements can differ slightly by device, sensor placement, and pause handling.</div>
+          </div>
+
           <!-- Strength Exercises -->
           <div class="det-card" v-if="isStrength && activity.strengthExercises?.length">
             <h3 class="det-section-title">Exercises</h3>
@@ -1661,6 +1698,30 @@ onMounted(init)
 .listening-track { color: #16130F; font-weight: 800; text-decoration: none; }
 .listening-track:hover { color: #2A55F5; }
 .listening-artist { color: #5A5348; font-size: .78rem; }
+
+/* Provider comparison */
+.source-comparison-card { overflow: hidden; }
+.source-comparison-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.source-comparison-eyebrow { color: #2A55F5; font: 700 .62rem 'Spline Sans Mono', monospace; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 5px; }
+.source-comparison-count { flex-shrink: 0; border: 2px solid #16130F; background: #FFC53D; color: #16130F; padding: 5px 8px; font: 800 .58rem 'Spline Sans Mono', monospace; letter-spacing: .08em; }
+.source-comparison-copy { margin: 8px 0 18px; color: #5A5348; font-size: .82rem; line-height: 1.5; max-width: 620px; }
+.source-comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.source-column { border: 2px solid #16130F; background: #FBF6EC; min-width: 0; }
+.source-column-head { padding: 12px 14px 10px; border-bottom: 2px solid #16130F; background: #16130F; color: #FBF6EC; }
+.source-name { display: block; font: 800 1.05rem 'Big Shoulders Display', system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+.source-attribution { display: block; margin-top: 2px; color: rgba(251,246,236,.62); font: 600 .56rem 'Spline Sans Mono', monospace; letter-spacing: .07em; text-transform: uppercase; }
+.source-metric { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 14px; border-bottom: 1.5px solid #E7DFCE; }
+.source-metric:last-child { border-bottom: 0; }
+.source-metric span { color: #5A5348; font: 600 .61rem 'Spline Sans Mono', monospace; letter-spacing: .07em; text-transform: uppercase; }
+.source-metric strong { color: #16130F; font: 800 .86rem 'Hanken Grotesk', system-ui, sans-serif; text-align: right; font-variant-numeric: tabular-nums; }
+.source-comparison-note { margin-top: 14px; color: #5A5348; font-size: .72rem; line-height: 1.45; }
+
+@media (max-width: 640px) {
+  .source-comparison-header { gap: 10px; }
+  .source-comparison-count { padding: 4px 6px; font-size: .52rem; }
+  .source-comparison-copy { font-size: .78rem; }
+  .source-comparison-grid { grid-template-columns: 1fr; gap: 10px; }
+}
 
 /* Comment form */
 .comment-form {
