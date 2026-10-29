@@ -39,7 +39,7 @@
           <span class="top-date">{{ formatDate(activity.performedAt) }}</span>
         </div>
         <div class="top-bar-spacer"></div>
-        <button v-if="isOwn" class="combine-btn" @click="router.push({ path: '/feed', query: { createEvent: '1', activityId: activity.id } })">
+        <button v-if="isOwn && !parentEvent" class="combine-btn" @click="showCombineEvent = true">
           <i class="bi bi-collection me-1"></i>Combine
         </button>
         <button v-if="isOwn" class="combine-btn" @click="openFolderPicker"><i class="bi bi-folder-plus me-1"></i>Folder</button>
@@ -54,6 +54,8 @@
             </div>
           </router-link>
           <div class="user-info">
+            <div class="activity-kicker">{{ activity.source || activity.provider || 'RUNNIT' }} · {{ sportLabel(activity) }}</div>
+            <h1 class="activity-title">{{ activity.name || `${sportLabel(activity)} session` }}</h1>
             <router-link :to="`/profile/${activity.userId}`" class="user-name-link">
               {{ activity.userDisplayName || 'Athlete' }}
             </router-link>
@@ -500,6 +502,25 @@
 
       </div>
     </template>
+    <div v-if="showCombineEvent" class="combine-overlay" @click.self="showCombineEvent = false">
+      <section class="combine-modal" role="dialog" aria-modal="true" aria-labelledby="combine-title">
+        <div class="combine-modal-head">
+          <div>
+            <div class="combine-eyebrow">Activity grouping</div>
+            <h2 id="combine-title">Combine this activity</h2>
+            <p>Group this session with the rest of your race, brick, or multisport event.</p>
+          </div>
+          <button type="button" class="combine-close" aria-label="Close combine form" @click="showCombineEvent = false">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <CreateEventForm
+          :initialActivityId="activity.id"
+          @saved="onEventCreated"
+          @cancel="showCombineEvent = false"
+        />
+      </section>
+    </div>
     <div v-if="folderPicker" class="folder-picker-overlay" @click.self="folderPicker = false"><div class="folder-picker-modal"><strong>Save to training folder</strong><select v-model="selectedFolderId"><option value="">Choose a folder…</option><option v-for="f in folders" :key="f.id" :value="String(f.id)">{{ f.name }}</option></select><button :disabled="!selectedFolderId || folderSaving" @click="saveToFolder">{{ folderSaving ? 'Saving…' : 'Save' }}</button></div></div>
 
     <ConfirmModal
@@ -527,6 +548,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import CreateEventForm from '@/components/CreateEventForm.vue'
 import { useUploadStore } from '@/stores/upload'
 import { useActivityStore } from '@/stores/activity'
 import { computePRs, getActivityPRs, PR_CATALOG } from '@/stores/pr'
@@ -577,6 +599,7 @@ const followLoading = ref(false)
 const { showToast } = useToast()
 const deleteLoading = ref(false)
 const showDeleteConfirm = ref(false)
+const showCombineEvent = ref(false)
 
 const activityId = computed(() => route.params.id)
 const parentEvent = ref(null)
@@ -713,6 +736,7 @@ const isOwn = computed(() =>
 const folders = ref([]), folderPicker = ref(false), selectedFolderId = ref(''), folderSaving = ref(false)
 const openFolderPicker = async () => { folderPicker.value = true; try { folders.value = (await axios.get(`${API_URL}/training-folders`)).data } catch { showToast('Folders did not load.', 'error') } }
 const saveToFolder = async () => { if (!selectedFolderId.value) return; folderSaving.value = true; try { await axios.post(`${API_URL}/training-folders/${selectedFolderId.value}/items`, { itemType: 'ACTIVITY', itemId: activity.value.id }); folderPicker.value = false; showToast('Saved to training folder.', 'success') } catch { showToast('Could not save to that folder.', 'error') } finally { folderSaving.value = false } }
+const onEventCreated = (event) => { showCombineEvent.value = false; router.push(`/multisport-events/${event.id}`) }
 
 const hasCoords = computed(() => {
   const a = activity.value
@@ -1166,7 +1190,7 @@ onMounted(init)
   gap: 16px;
   padding: 20px 40px;
   background: #FBF6EC;
-  border-bottom: 2px solid #16130F;
+  border-bottom: 1px solid #D8CFBE;
 }
 .back-btn {
   background: transparent;
@@ -1216,22 +1240,40 @@ onMounted(init)
   font-weight: 500;
   color: #5A5348;
 }
-.top-bar-spacer { width: 80px; }
-.combine-btn { border: 2px solid #16130F; background: #FFC53D; color: #16130F; padding: 7px 10px; font: 800 .68rem 'Spline Sans Mono', monospace; text-transform: uppercase; cursor: pointer; }
+.top-bar-spacer { flex: 0 0 auto; width: clamp(24px, 8vw, 80px); }
+.combine-btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid #16130F;
+  border-radius: 10px;
+  background: #FFC53D;
+  color: #16130F;
+  padding: 7px 13px;
+  font: 800 .68rem 'Spline Sans Mono', monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.combine-btn:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 #16130F; }
 
 /* USER ROW */
 .user-row-wrap {
   background: #FBF6EC;
-  border-bottom: 2px solid #16130F;
-  padding: 0 40px;
+  padding: 22px 40px 4px;
 }
 .user-row {
   max-width: 1000px;
   margin: 0 auto;
+  background: #fff;
+  border: 2px solid #16130F;
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 #E7DFCE;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 18px 0;
+  padding: 18px 22px;
 }
 .avatar-link { text-decoration: none; flex-shrink: 0; }
 
@@ -1266,7 +1308,24 @@ onMounted(init)
   flex-shrink: 0;
 }
 
-.user-info { flex: 1; }
+.user-info { flex: 1; min-width: 0; }
+.activity-kicker {
+  color: #2A55F5;
+  font: 700 .58rem 'Spline Sans Mono', monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.activity-title {
+  margin: 0 0 4px;
+  color: #16130F;
+  font: 900 1.45rem/.95 'Big Shoulders Display', system-ui, sans-serif;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .user-name-link {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
   font-weight: 800;
@@ -1308,14 +1367,18 @@ onMounted(init)
 
 /* GR 4-cell stat strip */
 .gr-stat-strip {
+  max-width: 1000px;
+  margin: 18px auto 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-top: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
+  border: 2px solid #16130F;
+  border-radius: 16px;
+  overflow: hidden;
   background: #FBF6EC;
+  box-shadow: 5px 5px 0 #E7DFCE;
 }
 .gr-stat-strip-cell {
-  padding: 24px 20px;
+  padding: 20px 18px;
   text-align: center;
 }
 .gr-stat-strip-cell--div { border-left: 2px solid #16130F; }
@@ -1338,6 +1401,67 @@ onMounted(init)
   color: #5A5348;
   margin-top: 8px;
 }
+
+/* Combine flow — stays on the activity so the user keeps their context. */
+.combine-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(22, 19, 15, .58);
+}
+.combine-modal {
+  width: min(680px, 100%);
+  max-height: min(820px, calc(100vh - 48px));
+  overflow-y: auto;
+  padding: 26px;
+  background: #FBF6EC;
+  border: 2px solid #16130F;
+  border-radius: 18px;
+  box-shadow: 8px 8px 0 #2A55F5;
+}
+.combine-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.combine-eyebrow {
+  color: #2A55F5;
+  font: 700 .62rem 'Spline Sans Mono', monospace;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.combine-modal h2 {
+  margin: 0;
+  color: #16130F;
+  font: 900 2rem/.95 'Big Shoulders Display', system-ui, sans-serif;
+  text-transform: uppercase;
+}
+.combine-modal-head p {
+  max-width: 480px;
+  margin: 8px 0 0;
+  color: #5A5348;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.combine-close {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 2px solid #16130F;
+  border-radius: 999px;
+  background: transparent;
+  color: #16130F;
+  cursor: pointer;
+}
+.combine-close:hover { background: #E7DFCE; }
 
 /* Legacy btn — kept for delete/confirm modals */
 .btn {
@@ -1464,7 +1588,9 @@ onMounted(init)
   display: flex;
   height: 10px;
   gap: 2px;
-  margin-bottom: 8px;
+  /* Reserve a dedicated row for the active-zone marker so it never climbs
+     into the section label above the bar. */
+  margin-bottom: 25px;
 }
 .hr-zone-seg {
   flex: 1;
@@ -1477,11 +1603,13 @@ onMounted(init)
 }
 .hr-zone-marker {
   position: absolute;
-  bottom: 14px;
+  top: calc(100% + 6px);
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.6rem;
+  line-height: 1;
   font-weight: 900;
   color: #16130F;
   letter-spacing: 0.06em;
@@ -1882,7 +2010,9 @@ onMounted(init)
 @media (max-width: 600px) {
   .top-bar { padding: 16px 20px; }
   .top-bar-spacer { display: none; }
-  .user-row-wrap { padding: 0 20px; }
+  .user-row-wrap { padding: 16px 20px 2px; }
+  .user-row { padding: 16px; }
+  .gr-stat-strip { margin: 16px 20px 0; }
   .detail-layout { padding: 20px 16px 48px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .top-date { display: none; }
@@ -1893,8 +2023,17 @@ onMounted(init)
 @media (max-width: 480px) {
   .top-bar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
   .top-bar-meta { flex: 1 1 100%; } /* push meta to its own row on tiny screens */
-  .user-row-wrap { padding: 0 16px; }
+  .user-row-wrap { padding: 12px 16px 2px; }
+  .user-row { padding: 14px; gap: 10px; box-shadow: 3px 3px 0 #E7DFCE; }
+  .activity-title { font-size: 1.2rem; white-space: normal; }
+  .activity-kicker { font-size: .52rem; }
+  .gr-stat-strip { margin: 12px 16px 0; box-shadow: 3px 3px 0 #E7DFCE; }
+  .gr-stat-strip-cell { padding: 16px 8px; }
+  .gr-stat-strip-num { font-size: 1.8rem; }
   .detail-layout { padding: 16px 12px 64px; }
+  .combine-overlay { padding: 12px; }
+  .combine-modal { padding: 20px; box-shadow: 4px 4px 0 #2A55F5; }
+  .combine-modal h2 { font-size: 1.7rem; }
   /* Ensure 44px minimum touch target on reaction buttons */
   .reaction-btn { padding: 10px 14px; font-size: 0.78rem; min-height: 44px; }
   .sr-date { font-size: 0.72rem; }
