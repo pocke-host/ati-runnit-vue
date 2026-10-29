@@ -717,7 +717,8 @@ const hasCoords = computed(() => {
   return a && (
     (Array.isArray(a.coords) && a.coords.length > 0) ||
     (Array.isArray(a.gpsCoords) && a.gpsCoords.length > 0) ||
-    (Array.isArray(a.route) && a.route.length > 0)
+    (Array.isArray(a.route) && a.route.length > 0) ||
+    Boolean(a.routePolyline)
   )
 })
 
