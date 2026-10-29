@@ -191,8 +191,10 @@
                   v-for="rxn in [{type:'LIKE',label:'Like',icon:'bi-heart-fill'},{type:'KUDOS',label:'Kudos',icon:'bi-hand-thumbs-up-fill'}]"
                   :key="rxn.type"
                   :class="['gr-rxn-btn', { 'gr-rxn-btn--active': hasActivityReaction(item.id, rxn.type) }]"
+                  :aria-label="`${rxn.label}${getActivityReactionCount(item.id, rxn.type) ? `, ${getActivityReactionCount(item.id, rxn.type)}` : ''}`"
+                  :title="rxn.label"
                   @click.prevent.stop="toggleActivityReaction(item.id, rxn.type)"
-                ><i :class="['bi', rxn.icon, 'me-1']"></i>{{ rxn.label }}<template v-if="getActivityReactionCount(item.id, rxn.type)">&nbsp;{{ getActivityReactionCount(item.id, rxn.type) }}</template></button>
+                ><i :class="['bi', rxn.icon, 'me-1']" aria-hidden="true"></i><span class="gr-rxn-label">{{ rxn.label }}</span><span v-if="getActivityReactionCount(item.id, rxn.type)" class="gr-rxn-count">{{ getActivityReactionCount(item.id, rxn.type) }}</span></button>
               </div>
 
             </router-link>
@@ -1234,6 +1236,22 @@ onUnmounted(() => {
 .gr-rxn-btn:last-child { border-right: none; }
 .gr-rxn-btn--active { background: #2A55F5; color: #fff; }
 .gr-rxn-btn:hover:not(.gr-rxn-btn--active) { background: rgba(42,85,245,0.06); color: #2A55F5; }
+.gr-rxn-label { white-space: nowrap; }
+.gr-rxn-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  min-height: 1.25rem;
+  padding: 2px 5px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: #F0E8D8;
+  color: #16130F;
+  font-size: .58rem;
+  line-height: 1;
+}
+.gr-rxn-btn--active .gr-rxn-count { background: #fff; color: #2A55F5; }
 
 /* ── MOMENT CARDS ── */
 .feed-card-moment .moment-image {

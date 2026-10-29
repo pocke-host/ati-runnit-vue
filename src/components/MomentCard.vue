@@ -75,7 +75,10 @@
         >
           <i class="bi bi-hand-thumbs-up-fill"></i>
         </button>
-        <span class="reaction-count">{{ moment.reactionCount }}</span>
+        <span class="reaction-count" :aria-label="`${moment.reactionCount || 0} ${moment.reactionCount === 1 ? 'reaction' : 'reactions'}`">
+          <strong>{{ moment.reactionCount || 0 }}</strong>
+          <span>{{ moment.reactionCount === 1 ? 'reaction' : 'reactions' }}</span>
+        </span>
       </div>
     </div>
   </div>
