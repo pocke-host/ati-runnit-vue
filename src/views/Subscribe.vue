@@ -6,7 +6,7 @@
       <div class="page-inner">
         <span class="gr-eyebrow-badge">Pricing</span>
         <h1 class="hero-h1">Core training stays free.</h1>
-        <p class="launch-note">Free for every athlete. Runnit earns when coaches earn.</p>
+        <p class="launch-note">The first 100 athletes get Pro for life. Runnit earns when coaches earn.</p>
       </div>
     </section>
 

@@ -5,8 +5,8 @@
     <section class="hero">
       <div class="page-inner">
         <span class="gr-eyebrow-badge">What's inside</span>
-        <h1 class="hero-h1">Everything a session<br>should remember.</h1>
-        <p class="hero-sub">Track, share, compete, train. The whole kit that used to take five apps — in one. Built by athletes who'd rather be outside than switching tabs.</p>
+        <h1 class="hero-h1">Everything your week<br>needs to move.</h1>
+        <p class="hero-sub">Track, plan, recover, and stay connected. RUNNIT turns the data you already collect into one clearer training home for the race or goal ahead.</p>
       </div>
     </section>
 
@@ -52,53 +52,53 @@
           </div>
           <div class="kit-cell">
             <div class="kit-num">03</div>
-            <div class="kit-name">Segments</div>
-            <div class="kit-desc">Chase course records block by block</div>
+            <div class="kit-name">Race Goals</div>
+            <div class="kit-desc">Keep the event at the center of the week</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">04</div>
-            <div class="kit-name">Adaptive Plans</div>
-            <div class="kit-desc">12-week blocks that adjust to your load</div>
+            <div class="kit-name">Event Coaching</div>
+            <div class="kit-desc">Training that bends around real life</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">05</div>
-            <div class="kit-name">Live Share</div>
-            <div class="kit-desc">Your crew tracks you in real time</div>
+            <div class="kit-name">Recovery Signals</div>
+            <div class="kit-desc">See sleep, readiness, and load together</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">06</div>
-            <div class="kit-name">Personal Records</div>
-            <div class="kit-desc">Every benchmark, automatically tracked</div>
+            <div class="kit-name">Progress</div>
+            <div class="kit-desc">Trends, PRs, and the work adding up</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">07</div>
-            <div class="kit-name">Challenges</div>
-            <div class="kit-desc">Monthly distance & time races</div>
+            <div class="kit-name">Social Training</div>
+            <div class="kit-desc">Crews, kudos, challenges, and accountability</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">08</div>
-            <div class="kit-name">Coaching</div>
-            <div class="kit-desc">Assign plans, track athlete load & progress</div>
+            <div class="kit-name">Coach Marketplace</div>
+            <div class="kit-desc">Find a coach for the goal in front of you</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">09</div>
-            <div class="kit-name">Workout Library</div>
-            <div class="kit-desc">Build custom sessions, drills & interval sets</div>
+            <div class="kit-name">Strength Journal</div>
+            <div class="kit-desc">Keep the work beyond the run in the record</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">10</div>
-            <div class="kit-name">Structured Plans</div>
-            <div class="kit-desc">Build structured plans, then watch them land on your calendar</div>
+            <div class="kit-name">Training Folders</div>
+            <div class="kit-desc">Keep a whole block together from start to finish</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">11</div>
-            <div class="kit-name">Recovery</div>
-            <div class="kit-desc">HRV, rest days & training load in one view</div>
+            <div class="kit-name">Weekly View</div>
+            <div class="kit-desc">Planned, completed, and what needs attention</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">12</div>
             <div class="kit-name">Sync</div>
-            <div class="kit-desc">Garmin, Apple Health, COROS</div>
+            <div class="kit-desc">Garmin, WHOOP, Oura, Fitbit, COROS, Strava, and Apple Health</div>
           </div>
         </div>
       </div>
@@ -112,8 +112,8 @@
         <p class="section-intro">The stuff we said no to matters as much as the stuff we shipped.</p>
         <div class="leave-grid">
           <div class="leave-cell">
-            <div class="leave-title">No badges or streaks</div>
-            <div class="leave-body">Your training isn't a video game.</div>
+            <div class="leave-title">No pressure to perform</div>
+            <div class="leave-body">Use the numbers to train better, not to prove your worth.</div>
           </div>
           <div class="leave-cell">
             <div class="leave-title">No algorithmic feed</div>
@@ -141,18 +141,18 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Features — Runnit | GPS Tracking, Run Clubs & Live Sharing',
+  title: 'Features — Runnit | Your whole training in one home',
   link: [{ rel: 'canonical', href: 'https://runnit.live/features' }],
   meta: [
-    { name: 'description', content: 'Everything a session should remember. GPS tracking, run clubs, live sharing, race challenges, training plans, and personal records — every feature earns its place.' },
-    { property: 'og:title', content: 'Features — Runnit | GPS Tracking, Run Clubs & Live Sharing' },
-    { property: 'og:description', content: 'GPS tracking, run clubs, live sharing, race challenges, and structured training plans — all in one endurance training app.' },
+    { name: 'description', content: 'Your whole training in one home: event-based plans, recovery signals, connected devices, social accountability, races, and progress.' },
+    { property: 'og:title', content: 'Features — Runnit | Your whole training in one home' },
+    { property: 'og:description', content: 'Bring workouts, race goals, recovery, plans, and people into one clearer training week.' },
     { property: 'og:url', content: 'https://runnit.live/features' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'Features — Runnit | GPS Tracking, Run Clubs & Live Sharing' },
-    { name: 'twitter:description', content: 'GPS tracking, run clubs, live sharing, race challenges — every feature earns its place.' },
+    { name: 'twitter:title', content: 'Features — Runnit | Your whole training in one home' },
+    { name: 'twitter:description', content: 'Event-based plans, recovery signals, connected devices, social accountability, and progress in one home.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
@@ -430,5 +430,22 @@ const kitItems = [
   .kit-section, .leave-out-section { padding: 40px 0; }
   .kit-grid { grid-template-columns: 1fr 1fr; }
   .final-cta { padding: 48px 22px; }
+}
+
+/* Editorial product surface: structured, tactile, and easier to scan. */
+.features-page .hero {
+  background: radial-gradient(circle at 78% 22%, rgba(42,85,245,.24), transparent 32%), #16130F;
+}
+.features-page .moments-photo-col,
+.features-page .kit-cell,
+.features-page .leave-cell { transition: background .18s ease, transform .18s ease; }
+.features-page .moments-photo-col { border-radius: 20px; overflow: hidden; box-shadow: 0 18px 44px rgba(22,19,15,.12); }
+.features-page .kit-cell { background: rgba(255,255,255,.65); }
+.features-page .kit-cell:hover { background: #fff; transform: translateY(-3px); }
+.features-page .leave-grid { border-radius: 18px; overflow: hidden; }
+.features-page .final-cta { position: relative; overflow: hidden; }
+@media (max-width: 640px) {
+  .features-page .hero { padding-top: 52px; }
+  .features-page .kit-cell { min-height: 128px; }
 }
 </style>

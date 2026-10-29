@@ -8,19 +8,23 @@
           <!-- LEFT: copy -->
           <div class="hero-copy">
             <span class="sticker sticker--yellow sticker--rot-neg">The training home</span>
-            <h1 class="hero-h1">Run it.<br>Log it.<br><span class="hero-accent">Brag a little.</span></h1>
-            <p class="hero-sub">Your training is scattered across Strava, your watch, a notes app, and a group chat. RUNNIT puts it in one training home — so every session points toward what you're preparing for.</p>
+            <h1 class="hero-h1">Your whole training.<br><span class="hero-accent">One home.</span></h1>
+            <p class="hero-sub">Your training is scattered across Strava, your watch, a notes app, and a group chat. RUNNIT brings the workouts, race goals, recovery, plans, and people together — so every session points toward what you're preparing for.</p>
             <div class="hero-actions">
-              <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_home">Create your account</router-link>
-              <a href="#track" class="hero-link" @click.prevent="scrollTo('track')">Watch a run →</a>
+              <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_home">Start free</router-link>
+              <a href="#track" class="hero-link" @click.prevent="scrollTo('track')">See how it works →</a>
             </div>
             <div class="syncs-row">
-              <span class="syncs-label">Syncs</span>
+              <span class="syncs-label">Connects with</span>
               <span class="syncs-app">Garmin</span>
+              <span class="syncs-slash">/</span>
+              <span class="syncs-app">WHOOP</span>
+              <span class="syncs-slash">/</span>
+              <span class="syncs-app">Oura</span>
               <span class="syncs-slash">/</span>
               <span class="syncs-app">Apple&nbsp;Health</span>
               <span class="syncs-slash">/</span>
-              <span class="syncs-app">COROS</span>
+              <span class="syncs-app">Strava</span>
             </div>
           </div>
           <!-- RIGHT: tilted photo stack -->
@@ -177,8 +181,8 @@
           </div>
           <div class="leaderboard">
             <div class="lb-header">
-              <span class="lb-title">JUNE DISTANCE DASH</span>
-              <span class="lb-meta">4 DAYS LEFT</span>
+              <span class="lb-title">COMMUNITY TRAINING BLOCK</span>
+              <span class="lb-meta">THIS WEEK</span>
             </div>
             <div class="lb-row lb-row--gold">
               <span class="lb-rank">🥇</span>
@@ -1237,5 +1241,34 @@ function scrollTo(id) {
   .syncs-row { flex-wrap: wrap; gap: 6px 10px; }
   .crews-header { flex-direction: column; align-items: flex-start; gap: 12px; }
   .track-steps { display: none; }
+}
+
+/* Launch refresh: keep the expressive RUNNIT palette, add calmer surfaces and
+   more deliberate hierarchy so the page feels like a product, not a poster. */
+.home-page .hero {
+  background: radial-gradient(circle at 82% 18%, rgba(42,85,245,.22), transparent 30%), #16130F;
+}
+.home-page .hero-copy { max-width: 640px; }
+.home-page .hero-sub { max-width: 570px; color: rgba(251,246,236,.76); }
+.home-page .hero-actions { align-items: center; }
+.home-page .activity-card,
+.home-page .feature-box,
+.home-page .leaderboard,
+.home-page .crew-card,
+.home-page .moment-photo {
+  border-radius: 18px;
+}
+.home-page .activity-card,
+.home-page .feature-box { box-shadow: 0 18px 50px rgba(22,19,15,.10); }
+.home-page .crew-card { transition: transform .18s ease, box-shadow .18s ease; }
+.home-page .crew-card:hover { transform: translateY(-4px); box-shadow: 5px 5px 0 #2A55F5; }
+.home-page .btn-pill-primary,
+.home-page .btn-pill-yellow,
+.home-page .btn-pill-ghost { min-height: 46px; }
+@media (max-width: 640px) {
+  .home-page .hero { padding-top: 40px; }
+  .home-page .hero-copy { padding-bottom: 4px; }
+  .home-page .hero-h1 { letter-spacing: -.02em; }
+  .home-page .content-section { padding-block: 48px; }
 }
 </style>

@@ -309,17 +309,17 @@
               <div class="db2-insights-grid">
                 <div class="db2-insight-cell db2-insight-cell--br">
                   <div class="db2-insight-lbl">Fitness</div>
-                  <div class="db2-insight-val">{{ dashInsights.fitnessScore }}</div>
+                  <div class="db2-insight-val db2-insight-val--fitness">{{ dashInsights.fitnessScore }}</div>
                 </div>
                 <div class="db2-insight-cell db2-insight-cell--br">
                   <div class="db2-insight-lbl">Form</div>
-                  <div class="db2-insight-val" :style="{ color: dashInsights.formScore > 0 ? '#FFC53D' : '#FBF6EC' }">
+                  <div :class="['db2-insight-val', dashInsights.formScore > 5 ? 'db2-insight-val--positive' : dashInsights.formScore < -5 ? 'db2-insight-val--negative' : 'db2-insight-val--caution']">
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </div>
                 </div>
                 <div class="db2-insight-cell">
                   <div class="db2-insight-lbl">ACWR</div>
-                  <div class="db2-insight-val">{{ trainingLoad?.acwr ?? '—' }}</div>
+                  <div :class="['db2-insight-val', trainingLoad?.acwr == null ? 'db2-insight-val--neutral' : trainingLoad.acwr < 1.3 ? 'db2-insight-val--positive' : trainingLoad.acwr < 1.5 ? 'db2-insight-val--caution' : 'db2-insight-val--negative']">{{ trainingLoad?.acwr ?? '—' }}</div>
                 </div>
               </div>
             </template>
@@ -772,17 +772,17 @@
               <div class="dash-insights-row">
                 <div class="dash-insight-item">
                   <span class="dash-insight-key">Fitness</span>
-                  <span class="dash-insight-val">{{ dashInsights.fitnessScore }}</span>
+                  <span class="dash-insight-val dash-insight-val--fitness">{{ dashInsights.fitnessScore }}</span>
                 </div>
                 <div class="dash-insight-item">
                   <span class="dash-insight-key">Form</span>
-                  <span class="dash-insight-val" :style="{ color: dashInsights.formScore > 5 ? '#2A55F5' : dashInsights.formScore > -5 ? '#767676' : '#ef4444' }">
+                  <span :class="['dash-insight-val', dashInsights.formScore > 5 ? 'dash-insight-val--positive' : dashInsights.formScore < -5 ? 'dash-insight-val--negative' : 'dash-insight-val--caution']">
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
                 <div class="dash-insight-item" v-if="trainingLoad?.acwr != null">
                   <span class="dash-insight-key">ACWR</span>
-                  <span class="dash-insight-val" :style="{ color: trainingLoad.acwr < 1.3 ? '#2A55F5' : trainingLoad.acwr < 1.5 ? '#767676' : '#ef4444' }">
+                  <span :class="['dash-insight-val', trainingLoad.acwr < 1.3 ? 'dash-insight-val--positive' : trainingLoad.acwr < 1.5 ? 'dash-insight-val--caution' : 'dash-insight-val--negative']">
                     {{ trainingLoad.acwr }}
                   </span>
                 </div>
@@ -1049,17 +1049,17 @@
               <div class="dm-insights-rows">
                 <div class="dm-insight-row">
                   <span class="dm-insight-key">Fitness</span>
-                  <span class="dm-insight-val">{{ dashInsights.fitnessScore }}</span>
+                  <span class="dm-insight-val dm-insight-val--fitness">{{ dashInsights.fitnessScore }}</span>
                 </div>
                 <div class="dm-insight-row">
                   <span class="dm-insight-key">Form</span>
-                  <span class="dm-insight-val" :style="{ color: dashInsights.formScore > 0 ? '#FFC53D' : '#FBF6EC' }">
+                  <span :class="['dm-insight-val', dashInsights.formScore > 5 ? 'dm-insight-val--positive' : dashInsights.formScore < -5 ? 'dm-insight-val--negative' : 'dm-insight-val--caution']">
                     {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
                   </span>
                 </div>
                 <div v-if="trainingLoad?.acwr != null" class="dm-insight-row">
                   <span class="dm-insight-key">ACWR</span>
-                  <span class="dm-insight-val">{{ trainingLoad.acwr }}</span>
+                  <span :class="['dm-insight-val', trainingLoad.acwr < 1.3 ? 'dm-insight-val--positive' : trainingLoad.acwr < 1.5 ? 'dm-insight-val--caution' : 'dm-insight-val--negative']">{{ trainingLoad.acwr }}</span>
                 </div>
               </div>
             </div>
@@ -4953,6 +4953,31 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 .db2-feat-map { background: linear-gradient(135deg, #EEF1FF, #F7F9FF); }
 .db2-next-box { border-color: #E7DFCE; border-radius: 10px; }
 .db2-insights { background: #FFFDF8; }
+.db2-insights { color: #16130F; }
+.db2-insights .db2-insight-cell--br { border-right: 1px solid #E7DFCE; }
+.db2-insights .db2-insight-lbl { color: #665F55; }
+.db2-insights .db2-insights-empty { color: #665F55; }
+.db2-insights .db2-insights-foot { border-top: 1px solid #E7DFCE; }
+.db2-insights .db2-insights-link { color: #2A55F5; }
+.db2-card-head--ink .db2-eyebrow.db2-eyebrow--cobalt { color: #FFC53D; }
+.db2-insight-val--fitness,
+.dash-insight-val--fitness { color: #2A55F5; }
+.db2-insight-val--positive,
+.dash-insight-val--positive { color: #16804A; }
+.db2-insight-val--caution,
+.dash-insight-val--caution { color: #A66B00; }
+.db2-insight-val--negative,
+.dash-insight-val--negative { color: #C0392B; }
+.db2-insight-val--neutral { color: #665F55; }
+.dm-insight-val--fitness { color: #8FA7FF; }
+.dm-insight-val--positive { color: #74D6A1; }
+.dm-insight-val--caution { color: #FFD27A; }
+.dm-insight-val--negative { color: #FF8F82; }
+.dm-insights-card .dm-insight-val { color: #FBF6EC; }
+.dm-insights-card .dm-insight-val--fitness { color: #8FA7FF; }
+.dm-insights-card .dm-insight-val--positive { color: #74D6A1; }
+.dm-insights-card .dm-insight-val--caution { color: #FFD27A; }
+.dm-insights-card .dm-insight-val--negative { color: #FF8F82; }
 .db2-recovery { background: #F8FBFF; }
 .db2-btn-cobalt,
 .db2-btn-ghost,

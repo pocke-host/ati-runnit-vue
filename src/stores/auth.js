@@ -145,6 +145,11 @@ export const useAuthStore = defineStore('auth', () => {
   function setAuth(newUser) {
     user.value = newUser
     localStorage.setItem('user', JSON.stringify(newUser))
+    if (newUser?.subscriptionTier) {
+      subscriptionTier.value = newUser.subscriptionTier
+      localStorage.setItem('subscriptionTier', newUser.subscriptionTier)
+    }
+    if (newUser?.subscriptionStatus) subscriptionStatus.value = newUser.subscriptionStatus
     if (newUser?.role) {
       role.value = newUser.role
       localStorage.setItem('userRole', newUser.role)

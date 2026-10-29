@@ -372,4 +372,12 @@ const posts = [
   .newsletter-form { width: 100%; border: 2px solid rgba(251,246,236,0.3); }
   .newsletter-input { flex: 1; width: auto; }
 }
+
+.editorial-page .ep-hero { background: radial-gradient(circle at 78% 10%, rgba(42,85,245,.24), transparent 32%), #16130F; }
+.editorial-page .post-featured,
+.editorial-page .post-card,
+.editorial-page .newsletter-cta { border-radius: 18px; box-shadow: 0 16px 38px rgba(22,19,15,.08); }
+.editorial-page .post-card { transition: transform .18s ease, box-shadow .18s ease; }
+.editorial-page .post-card:hover { transform: translateY(-4px); box-shadow: 5px 5px 0 #2A55F5; }
+.editorial-page .newsletter-btn { min-height: 46px; border-radius: 999px; }
 </style>

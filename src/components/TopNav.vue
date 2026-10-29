@@ -1151,6 +1151,25 @@ onUnmounted(() => {
   .mobile-menu-toggle { display: flex; color: #000; }
   .brand-text { font-size: 1rem; }
 }
+
+/* Shared nav polish: the header should feel like a calm control bar, not a
+   second dashboard. Keep the action hierarchy obvious on desktop and mobile. */
+.site-header .navbar { background: rgba(251,246,236,.94); backdrop-filter: blur(14px); }
+.site-header.site-header--auth .navbar { background: rgba(251,246,236,.97); }
+.navbar-content { min-width: 0; }
+.navbar-links { gap: clamp(10px, 1.35vw, 18px); min-width: 0; }
+.nav-link-auth { white-space: nowrap; }
+.nav-link-gr { white-space: nowrap; }
+.training-menu-dropdown { border-radius: 18px; box-shadow: 8px 8px 0 rgba(22,19,15,.16); }
+.training-menu-featured, .training-menu-context { border-radius: 12px !important; }
+.training-menu-grid a { border-radius: 10px; }
+.nav-track-pill { box-shadow: 3px 3px 0 #16130F; }
+@media (max-width: 1080px) and (min-width: 769px) {
+  .navbar-content { padding-inline: 16px; }
+  .navbar-links { gap: 10px; margin-left: 12px; }
+  .nav-link-auth { font-size: .66rem !important; letter-spacing: .07em !important; }
+  .nav-right .icon-group { gap: 10px; padding-left: 10px; }
+}
 </style>
 
 <!-- Non-scoped: drawer teleported to <body>, scoped attrs don't follow -->

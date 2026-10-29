@@ -19,10 +19,10 @@
     <!-- LEAD + 2-col story -->
     <section class="story-section">
       <div class="page-inner">
-        <p class="story-lead">Your training is scattered across five apps. RUNNIT is where it all lives.</p>
+        <p class="story-lead">Training is better when the whole week makes sense.</p>
         <div class="story-grid">
-          <p class="story-body">Training data is everywhere: a watch for the workout, an app for recovery, a calendar for the plan, and a group chat for accountability. The pieces are useful. The stitching is exhausting.</p>
-          <p class="story-body">RUNNIT gives the whole block a home. See what you did, what is next, and who is in it with you — whether you are chasing a race, building a habit, or just trying to show up again.</p>
+          <p class="story-body">Your watch records the workout. Your recovery app records the night. Your calendar holds the plan, and your group chat holds the accountability. The pieces are useful. The stitching is exhausting.</p>
+          <p class="story-body">RUNNIT gives the whole block a home. Put the event first, bring in the data you already collect, and see what you did, what is next, and who is in it with you.</p>
         </div>
       </div>
     </section>
@@ -56,18 +56,18 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'About — Runnit | Built by Athletes, for Athletes',
+  title: 'About — Runnit | The training home for what comes next',
   link: [{ rel: 'canonical', href: 'https://runnit.live/about' }],
   meta: [
-    { name: 'description', content: 'We built the app we wanted to use. Runnit is built by endurance athletes, for endurance athletes — no VC hype, no ads, just the tools that make training better.' },
-    { property: 'og:title', content: 'About — Runnit | Built by Athletes, for Athletes' },
-    { property: 'og:description', content: 'Runnit is built by endurance athletes, for endurance athletes. No ads, no hype — just the training tools that actually matter.' },
+    { name: 'description', content: 'RUNNIT is the training home for athletes preparing for something: a clearer week, connected data, better accountability, and more progress.' },
+    { property: 'og:title', content: 'About — Runnit | The training home for what comes next' },
+    { property: 'og:description', content: 'Bring workouts, race goals, recovery, and people into one clearer training week.' },
     { property: 'og:url', content: 'https://runnit.live/about' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: 'About — Runnit | Built by Athletes, for Athletes' },
-    { name: 'twitter:description', content: 'Runnit is built by endurance athletes, for endurance athletes. No ads, no hype.' },
+    { name: 'twitter:title', content: 'About — Runnit | The training home for what comes next' },
+    { name: 'twitter:description', content: 'Bring workouts, race goals, recovery, and people into one clearer training week.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
@@ -306,4 +306,13 @@ const stackItems = [
   .story-section, .beliefs-section { padding: 40px 0; }
   .final-cta { padding: 48px 22px; }
 }
+
+.about-page .hero {
+  background: radial-gradient(circle at 78% 20%, rgba(42,85,245,.22), transparent 30%), #16130F;
+}
+.about-page .hero-photo { border-radius: 22px; box-shadow: 8px 8px 0 #2A55F5; }
+.about-page .belief-card { background: rgba(255,255,255,.34); transition: transform .18s ease, background .18s ease; }
+.about-page .belief-card:hover { background: #fff; transform: translateY(-4px); }
+.about-page .beliefs-grid { border-radius: 18px; overflow: hidden; }
+.about-page .final-cta { position: relative; overflow: hidden; }
 </style>

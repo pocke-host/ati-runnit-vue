@@ -14,9 +14,9 @@
     <section class="cards-section">
       <div class="page-inner">
         <div class="pricing-intro">
-          <span class="section-kicker">One free core. Three ways to grow.</span>
+          <span class="section-kicker">One free core. One paid layer. Coaches in between.</span>
           <h2>Train free. Go deeper when it matters.</h2>
-          <p>Keep your training, data, and community in one place. RUNNIT Pro adds advanced guidance when you are ready, while coaches earn through the marketplace.</p>
+          <p>Keep your training, data, and community in one place. The athlete core stays free; Pro adds deeper guidance when it opens, while coaches earn through the marketplace.</p>
         </div>
         <div class="cards-grid">
 
@@ -40,13 +40,14 @@
 
           <!-- RUNNIT Pro -->
           <div class="price-card price-card--featured">
-            <span class="popular-tag">Planned</span>
+            <span class="popular-tag">First 100 · Free for life</span>
             <div class="plan-tier plan-tier--cobalt">RUNNIT Pro</div>
             <div class="price-row">
               <span class="price-amount">$8.99</span>
               <span class="price-mo">/MO</span>
             </div>
-            <div class="plan-tagline">Advanced training intelligence. Target: $79/year.</div>
+            <div class="plan-tagline">Advanced training intelligence. Launching after the first 100 athletes.</div>
+            <p class="launch-terms">The first 100 accounts — plus the RUNNIT owner — receive Pro at no cost for life. No card required.</p>
             <ul class="plan-features">
               <li><b class="check">✓</b>&nbsp; Adaptive event coaching</li>
               <li><b class="check">✓</b>&nbsp; Recovery-aware plan adjustments</li>
@@ -54,7 +55,12 @@
               <li><b class="check">✓</b>&nbsp; Advanced trends, reports, and exports</li>
               <li><b class="check">✓</b>&nbsp; Deeper route and training analysis</li>
             </ul>
-            <router-link to="/waitlist" class="btn-plan btn-plan--cobalt" data-analytics="cta_waitlist_pro">Join Pro interest list</router-link>
+            <button v-if="isAuthenticated && !isLifetimePro" class="btn-plan btn-plan--cobalt" data-analytics="cta_upgrade_pricing_pro" :disabled="proLoading" @click="upgradeToPro">
+              {{ proLoading ? 'Opening checkout…' : 'Upgrade with Stripe' }}
+            </button>
+            <span v-else-if="isLifetimePro" class="btn-plan btn-plan--included">Included for life</span>
+            <router-link v-else to="/signup" class="btn-plan btn-plan--cobalt" data-analytics="cta_signup_pricing_pro">Claim your launch spot</router-link>
+            <p v-if="proError" class="pro-error" role="alert">{{ proError }}</p>
           </div>
 
           <!-- Coach Marketplace -->
@@ -81,7 +87,7 @@
     <!-- CTA — cobalt -->
     <section class="final-cta">
       <h2 class="cta-h2">Train like you mean it.</h2>
-      <p class="cta-sub">The athlete core stays free. Premium guidance and coaching create the next layer of value.</p>
+      <p class="cta-sub">The athlete core stays free. Pro adds depth; the coach marketplace is where RUNNIT earns.</p>
       <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_pricing_footer">Start Free</router-link>
     </section>
 
@@ -90,6 +96,9 @@
 
 <script setup>
 import { useHead } from '@unhead/vue'
+import { computed, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useStripe } from '@/composables/useStripe'
 
 useHead({
   title: 'Pricing — Runnit | Free training for endurance athletes',
@@ -107,6 +116,25 @@ useHead({
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })
+
+const authStore = useAuthStore()
+const { startProCheckout } = useStripe()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const isLifetimePro = computed(() => Boolean(authStore.user?.lifetimePro))
+const proLoading = ref(false)
+const proError = ref('')
+
+const upgradeToPro = async () => {
+  proLoading.value = true
+  proError.value = ''
+  try {
+    await startProCheckout()
+  } catch (error) {
+    proError.value = error?.response?.data?.error || 'Checkout is not available yet. Please try again shortly.'
+  } finally {
+    proLoading.value = false
+  }
+}
 
 </script>
 
@@ -238,6 +266,15 @@ useHead({
 .price-card--featured {
   box-shadow: 6px 6px 0 #2A55F5;
 }
+.launch-terms {
+  margin: -8px 0 22px;
+  padding: 11px 12px;
+  background: #EEF1FF;
+  border-left: 4px solid #2A55F5;
+  color: #3F4D84;
+  font-size: .78rem;
+  line-height: 1.45;
+}
 .popular-tag {
   position: absolute;
   top: -2px;
@@ -321,6 +358,8 @@ useHead({
   color: #fff;
   border: 2px solid #16130F;
 }
+.btn-plan--included { display: inline-flex; align-items: center; justify-content: center; background: #E8F5EC; color: #257942; border: 2px solid #257942; padding: 13px 18px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: .72rem; }
+.pro-error { color: #9B2C2C; font-size: .76rem; line-height: 1.4; margin: 10px 0 0; }
 .btn-plan:hover:not(:disabled) { opacity: 0.8; }
 .btn-plan:disabled { opacity: 0.5; cursor: not-allowed; }
 

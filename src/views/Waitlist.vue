@@ -536,4 +536,15 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid 
   .proof-cell { padding: 14px 6px; }
   .proof-val { font-size: .72rem; }
 }
+
+.waitlist-page .hero { background: radial-gradient(circle at 78% 18%, rgba(42,85,245,.24), transparent 32%), #16130F; }
+.waitlist-page .preview-card,
+.waitlist-page .form-card,
+.waitlist-page .sync-item { border-radius: 18px; }
+.waitlist-page .form-card { box-shadow: 0 18px 46px rgba(22,19,15,.10); }
+.waitlist-page .btn-submit { min-height: 48px; border-radius: 999px; }
+@media (max-width: 640px) {
+  .waitlist-page .hero { padding-top: 52px; }
+  .waitlist-page .hero-visual { margin-top: 8px; }
+}
 </style>

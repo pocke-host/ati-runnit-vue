@@ -257,4 +257,9 @@ const facts = [
   .press-kit-grid { grid-template-columns: 1fr; }
   .facts-grid { grid-template-columns: 1fr 1fr; }
 }
+
+.editorial-page .ep-hero { background: radial-gradient(circle at 78% 10%, rgba(42,85,245,.24), transparent 32%), #16130F; }
+.editorial-page .ep-hero-card { border-radius: 20px; box-shadow: 8px 8px 0 #FFC53D; }
+.editorial-page .press-kit-card { border-radius: 16px; transition: transform .18s ease, box-shadow .18s ease; }
+.editorial-page .press-kit-card:hover { transform: translateY(-4px); box-shadow: 4px 4px 0 #2A55F5; }
 </style>

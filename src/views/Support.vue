@@ -398,4 +398,17 @@ const searchHelp = async () => {
   .sp-cat-tile { border-right: none; }
   .sp-cat-tile:last-child { border-bottom: none; }
 }
+
+.support-page .sp-hero { background: radial-gradient(circle at 78% 10%, rgba(42,85,245,.24), transparent 32%), #16130F; }
+.support-page .sp-search-bar,
+.support-page .sp-cat-tile,
+.support-page .sp-faq-list,
+.support-page .sp-contact-card { border-radius: 18px; }
+.support-page .sp-search-btn { border-radius: 999px; }
+.support-page .sp-cat-tile { transition: transform .18s ease, background .18s ease; }
+.support-page .sp-cat-tile:hover { transform: translateY(-3px); background: #fff; }
+@media (max-width: 640px) {
+  .support-page .sp-search-bar { padding: 6px; }
+  .support-page .sp-search-btn { min-height: 44px; }
+}
 </style>

@@ -14,7 +14,8 @@
           <div class="billing-label">CURRENT PLAN</div>
           <div class="billing-tier-row">
             <span class="tier-pill" :class="tierClass">{{ tierLabel }}</span>
-            <span v-if="subscriptionStatus" class="billing-status">{{ subscriptionStatus }}</span>
+            <span v-if="isLifetimePro" class="billing-status billing-status--launch">Included for life</span>
+            <span v-else-if="subscriptionStatus" class="billing-status">{{ subscriptionStatus }}</span>
           </div>
         </div>
 
@@ -22,7 +23,10 @@
 
         <div class="billing-section">
           <p class="billing-desc">
-            <template v-if="subscriptionTier === 'free'">
+            <template v-if="isLifetimePro">
+              Your RUNNIT Pro access is included for life through the launch cohort. There is no subscription to manage and no card on file for this benefit.
+            </template>
+            <template v-else-if="subscriptionTier === 'free'">
               Your complete Runnit athlete experience is free. Coaching services are paid directly to coaches through the marketplace.
             </template>
             <template v-else>
@@ -30,7 +34,14 @@
             </template>
           </p>
 
-          <div v-if="subscriptionTier === 'free'" class="billing-actions"><router-link to="/coaches" class="btn-billing-primary">Find a Coach →</router-link></div>
+          <div v-if="subscriptionTier === 'free'" class="billing-actions">
+            <button class="btn-billing-primary" @click="handleUpgrade" :disabled="upgradeLoading">
+              <span v-if="upgradeLoading" class="btn-spinner"></span>
+              <span v-else>Upgrade to Pro →</span>
+            </button>
+            <router-link to="/coaches" class="billing-link">Or find a coach</router-link>
+            <p v-if="portalError" class="billing-error">{{ portalError }}</p>
+          </div>
 
           <div v-else class="billing-actions">
             <button class="btn-billing-primary" @click="handlePortal" :disabled="portalLoading">
@@ -57,11 +68,13 @@ import { useStripe } from '@/composables/useStripe'
 import { storeToRefs } from 'pinia'
 
 const authStore = useAuthStore()
-const { subscriptionTier, subscriptionStatus } = storeToRefs(authStore)
-const { openBillingPortal } = useStripe()
+const { user, subscriptionTier, subscriptionStatus } = storeToRefs(authStore)
+const { startProCheckout, openBillingPortal } = useStripe()
 
 const portalLoading = ref(false)
 const portalError = ref('')
+const upgradeLoading = ref(false)
+const isLifetimePro = computed(() => Boolean(user.value?.lifetimePro))
 
 const tierLabel = computed(() => {
   if (subscriptionTier.value === 'premium' || subscriptionTier.value === 'duo') return 'Pro'
@@ -79,6 +92,18 @@ const handlePortal = async () => {
     portalError.value = "Couldn't open the billing portal. Try again."
   } finally {
     portalLoading.value = false
+  }
+}
+
+const handleUpgrade = async () => {
+  upgradeLoading.value = true
+  portalError.value = ''
+  try {
+    await startProCheckout()
+  } catch (error) {
+    portalError.value = error?.response?.data?.error || "Couldn't open checkout. Try again."
+  } finally {
+    upgradeLoading.value = false
   }
 }
 </script>
@@ -162,6 +187,7 @@ const handlePortal = async () => {
   color: #8A8A8A;
   text-transform: capitalize;
 }
+.billing-status--launch { color: #257942; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .billing-divider { border: none; border-top: 2px solid #E7DFCE; }
 .billing-desc {
   font-size: 0.9rem;
