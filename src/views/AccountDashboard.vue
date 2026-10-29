@@ -4906,4 +4906,73 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
   .web-week-summary-days { gap: 5px; }
   .web-week-summary-bar { width: 20px; }
 }
+
+/* ── Dashboard visual system ─────────────────────────────────────────────
+   Keep the bento layout and its data contracts, but give the page a calmer
+   reading order: one strong action, quiet surfaces, and clear card grouping. */
+.dash {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(42,85,245,.06), transparent 28rem),
+    #FBF6EC;
+}
+.dash .wrap { max-width: 1440px; padding-left: clamp(16px, 3vw, 40px); padding-right: clamp(16px, 3vw, 40px); }
+.first-action-card,
+.daily-focus {
+  border: 1px solid #DED5C4;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(22,19,15,.06);
+}
+.first-action-card { background: linear-gradient(135deg, #FFF7DD, #FFFDF7); }
+.daily-focus { background: rgba(255,255,255,.82); }
+.daily-focus-primary { border-radius: 999px; box-shadow: 0 6px 14px rgba(42,85,245,.18); }
+.daily-focus-secondary { padding: 9px 4px; }
+.db2-hero {
+  border: 1px solid rgba(251,246,236,.12);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #16130F 0%, #2B2721 100%);
+  box-shadow: 0 20px 44px rgba(22,19,15,.14);
+  overflow: hidden;
+}
+.db2-stats-grid { border: 1px solid rgba(251,246,236,.18); border-radius: 16px; overflow: hidden; }
+.db2-stat { border-color: rgba(251,246,236,.18); }
+.db2-week-rail {
+  border: 1px solid #DED5C4;
+  border-radius: 16px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 8px 22px rgba(22,19,15,.04);
+}
+.db2-card {
+  border: 1px solid #DED5C4;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(22,19,15,.055);
+  overflow: hidden;
+}
+.db2-card-head { border-bottom-color: #E7DFCE; }
+.db2-card-head--ink { background: #24201B; }
+.db2-featured { border-color: #DED5C4; }
+.db2-feat-map { background: linear-gradient(135deg, #EEF1FF, #F7F9FF); }
+.db2-next-box { border-color: #E7DFCE; border-radius: 10px; }
+.db2-insights { background: #FFFDF8; }
+.db2-recovery { background: #F8FBFF; }
+.db2-btn-cobalt,
+.db2-btn-ghost,
+.db2-feat-log-btn { border-radius: 999px; }
+.db2-btn-cobalt { box-shadow: 0 6px 14px rgba(42,85,245,.22); }
+.db2-xp { border-radius: 18px; }
+.web-week-summary { border: 1px solid #DED5C4; border-radius: 16px; box-shadow: 0 8px 22px rgba(22,19,15,.04); }
+.web-week-summary-bar { border: 0; border-radius: 5px 5px 0 0; }
+.activity-feedback { background: #FFFDF7; }
+@media (max-width: 900px) {
+  .db2-hero { border-radius: 20px; }
+  .db2-bento { gap: 14px; }
+}
+@media (max-width: 600px) {
+  .dash .wrap { padding-bottom: 40px; }
+  .first-action-card, .daily-focus { border-radius: 15px; }
+  .db2-hero { border-radius: 16px; }
+  .db2-card, .db2-week-rail { border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .db2-card, .daily-focus-primary, .db2-btn-cobalt { transition: none !important; }
+}
 </style>

@@ -1872,4 +1872,61 @@ textarea.form-control { resize: vertical; min-height: 60px; }
   border-color: #2A55F5;
 }
 .footer-btn-group:hover { background: #2A55F5; color: #fff; border-color: #2A55F5; }
+
+/* ── Calendar visual system ──────────────────────────────────────────────── */
+.cal-page {
+  background:
+    radial-gradient(circle at 88% 0%, rgba(255,197,61,.11), transparent 25rem),
+    #FBF6EC;
+}
+.cal-hero {
+  background: linear-gradient(135deg, #16130F 0%, #2B2721 100%);
+  border-bottom: 0;
+  box-shadow: 0 16px 34px rgba(22,19,15,.12);
+}
+.cal-month-title { letter-spacing: -.01em; }
+.nav-btn,
+.hero-btn-ghost,
+.view-toggle { border-radius: 999px; }
+.hero-btn-ai { box-shadow: 0 6px 14px rgba(42,85,245,.24); }
+.view-toggle { overflow: hidden; }
+.cal-body { padding-top: 30px; }
+.cal-dow { color: #665F55; }
+.cal-grid { gap: 8px; }
+.cal-dow-headers { gap: 8px; margin-bottom: 8px; }
+.cal-cell {
+  min-height: 116px;
+  border: 1px solid #DED5C4;
+  border-radius: 12px;
+  background: rgba(255,255,255,.55);
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.cal-cell:hover { border-color: #BDB09B; box-shadow: 0 8px 18px rgba(22,19,15,.06); transform: translateY(-1px); }
+.cal-cell-today { border-color: #2A55F5; border-width: 2px; background: #FFFDF7; }
+.cal-cell-selected { border-color: #2A55F5; background: #EEF1FF; }
+.cal-chip { border-radius: 8px; border-width: 1px; }
+.cal-chip-race { box-shadow: 0 3px 8px rgba(42,85,245,.16); }
+.cal-plus { border-radius: 999px; }
+.cal-drawer {
+  border: 1px solid #DED5C4;
+  border-radius: 18px;
+  box-shadow: 0 16px 36px rgba(22,19,15,.1);
+  overflow: hidden;
+}
+.cal-drawer-header { border-bottom-color: #E7DFCE; }
+@media (max-width: 900px) {
+  .cal-body { padding-left: 12px; padding-right: 12px; }
+  .cal-grid, .cal-dow-headers { gap: 5px; }
+  .cal-cell { border-radius: 9px; }
+}
+@media (max-width: 600px) {
+  .cal-hero { padding-left: 16px; padding-right: 16px; }
+  .cal-month-title { min-width: 0; font-size: 1.65rem; }
+  .cal-body { padding-top: 20px; }
+  .cal-grid, .cal-dow-headers { gap: 3px; }
+  .cal-cell { border-radius: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cal-cell { transition: none; }
+}
 </style>

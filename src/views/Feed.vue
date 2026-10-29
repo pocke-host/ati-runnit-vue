@@ -2080,4 +2080,63 @@ onUnmounted(() => {
 
 .feed-comment-media{display:block;max-width:180px;max-height:140px;margin-top:8px;object-fit:cover;border:1px solid #ddd4c5}.feed-mention-suggestions{position:absolute;bottom:calc(100% + 8px);left:0;display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#fff;border:2px solid #16130f;box-shadow:3px 3px #16130f;z-index:3}.feed-mention-suggestions button{border:1px solid #16130f;background:#f5d547;padding:6px 8px;font:11px 'Spline Sans Mono',monospace;cursor:pointer}.comment-form{position:relative}.feed-gif-btn{border:0;background:#e6edff;padding:0 8px;font:10px 'Spline Sans Mono',monospace;font-weight:700;cursor:pointer}.feed-gif-btn:disabled{opacity:.5}.feed-gif-picker{margin-top:8px;padding:10px;border:2px solid #16130f;background:#fff}.feed-gif-search{display:flex;gap:6px}.feed-gif-search input{min-width:0;flex:1;border:1px solid #16130f;padding:8px}.feed-gif-search button{border:2px solid #16130f;background:#2a55f5;color:#fff;padding:8px 12px;font-weight:700}.feed-gif-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;max-height:180px;overflow:auto}.feed-gif-grid button{padding:0;border:0;background:none;cursor:pointer}.feed-gif-grid img{display:block;width:100%;height:60px;object-fit:cover}.feed-gif-state{padding:16px;text-align:center;color:#665f55;font-size:.8rem}
 .comment-reply-btn{margin-top:6px;padding:0;border:0;background:none;color:#2A55F5;font:600 .65rem 'Spline Sans Mono',monospace;cursor:pointer;text-transform:uppercase}.replying-to{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;background:#FFF8DC;color:#5A5348;font-size:.72rem}.replying-to button{border:0;background:none;color:#2A55F5;font-weight:700;cursor:pointer}
+
+/* ── Feed visual system ──────────────────────────────────────────────────── */
+.feed-page {
+  background:
+    radial-gradient(circle at 88% 3%, rgba(255,197,61,.13), transparent 22rem),
+    #FBF6EC;
+}
+.feed-header-bar {
+  background: rgba(251,246,236,.94);
+  border-bottom: 1px solid #DED5C4;
+  backdrop-filter: blur(16px);
+}
+.feed-header-inner { padding-left: clamp(16px, 4vw, 44px); padding-right: clamp(16px, 4vw, 44px); }
+.feed-headline-row { padding-top: 34px; }
+.feed-title { letter-spacing: -.02em; }
+.feed-subline { color: #665F55; }
+.feed-controls-bar { border-top: 1px solid #E7DFCE; }
+.feed-tab { margin-right: 22px; padding-top: 13px; padding-bottom: 13px; }
+.time-chip {
+  border: 1px solid #D8CFBE;
+  border-radius: 999px;
+  background: rgba(255,255,255,.55);
+}
+.time-chip.active { background: #16130F; border-color: #16130F; }
+.feed-container { padding-left: clamp(16px, 4vw, 44px); padding-right: clamp(16px, 4vw, 44px); }
+.feed-grid { gap: 18px; }
+.feed-card {
+  border: 1px solid #DED5C4;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(22,19,15,.055);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.feed-card:hover {
+  transform: translateY(-2px);
+  border-color: #BDB09B;
+  box-shadow: 0 16px 32px rgba(22,19,15,.09);
+}
+.feed-error-banner { border-bottom: 1px solid #E3C77A; background: #FFF7DD; }
+.feed-error-retry { border: 1px solid #16130F; border-radius: 999px; }
+.feed-comment-media { border: 1px solid #DED5C4; border-radius: 10px; }
+.feed-mention-suggestions,
+.feed-gif-picker { border: 1px solid #DED5C4; border-radius: 12px; box-shadow: 0 12px 28px rgba(22,19,15,.12); }
+.feed-mention-suggestions button { border: 1px solid #E2B52F; border-radius: 999px; }
+.feed-gif-search input { border: 1px solid #D8CFBE; border-radius: 8px; }
+.feed-gif-search button { border: 0; border-radius: 999px; }
+@media (max-width: 768px) {
+  .feed-headline-row { padding-top: 28px; }
+  .feed-container { padding-top: 184px; }
+  .feed-card { border-radius: 15px; }
+}
+@media (max-width: 640px) {
+  .feed-container { padding-top: 208px; }
+  .feed-controls-bar { gap: 10px; }
+  .feed-time-chips { gap: 5px; overflow-x: auto; padding-bottom: 9px; }
+  .time-chip { padding: 7px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-card { transition: none; }
+}
 </style>
