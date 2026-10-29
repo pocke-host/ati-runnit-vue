@@ -2,21 +2,24 @@
   <defs>
     <style>
       .letter {
-        font-family: 'Futura PT', 'Futura', 'Century Gothic', 'Avenir Next', sans-serif;
-        font-weight: 800;
+        font-family: 'Arial Black', 'Impact', 'Avenir Next', sans-serif;
+        font-weight: 900;
+        font-style: italic;
         font-size: 580px;
-        fill: #ffffff;
+        fill: #2A55F5;
         letter-spacing: -0.02em;
       }
     </style>
   </defs>
 
-  <!-- Black background (App Store requires no transparency) -->
-  <rect width="1024" height="1024" fill="#000000" />
+  <!-- Cream field with an ink frame; no white is used in the mark. -->
+  <rect width="1024" height="1024" rx="190" fill="#FBF6EC" />
+  <rect x="28" y="28" width="968" height="968" rx="162" fill="none" stroke="#16130F" stroke-width="28" />
 
   <!-- Large R centered -->
   <text x="512" y="760" class="letter" text-anchor="middle">R</text>
 
-  <!-- Blue underline accent -->
-  <rect x="200" y="820" width="624" height="28" fill="#0052FF" />
+  <!-- Ink signature bar and cobalt underline accent -->
+  <rect x="604" y="730" width="118" height="70" fill="#16130F" />
+  <rect x="200" y="850" width="624" height="28" fill="#2A55F5" />
 </svg>

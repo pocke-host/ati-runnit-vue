@@ -9,7 +9,7 @@
           <div class="hero-copy">
             <span class="sticker sticker--yellow sticker--rot-neg">The training home</span>
             <h1 class="hero-h1">Run it.<br>Log it.<br><span class="hero-accent">Brag a little.</span></h1>
-            <p class="hero-sub">The training app for athletes who'd rather be outside — with the crew that drags them out at dawn. Log every session, find your people, and celebrate the wins that don't fit on a medal.</p>
+            <p class="hero-sub">Your training is scattered across Strava, your watch, a notes app, and a group chat. RUNNIT puts it in one training home — so every session points toward what you're preparing for.</p>
             <div class="hero-actions">
               <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_home">Create your account</router-link>
               <a href="#track" class="hero-link" @click.prevent="scrollTo('track')">Watch a run →</a>
@@ -316,19 +316,19 @@ import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Runnit — The Training App for Endurance Athletes',
+  title: 'RUNNIT — The Training Home for Athletes',
   link: [{ rel: 'canonical', href: 'https://runnit.live' }],
   meta: [
-    { name: 'description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, clubs, live sharing, and race challenges for athletes across running, cycling, swimming, and trail — all in one app.' },
-    { property: 'og:title', content: 'Runnit — The Training App for Endurance Athletes' },
-    { property: 'og:description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing, and race challenges — all in one app.' },
+    { name: 'description', content: 'RUNNIT is the training home for athletes preparing for something. Bring workouts, races, recovery, plans, and community together with data from Strava, Garmin, WHOOP, Oura, Fitbit, COROS, and Apple Health.' },
+    { property: 'og:title', content: 'RUNNIT — Your Whole Training, One Place' },
+    { property: 'og:description', content: 'Bring workouts, races, recovery, plans, and community together in one training home for athletes preparing for something.' },
     { property: 'og:url', content: 'https://runnit.live' },
     { property: 'og:image', content: 'https://runnit.live/og-image.png' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:site', content: '@runnitapp' },
-    { name: 'twitter:title', content: 'Runnit — The Training App for Endurance Athletes' },
-    { name: 'twitter:description', content: 'Log every session, find your crew, and celebrate every mile. GPS tracking, run clubs, live sharing.' },
+    { name: 'twitter:title', content: 'RUNNIT — Your Whole Training, One Place' },
+    { name: 'twitter:description', content: 'The training home for athletes preparing for something. Bring your workouts, races, recovery, plans, and people together.' },
     { name: 'twitter:image', content: 'https://runnit.live/og-image.png' },
   ]
 })

@@ -1,21 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Ink background -->
-  <rect width="64" height="64" fill="#16130F"/>
+  <!-- Cream field keeps the mark legible in Google results and browser chrome. -->
+  <rect width="64" height="64" rx="13" fill="#FBF6EC"/>
+  <rect x="2" y="2" width="60" height="60" rx="11" fill="none" stroke="#16130F" stroke-width="3"/>
 
-  <!-- Bold italic R in cream — matches the logo mark -->
+  <!-- Bold italic R in cobalt — the primary RUNNIT mark, without white. -->
   <text
     x="8" y="48"
     font-family="'Arial Black', 'Impact', 'Haettenschweiler', sans-serif"
     font-size="46"
     font-weight="900"
     font-style="italic"
-    fill="#FBF6EC"
+    fill="#2A55F5"
     letter-spacing="-1"
   >R</text>
 
-  <!-- Cobalt square period — the GR signature motif -->
-  <rect x="38" y="43" width="11" height="8" fill="#2A55F5"/>
+  <!-- Ink signature bar -->
+  <rect x="38" y="43" width="11" height="8" fill="#16130F"/>
 
   <!-- Cobalt bottom stripe -->
-  <rect x="0" y="61" width="64" height="3" fill="#2A55F5"/>
+  <rect x="12" y="58" width="40" height="3" fill="#2A55F5"/>
 </svg>

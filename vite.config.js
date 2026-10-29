@@ -12,20 +12,20 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' && vueDevTools(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo192.png'],
+      includeAssets: ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'logo192.png', 'logo512.png'],
       manifest: {
-        name: 'Runnit',
-        short_name: 'Runnit',
-        description: 'Train smarter. Race faster.',
-        theme_color: '#000000',
-        background_color: '#ffffff',
+        name: 'RUNNIT — The Training Home for Athletes',
+        short_name: 'RUNNIT',
+        description: 'Bring workouts, races, recovery, plans, and community into one training home.',
+        theme_color: '#FBF6EC',
+        background_color: '#FBF6EC',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
         start_url: '/',
         icons: [
-          { src: '/logo192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/logo512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/logo192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: '/logo512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
       },
       workbox: {

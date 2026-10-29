@@ -1,36 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
-  <!-- Background -->
-  <rect width="1200" height="630" fill="#000000"/>
+  <rect width="1200" height="630" fill="#FBF6EC"/>
+  <rect width="1200" height="12" fill="#2A55F5"/>
+  <rect x="850" y="0" width="350" height="630" fill="#16130F"/>
+  <path d="M850 0H1200V630H850C925 520 925 110 850 0Z" fill="#2A55F5" opacity=".14"/>
 
-  <!-- Electric blue accent bar left -->
-  <rect x="0" y="0" width="8" height="630" fill="#0052FF"/>
+  <!-- Mark -->
+  <rect x="936" y="126" width="154" height="154" rx="28" fill="#FBF6EC"/>
+  <text x="958" y="250" font-family="Arial Black, Impact, sans-serif" font-size="118" font-style="italic" font-weight="900" fill="#2A55F5">R</text>
+  <rect x="1032" y="218" width="28" height="20" fill="#16130F"/>
+  <rect x="964" y="264" width="92" height="8" fill="#2A55F5"/>
 
-  <!-- Grid lines (subtle) -->
-  <line x1="0" y1="210" x2="1200" y2="210" stroke="#111" stroke-width="1"/>
-  <line x1="0" y1="420" x2="1200" y2="420" stroke="#111" stroke-width="1"/>
-  <line x1="400" y1="0" x2="400" y2="630" stroke="#111" stroke-width="1"/>
-  <line x1="800" y1="0" x2="800" y2="630" stroke="#111" stroke-width="1"/>
+  <!-- Wordmark and promise -->
+  <text x="82" y="170" font-family="Arial Black, Impact, sans-serif" font-size="112" font-weight="900" fill="#16130F" letter-spacing="-4">RUNNIT</text>
+  <rect x="86" y="202" width="178" height="9" fill="#2A55F5"/>
+  <text x="86" y="278" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#16130F">YOUR WHOLE TRAINING, ONE PLACE.</text>
+  <text x="86" y="329" font-family="Arial, sans-serif" font-size="25" fill="#5D574E">Workouts, races, recovery, plans, and community</text>
+  <text x="86" y="365" font-family="Arial, sans-serif" font-size="25" fill="#5D574E">for athletes preparing for something.</text>
 
-  <!-- R mark -->
-  <text x="80" y="420" font-family="Arial Black, sans-serif" font-size="320" font-weight="900" fill="#0052FF" opacity="0.12">R</text>
-
-  <!-- Wordmark -->
-  <text x="80" y="310" font-family="Arial Black, sans-serif" font-size="120" font-weight="900" fill="#FFFFFF" letter-spacing="-2">RUNNIT</text>
-
-  <!-- Tagline -->
-  <text x="82" y="370" font-family="Arial, sans-serif" font-size="32" font-weight="400" fill="#767676" letter-spacing="6">TRAIN SMARTER. RACE FASTER.</text>
-
-  <!-- Blue underline accent -->
-  <rect x="80" y="390" width="180" height="5" fill="#0052FF"/>
-
-  <!-- Bottom stats row -->
-  <text x="80" y="530" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">GPS TRACKING</text>
-  <text x="80" y="560" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">PERIODIZED PLANS</text>
-  <text x="480" y="530" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">GARMIN SYNC</text>
-  <text x="480" y="560" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">COMMUNITY</text>
-  <text x="880" y="530" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">STRAVA IMPORT</text>
-  <text x="880" y="560" font-family="Arial, sans-serif" font-size="22" fill="#444" letter-spacing="2">RACE TRACKING</text>
-
-  <!-- URL -->
-  <text x="1120" y="600" font-family="Arial, sans-serif" font-size="20" fill="#0052FF" text-anchor="end" letter-spacing="1">runnit.live</text>
+  <!-- Data ecosystem -->
+  <text x="86" y="472" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#16130F" letter-spacing="2">BRING THE DATA YOU ALREADY COLLECT</text>
+  <text x="86" y="520" font-family="Arial, sans-serif" font-size="23" fill="#2A55F5" letter-spacing="2">STRAVA  ·  GARMIN  ·  WHOOP  ·  OURA</text>
+  <text x="86" y="554" font-family="Arial, sans-serif" font-size="23" fill="#2A55F5" letter-spacing="2">FITBIT  ·  COROS  ·  APPLE HEALTH</text>
+  <text x="1114" y="586" font-family="Arial, sans-serif" font-size="20" fill="#FBF6EC" text-anchor="end" letter-spacing="1">runnit.live</text>
 </svg>
