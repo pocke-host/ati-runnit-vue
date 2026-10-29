@@ -24,14 +24,20 @@
         </router-link>
       </div>
       <template v-else>
-        <template v-for="section in sections" :key="section.key">
-          <section v-if="section.items?.length" class="discovery-section">
-            <div class="discovery-section-head"><div><p class="discovery-kicker">For you</p><h2>{{ section.title }}</h2></div><router-link v-if="section.path" :to="section.path">See all →</router-link></div>
-            <div class="discovery-grid">
-              <router-link v-for="item in section.items" :key="`${section.key}-${item.id || item.path}`" :to="item.path" class="discovery-card"><div class="discovery-card-icon"><i :class="iconFor(item.type)"></i></div><strong>{{ item.title }}</strong><span>{{ item.subtitle || section.label }}</span></router-link>
-            </div>
-          </section>
-        </template>
+        <div v-if="sections.some(s => s.items?.length)" class="discovery-recommendations">
+          <div class="discovery-recommendations-head">
+            <p class="discovery-kicker">For you</p>
+            <p>Recommendations shaped by your training and goals.</p>
+          </div>
+          <template v-for="section in sections" :key="section.key">
+            <section v-if="section.items?.length" class="discovery-section">
+              <div class="discovery-section-head"><h2>{{ section.title }}</h2><router-link v-if="section.path" :to="section.path">See all →</router-link></div>
+              <div class="discovery-grid">
+                <router-link v-for="item in section.items" :key="`${section.key}-${item.id || item.path}`" :to="item.path" class="discovery-card"><div class="discovery-card-icon"><i :class="iconFor(item.type)"></i></div><strong>{{ item.title }}</strong><span>{{ item.subtitle || section.label }}</span></router-link>
+              </div>
+            </section>
+          </template>
+        </div>
         <div v-if="!sections.some(s => s.items?.length) && !loading" class="discovery-empty"><strong>Your discovery feed is getting ready.</strong><p>Complete your profile or record an activity so we can make better recommendations.</p><router-link to="/track" class="discovery-primary">Record an activity →</router-link></div>
       </template>
     </div>
@@ -48,7 +54,7 @@ let timer
 const search = async () => { if (query.value.length < 2) return; loading.value = true; try { results.value = (await axios.get(`${API_URL}/discovery/search`, { params: { q: query.value }, headers: headers() })).data.results || [] } catch { results.value = [] } finally { loading.value = false } }
 const debouncedSearch = () => { clearTimeout(timer); timer = setTimeout(search, 280) }
 const loadListeningSummary = async period => { summaryPeriod.value = period; try { spotifySummary.value = (await axios.get(`${API_URL}/spotify/listening-summary`, { params: { period }, headers: headers() })).data } catch { spotifySummary.value = null } }
-const createHistoryPlaylist = async () => { playlistLoading.value = true; playlistMessage.value = ''; try { const { data } = await axios.post(`${API_URL}/spotify/playlists/from-history`, { period: summaryPeriod.value }, { headers: headers() }); playlistMessage.value = `Created “${data.name || 'RUNNIT soundtrack'}” in Spotify.` } catch (e) { playlistMessage.value = e.response?.data?.error || 'Connect Spotify and listen during a workout first.' } finally { playlistLoading.value = false } }
+const createHistoryPlaylist = async () => { playlistLoading.value = true; playlistMessage.value = ''; try { const { data } = await axios.post(`${API_URL}/spotify/playlists/from-history`, { period: summaryPeriod.value }, { headers: headers() }); playlistMessage.value = `Created “${data.name || 'RUNNIT soundtrack'}” in Spotify.` } catch (e) { playlistMessage.value = e.response?.data?.error || e.response?.data?.message || 'Spotify could not create that playlist. Reconnect Spotify and try again.' } finally { playlistLoading.value = false } }
 const sections = computed(() => [
   { key: 'athletes', title: 'Athletes to follow', path: '/friends', label: 'Athlete', items: recommendations.value.athletes },
   { key: 'plans', title: 'Training plans', path: '/plans', label: 'Plan', items: recommendations.value.plans },
@@ -95,6 +101,10 @@ onMounted(async () => {
 .discovery-search:focus-within { border-color: #2A55F5; box-shadow: 0 0 0 4px rgba(42,85,245,.12); }
 .discovery-search button { padding: 10px 4px; }
 .discovery-section { margin-top: 42px; }
+.discovery-recommendations-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 42px; padding-bottom: 14px; border-bottom: 1px solid #E7DFCE; }
+.discovery-recommendations-head .discovery-kicker { margin: 0; }
+.discovery-recommendations-head > p:last-child { margin: 0; color: #665F55; font-size: .82rem; }
+.discovery-recommendations .discovery-section { margin-top: 24px; }
 .discovery-section-head { margin-bottom: 16px; }
 .discovery-section-head h2 { font-size: 1.35rem; }
 .discovery-grid { gap: 14px; }
@@ -121,6 +131,7 @@ onMounted(async () => {
   .discovery-page { padding-left: 16px; padding-right: 16px; }
   .discovery-header { padding-top: 8px; }
   .discovery-section { margin-top: 32px; }
+  .discovery-recommendations-head { align-items: flex-start; flex-direction: column; gap: 5px; margin-top: 32px; }
   .discovery-grid { gap: 10px; }
   .discovery-card { border-radius: 13px; padding: 14px; }
 }
