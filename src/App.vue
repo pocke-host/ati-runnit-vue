@@ -86,7 +86,13 @@ onMounted(() => {
 
   initStatusBar()
   initDeepLinks()
-  if (isAuthenticated.value) initPush()
+  if (isAuthenticated.value) {
+    initPush()
+    // Refresh account entitlements on every authenticated app start. This
+    // keeps launch Pro access, subscription changes, and billing status from
+    // being stuck on a stale localStorage snapshot.
+    authStore.fetchCurrentUser().catch(() => {})
+  }
 
   // Resume a coach invite the user clicked before signing up/in
   const pendingInvite = sessionStorage.getItem('pending_coach_invite')
