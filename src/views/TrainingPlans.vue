@@ -16,6 +16,61 @@
       {{ statusMessage }}
     </div>
 
+    <!-- The plan should reflect the athlete's real week, not a blank form. -->
+    <section class="plan-context container-xxl" aria-labelledby="plan-context-title">
+      <div class="plan-context-header">
+        <div>
+          <p class="eyebrow plan-context-eyebrow">Your training context</p>
+          <h2 id="plan-context-title">Build from the week you actually had.</h2>
+          <p class="plan-context-copy">Runnit uses your synced activities, recovery signals, and training load to make the starting point more honest.</p>
+        </div>
+        <router-link to="/devices" class="plan-context-link">Manage sources <span aria-hidden="true">→</span></router-link>
+      </div>
+
+      <div class="plan-signal-grid" :class="{ 'plan-signal-grid--loading': planContextLoading }">
+        <article class="plan-signal-card plan-signal-card--training">
+          <div class="plan-signal-icon" aria-hidden="true"><i class="bi bi-activity"></i></div>
+          <div class="plan-signal-content">
+            <span class="plan-signal-label">This week</span>
+            <strong>{{ signalWeeklyDurationLabel }}</strong>
+            <span class="plan-signal-detail">{{ signalWeeklyDistanceLabel }} · {{ signalWeeklySessionsLabel }}</span>
+          </div>
+        </article>
+
+        <article class="plan-signal-card plan-signal-card--recovery">
+          <div class="plan-signal-icon" aria-hidden="true"><i class="bi bi-heart-pulse"></i></div>
+          <div class="plan-signal-content">
+            <span class="plan-signal-label">Readiness</span>
+            <strong>{{ readinessValue }}</strong>
+            <span class="plan-signal-detail">{{ readinessDetail }}</span>
+          </div>
+        </article>
+
+        <article class="plan-signal-card plan-signal-card--load">
+          <div class="plan-signal-icon" aria-hidden="true"><i class="bi bi-speedometer2"></i></div>
+          <div class="plan-signal-content">
+            <span class="plan-signal-label">Training load</span>
+            <strong>{{ trainingLoadLabel }}</strong>
+            <span class="plan-signal-detail">{{ trainingLoadDetail }}</span>
+          </div>
+        </article>
+
+        <article class="plan-signal-card plan-signal-card--sources">
+          <div class="plan-signal-icon" aria-hidden="true"><i class="bi bi-watch"></i></div>
+          <div class="plan-signal-content">
+            <span class="plan-signal-label">Connected sources</span>
+            <strong>{{ connectedSourceLabel }}</strong>
+            <span class="plan-signal-detail">{{ sourceFreshnessLabel }}</span>
+          </div>
+        </article>
+      </div>
+
+      <div v-if="planContextError" class="plan-context-note" role="status">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        We couldn’t refresh device context. Your saved activity data is still available, and you can retry from Devices.
+      </div>
+    </section>
+
     <div class="plans-body container-xxl">
 
       <!-- ── MY PLANS ───────────────────────────────── -->
@@ -35,6 +90,7 @@
               <div class="plan-badges">
                 <span class="plan-badge plan-badge-level" :class="plan.level">{{ plan.level }}</span>
                 <span v-if="plan.isActive" class="plan-badge plan-badge-active">Active</span>
+                <span v-if="plan.isActive && plan.adaptiveEnabled" class="plan-badge plan-badge-adaptive">Adaptive</span>
               </div>
             </div>
             <div class="plan-card-body">
@@ -183,6 +239,19 @@
                     style="max-width: 160px"
                   />
                   <span class="field-unit">{{ distanceLabel }}/week</span>
+                </div>
+                <button
+                  v-if="recentTrainingDistance > 0"
+                  type="button"
+                  class="use-signal-btn"
+                  @click="useRecentTrainingData"
+                >
+                  <i class="bi bi-magic me-1" aria-hidden="true"></i>
+                  Use recent week · {{ formatDistance(recentTrainingDistance) }}
+                </button>
+                <div v-if="weeklyMileagePrefilled" class="data-assisted-note" role="status">
+                  <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                  Starting point based on your recent synced and manual activity. You can change it.
                 </div>
                 <div class="level-derived" v-if="weeklyMileageInput > 0">
                   <span class="level-chip" :class="derivedLevel">{{ derivedLevelLabel }}</span>
@@ -349,7 +418,10 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import axios from 'axios'
 import { usePlanStore } from '@/stores/plan.js'
+import { useActivityStore } from '@/stores/activity.js'
+import { useTrainingLoadStore } from '@/stores/trainingLoad.js'
 import { storeToRefs } from 'pinia'
 import { useUnits } from '@/composables/useUnits'
 import { useAuthStore } from '@/stores/auth.js'
@@ -359,14 +431,209 @@ import EmptyState from '@/components/EmptyState.vue'
 
 const router = useRouter()
 const planStore = usePlanStore()
+const activityStore = useActivityStore()
+const trainingLoadStore = useTrainingLoadStore()
 const authStore = useAuthStore()
 const { plans } = storeToRefs(planStore)
+const { activities } = storeToRefs(activityStore)
+const { data: trainingLoad } = storeToRefs(trainingLoadStore)
 const { formatDistance, distanceLabel, isImperial: isImperialUnits } = useUnits()
 const { unitSystem } = storeToRefs(authStore)
 const { showToast } = useToast()
 
 // ── Status (toast-backed) ────────────────────────────
 const showStatus = (msg, type = 'success') => showToast(msg, type)
+
+// ── Device-assisted planning context ─────────────────
+// These are advisory inputs only. The backend remains the source of truth for
+// adaptive plan changes; this page simply makes the signals visible before an
+// athlete creates or opens a plan.
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+const planContextLoading = ref(true)
+const planContextError = ref(false)
+const weeklySummary = ref(null)
+const wellnessSnapshot = ref(null)
+const integrationStatuses = ref([])
+const weeklyMileagePrefilled = ref(false)
+
+const providerLabels = {
+  whoop: 'WHOOP',
+  garmin: 'Garmin',
+  oura: 'Oura',
+  fitbit: 'Fitbit',
+  coros: 'COROS',
+  'apple-health': 'Apple Health',
+  strava: 'Strava',
+}
+
+const currentWeekActivities = computed(() => {
+  const now = new Date()
+  const day = now.getDay()
+  const monday = new Date(now)
+  monday.setHours(0, 0, 0, 0)
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1))
+  const nextMonday = new Date(monday)
+  nextMonday.setDate(monday.getDate() + 7)
+  return (activities.value || []).filter(activity => {
+    const date = new Date(activity.performedAt || activity.createdAt)
+    return date >= monday && date < nextMonday
+  })
+})
+
+const contextWeeklyDistance = computed(() => {
+  const summaryDistance = Number(weeklySummary.value?.totalDistanceMeters || 0)
+  if (summaryDistance > 0) return summaryDistance
+  return currentWeekActivities.value.reduce((total, activity) => total + Number(activity.distanceMeters || 0), 0)
+})
+
+const recentTrainingDistance = computed(() => {
+  const sportKeys = {
+    '5k': ['RUN', 'RUNNING'],
+    '10k': ['RUN', 'RUNNING'],
+    half: ['RUN', 'RUNNING'],
+    marathon: ['RUN', 'RUNNING'],
+    cycling: ['BIKE', 'BIKING', 'CYCLING', 'RIDE'],
+    swim: ['SWIM', 'SWIMMING'],
+  }[selectedGoal.value] || []
+  return currentWeekActivities.value
+    .filter(activity => sportKeys.includes(String(activity.sportType || '').toUpperCase()))
+    .reduce((total, activity) => total + Number(activity.distanceMeters || 0), 0)
+})
+
+const recentTrainingSeconds = computed(() => {
+  const summarySeconds = Number(weeklySummary.value?.totalDurationSeconds || 0)
+  if (summarySeconds > 0) return summarySeconds
+  return currentWeekActivities.value.reduce((total, activity) => total + Number(activity.durationSeconds || 0), 0)
+})
+
+const signalWeeklyDurationLabel = computed(() => {
+  if (!recentTrainingSeconds.value) return 'No training logged yet'
+  return `${formatExerciseTime(recentTrainingSeconds.value)} logged`
+})
+
+const signalWeeklyDistanceLabel = computed(() =>
+  contextWeeklyDistance.value ? `${formatDistance(contextWeeklyDistance.value)} distance` : 'Distance will appear here'
+)
+
+const signalWeeklySessionsLabel = computed(() => {
+  const count = Number(weeklySummary.value?.activityCount || currentWeekActivities.value.length || 0)
+  return `${count} ${count === 1 ? 'session' : 'sessions'}`
+})
+
+const readinessSourceLabel = computed(() => {
+  const source = String(wellnessSnapshot.value?.source || '')
+    .toLowerCase()
+    .replace(/_/g, '-')
+  return providerLabels[source] || wellnessSnapshot.value?.source || 'Device'
+})
+
+const readinessValue = computed(() => {
+  const recovery = wellnessSnapshot.value?.recoveryScore
+  const bodyBattery = wellnessSnapshot.value?.bodyBattery
+  if (recovery != null) return `${recovery}% recovery`
+  if (bodyBattery != null) return `${bodyBattery}% battery`
+  return 'No reading yet'
+})
+
+const readinessDetail = computed(() => {
+  if (!wellnessSnapshot.value) return 'Connect WHOOP, Garmin, Oura, or Fitbit'
+  const source = readinessSourceLabel.value
+  if (wellnessSnapshot.value.sleepPerformancePct != null) {
+    return `${source} · ${wellnessSnapshot.value.sleepPerformancePct}% sleep performance`
+  }
+  if (wellnessSnapshot.value.averageStress != null) {
+    return `${source} · ${wellnessSnapshot.value.averageStress} average stress`
+  }
+  return `${source} · latest available reading`
+})
+
+const trainingLoadLabel = computed(() => {
+  const labels = { OPTIMAL: 'On track', HIGH_RISK: 'Back off', DETRAINING: 'Build gently' }
+  return labels[trainingLoad.value?.riskLabel] || (trainingLoad.value?.hasEnoughData ? 'In progress' : 'Building baseline')
+})
+
+const trainingLoadDetail = computed(() => {
+  if (!trainingLoad.value?.hasEnoughData) return 'More activity makes this signal useful'
+  const acwr = trainingLoad.value.acwr
+  return acwr != null ? `ACWR ${Number(acwr).toFixed(2)} · plan can adapt` : 'Plan can adapt to your load'
+})
+
+const connectedSources = computed(() => integrationStatuses.value.filter(status => status.connected))
+const reconnectSources = computed(() => integrationStatuses.value.filter(status => status.needsReconnect))
+const connectedSourceLabel = computed(() => {
+  if (!connectedSources.value.length) return 'None yet'
+  return `${connectedSources.value.length} ${connectedSources.value.length === 1 ? 'source' : 'sources'}`
+})
+
+const sourceFreshnessLabel = computed(() => {
+  if (reconnectSources.value.length) {
+    return `${reconnectSources.value.map(source => providerLabels[source.provider] || source.provider).join(', ')} needs attention`
+  }
+  if (!connectedSources.value.length) return 'Connect a device to personalize your plan'
+  const withSync = connectedSources.value.filter(source => source.lastSync)
+  if (!withSync.length) return 'Connected · waiting for first sync'
+  const latest = withSync.reduce((latestDate, source) => {
+    const date = new Date(source.lastSync)
+    return date > latestDate ? date : latestDate
+  }, new Date(0))
+  return `Latest sync ${formatRelativeDate(latest)}`
+})
+
+function formatExerciseTime(seconds) {
+  const totalMinutes = Math.round(Number(seconds || 0) / 60)
+  if (!totalMinutes) return '0 min'
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  return hours ? `${hours}h${minutes ? ` ${minutes}m` : ''}` : `${minutes} min`
+}
+
+function formatRelativeDate(date) {
+  const minutes = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000))
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.round(hours / 24)}d ago`
+}
+
+function useRecentTrainingData() {
+  if (!recentTrainingDistance.value) return
+  weeklyMileageInput.value = Math.max(1, Math.round((recentTrainingDistance.value / metersPerUnit.value) * 10) / 10)
+  weeklyMileagePrefilled.value = true
+}
+
+async function loadPlanContext() {
+  planContextLoading.value = true
+  planContextError.value = false
+  const providers = Object.keys(providerLabels)
+  const requests = [
+    axios.get(`${API_URL}/activities/summary/weekly`, {
+      params: { timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' },
+      headers: getAuthHeaders(),
+    }),
+    axios.get(`${API_URL}/wellness/today`, { headers: getAuthHeaders() }),
+    axios.get(`${API_URL}/training-load`, { headers: getAuthHeaders() }),
+    ...providers.map(provider => axios.get(`${API_URL}/integrations/${provider}/status`, { headers: getAuthHeaders() })),
+  ]
+  const results = await Promise.allSettled(requests)
+  const dataAt = index => results[index]?.status === 'fulfilled' ? results[index].value.data : null
+  weeklySummary.value = dataAt(0)
+  wellnessSnapshot.value = dataAt(1)?.available === false ? null : dataAt(1)
+  if (dataAt(2)) trainingLoad.value = dataAt(2)
+  integrationStatuses.value = providers
+    .map((provider, index) => {
+      const status = dataAt(index + 3)
+      return status ? { provider, ...status } : null
+    })
+    .filter(Boolean)
+  if (results.slice(0, 3).every(result => result.status === 'rejected') && !activities.value.length) {
+    planContextError.value = true
+  }
+  planContextLoading.value = false
+}
 
 // ── Plan Templates ────────────────────────────────────
 const PLAN_TEMPLATES = [
@@ -858,7 +1125,11 @@ onMounted(async () => {
   loadWizardDraft()
   plansLoading.value = true
   try {
-    await planStore.fetchPlans()
+    await Promise.all([
+      planStore.fetchPlans(),
+      activityStore.fetchActivities(),
+      loadPlanContext(),
+    ])
   } finally {
     plansLoading.value = false
   }
@@ -1159,6 +1430,226 @@ onBeforeRouteLeave((to, from, next) => {
 .template-name { font-weight: 900; font-size: 0.95rem; color: #000; }
 .template-meta { font-size: 0.78rem; color: #8A8A8A; font-weight: 600; margin-top: 2px; }
 .template-check { font-size: 1.1rem; color: #2A55F5; flex-shrink: 0; margin-left: auto; }
+
+/* ── Device-aware plan context ─────────────────────── */
+.plans-page {
+  background: #FBF6EC;
+}
+.hero {
+  padding: 54px 24px 34px;
+  background: #16130F;
+  border-bottom: 0;
+}
+.hero .container-xxl {
+  max-width: 1100px;
+}
+.hero h1 {
+  max-width: 760px;
+  margin: 6px 0 12px;
+  font-size: clamp(2.8rem, 7vw, 5.8rem);
+  line-height: .9;
+  letter-spacing: -.02em;
+}
+.hero .lead {
+  max-width: 610px;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.plan-context {
+  max-width: 1100px;
+  padding: 34px 24px 0;
+}
+.plan-context-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+.plan-context-eyebrow { color: #2A55F5; margin: 0 0 7px; }
+.plan-context-header h2 {
+  margin: 0;
+  color: #16130F;
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  line-height: .98;
+  letter-spacing: -.02em;
+}
+.plan-context-copy {
+  max-width: 620px;
+  margin: 9px 0 0;
+  color: #665F55;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+.plan-context-link {
+  flex: 0 0 auto;
+  color: #16130F;
+  font: 700 .72rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.plan-context-link:hover { color: #2A55F5; }
+.plan-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.plan-signal-grid--loading { opacity: .7; }
+.plan-signal-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 126px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #D8CEBB;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(22,19,15,.05);
+}
+.plan-signal-card--training { background: #EEF1FF; border-color: #B7C4FF; }
+.plan-signal-card--recovery { background: #F8F0D8; border-color: #E5D19A; }
+.plan-signal-card--load { background: #F2EEE6; }
+.plan-signal-card--sources { background: #fff; }
+.plan-signal-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 10px;
+  background: #16130F;
+  color: #fff;
+  font-size: .98rem;
+}
+.plan-signal-card--training .plan-signal-icon { background: #2A55F5; }
+.plan-signal-card--recovery .plan-signal-icon { background: #C98B00; }
+.plan-signal-content { min-width: 0; }
+.plan-signal-label {
+  display: block;
+  color: #665F55;
+  font: 700 .65rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.plan-signal-content strong {
+  display: block;
+  margin: 8px 0 5px;
+  color: #16130F;
+  font-size: 1.05rem;
+  line-height: 1.05;
+}
+.plan-signal-detail {
+  display: block;
+  color: #665F55;
+  font-size: .76rem;
+  line-height: 1.35;
+}
+.plan-context-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: #665F55;
+  font-size: .78rem;
+}
+.plans-body {
+  max-width: 1100px;
+  padding: 38px 24px 90px;
+  gap: 56px;
+}
+.section-header { margin-bottom: 16px; }
+.section-title { font-size: clamp(1.7rem, 3vw, 2.35rem); line-height: .95; }
+.section-sub { line-height: 1.45; }
+.plan-card {
+  min-height: 220px;
+  border: 1px solid #D8CEBB;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(22,19,15,.04);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.plan-card:hover {
+  border-color: #2A55F5;
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(22,19,15,.08);
+}
+.plan-card-active {
+  border-color: #2A55F5;
+  box-shadow: 0 10px 28px rgba(42,85,245,.14);
+}
+.plan-card-active:hover { box-shadow: 0 16px 32px rgba(42,85,245,.18); }
+.plan-badge { border-radius: 999px; }
+.plan-badge-adaptive { background: #E9F5EE; color: #197044; }
+.plan-progress-bar { height: 8px; border-radius: 999px; }
+.plan-progress-fill { border-radius: 999px; }
+.templates-grid { gap: 14px; }
+.template-card {
+  min-height: 82px;
+  border: 1px solid #D8CEBB;
+  border-radius: 14px;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.template-card:hover { border-color: #2A55F5; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(22,19,15,.06); }
+.template-selected { box-shadow: 0 8px 18px rgba(42,85,245,.12); }
+.wizard {
+  border: 1px solid #D8CEBB;
+  border-radius: 20px;
+  box-shadow: 0 12px 34px rgba(22,19,15,.06);
+}
+.wizard-steps-bar { background: #F3EBDD; border-bottom: 1px solid #D8CEBB; }
+.wsb-dot { border-radius: 50%; }
+.goal-tab { border-radius: 14px; border-color: #D8CEBB; }
+.goal-tab.active { background: #EEF1FF; border-color: #2A55F5; }
+.goal-tab:focus-visible, .day-btn:focus-visible, .template-card:focus-visible, .btn:focus-visible, .use-signal-btn:focus-visible {
+  outline: 3px solid rgba(42,85,245,.42);
+  outline-offset: 3px;
+}
+.field-input, .start-input { border-radius: 10px; border-color: #D8CEBB; }
+.toggle-track { border-radius: 999px; }
+.day-btn { border-radius: 12px; border-color: #D8CEBB; }
+.day-btn.active { border-color: #2A55F5; background: #EEF1FF; }
+.preview-card { border: 1px solid #D8CEBB; border-radius: 16px; overflow: hidden; }
+.preview-workout { border-radius: 12px; border-color: #D8CEBB; }
+.btn { border-radius: 10px; }
+.btn-primary { border-radius: 999px; }
+.use-signal-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 7px 11px;
+  border: 1px solid #B7C4FF;
+  border-radius: 999px;
+  background: #EEF1FF;
+  color: #2447CE;
+  font: 700 .69rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .02em;
+  cursor: pointer;
+}
+.use-signal-btn:hover { background: #DDE5FF; }
+.data-assisted-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+  color: #197044;
+  font-size: .77rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+  .plan-signal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .hero { padding: 42px 16px 30px; }
+  .plan-context { padding: 28px 16px 0; }
+  .plan-context-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .plan-context-link { align-self: flex-start; }
+  .plan-signal-grid { grid-template-columns: 1fr; }
+  .plan-signal-card { min-height: 96px; }
+  .plans-body { padding: 32px 16px 80px; }
+}
 
 @media (max-width: 640px) {
   .templates-grid { grid-template-columns: 1fr; }
