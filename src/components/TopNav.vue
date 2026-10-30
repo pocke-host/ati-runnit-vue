@@ -14,17 +14,20 @@
       </router-link>
 
       <!-- LEFT: desktop nav links (authenticated athletes, left-aligned after brand) -->
-      <div class="navbar-links" v-if="isAuthenticated && role !== 'coach'">
+      <div class="navbar-links navbar-links--athlete" v-if="isAuthenticated && role !== 'coach'" aria-label="Primary navigation">
         <router-link to="/feed" class="nav-link-auth">Feed</router-link>
         <router-link to="/discover" class="nav-link-auth">Discover</router-link>
         <router-link to="/friends" class="nav-link-auth">Friends</router-link>
         <router-link to="/stats" class="nav-link-auth">Stats</router-link>
         <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
         <div class="training-menu" ref="trainingRef">
-          <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">Training <span aria-hidden="true">⌄</span></button>
+          <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">
+            <span>Training</span><span class="training-menu-chevron" aria-hidden="true">⌄</span>
+          </button>
           <div v-if="trainingOpen" class="training-menu-dropdown">
-            <div class="training-menu-heading"><span class="training-menu-eyebrow">Your training system</span><strong>Make the next move.</strong><small>Goal, week, and fuel in one place.</small></div>
+            <div class="training-menu-heading"><span class="training-menu-eyebrow">Training hub</span><strong>Stay in the block.</strong><small>Plan the work, find the start line, and keep your week moving.</small></div>
             <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Training hub</strong><small>See the whole build at a glance</small></span><b>→</b></router-link>
+            <span class="training-menu-section-label">Plan &amp; progress</span>
             <div class="training-menu-grid">
               <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i><span><strong>Plans</strong><small>Structure the week</small></span></router-link>
               <router-link to="/calendar" @click="trainingOpen = false"><i class="bi bi-calendar3"></i><span><strong>Calendar</strong><small>See what comes next</small></span></router-link>
@@ -33,6 +36,7 @@
               <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i><span><strong>Folders</strong><small>Keep a block together</small></span></router-link>
               <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-barbell"></i><span><strong>Strength</strong><small>Build durability</small></span></router-link>
             </div>
+            <span class="training-menu-section-label training-menu-section-label--context">Connected context</span>
             <router-link to="/coros-coach" class="training-menu-context" @click="trainingOpen = false"><i class="bi bi-watch"></i><span><strong>COROS Coach</strong><small>Recovery and load context</small></span><b>→</b></router-link>
           </div>
         </div>
@@ -542,7 +546,9 @@ onUnmounted(() => {
   margin: 0 auto;
   padding: 0 24px;
   height: 66px;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 18px;
   align-items: center;
 }
 
@@ -557,9 +563,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: clamp(14px, 1.8vw, 24px);
-  margin-left: 20px;
+  margin-left: 0;
 }
-.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-trigger span{font-size:15px;line-height:1}.training-menu-dropdown{position:absolute;top:calc(100% - 1px);left:-34px;width:352px;padding:14px;background:#fbf6ec;border:2px solid #16130f;box-shadow:5px 5px #16130f;z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:18px;color:#2a55f5;font-size:15px}.training-menu-heading{display:grid;gap:3px;padding:2px 4px 13px}.training-menu-eyebrow{color:#2a55f5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-heading>strong{font:900 25px/.9 'Big Shoulders Display',sans-serif;text-transform:uppercase}.training-menu-heading>small{color:#665f55;font:400 11px 'Hanken Grotesk',system-ui,sans-serif}.training-menu-featured,.training-menu-context{gap:10px!important;border:2px solid #16130f!important}.training-menu-featured{background:#ffc53d;margin-bottom:10px}.training-menu-context{margin-top:10px;background:#fff}.training-menu-featured span,.training-menu-context span,.training-menu-grid span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-context strong,.training-menu-grid strong{font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase}.training-menu-featured small,.training-menu-context small,.training-menu-grid small{color:#665f55;font:400 10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-context b{font-size:15px}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.training-menu-grid a{align-items:flex-start;min-height:64px;border:1px solid #e7dfce}.training-menu-grid a:hover{border-color:#16130f}
+.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-chevron{font-size:15px;line-height:1;transition:transform .16s ease}.training-menu-trigger[aria-expanded="true"] .training-menu-chevron{transform:rotate(180deg)}.training-menu-dropdown{position:absolute;top:calc(100% + 8px);right:-18px;left:auto;width:min(390px,calc(100vw - 32px));padding:15px;background:#fbf6ec;border:2px solid #16130f;box-shadow:7px 7px rgba(22,19,15,.16);z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:18px;color:#2a55f5;font-size:15px}.training-menu-heading{display:grid;gap:4px;padding:2px 4px 13px}.training-menu-eyebrow{color:#2a55f5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-heading>strong{font:900 25px/.9 'Big Shoulders Display',sans-serif;text-transform:uppercase}.training-menu-heading>small{color:#665f55;font:400 11px 'Hanken Grotesk',system-ui,sans-serif;line-height:1.45}.training-menu-section-label{display:block;margin:2px 4px 5px;color:#8a8174;font:700 8px 'Spline Sans Mono',monospace;letter-spacing:.15em;text-transform:uppercase}.training-menu-section-label--context{margin-top:12px}.training-menu-featured,.training-menu-context{gap:10px!important;border:2px solid #16130f!important}.training-menu-featured{background:#ffc53d;margin-bottom:12px}.training-menu-context{margin-top:5px;background:#fff}.training-menu-featured span,.training-menu-context span,.training-menu-grid span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-context strong,.training-menu-grid strong{font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase}.training-menu-featured small,.training-menu-context small,.training-menu-grid small{color:#665f55;font:400 10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-context b{font-size:15px}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.training-menu-grid a{align-items:flex-start;min-height:64px;border:1px solid #e7dfce}.training-menu-grid a:hover{border-color:#16130f}
 /* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
 .navbar-links--public {
@@ -573,12 +579,16 @@ onUnmounted(() => {
   align-items: center;
   gap: 4px;
   margin-left: auto;
+  justify-self: end;
 }
 .nav-right .icon-group {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding-left: 20px;
+  padding: 4px 5px 4px 12px;
+  border: 1px solid #e7dfce;
+  border-radius: 999px;
+  background: rgba(255,255,255,.52);
 }
 
 .brand-text {
@@ -1158,17 +1168,47 @@ onUnmounted(() => {
 .site-header.site-header--auth .navbar { background: rgba(251,246,236,.97); }
 .navbar-content { min-width: 0; }
 .navbar-links { gap: clamp(10px, 1.35vw, 18px); min-width: 0; }
+.navbar-links--athlete {
+  justify-self: center;
+  padding: 4px;
+  gap: 2px;
+  border: 1px solid #e7dfce;
+  border-radius: 999px;
+  background: rgba(255,255,255,.52);
+}
+.navbar-links--athlete .nav-link-auth {
+  padding: 10px 11px;
+  border-radius: 999px;
+}
+.navbar-links--athlete .nav-link-auth.router-link-active,
+.navbar-links--athlete .training-menu-trigger[aria-expanded="true"] {
+  color: #16130f;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(22,19,15,.10);
+}
+.navbar-links--athlete .nav-link-auth.router-link-active::after { display: none; }
+.navbar-links--athlete .training-menu-trigger[aria-expanded="true"] { color: #2a55f5; }
+.navbar-links--public { gap: clamp(10px, 1.3vw, 18px); }
+.navbar-links--public .nav-link-gr { padding-inline: 2px !important; }
 .nav-link-auth { white-space: nowrap; }
 .nav-link-gr { white-space: nowrap; }
-.training-menu-dropdown { border-radius: 18px; box-shadow: 8px 8px 0 rgba(22,19,15,.16); }
+.training-menu-dropdown { border-radius: 16px; }
 .training-menu-featured, .training-menu-context { border-radius: 12px !important; }
 .training-menu-grid a { border-radius: 10px; }
 .nav-track-pill { box-shadow: 3px 3px 0 #16130F; }
 @media (max-width: 1080px) and (min-width: 769px) {
   .navbar-content { padding-inline: 16px; }
-  .navbar-links { gap: 10px; margin-left: 12px; }
+  .navbar-content { column-gap: 10px; }
+  .navbar-links--athlete { gap: 0; }
+  .navbar-links--athlete .nav-link-auth { padding-inline: 8px; }
   .nav-link-auth { font-size: .66rem !important; letter-spacing: .07em !important; }
-  .nav-right .icon-group { gap: 10px; padding-left: 10px; }
+  .nav-right .icon-group { gap: 8px; padding-left: 8px; }
+}
+@media (max-width: 768px) {
+  .navbar-content { display: flex; justify-content: space-between; }
+  .navbar-brand { position: static; transform: none; }
+  .nav-right { justify-self: auto; }
+  .nav-right .icon-group { border: 0; background: transparent; padding: 0; }
 }
 </style>
 

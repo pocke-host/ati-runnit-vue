@@ -1,5 +1,5 @@
 <template>
-  <nav class="bottom-nav" v-if="isAuthenticated">
+  <nav class="bottom-nav" v-if="isAuthenticated" aria-label="Primary navigation">
     <!-- Coach tabs — 5 items, Track centered -->
     <template v-if="role === 'coach'">
       <router-link to="/coach/dashboard" class="tab-item" active-class="tab-active">
@@ -80,9 +80,10 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   height: auto;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 900;
-  background: #FBF6EC;
-  border-top: 2px solid #16130F;
-  box-shadow: none;
+  background: rgba(251, 246, 236, 0.94);
+  border-top: 1px solid #E7DFCE;
+  box-shadow: 0 -8px 24px rgba(22, 19, 15, 0.08);
+  backdrop-filter: blur(16px);
   align-items: center;
   justify-content: space-around;
   padding: 0 8px env(safe-area-inset-bottom, 0px);
@@ -99,7 +100,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
   padding: 8px 2px 6px;
   min-height: var(--tab-h, 64px);
@@ -107,6 +108,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   color: #A3A69F;
   transition: color 0.15s;
   min-width: 0;
+  position: relative;
 }
 
 .tab-item:hover { text-decoration: none; }
@@ -117,15 +119,24 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
 }
 
 .tab-label {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   line-height: 1;
 }
 
 .tab-active {
   color: #2A55F5;
+}
+.tab-active::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: #2A55F5;
 }
 
 /* Track center tab */
