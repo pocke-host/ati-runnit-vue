@@ -34,7 +34,11 @@
             </template>
           </p>
 
-          <div v-if="subscriptionTier === 'free'" class="billing-actions">
+          <div v-if="isLifetimePro" class="billing-actions billing-actions--lifetime">
+            <span class="billing-note">Lifetime launch access is active. No payment method or subscription is required.</span>
+          </div>
+
+          <div v-else-if="subscriptionTier === 'free'" class="billing-actions">
             <button class="btn-billing-primary" @click="handleUpgrade" :disabled="upgradeLoading">
               <span v-if="upgradeLoading" class="btn-spinner"></span>
               <span v-else>Upgrade to Pro →</span>
@@ -77,7 +81,7 @@ const upgradeLoading = ref(false)
 const isLifetimePro = computed(() => Boolean(user.value?.lifetimePro))
 
 const tierLabel = computed(() => {
-  if (subscriptionTier.value === 'premium' || subscriptionTier.value === 'duo') return 'Pro'
+  if (isLifetimePro.value || subscriptionTier.value === 'pro' || subscriptionTier.value === 'premium' || subscriptionTier.value === 'duo') return 'Pro'
   return 'Free'
 })
 
@@ -179,6 +183,7 @@ const handleUpgrade = async () => {
   border-radius: 999px;
 }
 .tier-free { background: #F1EADC; color: #5A5348; border: 2px solid #E7DFCE; }
+.tier-pro { background: #16130F; color: #FBF6EC; border: 2px solid #16130F; }
 .tier-premium { background: #16130F; color: #FBF6EC; border: 2px solid #16130F; }
 .tier-duo { background: #16130F; color: #FBF6EC; border: 2px solid #16130F; }
 .billing-status {
@@ -196,6 +201,8 @@ const handleUpgrade = async () => {
   margin-bottom: 24px;
 }
 .billing-actions { display: flex; flex-direction: column; gap: 12px; }
+.billing-actions--lifetime { padding-top: 2px; }
+.billing-note { font-size: 0.82rem; color: #257942; line-height: 1.5; }
 
 .btn-billing-primary {
   display: inline-flex;
