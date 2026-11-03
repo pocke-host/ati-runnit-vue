@@ -92,6 +92,34 @@
         <button @click="refreshStats">Try again</button>
       </div>
 
+      <section v-if="hasActivities" class="section period-summary-section" aria-labelledby="period-summary-title">
+        <div class="section-header-row">
+          <div>
+            <span class="section-kicker">Period summary</span>
+            <h2 id="period-summary-title" class="period-summary-title">What changed in your training</h2>
+            <p class="period-summary-deck">Server-calculated totals using your local timezone and canonical activity history.</p>
+          </div>
+          <div class="period-summary-toggle" role="group" aria-label="Summary period">
+            <button type="button" :class="{ active: summaryPeriod === 'month' }" @click="loadPeriodSummary('month')">Month</button>
+            <button type="button" :class="{ active: summaryPeriod === 'week' }" @click="loadPeriodSummary('week')">Week</button>
+          </div>
+        </div>
+        <div v-if="periodSummaryLoading" class="period-summary-state" role="status"><AppSpinner label="Calculating your summary…" /></div>
+        <div v-else-if="periodSummaryError" class="period-summary-state period-summary-state--error" role="alert">
+          <span>{{ periodSummaryError }}</span><button type="button" @click="loadPeriodSummary(summaryPeriod)">Retry</button>
+        </div>
+        <div v-else-if="periodSummary" class="period-summary-grid">
+          <div class="period-summary-lead">
+            <span class="period-summary-label">{{ summaryPeriod === 'month' ? periodSummary.monthLabel : 'This week' }}</span>
+            <strong>{{ formatDuration(periodSummary.totalDurationSeconds) }}</strong>
+            <span>{{ periodSummary.activityCount }} sessions · {{ formatDistance(periodSummary.totalDistanceMeters) }}</span>
+          </div>
+          <div class="period-summary-stat"><span>Previous period</span><strong>{{ formatDuration(summaryPreviousDuration) }}</strong><em>{{ summaryChangeLabel(periodSummary.changePercent) }}</em></div>
+          <div class="period-summary-stat"><span>Active days</span><strong>{{ periodSummary.activeDays ?? '—' }}</strong><em>{{ summaryPeriod === 'month' ? 'calendar days trained' : 'days with activity' }}</em></div>
+          <div class="period-summary-stat"><span>Sources</span><strong>{{ (periodSummary.bySource || []).length || '—' }}</strong><em>{{ summarySourceLabel }}</em></div>
+        </div>
+      </section>
+
       <!-- EMPTY STATE -->
       <EmptyState
         v-if="!hasActivities"
@@ -484,6 +512,7 @@ import AppSpinner from '@/components/AppSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import FitnessGauge from '@/components/FitnessGauge.vue'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
+import { localTimezone } from '@/composables/useTrainingData'
 
 Chart.register(...registerables)
 
@@ -500,6 +529,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const comparison = ref(null)
 const comparisonLoading = ref(false)
 const comparisonError = ref('')
+const periodSummary = ref(null)
+const periodSummaryLoading = ref(false)
+const periodSummaryError = ref('')
+const summaryPeriod = ref('month')
 
 const authHeaders = () => {
   const token = localStorage.getItem('token')
@@ -521,6 +554,33 @@ const loadDeviceComparison = async () => {
     comparisonLoading.value = false
   }
 }
+
+const loadPeriodSummary = async (period = summaryPeriod.value) => {
+  summaryPeriod.value = period
+  periodSummaryLoading.value = true
+  periodSummaryError.value = ''
+  try {
+    const endpoint = period === 'week' ? 'weekly' : 'monthly'
+    const { data } = await axios.get(`${API_URL}/activities/summary/${endpoint}`, {
+      headers: authHeaders(),
+      params: { timezone: localTimezone() },
+    })
+    periodSummary.value = data
+  } catch (error) {
+    periodSummaryError.value = error.response?.data?.error || 'This summary is temporarily unavailable.'
+  } finally {
+    periodSummaryLoading.value = false
+  }
+}
+
+const summaryPreviousDuration = computed(() => summaryPeriod.value === 'month'
+  ? periodSummary.value?.previousTotalDurationSeconds || 0
+  : periodSummary.value?.previousTotalDurationSeconds || 0)
+const summaryChangeLabel = (change) => change == null ? 'No comparison' : `${change > 0 ? '+' : ''}${change}% vs prior period`
+const summarySourceLabel = computed(() => {
+  const sources = (periodSummary.value?.bySource || []).map(source => source.source).filter(Boolean)
+  return sources.length ? sources.join(' · ') : 'Manual activity'
+})
 
 const sourceLabel = source => source === 'WHOOP' ? 'WHOOP' : source === 'GARMIN' ? 'Garmin' : source
 const formatComparisonValue = (value, unit) => {
@@ -1071,6 +1131,7 @@ onMounted(async () => {
   trainingLoadStore.fetchTrainingLoad()
   await prStore.fetchPRs(activities.value)
   await loadDeviceComparison()
+  await loadPeriodSummary()
   await nextTick()
   initWeeklyChart()
   initPieChart()
@@ -1093,6 +1154,27 @@ onUnmounted(() => {
   color: #16130F;
   overflow-x: hidden;
 }
+
+.period-summary-section { padding-top: 8px; }
+.period-summary-title { margin: 8px 0 0; font-size: clamp(1.55rem, 3vw, 2.2rem); line-height: 1; }
+.period-summary-deck { margin: 8px 0 0; color: #665f55; font-size: .84rem; line-height: 1.45; }
+.period-summary-toggle { display: inline-flex; border: 2px solid #16130F; background: #fff; }
+.period-summary-toggle button { min-height: 36px; padding: 8px 12px; border: 0; background: transparent; color: #16130F; font: 700 .62rem 'Spline Sans Mono', monospace; text-transform: uppercase; cursor: pointer; }
+.period-summary-toggle button + button { border-left: 2px solid #16130F; }
+.period-summary-toggle button.active { background: #16130F; color: #FBF6EC; }
+.period-summary-state { display: flex; align-items: center; justify-content: center; min-height: 96px; padding: 18px; border: 2px solid #16130F; background: #fff; }
+.period-summary-state--error { justify-content: space-between; gap: 16px; color: #9f2d22; }
+.period-summary-state button { border: 0; background: transparent; color: #2A55F5; font: 700 .65rem 'Spline Sans Mono', monospace; text-transform: uppercase; cursor: pointer; }
+.period-summary-grid { display: grid; grid-template-columns: 1.45fr repeat(3, 1fr); border: 2px solid #16130F; background: #fff; }
+.period-summary-lead, .period-summary-stat { min-width: 0; padding: 18px; }
+.period-summary-stat { border-left: 1px solid #E7DFCE; }
+.period-summary-label, .period-summary-stat span { display: block; color: #665f55; font: 700 .62rem 'Spline Sans Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.period-summary-lead strong { display: block; margin: 10px 0 5px; font: 800 clamp(2.1rem, 5vw, 3.6rem)/.88 'Big Shoulders Display', system-ui, sans-serif; }
+.period-summary-lead > span:last-child, .period-summary-stat em { color: #665f55; font-size: .76rem; font-style: normal; line-height: 1.4; }
+.period-summary-stat strong { display: block; margin: 14px 0 5px; font: 800 1.55rem/1 'Big Shoulders Display', system-ui, sans-serif; }
+.period-summary-stat em { display: block; }
+@media (max-width: 800px) { .period-summary-grid { grid-template-columns: repeat(2, 1fr); } .period-summary-lead { grid-column: 1 / -1; } .period-summary-stat:nth-child(3) { border-left: 0; border-top: 1px solid #E7DFCE; } .period-summary-stat:nth-child(4) { border-top: 1px solid #E7DFCE; } }
+@media (max-width: 520px) { .section-header-row { align-items: flex-start; gap: 14px; flex-direction: column; } .period-summary-toggle { width: 100%; } .period-summary-toggle button { flex: 1; } .period-summary-grid { grid-template-columns: 1fr 1fr; } }
 
 /* ── HERO ───────────────────────────────────────── */
 .hero {

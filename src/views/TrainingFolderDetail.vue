@@ -1,13 +1,13 @@
 <template>
   <main class="folder-detail-page">
     <section class="folder-detail-hero">
-      <router-link to="/training-folders" class="back-link">← All folders</router-link>
-      <p class="eyebrow">Training block</p>
+      <router-link to="/training-folders" class="back-link">← All goals</router-link>
+      <p class="eyebrow">Training goal</p>
       <h1>{{ folder?.name || 'Training folder' }}</h1>
       <p>{{ folder?.description || 'A focused place for the work behind your goal.' }}</p>
     </section>
     <section class="folder-detail-body">
-      <div v-if="loading" class="detail-state" role="status">Loading training block…</div>
+      <div v-if="loading" class="detail-state" role="status">Loading goal…</div>
       <div v-else-if="error" class="detail-state detail-error" role="alert">{{ error }}<button @click="load">Try again</button></div>
       <template v-else-if="folder">
         <div class="detail-summary">
@@ -15,7 +15,7 @@
           <div><span>Target date</span><strong>{{ folder.targetDate ? formatDate(folder.targetDate) : 'Not set' }}</strong></div>
           <div><span>Time remaining</span><strong>{{ daysRemaining }}</strong></div>
         </div>
-        <div class="detail-heading"><div><p class="eyebrow">Your work</p><h2>Block activity</h2></div><router-link to="/training-folders" class="secondary-link">Manage folders →</router-link></div>
+        <div class="detail-heading"><div><p class="eyebrow">Your work</p><h2>Goal activity</h2></div><router-link to="/training-folders" class="secondary-link">Manage goals →</router-link></div>
         <div v-if="items.length" class="item-list">
           <article v-for="item in items" :key="item.id" class="item-row">
             <div class="item-mark">{{ item.itemType === 'ACTIVITY' ? 'RUN' : item.itemType }}</div>
@@ -24,7 +24,7 @@
             <button class="item-remove" type="button" @click="removeItem(item)">Remove</button>
           </article>
         </div>
-        <div v-else class="detail-state"><strong>No workouts in this block yet.</strong><span>Open an activity and choose “Save to training folder” to start building the story.</span></div>
+        <div v-else class="detail-state"><strong>No workouts in this goal yet.</strong><span>Open an activity and choose “Save to goal” to start building the story.</span></div>
       </template>
     </section>
   </main>

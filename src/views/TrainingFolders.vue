@@ -1,22 +1,22 @@
 <template>
   <main class="folders-page">
-    <section class="folders-hero"><p class="eyebrow">Training archive</p><h1>Folders</h1><p>Keep every workout for a race or season in one place.</p></section>
+    <section class="folders-hero"><p class="eyebrow">Training goals</p><h1>Goals</h1><p>Keep the work for a race, season, or focus in one place.</p></section>
     <section class="folders-body">
-      <div class="folders-toolbar"><div><span class="eyebrow">Your blocks</span><strong>{{ folders.length }} {{ folders.length === 1 ? 'folder' : 'folders' }}</strong></div><router-link to="/plans" class="plans-link">Browse training plans →</router-link></div>
+      <div class="folders-toolbar"><div><span class="eyebrow">Your goals</span><strong>{{ folders.length }} {{ folders.length === 1 ? 'goal' : 'goals' }}</strong></div><router-link to="/plans" class="plans-link">Browse training plans →</router-link></div>
       <form class="folder-create" @submit.prevent="createFolder">
-        <input v-model.trim="draft.name" required maxlength="120" placeholder="London Marathon" aria-label="Folder name">
-        <input v-model.trim="draft.description" maxlength="240" placeholder="Spring build · April 26" aria-label="Folder description">
+        <input v-model.trim="draft.name" required maxlength="120" placeholder="London Marathon" aria-label="Goal name">
+        <input v-model.trim="draft.description" maxlength="240" placeholder="Spring build · April 26" aria-label="Goal description">
         <input v-model="draft.targetDate" type="date" aria-label="Target date">
         <RunnitButton type="submit" variant="secondary" :disabled="saving">{{ saving ? 'Saving…' : 'Create folder' }}</RunnitButton>
       </form>
       <p v-if="error" class="folder-error">{{ error }}</p>
-      <div v-if="loading" class="folder-empty" role="status">Loading folders…</div>
-      <div v-else-if="!folders.length" class="folder-empty"><strong>Your training blocks live here.</strong><span>Create a folder above, then add workouts from a plan or activity.</span></div>
+      <div v-if="loading" class="folder-empty" role="status">Loading goals…</div>
+      <div v-else-if="!folders.length" class="folder-empty"><strong>Your next goal starts here.</strong><span>Create a goal above, then add workouts from a plan or activity.</span></div>
       <div v-else class="folder-grid">
         <article v-for="folder in folders" :key="folder.id" class="folder-card">
           <div class="folder-card-top"><span class="folder-mark">{{ folder.name.slice(0, 1).toUpperCase() }}</span><button class="delete-btn" @click="removeFolder(folder)">Delete</button></div>
           <router-link :to="`/training-folders/${folder.id}`" class="folder-card-link"><h2>{{ folder.name }}</h2></router-link><p>{{ folder.description || 'A focused training block.' }}</p>
-          <div class="folder-meta"><span>{{ folder.items?.length || 0 }} items</span><span v-if="folder.targetDate">Target {{ formatDate(folder.targetDate) }}</span></div>
+          <div class="folder-meta"><span>{{ folder.items?.length || 0 }} saved items</span><span v-if="folder.targetDate">Target {{ formatDate(folder.targetDate) }}</span></div>
           <div v-if="folder.items?.length" class="folder-items"><span v-for="item in folder.items" :key="item.id">{{ item.itemType.toLowerCase() }} #{{ item.itemId }}</span></div>
         </article>
       </div>

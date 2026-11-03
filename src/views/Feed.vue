@@ -426,6 +426,7 @@ import { useNotificationStore } from '@/stores/notification'
 import { useWorkoutClassifier } from '@/composables/useWorkoutClassifier'
 import CreateEventForm from '@/components/CreateEventForm.vue'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
+import { activityTimestamp, dedupeActivities } from '@/composables/useTrainingData'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const route = useRoute()
@@ -563,11 +564,11 @@ const sortedFeedItems = computed(() => {
   // Apply time period filter
   const cutoff = getTimeCutoff()
   if (cutoff) {
-    filtered = filtered.filter(item => new Date(item.performedAt || item.createdAt) >= cutoff)
+    filtered = filtered.filter(item => new Date(activityTimestamp(item)) >= cutoff)
   }
 
   if (sortOrder.value === 'newest') {
-    return [...filtered].sort((a, b) => new Date(b.performedAt || b.createdAt) - new Date(a.performedAt || a.createdAt))
+    return [...filtered].sort((a, b) => new Date(activityTimestamp(b)) - new Date(activityTimestamp(a)))
   } else {
     // Sort by popularity (reactions for moments, distance for activities)
     return [...filtered].sort((a, b) => {
@@ -675,7 +676,7 @@ const fetchFeed = async () => {
     for (const a of ownActs) {
       if (!seen.has(a.id)) { seen.add(a.id); merged.push(a) }
     }
-    activities.value = merged
+    activities.value = dedupeActivities(merged)
     for (const a of merged) initActivityReactions(a)
   } finally {
     loading.value = false

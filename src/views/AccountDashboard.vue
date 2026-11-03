@@ -377,21 +377,21 @@
             <div class="db2-ring-sub">{{ formatDistance(monthlyDistanceMeters) }} this month</div>
           </div>
 
-          <!-- WEEKLY XP -->
+          <!-- WEEKLY CONSISTENCY -->
           <div class="db2-card db2-xp">
-            <div class="db2-eyebrow">Weekly XP</div>
+            <div class="db2-eyebrow">Weekly consistency</div>
             <div class="db2-ring-wrap">
               <svg viewBox="0 0 42 42" class="db2-ring-svg">
                 <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EDE5D5" stroke-width="5"/>
                 <circle cx="21" cy="21" r="15.9" fill="none" stroke="#FFC53D" stroke-width="5"
-                  :stroke-dasharray="`${weeklyXP.pct} ${100 - weeklyXP.pct}`"/>
+                  :stroke-dasharray="`${weeklyConsistency.pct} ${100 - weeklyConsistency.pct}`"/>
               </svg>
-              <div class="db2-ring-pct">{{ weeklyXP.earned }}</div>
+              <div class="db2-ring-pct">{{ weeklyConsistency.pct }}<span class="db2-ring-sym">%</span></div>
             </div>
-            <div class="db2-ring-sub">{{ weeklyXP.earned }} / {{ weeklyXP.target }} XP</div>
+            <div class="db2-ring-sub">{{ weeklyConsistency.primary }} {{ weeklyConsistency.label }}</div>
             <div class="db2-xp-stats">
               <div class="db2-xp-stat">
-                <div class="db2-xp-stat-val">{{ weeklyXP.sessionsLabel }}</div>
+                <div class="db2-xp-stat-val">{{ weeklyConsistency.sessionsLabel }}</div>
                 <div class="db2-xp-stat-lbl">Sessions</div>
               </div>
               <div class="db2-xp-stat">
@@ -1779,20 +1779,20 @@ const weekPlannedWorkouts = computed(() => {
   return week?.workouts || []
 })
 
-// Hybrid XP: base points for anything logged this week, bonus for hitting a
-// prescribed workout from the active plan — works with or without a plan.
-const weeklyXP = computed(() => {
+// A plain-language consistency measure. It is deliberately not an XP system:
+// it reflects completed planned sessions when a plan exists, otherwise a
+// modest three-session weekly baseline.
+const weeklyConsistency = computed(() => {
   const loggedCount = weekActivities.value
   const planned = weekPlannedWorkouts.value
   const completedCount = planned.filter(w => w.isCompleted).length
-
-  const earned = loggedCount * 10 + completedCount * 15
-  const target = planned.length ? planned.length * 25 : 30
+  const target = planned.length || 3
+  const completed = planned.length ? completedCount : loggedCount
 
   return {
-    earned,
-    target,
-    pct: Math.min(100, Math.round((earned / target) * 100)),
+    primary: planned.length ? `${completedCount}/${planned.length}` : `${loggedCount}/${target}`,
+    label: planned.length ? 'planned sessions' : 'weekly sessions',
+    pct: Math.min(100, Math.round((completed / target) * 100)),
     sessionsLabel: planned.length ? `${completedCount}/${planned.length}` : `${loggedCount}`,
   }
 })
@@ -4819,7 +4819,7 @@ textarea.form-control{resize:vertical;min-height:72px}
   color: #5A5348;
 }
 
-/* ── WEEKLY XP ── */
+/* ── WEEKLY CONSISTENCY ── */
 .db2-xp { padding: 18px; display: flex; flex-direction: column; align-items: center; }
 .db2-xp-stats {
   display: flex;

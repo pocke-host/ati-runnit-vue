@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const localTimezone = () => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
@@ -18,7 +19,7 @@ export const useTrainingLoadStore = defineStore('trainingLoad', () => {
   async function fetchTrainingLoad() {
     loading.value = true
     try {
-      const { data: d } = await axios.get(`${API_URL}/training-load`, { headers: getAuthHeaders() })
+      const { data: d } = await axios.get(`${API_URL}/training-load`, { headers: getAuthHeaders(), params: { timezone: localTimezone() } })
       data.value = d
     } catch {
       data.value = null

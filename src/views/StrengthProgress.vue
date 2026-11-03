@@ -29,6 +29,11 @@
           <div><strong>{{ volume.totalSets }}</strong><span>Working sets</span></div>
           <div><strong>{{ volume.sessionCount }}</strong><span>Sessions</span></div>
         </div>
+        <div v-if="progressionRead" class="sp-read" role="status">
+          <div class="sp-read-label">PROGRESSION READ</div>
+          <strong>{{ progressionRead.title }}</strong>
+          <span>{{ progressionRead.message }}</span>
+        </div>
         <div class="sp-picker-row">
           <label class="sp-picker-label" for="strength-exercise">Exercise</label>
           <select id="strength-exercise" v-model="selectedExercise" class="sp-picker" aria-label="Choose an exercise to view progress">
@@ -159,6 +164,19 @@ const metrics = [
 ]
 
 const reversedHistory = computed(() => [...history.value].reverse())
+
+const progressionRead = computed(() => {
+  if (history.value.length < 2) return null
+  const ordered = [...history.value].sort((a, b) => new Date(a.performedAt) - new Date(b.performedAt))
+  const current = ordered[ordered.length - 1]
+  const previous = ordered[ordered.length - 2]
+  const currentOneRepMax = Number(current.estimatedOneRepMax || 0)
+  const previousOneRepMax = Number(previous.estimatedOneRepMax || 0)
+  const delta = currentOneRepMax - previousOneRepMax
+  if (delta > 0.1) return { title: 'Strength is moving up', message: `Estimated 1RM is up ${formatWeight(delta)} from your previous logged session.` }
+  if (delta < -0.1) return { title: 'Hold the line', message: `Estimated 1RM is down ${formatWeight(Math.abs(delta))}; keep the next session controlled and focus on quality.` }
+  return { title: 'Stable output', message: 'Your estimated 1RM is holding steady. Add load only when the current work feels repeatable.' }
+})
 
 const formatDate = (d) => {
   if (!d) return ''
@@ -298,6 +316,11 @@ onMounted(fetchExercises)
   margin: 0;
 }
 .sp-subtitle { max-width: 520px; margin: 12px 0 0; color: #665f55; font-size: .9rem; line-height: 1.5; }
+.sp-read { display: grid; grid-template-columns: auto minmax(0, auto) 1fr; align-items: baseline; gap: 12px; margin: 0 0 22px; padding: 14px 16px; border: 2px solid #16130F; background: #16130F; color: #FBF6EC; }
+.sp-read-label { color: #FFC53D; font: 700 .6rem 'Spline Sans Mono', monospace; letter-spacing: .1em; }
+.sp-read strong { font-size: .98rem; }
+.sp-read span { color: rgba(251,246,236,.72); font-size: .82rem; line-height: 1.4; }
+@media (max-width: 640px) { .sp-read { grid-template-columns: 1fr; gap: 5px; } }
 
 .sp-body {
   max-width: 900px;

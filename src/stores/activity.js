@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { dedupeActivities } from '@/composables/useTrainingData'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -32,7 +33,7 @@ export const useActivityStore = defineStore('activity', () => {
         timeout: 30000,
         headers: { Authorization: `Bearer ${token}` },
       })
-      activities.value.unshift(response.data)
+      activities.value = dedupeActivities([response.data, ...activities.value])
       saveCache(activities.value)
       return response.data
     } catch (err) {
@@ -52,7 +53,7 @@ export const useActivityStore = defineStore('activity', () => {
         timeout: 30000,
         headers: { Authorization: `Bearer ${token}` },
       })
-      activities.value.unshift(response.data)
+      activities.value = dedupeActivities([response.data, ...activities.value])
       saveCache(activities.value)
       return response.data
     } catch (err) {
@@ -88,8 +89,8 @@ export const useActivityStore = defineStore('activity', () => {
         }
       }
 
-      activities.value = all
-      saveCache(all)
+      activities.value = dedupeActivities(all)
+      saveCache(activities.value)
       return activities.value
     } catch (err) {
       error.value = err.response?.data?.error || "Couldn't load your activities. Check your connection."
