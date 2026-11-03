@@ -1,19 +1,6 @@
 <template>
   <main class="login-page">
 
-    <!-- Ticker -->
-    <div class="lp-ticker-wrap" aria-hidden="true">
-      <div class="lp-ticker">
-        <span>&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
-        <span aria-hidden="true">&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
-      </div>
-    </div>
-
-    <!-- Logo bar -->
-    <div class="lp-logo-bar">
-      <span class="lp-logo-text">RUNNIT<span class="lp-logo-dot">.</span></span>
-    </div>
-
     <!-- Form body -->
     <div class="lp-body">
 
@@ -292,7 +279,6 @@ const handleAppleSignIn = () => {}
 </script>
 
 <style scoped>
-@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 @keyframes spin    { to { transform: rotate(360deg) } }
 
 .login-page {
@@ -305,47 +291,6 @@ const handleAppleSignIn = () => {}
   color: #16130F;
   padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
 }
-
-/* Ticker */
-.lp-ticker-wrap {
-  width: 100%;
-  background: #16130F;
-  border-bottom: 3px solid #2A55F5;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.lp-ticker {
-  display: flex;
-  white-space: nowrap;
-  animation: rkMarq 28s linear infinite;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #FBF6EC;
-  padding: 7px 0;
-}
-@media (prefers-reduced-motion: reduce) { .lp-ticker { animation: none; } }
-
-/* Logo bar */
-.lp-logo-bar {
-  width: 100%;
-  padding: 18px 32px;
-  border-bottom: 2px solid #16130F;
-  display: flex;
-  align-items: center;
-}
-.lp-logo-text {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-weight: 900;
-  font-style: italic;
-  font-size: 1.4rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: #16130F;
-}
-.lp-logo-dot { color: #2A55F5; }
 
 /* Body */
 .lp-body {
@@ -584,7 +529,6 @@ const handleAppleSignIn = () => {}
 .lp-signup-a:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
-  .lp-logo-bar { padding: 14px 18px; }
   .lp-body { padding: 32px 18px 48px; }
   .lp-form-opts { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
