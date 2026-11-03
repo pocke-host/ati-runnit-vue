@@ -147,35 +147,44 @@
             >
               <div class="nav-avatar-mono">{{ userInitial }}</div>
             </button>
-            <div v-if="avatarOpen" class="avatar-dropdown">
-              <div class="avd-header">
-                <div class="avd-name">{{ user?.displayName }}</div>
-                <div class="avd-email">{{ user?.email }}</div>
+            <div v-if="avatarOpen" class="avatar-dropdown" role="menu" aria-label="Account menu">
+              <div class="avd-profile-head">
+                <UserAvatar :src="user?.avatarUrl" :name="user?.displayName || ''" :size="42" />
+                <div class="avd-profile-copy">
+                  <strong class="avd-name">{{ user?.displayName || 'Runnit athlete' }}</strong>
+                  <span class="avd-handle">{{ user?.user ? `@${user.user}` : user?.email }}</span>
+                </div>
+                <span class="avd-tier" :class="{ 'avd-tier--pro': isProAccount }">{{ accountTierLabel }}</span>
               </div>
-              <router-link :to="role === 'coach' ? '/coach/dashboard' : '/dashboard'" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-grid-3x3-gap"></i> Dashboard
+              <div class="avd-profile-actions">
+                <router-link :to="profilePath" class="avd-view-profile" role="menuitem" @click="avatarOpen = false">
+                  View profile <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </router-link>
+                <router-link :to="role === 'coach' ? '/coach/dashboard' : '/dashboard'" class="avd-dashboard-link" role="menuitem" @click="avatarOpen = false">
+                  <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Dashboard
+                </router-link>
+              </div>
+              <router-link to="/track" class="avd-record-link" role="menuitem" @click="avatarOpen = false">
+                <span><i class="bi bi-play-circle-fill" aria-hidden="true"></i> Record activity</span><b aria-hidden="true">→</b>
               </router-link>
-              <router-link to="/settings" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-gear"></i> Settings
-              </router-link>
-              <router-link to="/devices" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-phone"></i> Devices &amp; integrations
-              </router-link>
-              <router-link to="/plans" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-journal-text"></i> Training plans
-              </router-link>
-              <router-link to="/fuel" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-lightning-charge"></i> Fuel journal
-              </router-link>
-              <router-link to="/training-folders" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-folder2-open"></i> Training folders
-              </router-link>
-              <router-link to="/rewards" class="avd-link" @click="avatarOpen = false">
-                <i class="bi bi-gift"></i> Runnit Rewards
-              </router-link>
+              <div class="avd-section">
+                <span class="avd-section-label">Your training</span>
+                <div class="avd-link-grid">
+                  <router-link to="/plans" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-journal-text" aria-hidden="true"></i> Plans</router-link>
+                  <router-link to="/training-folders" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-flag" aria-hidden="true"></i> Goals</router-link>
+                  <router-link to="/devices" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-phone" aria-hidden="true"></i> Devices</router-link>
+                  <router-link to="/fuel" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-lightning-charge" aria-hidden="true"></i> Fuel</router-link>
+                </div>
+              </div>
+              <div class="avd-section avd-section--account">
+                <span class="avd-section-label">Account</span>
+                <router-link to="/billing" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-credit-card" aria-hidden="true"></i> Billing</router-link>
+                <router-link to="/settings" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-gear" aria-hidden="true"></i> Settings</router-link>
+                <router-link to="/rewards" class="avd-link" role="menuitem" @click="avatarOpen = false"><i class="bi bi-gift" aria-hidden="true"></i> Rewards</router-link>
+              </div>
               <div class="avd-divider"></div>
-              <button class="avd-link avd-link-danger" @click="handleLogout">
-                <i class="bi bi-box-arrow-right"></i> Logout
+              <button class="avd-link avd-link-danger" role="menuitem" @click="handleLogout">
+                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Sign out
               </button>
             </div>
           </div>
@@ -430,6 +439,13 @@ const communityRef = ref(null)
 const avatarRef = ref(null)
 const userId = computed(() => user.value?.id)
 const userInitial = computed(() => user.value?.displayName?.charAt(0).toUpperCase() || '?')
+const profilePath = computed(() => userId.value ? `/profile/${userId.value}` : '/settings')
+const isProAccount = computed(() => Boolean(
+  user.value?.lifetimePro ||
+  user.value?.launchProGranted ||
+  ['pro', 'premium', 'duo'].includes(String(subscriptionTier.value || '').toLowerCase())
+))
+const accountTierLabel = computed(() => isProAccount.value ? 'PRO' : 'FREE')
 
 const toggleAvatarDropdown = () => {
   avatarOpen.value = !avatarOpen.value
@@ -1059,29 +1075,45 @@ onUnmounted(() => {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: 220px;
+  width: 316px;
   background: #FBF6EC;
   border: 2px solid #16130F;
-  box-shadow: 4px 4px 0 #16130F;
-  border-radius: 0;
+  box-shadow: 6px 6px 0 #16130F;
+  border-radius: 14px;
   overflow: hidden;
   animation: dropIn 0.15s ease;
   z-index: 2000;
 }
 
-.avd-header {
-  padding: 14px 16px;
-  border-bottom: 2px solid #E7DFCE;
-}
+.avd-profile-head { display: flex; align-items: center; gap: 11px; padding: 16px; border-bottom: 1px solid #E7DFCE; }
+.avd-profile-copy { display: grid; min-width: 0; gap: 3px; flex: 1; }
 .avd-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: 0.02em;
+  font-size: .84rem;
+  font-weight: 800;
+  color: #16130F;
+  letter-spacing: .01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.avd-handle { color: #665F55; font-size: .68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.avd-tier { flex-shrink: 0; padding: 5px 7px; border: 1px solid #C9C3B8; color: #665F55; font: 700 .54rem 'Spline Sans Mono', monospace; letter-spacing: .08em; }
+.avd-tier--pro { background: #FFC53D; border-color: #16130F; color: #16130F; }
+.avd-profile-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding: 10px 12px 12px; }
+.avd-view-profile, .avd-dashboard-link { display: flex; align-items: center; justify-content: space-between; gap: 7px; min-height: 34px; padding: 8px 9px; color: #16130F; text-decoration: none; font-size: .72rem; font-weight: 700; }
+.avd-view-profile { background: #E6EDFF; }
+.avd-dashboard-link { border: 1px solid #E7DFCE; }
+.avd-view-profile:hover, .avd-dashboard-link:hover { color: #2A55F5; }
+.avd-profile-actions i { font-size: .7rem; }
+.avd-record-link { display: flex; align-items: center; justify-content: space-between; margin: 0 12px 13px; padding: 12px 13px; background: #2A55F5; border: 2px solid #16130F; box-shadow: 3px 3px 0 #16130F; color: #fff; text-decoration: none; font: 700 .68rem 'Spline Sans Mono', monospace; letter-spacing: .07em; text-transform: uppercase; }
+.avd-record-link:hover { background: #1E42D6; color: #fff; }
+.avd-record-link span { display: inline-flex; align-items: center; gap: 8px; }
+.avd-record-link i { font-size: .9rem; }
+.avd-record-link b { font-size: .9rem; }
+.avd-section { padding: 0 12px 12px; }
+.avd-section--account { padding-top: 1px; }
+.avd-section-label { display: block; margin: 0 4px 5px; color: #8A8174; font: 700 .55rem 'Spline Sans Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.avd-link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
 .avd-email {
   font-size: 0.72rem;
   color: #767676;
@@ -1095,9 +1127,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 16px;
-  font-size: 0.83rem;
-  color: #000;
+  min-height: 35px;
+  padding: 8px 9px;
+  font-size: 0.74rem;
+  color: #16130F;
   text-decoration: none;
   background: transparent;
   border: none;
@@ -1107,18 +1140,22 @@ onUnmounted(() => {
   font-family: inherit;
   transition: background 0.1s;
 }
-.avd-link i { width: 16px; text-align: center; color: #767676; font-size: 0.9rem; }
-.avd-link:hover { background: #f5f5f5; }
+.avd-link i { width: 16px; text-align: center; color: #665F55; font-size: 0.84rem; }
+.avd-link:hover { background: #fff; color: #2A55F5; }
 
 .avd-divider {
   border: none;
-  border-top: 1px solid #E5E5E5;
-  margin: 4px 0;
+  border-top: 1px solid #E7DFCE;
+  margin: 0 12px 4px;
 }
 
-.avd-link-danger { color: #dc2626; }
+.avd-link-danger { color: #B42318; margin: 0 12px 10px; width: calc(100% - 24px); }
 .avd-link-danger i { color: #dc2626; }
 .avd-link-danger:hover { background: #fef2f2; }
+
+@media (max-width: 640px) {
+  .avatar-dropdown { right: -8px; width: min(316px, calc(100vw - 32px)); max-height: min(72vh, 560px); overflow-y: auto; }
+}
 
 /* Primary nav CTA — blue mono button */
 .nav-link-primary {

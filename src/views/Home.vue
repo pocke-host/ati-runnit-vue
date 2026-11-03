@@ -313,6 +313,23 @@
       </div>
     </section>
 
+    <!-- FINAL CTA -->
+    <section class="home-final-cta">
+      <div class="home-inner">
+        <div class="home-final-cta-card">
+          <div>
+            <div class="rk-eyebrow">Lace up.</div>
+            <h2 class="section-h2">Train like you mean it.</h2>
+            <p class="section-body">One training home for the data you already collect.</p>
+          </div>
+          <div class="home-final-cta-actions">
+            <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_home_bottom">Start free →</router-link>
+            <span class="home-waitlist-note">Not ready yet? <router-link to="/waitlist">Join the waitlist for launch updates.</router-link></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 </template>
 
@@ -646,6 +663,15 @@ function scrollTo(id) {
   margin: 8px 0 14px;
 }
 .section-h2--cream { color: #FBF6EC; }
+.home-final-cta { padding: 72px 0 88px; background: #FFC53D; border-top: 2px solid #16130F; }
+.home-final-cta-card { display: flex; align-items: end; justify-content: space-between; gap: 32px; padding: 32px; background: #FBF6EC; border: 2px solid #16130F; box-shadow: 7px 7px 0 #16130F; }
+.home-final-cta-card .section-h2 { margin: 10px 0 0; }
+.home-final-cta-card .section-body { margin: 14px 0 0; max-width: 420px; }
+.home-final-cta-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; min-width: 250px; }
+.home-final-cta-actions .btn-pill-primary { white-space: nowrap; }
+.home-waitlist-note { color: #5A5348; font-size: .78rem; line-height: 1.45; text-align: right; }
+.home-waitlist-note a { color: #16130F; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.home-waitlist-note a:hover { color: #2A55F5; }
 .section-body {
   font-size: 1.02rem;
   line-height: 1.6;
@@ -1292,6 +1318,11 @@ function scrollTo(id) {
   .home-page .hero-h1 { font-size: clamp(44px, 13vw, 52px); letter-spacing: -.02em; }
   .home-page .hero-context { font-size: .62rem; }
   .home-page .content-section { padding-block: 48px; }
+  .home-final-cta { padding: 48px 0 58px; }
+  .home-final-cta-card { align-items: stretch; flex-direction: column; gap: 24px; padding: 24px 20px; }
+  .home-final-cta-actions { align-items: stretch; min-width: 0; }
+  .home-final-cta-actions .btn-pill-primary { text-align: center; justify-content: center; }
+  .home-waitlist-note { text-align: center; }
 }
 @media (max-width: 860px) {
   .home-page .hero-stack {
