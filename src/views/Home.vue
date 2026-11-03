@@ -10,8 +10,9 @@
             <span class="sticker sticker--yellow sticker--rot-neg">The training home</span>
             <h1 class="hero-h1">Your whole training.<br><span class="hero-accent">One home.</span></h1>
             <p class="hero-sub">Your training is scattered across Strava, your watch, a notes app, and a group chat. RUNNIT brings the workouts, race goals, recovery, plans, and people together — so every session points toward what you're preparing for.</p>
+            <p class="hero-context">For the race you're chasing, the week you're building, and the people keeping you honest.</p>
             <div class="hero-actions">
-              <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_home">Start free</router-link>
+              <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_home">Create your free account</router-link>
               <a href="#track" class="hero-link" @click.prevent="scrollTo('track')">See how it works →</a>
             </div>
             <div class="syncs-row">
@@ -389,6 +390,17 @@ function scrollTo(id) {
   max-width: 450px;
   margin: 26px 0 0;
 }
+.hero-context {
+  max-width: 460px;
+  margin: 13px 0 0;
+  color: rgba(251,246,236,.58);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
 .hero-actions {
   display: flex;
   align-items: center;
@@ -428,6 +440,8 @@ function scrollTo(id) {
   position: absolute;
   background: #EDE5D5;
   border: 2px solid #16130F;
+  border-radius: 18px;
+  box-shadow: 8px 8px 0 rgba(42,85,245,.35);
   overflow: hidden;
 }
 .hero-card--back {
@@ -1246,11 +1260,18 @@ function scrollTo(id) {
 /* Launch refresh: keep the expressive RUNNIT palette, add calmer surfaces and
    more deliberate hierarchy so the page feels like a product, not a poster. */
 .home-page .hero {
-  background: radial-gradient(circle at 82% 18%, rgba(42,85,245,.22), transparent 30%), #16130F;
+  padding-top: 56px;
+  background: radial-gradient(circle at 82% 18%, rgba(42,85,245,.28), transparent 30%), radial-gradient(circle at 15% 92%, rgba(255,197,61,.12), transparent 26%), #16130F;
 }
 .home-page .hero-copy { max-width: 640px; }
+.home-page .hero-h1 { color: #FBF6EC; font-size: clamp(56px, 7.4vw, 94px); }
 .home-page .hero-sub { max-width: 570px; color: rgba(251,246,236,.76); }
 .home-page .hero-actions { align-items: center; }
+.home-page .hero-link { color: #FBF6EC; }
+.home-page .hero-link:hover { color: #FFC53D; }
+.home-page .syncs-label,
+.home-page .syncs-slash { color: rgba(251,246,236,.48); }
+.home-page .syncs-app { color: #FBF6EC; }
 .home-page .activity-card,
 .home-page .feature-box,
 .home-page .leaderboard,
@@ -1268,7 +1289,24 @@ function scrollTo(id) {
 @media (max-width: 640px) {
   .home-page .hero { padding-top: 40px; }
   .home-page .hero-copy { padding-bottom: 4px; }
-  .home-page .hero-h1 { letter-spacing: -.02em; }
+  .home-page .hero-h1 { font-size: clamp(44px, 13vw, 52px); letter-spacing: -.02em; }
+  .home-page .hero-context { font-size: .62rem; }
   .home-page .content-section { padding-block: 48px; }
+}
+@media (max-width: 860px) {
+  .home-page .hero-stack {
+    display: block;
+    height: 330px;
+    max-width: 430px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 640px) {
+  .home-page .hero-stack {
+    height: 260px;
+    transform: scale(.82);
+    transform-origin: top center;
+    margin-bottom: -42px;
+  }
 }
 </style>
