@@ -113,6 +113,72 @@
         </div>
       </section>
 
+      <!-- WHOOP-inspired completed-month recap: stable month vs month comparison. -->
+      <section class="monthly-recap-card" aria-labelledby="monthly-recap-title">
+        <div class="monthly-recap-head">
+          <div>
+            <p class="daily-focus-kicker">Monthly recap</p>
+            <h2 id="monthly-recap-title">{{ monthlySummary ? `${monthlySummary.monthLabel} vs ${monthlySummary.previousMonthLabel}` : 'A whole lot of insight' }}</h2>
+          </div>
+          <span class="monthly-recap-mark">WHOLE LOT OF INSIGHT</span>
+        </div>
+
+        <div v-if="monthlySummaryLoading" class="monthly-recap-state" role="status">
+          Reading your last two months…
+        </div>
+        <div v-else-if="monthlySummaryError" class="monthly-recap-state monthly-recap-state--error" role="status">
+          Monthly recap unavailable. <button type="button" @click="loadMonthlySummary">Retry</button>
+        </div>
+        <template v-else-if="monthlySummary">
+          <div class="monthly-recap-lead">
+            <div>
+              <span class="monthly-recap-label">TOTAL TRAINING TIME</span>
+              <strong>{{ formatExerciseTime(monthlySummary.totalDurationSeconds) }}</strong>
+            </div>
+            <span :class="['monthly-recap-change', monthlySummary.changePercent < 0 ? 'monthly-recap-change--down' : '']">
+              {{ monthlyChangeLabel(monthlySummary.changePercent) }}
+            </span>
+          </div>
+
+          <div class="monthly-recap-metrics" aria-label="Monthly training metrics">
+            <div class="monthly-recap-metric">
+              <span>Sessions</span>
+              <strong>{{ monthlySummary.activityCount }}</strong>
+              <em>{{ monthlyChangeLabel(monthlySummary.activityChangePercent) }}</em>
+            </div>
+            <div class="monthly-recap-metric">
+              <span>Distance</span>
+              <strong>{{ formatDistance(monthlySummary.totalDistanceMeters) }}</strong>
+              <em>{{ monthlyChangeLabel(monthlySummary.distanceChangePercent) }}</em>
+            </div>
+            <div class="monthly-recap-metric">
+              <span>Active days</span>
+              <strong>{{ monthlySummary.activeDays }}</strong>
+              <em>{{ monthlyChangeLabel(monthlySummary.activeDaysChangePercent) }}</em>
+            </div>
+          </div>
+
+          <div v-if="monthlySummary.bySport?.length" class="monthly-recap-breakdown">
+            <div class="monthly-recap-label">WHERE YOUR TIME WENT</div>
+            <div class="monthly-recap-sport-list">
+              <div v-for="sport in monthlySummary.bySport.slice(0, 4)" :key="sport.sport" class="monthly-recap-sport">
+                <span>{{ sport.sport.toLowerCase() }}</span>
+                <strong>{{ formatExerciseTime(sport.durationSeconds) }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="monthly-recap-read" role="status">
+            <span class="monthly-recap-label">RUNNIT READ</span>
+            <strong>{{ monthlyInsight.title }}</strong>
+            <span>{{ monthlyInsight.message }}</span>
+          </div>
+        </template>
+        <div v-else class="monthly-recap-state">
+          Log a few sessions and RUNNIT will compare your training month over month.
+        </div>
+      </section>
+
       <!-- ════ DESKTOP V2 BENTO ════ -->
       <div class="db2-desktop">
 
@@ -1524,6 +1590,9 @@ const showWelcome = ref(route.query.welcome === '1')
 const weeklySummary = ref(null)
 const weeklySummaryLoading = ref(false)
 const weeklySummaryError = ref(false)
+const monthlySummary = ref(null)
+const monthlySummaryLoading = ref(false)
+const monthlySummaryError = ref(false)
 const workoutExportError = ref('')
 const integrationStatuses = ref([])
 
@@ -1887,25 +1956,24 @@ const todayLine = computed(() => {
 })
 
 const monthCompare = computed(() => {
-  const acts = activities.value || []
-  const now = new Date()
-  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const pct = monthlySummary.value?.distanceChangePercent
+  if (pct == null) return null
+  return pct >= 0 ? `+${pct}% vs previous month` : `${pct}% vs previous month`
+})
 
-  const thisKm = acts
-    .filter(a => new Date(a.performedAt) >= thisMonthStart)
-    .reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
-
-  const lastKm = acts
-    .filter(a => {
-      const d = new Date(a.performedAt)
-      return d >= lastMonthStart && d < thisMonthStart
-    })
-    .reduce((sum, a) => sum + (a.distanceMeters || 0), 0) / 1000
-
-  if (lastKm === 0) return null
-  const pct = Math.round(((thisKm - lastKm) / lastKm) * 100)
-  return pct >= 0 ? `+${pct}% vs last month` : `${pct}% vs last month`
+const monthlyInsight = computed(() => {
+  const summary = monthlySummary.value
+  if (!summary) return { title: 'Build your baseline.', message: 'Log a few sessions to unlock your month-over-month read.' }
+  if (!summary.activityCount) return { title: 'A clean slate.', message: 'Your last completed month has no logged sessions yet. Start with one simple workout.' }
+  const topSport = summary.bySport?.slice().sort((a, b) => (b.durationSeconds || 0) - (a.durationSeconds || 0))[0]
+  const sportLabel = topSport?.sport ? topSport.sport.toLowerCase() : 'training'
+  if (summary.changePercent >= 10) {
+    return { title: 'You built momentum.', message: `You spent more time training than the month before, led by ${sportLabel}. Keep the rhythm sustainable.` }
+  }
+  if (summary.changePercent <= -10) {
+    return { title: 'A lighter month can be useful.', message: `Your training time came down from the month before. Use this as context, then choose the next block deliberately.` }
+  }
+  return { title: 'You kept the work steady.', message: `Your month stayed consistent, with ${sportLabel} taking the biggest share of your training time.` }
 })
 
 const weeklyChartData = computed(() => {
@@ -2240,6 +2308,12 @@ const formatExerciseTime = (seconds = 0) => {
   return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
 }
 
+const monthlyChangeLabel = (percent, comparison = 'previous month') => {
+  if (percent == null) return 'No prior data'
+  if (percent === 0) return `Flat vs ${comparison}`
+  return `${percent > 0 ? '↑' : '↓'} ${Math.abs(percent)}% vs ${comparison}`
+}
+
 const formatWeekday = (dateString) => {
   const date = new Date(`${dateString}T12:00:00`)
   return new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(date).slice(0, 2).toUpperCase()
@@ -2273,6 +2347,24 @@ const loadWeeklySummary = async () => {
     weeklySummaryError.value = true
   } finally {
     weeklySummaryLoading.value = false
+  }
+}
+
+const loadMonthlySummary = async () => {
+  monthlySummaryLoading.value = true
+  monthlySummaryError.value = false
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    const { data } = await axios.get(`${API_URL}/activities/summary/monthly`, {
+      params: { timezone },
+      headers: getAuthHeaders()
+    })
+    monthlySummary.value = data
+  } catch {
+    monthlySummary.value = null
+    monthlySummaryError.value = true
+  } finally {
+    monthlySummaryLoading.value = false
   }
 }
 
@@ -2474,6 +2566,7 @@ const loadData = async () => {
   await Promise.all([
     activityStore.fetchActivities(),
     loadWeeklySummary(),
+    loadMonthlySummary(),
     loadIntegrationFreshness(),
     loadFollowData(),
     planStore.fetchPlans(),
@@ -3341,6 +3434,147 @@ textarea.form-control{resize:vertical;min-height:72px}
    Shown ONLY on ≤768px; desktop sections hidden on ≤768px
 ───────────────────────────────────────────── */
 
+/* ── Completed-month recap ── */
+.monthly-recap-card {
+  margin: 0 0 20px;
+  padding: 22px;
+  background: #fff;
+  border: 2px solid #16130F;
+  box-shadow: 4px 4px #FFC53D;
+}
+.monthly-recap-head,
+.monthly-recap-lead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.monthly-recap-head h2 {
+  margin: 0;
+  color: #16130F;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+.monthly-recap-mark {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  background: #FFC53D;
+  color: #16130F;
+  font: 700 9px 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .1em;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+}
+.monthly-recap-lead {
+  align-items: flex-end;
+  margin-top: 22px;
+  padding: 16px 0;
+  border-top: 1px solid #E7DFCE;
+  border-bottom: 1px solid #E7DFCE;
+}
+.monthly-recap-label,
+.monthly-recap-metric span {
+  display: block;
+  color: #6B6258;
+  font: 700 9px 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.monthly-recap-lead strong {
+  display: block;
+  margin-top: 6px;
+  color: #16130F;
+  font-size: 2.35rem;
+  line-height: 1;
+}
+.monthly-recap-change {
+  color: #2A55F5;
+  font: 700 10px 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .04em;
+  text-align: right;
+  text-transform: uppercase;
+}
+.monthly-recap-change--down { color: #B94A3D; }
+.monthly-recap-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid #E7DFCE;
+}
+.monthly-recap-metric {
+  min-width: 0;
+  padding: 14px 14px 13px 0;
+  border-right: 1px solid #E7DFCE;
+}
+.monthly-recap-metric:not(:first-child) { padding-left: 14px; }
+.monthly-recap-metric:last-child { border-right: 0; }
+.monthly-recap-metric strong {
+  display: block;
+  margin: 7px 0 3px;
+  color: #16130F;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.monthly-recap-metric em {
+  display: block;
+  overflow: hidden;
+  color: #6B6258;
+  font: 10px 'Spline Sans Mono', ui-monospace, monospace;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.monthly-recap-breakdown { padding-top: 16px; }
+.monthly-recap-sport-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.monthly-recap-sport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  background: #FBF6EC;
+  border: 1px solid #E7DFCE;
+  color: #16130F;
+  font: 10px 'Spline Sans Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+}
+.monthly-recap-sport strong { color: #2A55F5; }
+.monthly-recap-read {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #16130F;
+  color: rgba(251,246,236,.72);
+  font-size: .78rem;
+  line-height: 1.4;
+}
+.monthly-recap-read .monthly-recap-label { color: #FFC53D; }
+.monthly-recap-read strong { color: #FBF6EC; }
+.monthly-recap-state {
+  padding: 22px 0 4px;
+  color: #6B6258;
+  font-size: .82rem;
+}
+.monthly-recap-state--error { color: #9D3C32; }
+.monthly-recap-state button {
+  margin-left: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #2A55F5;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* dash-mobile wrapper — hidden on desktop */
 .dash-mobile { display: none; }
 
@@ -4052,6 +4286,22 @@ textarea.form-control{resize:vertical;min-height:72px}
 @media(max-width:900px){.daily-focus{grid-template-columns:1fr;gap:14px}.daily-focus-actions{order:3}.daily-focus-primary{flex:1;text-align:center}.training-status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.training-status-metric:nth-child(2){border-right:0}.training-status-metric:nth-child(n+3){border-top:1px solid rgba(251,246,236,.14)}}
 @media(max-width:900px){.first-action-card{align-items:flex-start;flex-direction:column;gap:16px}.first-action-actions{justify-content:flex-start;width:100%}}
 @media(max-width:600px){.daily-focus{margin:0 0 14px;padding:16px}.daily-focus-actions{flex-wrap:wrap}.daily-focus-primary{width:100%}.training-status-card{padding:16px;margin-bottom:16px}.training-status-head{display:block}.training-status-freshness{display:block;margin-top:8px;text-align:left}.training-status-metric strong{font-size:1rem}.training-status-guidance{display:block}.training-status-guidance-label,.training-status-guidance strong,.training-status-guidance>span:not(.training-status-guidance-label){display:block;margin-bottom:5px}.training-status-link{display:inline-block;margin:5px 0 0}}
+.monthly-recap-card { margin-bottom: 16px; padding: 16px; }
+@media(max-width:600px){
+  .monthly-recap-head { display: block; }
+  .monthly-recap-mark { display: inline-block; margin-top: 12px; }
+  .monthly-recap-head h2 { font-size: 1.18rem; }
+  .monthly-recap-lead strong { font-size: 1.95rem; }
+  .monthly-recap-change { max-width: 46%; font-size: 9px; }
+  .monthly-recap-metric { padding-right: 8px; }
+  .monthly-recap-metric:not(:first-child) { padding-left: 8px; }
+  .monthly-recap-metric strong { font-size: 1rem; }
+  .monthly-recap-metric em { font-size: 8px; }
+  .monthly-recap-read { display: block; }
+  .monthly-recap-read .monthly-recap-label,
+  .monthly-recap-read strong,
+  .monthly-recap-read > span:last-child { display: block; margin-bottom: 5px; }
+}
 .db2-v1-mobile { display: none !important; }
 
 /* ── HERO ── */
