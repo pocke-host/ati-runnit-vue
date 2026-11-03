@@ -7,6 +7,11 @@
         <span class="gr-eyebrow-badge">What's inside</span>
         <h1 class="hero-h1">Everything your week<br>needs to move.</h1>
         <p class="hero-sub">Track, plan, recover, and stay connected. RUNNIT turns the data you already collect into one clearer training home for the race or goal ahead.</p>
+        <div class="feature-hero-actions">
+          <router-link to="/signup" class="btn-pill-primary" data-analytics="cta_signup_features">Start free →</router-link>
+          <router-link to="/races" class="feature-hero-link">Explore races</router-link>
+        </div>
+        <p class="feature-hero-note">The athlete core stays free. Pro adds depth; coaching is where RUNNIT earns.</p>
       </div>
     </section>
 
@@ -39,6 +44,7 @@
       <div class="page-inner">
         <div class="gr-eyebrow">The whole kit</div>
         <h2 class="section-h2">Everything included.</h2>
+        <p class="section-intro">One place for the work you do, the data you collect, and the people who help you keep going.</p>
         <div class="kit-grid">
           <div class="kit-cell">
             <div class="kit-num">01</div>
@@ -87,8 +93,8 @@
           </div>
           <div class="kit-cell">
             <div class="kit-num">10</div>
-            <div class="kit-name">Training Folders</div>
-            <div class="kit-desc">Keep a whole block together from start to finish</div>
+            <div class="kit-name">Training Goals</div>
+            <div class="kit-desc">Keep a whole event block together from start to finish</div>
           </div>
           <div class="kit-cell">
             <div class="kit-num">11</div>
@@ -129,9 +135,11 @@
 
     <!-- CTA — cobalt -->
     <section class="final-cta">
-      <h2 class="cta-h2">Start training.</h2>
-      <p class="cta-sub">Create your account and start logging every session.</p>
-      <router-link to="/signup" class="btn-pill-paper">Join Us</router-link>
+      <div class="gr-eyebrow gr-eyebrow--light">Lace up.</div>
+      <h2 class="cta-h2">Train like you mean it.</h2>
+      <p class="cta-sub">One training home for the data you already collect.</p>
+      <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_features_bottom">Start free →</router-link>
+      <p class="features-waitlist">Not ready yet? <router-link to="/waitlist">Join the waitlist for launch updates.</router-link></p>
     </section>
 
   </main>
@@ -157,16 +165,6 @@ useHead({
   ]
 })
 
-const kitItems = [
-  { num: '01', name: 'GPS Tracking',  desc: 'Wrist or phone, mile-accurate' },
-  { num: '02', name: 'Crews',         desc: 'Clubs that run your pace' },
-  { num: '03', name: 'Segments',      desc: 'Chase crowns block by block' },
-  { num: '04', name: 'Plans',         desc: 'Adaptive 12-week blocks' },
-  { num: '05', name: 'Live Share',    desc: 'Friends watch in real time' },
-  { num: '06', name: 'PRs',          desc: 'Every record, tracked' },
-  { num: '07', name: 'Challenges',    desc: 'Monthly distance races' },
-  { num: '08', name: 'Sync',         desc: 'Garmin, Apple Health, COROS' },
-]
 </script>
 
 <style scoped>
@@ -218,6 +216,10 @@ const kitItems = [
   max-width: 520px;
   margin: 22px 0 0;
 }
+.feature-hero-actions { display: flex; align-items: center; gap: 18px; margin-top: 28px; flex-wrap: wrap; }
+.feature-hero-link { color: #FBF6EC; font-weight: 800; text-decoration: none; }
+.feature-hero-link:hover { color: #FFC53D; }
+.feature-hero-note { margin: 20px 0 0; color: rgba(251,246,236,.52); font: 700 .64rem 'Spline Sans Mono', monospace; letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; }
 
 /* ── MOMENTS ── */
 .moments-feature {
@@ -316,6 +318,7 @@ const kitItems = [
   margin: 0 0 26px;
   max-width: 520px;
 }
+.gr-eyebrow--light { color: #AAB9FF; }
 
 .bullet-list { display: flex; flex-direction: column; }
 .bullet-row {
@@ -411,6 +414,9 @@ const kitItems = [
   transition: opacity 0.15s;
 }
 .btn-pill-paper:hover { opacity: 0.85; text-decoration: none; color: #16130F; }
+.features-waitlist { margin: 18px 0 0; color: rgba(255,255,255,.72); font-size: .8rem; }
+.features-waitlist a { color: #fff; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.features-waitlist a:hover { color: #FFC53D; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
@@ -430,6 +436,9 @@ const kitItems = [
   .kit-section, .leave-out-section { padding: 40px 0; }
   .kit-grid { grid-template-columns: 1fr 1fr; }
   .final-cta { padding: 48px 22px; }
+  .feature-hero-actions { align-items: stretch; flex-direction: column; gap: 13px; }
+  .feature-hero-actions .btn-pill-primary { width: 100%; text-align: center; }
+  .feature-hero-link { text-align: center; }
 }
 
 /* Editorial product surface: structured, tactile, and easier to scan. */
