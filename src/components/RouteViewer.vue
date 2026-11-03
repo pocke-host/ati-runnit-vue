@@ -2,18 +2,18 @@
 <template>
   <div class="route-viewer">
 
-    <div v-if="loading" class="route-loading">
-      <div class="rv-spinner"></div>
-      <span class="rv-loading-text">Loading route</span>
-    </div>
-
-    <div v-else-if="error" class="route-error">
+    <div v-if="error" class="route-error">
       <i class="bi bi-map"></i>
       <span>{{ error }}</span>
     </div>
 
     <div v-else class="route-container">
       <div ref="mapContainer" class="map-container"></div>
+
+      <div v-if="loading" class="route-loading" aria-live="polite">
+        <div class="rv-spinner"></div>
+        <span class="rv-loading-text">Loading route</span>
+      </div>
 
       <!-- Stat strip -->
       <div class="route-stat-strip">
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 const props = defineProps({
@@ -236,6 +236,10 @@ const placeMarkers = (mapInst, coordinates) => {
 
 // ── Map init ─────────────────────────────────────────
 const initializeMap = async () => {
+  // The map container is rendered alongside the loading state. Waiting for
+  // Vue's DOM flush also makes re-initialization safe when the activity prop
+  // changes while the detail view remains mounted.
+  await nextTick()
   const module = await import('maplibre-gl')
   mapboxgl = module.default
   if (!props.activity.routePolyline) {
@@ -385,6 +389,17 @@ watch(() => props.activity, () => {
   background: #FBF6EC;
   border: 2px solid #16130F;
   color: #5A5348;
+}
+
+.route-loading {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  z-index: 3;
+  border: 0;
+  background: rgba(251, 246, 236, 0.88);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
 .route-loading .bi,
