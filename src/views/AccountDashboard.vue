@@ -59,11 +59,6 @@
             <span>{{ todayTrainingCall.message }}</span>
           </div>
         </div>
-        <div class="daily-focus-context">
-          <div v-if="daysToRace !== null" class="daily-focus-stat"><span>Next race</span><strong>{{ daysToRace === 0 ? 'Race day' : `${daysToRace} days` }}</strong></div>
-          <div v-if="todayWellness?.recoveryScore != null" class="daily-focus-stat"><span>Recovery</span><strong>{{ todayWellness.recoveryScore }}%</strong></div>
-          <div v-if="riskBadge" class="daily-focus-stat"><span>Training load</span><strong>{{ riskBadge.label }}</strong></div>
-        </div>
         <div class="daily-focus-actions">
           <router-link v-if="primaryDashboardAction.kind === 'reconnect'" to="/devices" class="daily-focus-primary">{{ primaryDashboardAction.label }} →</router-link>
           <router-link v-else-if="primaryDashboardAction.kind === 'review'" to="/stats" class="daily-focus-primary">{{ primaryDashboardAction.label }} →</router-link>
@@ -71,6 +66,50 @@
           <router-link v-else to="/track" class="daily-focus-primary">{{ primaryDashboardAction.label }} →</router-link>
           <router-link v-if="todayWorkout && (fullActivePlan?.id || activePlan?.id)" :to="`/plans/${fullActivePlan?.id || activePlan?.id}`" class="daily-focus-secondary">View plan</router-link>
           <router-link v-else to="/plans" class="daily-focus-secondary">Browse plans</router-link>
+        </div>
+      </section>
+
+      <section class="training-status-card" aria-labelledby="training-status-title">
+        <div class="training-status-head">
+          <div>
+            <p class="daily-focus-kicker">Training status</p>
+            <h2 id="training-status-title">The numbers behind your next move.</h2>
+          </div>
+          <span class="training-status-freshness">{{ integrationFreshnessLabel || 'Based on your Runnit activity' }}</span>
+        </div>
+        <div class="training-status-grid">
+          <div class="training-status-metric">
+            <span>Recovery</span>
+            <strong v-if="todayWellness?.recoveryScore != null">{{ todayWellness.recoveryScore }}<small>/100</small></strong>
+            <strong v-else>—</strong>
+            <em>{{ todayWellness ? wellnessSourceLabel : 'Connect a wearable' }}</em>
+          </div>
+          <div class="training-status-metric">
+            <span>Training load</span>
+            <strong>{{ riskBadge?.label || 'Building baseline' }}</strong>
+            <em v-if="dashInsights?.formScore != null">Form {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}</em>
+            <em v-else>Need a few activities</em>
+          </div>
+          <div class="training-status-metric">
+            <span>This week</span>
+            <strong>{{ formatExerciseTime(weeklySummary?.totalDurationSeconds || weekDuration) }}</strong>
+            <em>{{ weeklySummary?.activityCount ?? weekActivities }} session{{ (weeklySummary?.activityCount ?? weekActivities) === 1 ? '' : 's' }}</em>
+          </div>
+          <div class="training-status-metric">
+            <span>{{ daysToRace !== null ? 'Next race' : 'Plan progress' }}</span>
+            <strong v-if="daysToRace !== null">{{ daysToRace === 0 ? 'Today' : `${daysToRace}d` }}</strong>
+            <strong v-else-if="weeklySummary?.plannedCount">{{ weeklySummary.completedPlannedDurationMinutes || 0 }}m</strong>
+            <strong v-else>—</strong>
+            <em v-if="daysToRace !== null">{{ daysToRace === 0 ? 'Race day' : 'to the start line' }}</em>
+            <em v-else-if="weeklySummary?.plannedCount">of {{ weeklySummary.plannedDurationMinutes || 0 }}m planned</em>
+            <em v-else>Choose an event or plan</em>
+          </div>
+        </div>
+        <div class="training-status-guidance" role="status">
+          <span class="training-status-guidance-label">RUNNIT READ</span>
+          <strong>{{ trainingRecommendation.title }}</strong>
+          <span>{{ trainingRecommendation.message }}</span>
+          <router-link to="/stats" class="training-status-link">Open full analysis →</router-link>
         </div>
       </section>
 
@@ -1752,6 +1791,40 @@ const primaryDashboardAction = computed(() => {
   if (todayWorkout.value && !todayWorkout.value.isCompleted) return { kind: 'complete', label: 'Complete today’s workout' }
   if (activityToday.value) return { kind: 'review', label: 'Review your progress' }
   return { kind: 'record', label: 'Record today’s activity' }
+})
+
+const trainingRecommendation = computed(() => {
+  if (integrationStatuses.value.some(status => status.needsReconnect)) {
+    return {
+      title: 'Reconnect before you rely on the numbers.',
+      message: 'A connected source needs attention, so today’s status may be incomplete.'
+    }
+  }
+  if (todayTrainingCall.value) {
+    return { title: todayTrainingCall.value.title, message: todayTrainingCall.value.message }
+  }
+  if (riskBadge.value?.modifier === 'db2-risk-badge--high') {
+    return {
+      title: 'Keep today controlled.',
+      message: 'Your recent load is elevated. Favor an easy session or recovery before adding more intensity.'
+    }
+  }
+  if (todayWorkout.value && !todayWorkout.value.isCompleted) {
+    return {
+      title: 'Your next move is already planned.',
+      message: `${todayWorkout.value.name || todayWorkout.value.type} is ready when you are.`
+    }
+  }
+  if ((weeklySummary.value?.activityCount ?? weekActivities.value) > 0) {
+    return {
+      title: 'Keep the week consistent.',
+      message: 'Your recent training is in. Review the week, then decide what supports your event goal next.'
+    }
+  }
+  return {
+    title: 'Build your baseline.',
+    message: 'Record an activity or connect a device so RUNNIT can make the next recommendation more personal.'
+  }
 })
 
 const activityFeedback = ref(null)
@@ -3954,10 +4027,10 @@ textarea.form-control{resize:vertical;min-height:72px}
 /* ════════════════════════════════════
    DESKTOP V2 BENTO DASHBOARD
    ════════════════════════════════════ */
-.first-action-card{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 18px;padding:20px;background:#FFF3D6;border:2px solid #16130F;box-shadow:4px 4px #16130F}.first-action-copy h2{margin:0;font-size:1.5rem;line-height:1}.first-action-copy>p:last-child{margin:8px 0 0;color:#665f55;font-size:.86rem;line-height:1.4}.first-action-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.first-action-dismiss{padding:8px 0;border:0;background:transparent;color:#665f55;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.first-action-dismiss:hover{text-decoration:underline}.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(220px,1fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-call{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:10px;border-top:1px solid #E7DFCE;color:#665f55;font-size:.76rem;line-height:1.35}.daily-focus-call-label{color:#2A55F5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.daily-focus-call strong{color:#16130F}.daily-focus-context{display:flex;gap:10px}.daily-focus-stat{min-width:0;padding-left:12px;border-left:2px solid #E7DFCE}.daily-focus-stat span{display:block;color:#665f55;font:9px 'Spline Sans Mono',monospace;text-transform:uppercase}.daily-focus-stat strong{display:block;margin-top:5px;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.db2-desktop { display: block; }
-@media(max-width:900px){.daily-focus{grid-template-columns:1fr;gap:14px}.daily-focus-context{order:2}.daily-focus-actions{order:3}.daily-focus-primary{flex:1;text-align:center}}
+.first-action-card{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 18px;padding:20px;background:#FFF3D6;border:2px solid #16130F;box-shadow:4px 4px #16130F}.first-action-copy h2{margin:0;font-size:1.5rem;line-height:1}.first-action-copy>p:last-child{margin:8px 0 0;color:#665f55;font-size:.86rem;line-height:1.4}.first-action-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}.first-action-dismiss{padding:8px 0;border:0;background:transparent;color:#665f55;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;cursor:pointer}.first-action-dismiss:hover{text-decoration:underline}.daily-focus{display:grid;grid-template-columns:minmax(260px,1.4fr) auto;align-items:center;gap:24px;margin:0 0 18px;padding:18px 20px;background:#fff;border:2px solid #16130F;box-shadow:4px 4px #16130F}.daily-focus-kicker{margin:0 0 6px;color:#2A55F5;font:10px 'Spline Sans Mono',monospace;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.daily-focus h2{margin:0;font-size:1.35rem;line-height:1.1}.daily-focus-intro>p:last-child{margin:7px 0 0;color:#665f55;font-size:.84rem;line-height:1.4}.daily-focus-call{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:10px;border-top:1px solid #E7DFCE;color:#665f55;font-size:.76rem;line-height:1.35}.daily-focus-call-label{color:#2A55F5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.daily-focus-call strong{color:#16130F}.daily-focus-actions{display:flex;align-items:center;gap:12px;white-space:nowrap}.daily-focus-primary{padding:10px 12px;background:#2A55F5;color:#fff;border:2px solid #16130F;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-primary:hover{background:#1E42D6;color:#fff}.daily-focus-secondary{color:#2A55F5;font:700 10px 'Spline Sans Mono',monospace;text-transform:uppercase;text-decoration:none}.daily-focus-secondary:hover{text-decoration:underline}.training-status-card{margin:0 0 20px;padding:20px;background:#16130F;color:#FBF6EC;border:2px solid #16130F;box-shadow:4px 4px #2A55F5}.training-status-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.training-status-head .daily-focus-kicker{color:#FFC53D}.training-status-head h2{margin:0;font-size:1.3rem;line-height:1.1}.training-status-freshness{padding-top:3px;color:rgba(251,246,236,.55);font:9px 'Spline Sans Mono',monospace;letter-spacing:.08em;text-align:right;text-transform:uppercase}.training-status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;border-top:1px solid rgba(251,246,236,.14);border-bottom:1px solid rgba(251,246,236,.14)}.training-status-metric{min-width:0;padding:14px 14px 13px 0;border-right:1px solid rgba(251,246,236,.14)}.training-status-metric:not(:first-child){padding-left:14px}.training-status-metric:last-child{border-right:0}.training-status-metric span,.training-status-metric em{display:block;color:rgba(251,246,236,.55);font:9px 'Spline Sans Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.training-status-metric strong{display:block;margin:7px 0 5px;color:#FBF6EC;font-size:1.18rem;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.training-status-metric strong small{font-size:.64rem;font-weight:700;color:rgba(251,246,236,.62)}.training-status-metric em{font-style:normal;letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.training-status-guidance{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding-top:15px;color:rgba(251,246,236,.72);font-size:.78rem;line-height:1.4}.training-status-guidance-label{color:#FFC53D;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.12em}.training-status-guidance strong{color:#FBF6EC}.training-status-link{margin-left:auto;color:#FFC53D;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.08em;text-decoration:none;text-transform:uppercase}.training-status-link:hover{color:#fff}.db2-desktop { display: block; }
+@media(max-width:900px){.daily-focus{grid-template-columns:1fr;gap:14px}.daily-focus-actions{order:3}.daily-focus-primary{flex:1;text-align:center}.training-status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.training-status-metric:nth-child(2){border-right:0}.training-status-metric:nth-child(n+3){border-top:1px solid rgba(251,246,236,.14)}}
 @media(max-width:900px){.first-action-card{align-items:flex-start;flex-direction:column;gap:16px}.first-action-actions{justify-content:flex-start;width:100%}}
-@media(max-width:600px){.daily-focus{margin:0 0 14px;padding:16px}.daily-focus-context{overflow:auto}.daily-focus-stat{flex:1}.daily-focus-actions{flex-wrap:wrap}.daily-focus-primary{width:100%}}
+@media(max-width:600px){.daily-focus{margin:0 0 14px;padding:16px}.daily-focus-actions{flex-wrap:wrap}.daily-focus-primary{width:100%}.training-status-card{padding:16px;margin-bottom:16px}.training-status-head{display:block}.training-status-freshness{display:block;margin-top:8px;text-align:left}.training-status-metric strong{font-size:1rem}.training-status-guidance{display:block}.training-status-guidance-label,.training-status-guidance strong,.training-status-guidance>span:not(.training-status-guidance-label){display:block;margin-bottom:5px}.training-status-link{display:inline-block;margin:5px 0 0}}
 .db2-v1-mobile { display: none !important; }
 
 /* ── HERO ── */
