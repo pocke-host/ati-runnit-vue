@@ -13,31 +13,44 @@
         <span v-else class="brand-text brand-text--gr">RUNNIT<span class="brand-dot">.</span></span>
       </router-link>
 
-      <!-- LEFT: desktop nav links (authenticated athletes, left-aligned after brand) -->
+      <!-- LEFT: desktop nav links (authenticated athletes, focused on the core loop) -->
       <div class="navbar-links navbar-links--athlete" v-if="isAuthenticated && role !== 'coach'" aria-label="Primary navigation">
+        <router-link to="/dashboard" class="nav-link-auth">Home</router-link>
         <router-link to="/feed" class="nav-link-auth">Feed</router-link>
-        <router-link to="/discover" class="nav-link-auth">Discover</router-link>
-        <router-link to="/friends" class="nav-link-auth">Friends</router-link>
-        <router-link to="/stats" class="nav-link-auth">Stats</router-link>
-        <router-link to="/calendar" class="nav-link-auth">Calendar</router-link>
         <div class="training-menu" ref="trainingRef">
           <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">
             <span>Training</span><span class="training-menu-chevron" aria-hidden="true">⌄</span>
           </button>
           <div v-if="trainingOpen" class="training-menu-dropdown">
-            <div class="training-menu-heading"><span class="training-menu-eyebrow">Training hub</span><strong>Stay in the block.</strong><small>Plan the work, find the start line, and keep your week moving.</small></div>
-            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Training hub</strong><small>See the whole build at a glance</small></span><b>→</b></router-link>
+            <div class="training-menu-heading"><span class="training-menu-eyebrow">Training hub</span><strong>Build the week.</strong><small>Plans, races, and the context behind your next move.</small></div>
+            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Open training hub</strong><small>See your block at a glance</small></span><b>→</b></router-link>
             <span class="training-menu-section-label">Plan &amp; progress</span>
             <div class="training-menu-grid">
               <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i><span><strong>Plans</strong><small>Structure the week</small></span></router-link>
               <router-link to="/calendar" @click="trainingOpen = false"><i class="bi bi-calendar3"></i><span><strong>Calendar</strong><small>See what comes next</small></span></router-link>
               <router-link to="/races" @click="trainingOpen = false"><i class="bi bi-flag"></i><span><strong>Races</strong><small>Find your start line</small></span></router-link>
-              <router-link to="/fuel" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i><span><strong>Fuel</strong><small>Support the work</small></span></router-link>
               <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i><span><strong>Folders</strong><small>Keep a block together</small></span></router-link>
               <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-barbell"></i><span><strong>Strength</strong><small>Build durability</small></span></router-link>
+              <router-link to="/fuel" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i><span><strong>Fuel</strong><small>Support the work</small></span></router-link>
             </div>
             <span class="training-menu-section-label training-menu-section-label--context">Connected context</span>
-            <router-link to="/coros-coach" class="training-menu-context" @click="trainingOpen = false"><i class="bi bi-watch"></i><span><strong>COROS Coach</strong><small>Recovery and load context</small></span><b>→</b></router-link>
+            <div class="training-menu-context-grid">
+              <router-link to="/devices" @click="trainingOpen = false"><i class="bi bi-phone"></i><span><strong>Devices</strong><small>Sync health and sources</small></span></router-link>
+              <router-link to="/coros-coach" @click="trainingOpen = false"><i class="bi bi-watch"></i><span><strong>COROS Coach</strong><small>Recovery and load context</small></span></router-link>
+            </div>
+          </div>
+        </div>
+        <router-link to="/stats" class="nav-link-auth">Insights</router-link>
+        <div class="community-menu" ref="communityRef">
+          <button class="nav-link-auth community-menu-trigger" @click="toggleCommunityMenu" :aria-expanded="communityOpen" aria-haspopup="true">
+            <span>Community</span><span class="training-menu-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div v-if="communityOpen" class="community-menu-dropdown">
+            <span class="training-menu-section-label">Find your people</span>
+            <router-link to="/discover" @click="communityOpen = false"><i class="bi bi-compass"></i><span><strong>Discover</strong><small>Find athletes, groups, and ideas</small></span></router-link>
+            <router-link to="/friends" @click="communityOpen = false"><i class="bi bi-people"></i><span><strong>Friends</strong><small>Keep up with your crew</small></span></router-link>
+            <router-link to="/clubs" @click="communityOpen = false"><i class="bi bi-person-hearts"></i><span><strong>Clubs</strong><small>Train together</small></span></router-link>
+            <router-link to="/challenges" @click="communityOpen = false"><i class="bi bi-trophy"></i><span><strong>Challenges</strong><small>Share a goal</small></span></router-link>
           </div>
         </div>
       </div>
@@ -265,11 +278,11 @@
             <!-- Athlete tile nav v2 -->
             <template v-else>
               <div class="drawer-tile-section">
-                <div class="drawer-group-label">Train</div>
+                <div class="drawer-group-label">Today &amp; train</div>
                 <div class="drawer-tile-grid">
                   <router-link to="/dashboard" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                    <span>Dashboard</span>
+                    <span>Home</span>
                   </router-link>
                   <router-link to="/feed" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18"/></svg>
@@ -281,7 +294,7 @@
                   </router-link>
                   <router-link to="/stats" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
-                    <span>Stats</span>
+                    <span>Insights</span>
                   </router-link>
                   <router-link to="/races" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>
@@ -411,21 +424,47 @@ const notifOpen = ref(false)
 const notifRef = ref(null)
 const avatarOpen = ref(false)
 const trainingOpen = ref(false)
+const communityOpen = ref(false)
 const trainingRef = ref(null)
+const communityRef = ref(null)
 const avatarRef = ref(null)
 const userId = computed(() => user.value?.id)
 const userInitial = computed(() => user.value?.displayName?.charAt(0).toUpperCase() || '?')
 
 const toggleAvatarDropdown = () => {
   avatarOpen.value = !avatarOpen.value
-  if (avatarOpen.value) notifOpen.value = false
+  if (avatarOpen.value) {
+    notifOpen.value = false
+    trainingOpen.value = false
+    communityOpen.value = false
+  }
 }
 
 const toggleNotifDropdown = () => {
   notifOpen.value = !notifOpen.value
-  if (notifOpen.value) notifStore.fetchNotifications()
+  if (notifOpen.value) {
+    trainingOpen.value = false
+    communityOpen.value = false
+    avatarOpen.value = false
+    notifStore.fetchNotifications()
+  }
 }
-const toggleTrainingMenu = () => { trainingOpen.value = !trainingOpen.value; if (trainingOpen.value) { notifOpen.value = false; avatarOpen.value = false } }
+const toggleTrainingMenu = () => {
+  trainingOpen.value = !trainingOpen.value
+  if (trainingOpen.value) {
+    communityOpen.value = false
+    notifOpen.value = false
+    avatarOpen.value = false
+  }
+}
+const toggleCommunityMenu = () => {
+  communityOpen.value = !communityOpen.value
+  if (communityOpen.value) {
+    trainingOpen.value = false
+    notifOpen.value = false
+    avatarOpen.value = false
+  }
+}
 
 const markAll = () => {
   notifStore.markAllRead()
@@ -490,6 +529,7 @@ const handleOutsideClick = (e) => {
   if (notifRef.value && !notifRef.value.contains(e.target)) notifOpen.value = false
   if (avatarRef.value && !avatarRef.value.contains(e.target)) avatarOpen.value = false
   if (trainingRef.value && !trainingRef.value.contains(e.target)) trainingOpen.value = false
+  if (communityRef.value && !communityRef.value.contains(e.target)) communityOpen.value = false
 }
 
 const handleKeydown = (e) => {
@@ -497,6 +537,7 @@ const handleKeydown = (e) => {
     notifOpen.value = false
     avatarOpen.value = false
     trainingOpen.value = false
+    communityOpen.value = false
     mobileMenuOpen.value = false
   }
 }
@@ -566,6 +607,23 @@ onUnmounted(() => {
   margin-left: 0;
 }
 .training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-chevron{font-size:15px;line-height:1;transition:transform .16s ease}.training-menu-trigger[aria-expanded="true"] .training-menu-chevron{transform:rotate(180deg)}.training-menu-dropdown{position:absolute;top:calc(100% + 8px);right:-18px;left:auto;width:min(390px,calc(100vw - 32px));padding:15px;background:#fbf6ec;border:2px solid #16130f;box-shadow:7px 7px rgba(22,19,15,.16);z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:18px;color:#2a55f5;font-size:15px}.training-menu-heading{display:grid;gap:4px;padding:2px 4px 13px}.training-menu-eyebrow{color:#2a55f5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-heading>strong{font:900 25px/.9 'Big Shoulders Display',sans-serif;text-transform:uppercase}.training-menu-heading>small{color:#665f55;font:400 11px 'Hanken Grotesk',system-ui,sans-serif;line-height:1.45}.training-menu-section-label{display:block;margin:2px 4px 5px;color:#8a8174;font:700 8px 'Spline Sans Mono',monospace;letter-spacing:.15em;text-transform:uppercase}.training-menu-section-label--context{margin-top:12px}.training-menu-featured,.training-menu-context{gap:10px!important;border:2px solid #16130f!important}.training-menu-featured{background:#ffc53d;margin-bottom:12px}.training-menu-context{margin-top:5px;background:#fff}.training-menu-featured span,.training-menu-context span,.training-menu-grid span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-context strong,.training-menu-grid strong{font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase}.training-menu-featured small,.training-menu-context small,.training-menu-grid small{color:#665f55;font:400 10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-context b{font-size:15px}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.training-menu-grid a{align-items:flex-start;min-height:64px;border:1px solid #e7dfce}.training-menu-grid a:hover{border-color:#16130f}
+/* Keep secondary destinations grouped without adding another crowded row. */
+.training-menu-context-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.training-menu-context-grid a { align-items:flex-start; min-height:64px; border:1px solid #e7dfce; }
+.training-menu-context-grid a:hover { border-color:#16130f; }
+.training-menu-context-grid span { display:flex; flex:1; flex-direction:column; gap:3px; }
+.training-menu-context-grid strong { font:700 10px 'Spline Sans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; }
+.training-menu-context-grid small { color:#665f55; font:400 10px 'Hanken Grotesk',system-ui,sans-serif; letter-spacing:0; text-transform:none; }
+.community-menu { position:relative; display:flex; align-items:center; }
+.community-menu-trigger { display:inline-flex; align-items:center; gap:5px; border:0; background:transparent; font:inherit; cursor:pointer; }
+.community-menu-dropdown { position:absolute; top:calc(100% + 8px); right:-12px; width:min(300px,calc(100vw - 32px)); padding:15px; background:#fbf6ec; border:2px solid #16130f; box-shadow:7px 7px rgba(22,19,15,.16); z-index:1200; border-radius:16px; }
+.community-menu-dropdown a { display:flex; align-items:flex-start; gap:10px; padding:11px; color:#16130f; text-decoration:none; }
+.community-menu-dropdown a:hover,.community-menu-dropdown a.router-link-active { background:#e6edff; }
+.community-menu-dropdown i { width:18px; color:#2a55f5; font-size:15px; }
+.community-menu-dropdown span { display:flex; flex:1; flex-direction:column; gap:3px; }
+.community-menu-dropdown strong { font:700 10px 'Spline Sans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; }
+.community-menu-dropdown small { color:#665f55; font:400 10px 'Hanken Grotesk',system-ui,sans-serif; letter-spacing:0; text-transform:none; }
+
 /* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
 .navbar-links--public {

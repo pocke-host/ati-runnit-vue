@@ -347,22 +347,31 @@
             <template v-if="dashInsights">
               <div class="db2-insights-grid">
                 <div class="db2-insight-cell db2-insight-cell--br">
-                  <div class="db2-insight-lbl">Fitness</div>
-                  <div class="db2-insight-val db2-insight-val--fitness">{{ dashInsights.fitnessScore }}</div>
+                  <div class="db2-insight-lbl">Fitness · 42d</div>
+                  <div class="db2-insight-val db2-insight-val--fitness">{{ dashInsights.fitnessScore ?? '—' }}</div>
+                  <div class="db2-insight-meta">baseline load</div>
+                </div>
+                <div class="db2-insight-cell db2-insight-cell--br">
+                  <div class="db2-insight-lbl">Fatigue · 7d</div>
+                  <div class="db2-insight-val db2-insight-val--fatigue">{{ dashInsights.fatigueScore ?? '—' }}</div>
+                  <div class="db2-insight-meta">recent load</div>
                 </div>
                 <div class="db2-insight-cell db2-insight-cell--br">
                   <div class="db2-insight-lbl">Form</div>
-                  <div :class="['db2-insight-val', dashInsights.formScore > 5 ? 'db2-insight-val--positive' : dashInsights.formScore < -5 ? 'db2-insight-val--negative' : 'db2-insight-val--caution']">
-                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
+                  <div :class="['db2-insight-val', dashInsights.formScore == null ? 'db2-insight-val--neutral' : dashInsights.formScore > 5 ? 'db2-insight-val--positive' : dashInsights.formScore < -5 ? 'db2-insight-val--negative' : 'db2-insight-val--caution']">
+                    {{ dashInsights.formScore == null ? '—' : `${dashInsights.formScore > 0 ? '+' : ''}${dashInsights.formScore}` }}
                   </div>
+                  <div class="db2-insight-meta">fitness − fatigue</div>
                 </div>
                 <div class="db2-insight-cell">
                   <div class="db2-insight-lbl">ACWR</div>
-                  <div :class="['db2-insight-val', trainingLoad?.acwr == null ? 'db2-insight-val--neutral' : trainingLoad.acwr < 1.3 ? 'db2-insight-val--positive' : trainingLoad.acwr < 1.5 ? 'db2-insight-val--caution' : 'db2-insight-val--negative']">{{ trainingLoad?.acwr ?? '—' }}</div>
+                  <div :class="['db2-insight-val', dashInsights.acwr == null ? 'db2-insight-val--neutral' : Number(dashInsights.acwr) < 1.3 ? 'db2-insight-val--positive' : Number(dashInsights.acwr) < 1.5 ? 'db2-insight-val--caution' : 'db2-insight-val--negative']">{{ dashInsights.acwr ?? '—' }}</div>
+                  <div class="db2-insight-meta">load ratio</div>
                 </div>
               </div>
+              <div class="db2-insights-read"><strong>{{ dashInsights.title }}</strong><span>{{ dashInsights.summary }}</span></div>
             </template>
-            <div v-else class="db2-insights-empty">Log 3+ activities and insights show up here</div>
+            <div v-else class="db2-insights-empty">{{ trainingLoadLoading ? 'Reading your training load…' : 'Training insights are temporarily unavailable.' }}</div>
             <div class="db2-insights-foot">
               <router-link to="/stats" class="db2-insights-link">Full analysis →</router-link>
             </div>
@@ -810,22 +819,27 @@
               <div class="dash-insights-label">TRAINING INSIGHTS</div>
               <div class="dash-insights-row">
                 <div class="dash-insight-item">
-                  <span class="dash-insight-key">Fitness</span>
-                  <span class="dash-insight-val dash-insight-val--fitness">{{ dashInsights.fitnessScore }}</span>
+                  <span class="dash-insight-key">Fitness · 42d</span>
+                  <span class="dash-insight-val dash-insight-val--fitness">{{ dashInsights.fitnessScore ?? '—' }}</span>
+                </div>
+                <div class="dash-insight-item">
+                  <span class="dash-insight-key">Fatigue · 7d</span>
+                  <span class="dash-insight-val dash-insight-val--fatigue">{{ dashInsights.fatigueScore ?? '—' }}</span>
                 </div>
                 <div class="dash-insight-item">
                   <span class="dash-insight-key">Form</span>
-                  <span :class="['dash-insight-val', dashInsights.formScore > 5 ? 'dash-insight-val--positive' : dashInsights.formScore < -5 ? 'dash-insight-val--negative' : 'dash-insight-val--caution']">
-                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
+                  <span :class="['dash-insight-val', dashInsights.formScore == null ? 'dash-insight-val--neutral' : dashInsights.formScore > 5 ? 'dash-insight-val--positive' : dashInsights.formScore < -5 ? 'dash-insight-val--negative' : 'dash-insight-val--caution']">
+                    {{ dashInsights.formScore == null ? '—' : `${dashInsights.formScore > 0 ? '+' : ''}${dashInsights.formScore}` }}
                   </span>
                 </div>
-                <div class="dash-insight-item" v-if="trainingLoad?.acwr != null">
+                <div class="dash-insight-item">
                   <span class="dash-insight-key">ACWR</span>
-                  <span :class="['dash-insight-val', trainingLoad.acwr < 1.3 ? 'dash-insight-val--positive' : trainingLoad.acwr < 1.5 ? 'dash-insight-val--caution' : 'dash-insight-val--negative']">
-                    {{ trainingLoad.acwr }}
+                  <span :class="['dash-insight-val', dashInsights.acwr == null ? 'dash-insight-val--neutral' : Number(dashInsights.acwr) < 1.3 ? 'dash-insight-val--positive' : Number(dashInsights.acwr) < 1.5 ? 'dash-insight-val--caution' : 'dash-insight-val--negative']">
+                    {{ dashInsights.acwr ?? '—' }}
                   </span>
                 </div>
               </div>
+              <p class="dash-insights-read"><strong>{{ dashInsights.title }}</strong> {{ dashInsights.summary }}</p>
               <router-link to="/stats" class="dash-insights-link">Full analysis →</router-link>
             </div>
 
@@ -1087,20 +1101,25 @@
               <div class="dm-insights-eyebrow">Insights</div>
               <div class="dm-insights-rows">
                 <div class="dm-insight-row">
-                  <span class="dm-insight-key">Fitness</span>
-                  <span class="dm-insight-val dm-insight-val--fitness">{{ dashInsights.fitnessScore }}</span>
+                  <span class="dm-insight-key">Fitness · 42d</span>
+                  <span class="dm-insight-val dm-insight-val--fitness">{{ dashInsights.fitnessScore ?? '—' }}</span>
+                </div>
+                <div class="dm-insight-row">
+                  <span class="dm-insight-key">Fatigue · 7d</span>
+                  <span class="dm-insight-val dm-insight-val--fatigue">{{ dashInsights.fatigueScore ?? '—' }}</span>
                 </div>
                 <div class="dm-insight-row">
                   <span class="dm-insight-key">Form</span>
-                  <span :class="['dm-insight-val', dashInsights.formScore > 5 ? 'dm-insight-val--positive' : dashInsights.formScore < -5 ? 'dm-insight-val--negative' : 'dm-insight-val--caution']">
-                    {{ dashInsights.formScore > 0 ? '+' : '' }}{{ dashInsights.formScore }}
+                  <span :class="['dm-insight-val', dashInsights.formScore == null ? 'dm-insight-val--neutral' : dashInsights.formScore > 5 ? 'dm-insight-val--positive' : dashInsights.formScore < -5 ? 'dm-insight-val--negative' : 'dm-insight-val--caution']">
+                    {{ dashInsights.formScore == null ? '—' : `${dashInsights.formScore > 0 ? '+' : ''}${dashInsights.formScore}` }}
                   </span>
                 </div>
-                <div v-if="trainingLoad?.acwr != null" class="dm-insight-row">
+                <div class="dm-insight-row">
                   <span class="dm-insight-key">ACWR</span>
-                  <span :class="['dm-insight-val', trainingLoad.acwr < 1.3 ? 'dm-insight-val--positive' : trainingLoad.acwr < 1.5 ? 'dm-insight-val--caution' : 'dm-insight-val--negative']">{{ trainingLoad.acwr }}</span>
+                  <span :class="['dm-insight-val', dashInsights.acwr == null ? 'dm-insight-val--neutral' : Number(dashInsights.acwr) < 1.3 ? 'dm-insight-val--positive' : Number(dashInsights.acwr) < 1.5 ? 'dm-insight-val--caution' : 'dm-insight-val--negative']">{{ dashInsights.acwr ?? '—' }}</span>
                 </div>
               </div>
+              <p class="dm-insights-read"><strong>{{ dashInsights.title }}</strong> {{ dashInsights.summary }}</p>
             </div>
           </div>
 
@@ -1492,7 +1511,7 @@ const { activePlan } = storeToRefs(planStore)
 const { latestEarned } = storeToRefs(achievementStore)
 const { topPRs } = storeToRefs(prStore)
 const { myCoach } = storeToRefs(athleteStore)
-const { data: trainingLoad } = storeToRefs(trainingLoadStore)
+const { data: trainingLoad, loading: trainingLoadLoading } = storeToRefs(trainingLoadStore)
 const myCoachLoaded = ref(false)
 const fullActivePlan = ref(null)
 const { formatDistance, formatDuration, formatDurationClock, formatPace, formatElevation, isImperial, distanceLabel, elevationLabel, metersToDisplay } = useUnits()
@@ -1718,37 +1737,35 @@ const streakSubtitle = computed(() => {
   return 'Keep going!'
 })
 
-// Training insights (compact CTL/ATL/ACWR for sidebar widget)
+// Training insights — all load metrics come from GET /api/training-load. Do not
+// recompute a distance-only version here: the dashboard, stats page, and plan
+// adaptation need to tell the same story.
 const dashInsights = computed(() => {
-  const acts = activities.value || []
-  if (acts.length < 3) return null
+  const load = trainingLoad.value
+  if (!load) return null
 
-  const today = new Date()
-  today.setHours(23, 59, 59, 999)
-  const dayMs = 86400000
-  const DAYS = 90
+  const hasEnoughData = load.hasEnoughData === true
+  const ctl = Number.isFinite(Number(load.ctl)) ? Math.round(Number(load.ctl)) : null
+  const atl = Number.isFinite(Number(load.atl)) ? Math.round(Number(load.atl)) : null
+  const tsb = Number.isFinite(Number(load.tsb)) ? Math.round(Number(load.tsb)) : null
+  const acwr = Number.isFinite(Number(load.acwr)) ? Number(load.acwr).toFixed(2) : null
+  const copy = {
+    BUILDING_BASELINE: { title: 'Build your baseline', summary: 'Log a few activities so RUNNIT can learn your normal training load.' },
+    DETRAINING: { title: 'Rebuild gradually', summary: 'Your recent load is light. Add easy, repeatable sessions before chasing intensity.' },
+    OPTIMAL: { title: 'Load is on track', summary: 'Your recent training is in a manageable range. Keep the week consistent.' },
+    HIGH_RISK: { title: 'Ease off the spike', summary: 'Your short-term load is rising faster than your baseline. Choose recovery or an easy session.' },
+  }[load.riskLabel] || { title: 'Build your baseline', summary: 'Keep logging sessions and RUNNIT will make this read more personal.' }
 
-  const dailyLoad = new Array(DAYS).fill(0)
-  for (const a of acts) {
-    const daysAgo = Math.floor((today - new Date(a.performedAt)) / dayMs)
-    if (daysAgo >= 0 && daysAgo < DAYS) {
-      dailyLoad[DAYS - 1 - daysAgo] += (a.distanceMeters || 0) / 1000
-    }
+  return {
+    fitnessScore: hasEnoughData ? ctl : null,
+    fatigueScore: hasEnoughData ? atl : null,
+    formScore: hasEnoughData ? tsb : null,
+    acwr: hasEnoughData ? acwr : null,
+    hasEnoughData,
+    title: copy.title,
+    summary: copy.summary,
+    activityCount90d: load.activityCount90d ?? 0,
   }
-
-  let ctl = 0, atl = 0
-  const ctlK = 1 / 42, atlK = 1 / 7
-  for (let i = 0; i < DAYS; i++) {
-    ctl = ctl * (1 - ctlK) + dailyLoad[i] * ctlK
-    atl = atl * (1 - atlK) + dailyLoad[i] * atlK
-  }
-
-  const fitnessScore = Math.min(100, Math.round(ctl * 10))
-  const fatigueScore = Math.min(100, Math.round(atl * 10))
-  const formScore = Math.round(fitnessScore - fatigueScore)
-  const acwr = ctl > 0 ? Math.round((atl / ctl) * 100) / 100 : null
-
-  return { fitnessScore, fatigueScore, formScore, acwr }
 })
 
 // Hero "Training Risk" sticker — sourced from GET /api/training-load, the
@@ -1756,7 +1773,7 @@ const dashInsights = computed(() => {
 // seen enough activity yet (BUILDING_BASELINE) rather than showing a
 // discouraging badge to a brand-new athlete.
 const RISK_BADGE_INFO = {
-  HIGH_RISK:  { label: 'High Risk ⚠', modifier: 'db2-risk-badge--high' },
+  HIGH_RISK:  { label: 'Load Spike', modifier: 'db2-risk-badge--high' },
   DETRAINING: { label: 'Low Load',     modifier: 'db2-risk-badge--low' },
   OPTIMAL:    { label: 'On Track',     modifier: 'db2-risk-badge--optimal' },
 }
@@ -2954,10 +2971,14 @@ onUnmounted(() => {
 .manage-sub-link a:hover{color:#16130F}
 .dash-insights{margin-top:16px;padding:16px;border:2px solid #16130F;background:#fff}
 .dash-insights-label{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;color:#2A55F5;text-transform:uppercase;margin-bottom:10px}
-.dash-insights-row{display:flex;gap:16px;margin-bottom:8px}
+.dash-insights-row{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
 .dash-insight-item{display:flex;flex-direction:column;gap:2px;flex:1}
 .dash-insight-key{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#8a8a8a}
 .dash-insight-val{font-family:'Big Shoulders Display',system-ui,sans-serif;font-size:1.4rem;font-weight:900;color:#16130F;line-height:0.9}
+.dash-insight-val--fatigue{color:#6B6258}
+.dash-insight-val--neutral{color:#8A8A8A}
+.dash-insights-read{margin:10px 0 12px;color:#665f55;font-size:.75rem;line-height:1.4}
+.dash-insights-read strong{color:#16130F}
 .dash-insights-link{font-family:'Spline Sans Mono',ui-monospace,monospace;font-size:0.68rem;font-weight:700;color:#2A55F5;text-decoration:none;letter-spacing:0.06em}
 .dash-insights-link:hover{color:#1E42D6}
 .recent-activities{background:#fff;border:2px solid #16130F;border-radius:0;padding:24px;box-shadow:none}
@@ -4584,7 +4605,7 @@ textarea.form-control{resize:vertical;min-height:72px}
 .db2-insights { background: #16130F; color: #FBF6EC; display: flex; flex-direction: column; }
 .db2-insights-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -4604,6 +4625,26 @@ textarea.form-control{resize:vertical;min-height:72px}
   line-height: 0.85;
   margin-top: 5px;
 }
+.db2-insight-meta {
+  margin-top: 6px;
+  font: 500 0.48rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.03em;
+  color: rgba(251,246,236,0.42);
+  text-transform: uppercase;
+}
+.db2-insights-read {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 16px 14px;
+  padding: 10px 12px;
+  border-left: 2px solid #FFC53D;
+  background: rgba(251,246,236,0.06);
+  color: rgba(251,246,236,0.64);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+.db2-insights-read strong { color: #FBF6EC; }
 .db2-insights-empty {
   padding: 24px 18px;
   font-size: 0.78rem;
@@ -5030,6 +5071,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 .db2-insights .db2-insight-cell--br { border-right: 1px solid #E7DFCE; }
 .db2-insights .db2-insight-lbl { color: #665F55; }
 .db2-insights .db2-insights-empty { color: #665F55; }
+.db2-insights .db2-insight-meta { color: #8A8174; }
+.db2-insights .db2-insights-read { color: #665F55; background: #F7F1E6; border-left-color: #2A55F5; }
+.db2-insights .db2-insights-read strong { color: #16130F; }
 .db2-insights .db2-insights-foot { border-top: 1px solid #E7DFCE; }
 .db2-insights .db2-insights-link { color: #2A55F5; }
 .db2-card-head--ink .db2-eyebrow.db2-eyebrow--cobalt { color: #FFC53D; }

@@ -184,10 +184,10 @@
         </div>
 
         <!-- Fitness metric row -->
-        <div class="fitness-metric-row" v-if="performanceMetrics">
+        <div class="fitness-metric-row" v-if="performanceMetrics || trainingLoad">
           <div class="fitness-metric-card">
             <div class="fm-label">Form</div>
-            <div class="fm-val" :style="{ color: formColor }">{{ performanceMetrics.formScore > 0 ? '+' : '' }}{{ performanceMetrics.formScore }}</div>
+            <div class="fm-val" :style="{ color: formColor }">{{ backendFormScore }}</div>
             <div class="fm-sub">{{ formLabel }}</div>
           </div>
           <div class="fitness-metric-card">
@@ -200,21 +200,22 @@
           </div>
           <div class="fitness-metric-card">
             <div class="fm-label">Fitness Base</div>
-            <div class="fm-val">{{ performanceMetrics.fitnessScore }}</div>
-            <div class="fm-sub">Chronic Training Load</div>
+            <div class="fm-val">{{ backendLoadValue('ctl') }}</div>
+            <div class="fm-sub">42-day training load</div>
             <div class="perf-bar-bg">
-              <div class="perf-bar" :style="{ width: performanceMetrics.fitnessScore + '%', background: '#2A55F5' }"></div>
+              <div class="perf-bar" :style="{ width: backendLoadBar('ctl'), background: '#2A55F5' }"></div>
             </div>
           </div>
           <div class="fitness-metric-card">
             <div class="fm-label">Fatigue</div>
-            <div class="fm-val">{{ performanceMetrics.fatigueScore }}</div>
-            <div class="fm-sub">Acute Training Load</div>
+            <div class="fm-val">{{ backendLoadValue('atl') }}</div>
+            <div class="fm-sub">7-day training load</div>
             <div class="perf-bar-bg">
-              <div class="perf-bar" :style="{ width: performanceMetrics.fatigueScore + '%', background: '#000' }"></div>
+              <div class="perf-bar" :style="{ width: backendLoadBar('atl'), background: '#16130F' }"></div>
             </div>
           </div>
         </div>
+        <p class="training-method-note">Fitness is your longer-term load, fatigue is your recent load, and form is the balance between them. ACWR is a training-load flag—not a medical diagnosis.</p>
       </section>
 
       <!-- DEVICE COMPARISON -->
@@ -345,7 +346,7 @@
         <div class="insights-row" v-if="acwrInfo || weeklyTargetKm || daysSinceLastActivity !== null">
           <div class="insight-card" v-if="acwrInfo">
             <div class="insight-head">
-              <span class="insight-label">Injury Risk (ACWR)</span>
+            <span class="insight-label">Training Load (ACWR)</span>
               <span class="insight-badge" :style="{ background: acwrInfo.color }">{{ acwrInfo.label }}</span>
             </div>
             <div class="insight-val" :style="{ color: acwrInfo.color }">{{ acwrScore }}</div>
@@ -750,14 +751,17 @@ const sportFitness = computed(() => {
 })
 
 const formColor = computed(() => {
-  const f = performanceMetrics.value?.formScore ?? 0
+  const f = trainingLoad.value?.hasEnoughData === true
+    ? Number(trainingLoad.value?.tsb ?? 0)
+    : (performanceMetrics.value?.formScore ?? 0)
   if (f > 10)  return '#2A55F5'
   if (f > -5)  return '#767676'
   return '#ef4444'
 })
 
 const formLabel = computed(() => {
-  const f = performanceMetrics.value?.formScore ?? 0
+  if (trainingLoad.value?.hasEnoughData !== true) return trainingLoad.value ? 'Building baseline' : 'Waiting for load data'
+  const f = Number(trainingLoad.value?.tsb ?? 0)
   if (f > 15)  return 'Fresh — ready to race'
   if (f > 5)   return 'Good form'
   if (f > -5)  return 'Neutral'
@@ -816,11 +820,29 @@ const jumpTo = (id) => {
 // shown on PlanDetail.vue for the same athlete.
 const acwrScore = computed(() => trainingLoad.value?.acwr ?? null)
 
+const backendLoadValue = (key) => {
+  if (trainingLoad.value?.hasEnoughData !== true) return '—'
+  const value = Number(trainingLoad.value?.[key])
+  return Number.isFinite(value) ? Math.round(value) : '—'
+}
+
+const backendLoadBar = (key) => {
+  if (trainingLoad.value?.hasEnoughData !== true) return '0%'
+  const value = Number(trainingLoad.value?.[key])
+  if (!Number.isFinite(value)) return '0%'
+  return `${Math.min(100, Math.max(4, Math.round(value)))}%`
+}
+
+const backendFormScore = computed(() => {
+  const value = backendLoadValue('tsb')
+  return value === '—' ? value : `${value > 0 ? '+' : ''}${value}`
+})
+
 const RISK_LABEL_INFO = {
   BUILDING_BASELINE: { label: 'Building Baseline', color: '#767676', desc: 'Log a few more activities for a reliable read' },
   DETRAINING:        { label: 'Undertraining',     color: '#767676', desc: 'Gradually increase volume to build fitness' },
   OPTIMAL:           { label: 'Optimal Load',      color: '#2A55F5', desc: 'Good training stimulus — manage recovery' },
-  HIGH_RISK:         { label: 'High Injury Risk',  color: '#ef4444', desc: 'Reduce load or take a rest day now' },
+  HIGH_RISK:         { label: 'Load Spike',        color: '#C0392B', desc: 'Recent load is high relative to your baseline' },
 }
 
 const acwrInfo = computed(() => {
@@ -887,7 +909,7 @@ const daysSinceLastActivity = computed(() => {
 })
 
 const trainingRead = computed(() => {
-  const form = performanceMetrics.value?.formScore ?? 0
+  const form = trainingLoad.value?.hasEnoughData === true ? Number(trainingLoad.value?.tsb ?? 0) : 0
   const risk = trainingLoad.value?.riskLabel
   if (risk === 'HIGH_RISK' || form < -20) return { tone: 'alert', icon: 'bi-exclamation-octagon', title: 'Ease off today', message: 'Your recent load is elevated. Choose recovery or an easy session before adding intensity.' }
   if (risk === 'DETRAINING' || (daysSinceLastActivity.value !== null && daysSinceLastActivity.value > 5)) return { tone: 'muted', icon: 'bi-arrow-up-right', title: 'Build the habit back', message: 'A short, comfortable session is a better next step than trying to make up missed training.' }
@@ -1599,6 +1621,7 @@ onUnmounted(() => {
 .insight-val  { font-family: 'Big Shoulders Display', system-ui, sans-serif; font-size: 2.4rem; font-weight: 900; color: #16130F; line-height: 0.85; font-variant-numeric: tabular-nums; }
 .insight-unit { font-size: 1rem; font-weight: 700; color: rgba(15,18,16,0.50); }
 .insight-sub  { font-size: 0.75rem; color: rgba(15,18,16,0.55); font-weight: 600; line-height: 1.4; margin-top: 2px; }
+.training-method-note { margin: -10px 0 0; max-width: 760px; color: rgba(15,18,16,0.55); font-size: 0.76rem; line-height: 1.5; }
 .insight-tip  {
   font-size: 0.72rem;
   color: rgba(15,18,16,0.45);
