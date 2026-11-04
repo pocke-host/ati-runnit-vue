@@ -10,14 +10,6 @@
 <template>
   <main class="events-page">
 
-    <!-- Ticker -->
-    <div class="ev-ticker-wrap" aria-hidden="true">
-      <div class="ev-ticker">
-        <span>&nbsp;★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED&nbsp;</span>
-        <span>&nbsp;★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED ★ EVERY SPORT ★ EVERY START LINE ★ NO OFF-SEASON ★ MILES ARE BETTER SHARED&nbsp;</span>
-      </div>
-    </div>
-
     <!-- HERO -->
     <section class="hero">
       <div class="container-xxl">
@@ -1072,7 +1064,6 @@ watch(zipcode, () => {
 </script>
 
 <style scoped>
-@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 .results-import-section { padding: 28px 0; background: #FFC53D; border-top: 2px solid #16130F; border-bottom: 2px solid #16130F; }
 .results-import-inner { display: grid; grid-template-columns: minmax(220px, .8fr) 1.2fr; gap: 24px; align-items: start; }
 .results-import-title { margin: 4px 0; font-size: 2rem; font-weight: 900; text-transform: uppercase; }
@@ -1097,26 +1088,6 @@ watch(zipcode, () => {
 .result-history-row span { display: block; color: #5A5348; font-size: .7rem; margin-top: 3px; }
 .result-history-row a { color: #2A55F5; font-weight: 800; white-space: nowrap; }
 @media (max-width: 700px) { .results-import-inner { grid-template-columns: 1fr; } .results-import-form { grid-template-columns: 1fr; } .result-submit { grid-column: auto; } }
-
-/* Ticker */
-.ev-ticker-wrap {
-  overflow: hidden;
-  background: #16130F;
-  border-bottom: 3px solid #2A55F5;
-}
-.ev-ticker {
-  display: flex;
-  white-space: nowrap;
-  animation: rkMarq 26s linear infinite;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(251, 246, 236, 0.6);
-  padding: 9px 0;
-}
-@media (prefers-reduced-motion: reduce) { .ev-ticker { animation: none; } }
 
 .events-page {
   min-height: 100vh;

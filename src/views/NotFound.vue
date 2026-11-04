@@ -1,14 +1,6 @@
 <template>
   <main class="notfound-page">
 
-    <!-- Ticker -->
-    <div class="notfound-ticker-wrap" aria-hidden="true">
-      <div class="notfound-ticker">
-        <span>&nbsp;★ WRONG TURN ★ OFF THE ROUTE ★ RECALCULATING ★ WRONG TURN ★ OFF THE ROUTE ★ RECALCULATING&nbsp;</span>
-        <span>&nbsp;★ WRONG TURN ★ OFF THE ROUTE ★ RECALCULATING ★ WRONG TURN ★ OFF THE ROUTE ★ RECALCULATING&nbsp;</span>
-      </div>
-    </div>
-
     <div class="notfound-inner">
       <div class="notfound-code">404</div>
       <h1 class="notfound-title">You went off route.</h1>
@@ -27,25 +19,7 @@
   background: #16130F;
   color: #FBF6EC;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
-}
-
-/* Ticker */
-.notfound-ticker-wrap {
-  background: #16130F;
-  overflow: hidden;
-  border-top: 3px solid #2A55F5;
-}
-.notfound-ticker {
-  display: flex;
-  white-space: nowrap;
-  animation: rkMarq 18s linear infinite;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(251, 246, 236, 0.6);
-  padding: 9px 0;
+  padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
 }
 
 /* Content */

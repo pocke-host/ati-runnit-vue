@@ -1,19 +1,6 @@
 <template>
   <main class="rp-page">
 
-    <!-- Ticker -->
-    <div class="rp-ticker" aria-hidden="true">
-      <div class="rp-ticker-track">
-        <span>&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
-        <span aria-hidden="true">&nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;★ NO OFF-SEASON &nbsp;★ MILES ARE BETTER SHARED &nbsp;★ DRAG YOUR CREW OUT AT 6AM &nbsp;★ BRING THE FRIEND WHO ALWAYS FLAKES &nbsp;</span>
-      </div>
-    </div>
-
-    <!-- Logo bar -->
-    <div class="rp-logo-bar">
-      <span class="rp-logo-text">RUNNIT<span class="rp-logo-dot">.</span></span>
-    </div>
-
     <!-- Card -->
     <div class="rp-body">
 
@@ -180,7 +167,6 @@ const submit = async () => {
 </script>
 
 <style scoped>
-@keyframes rkMarq { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 @keyframes spin { to { transform: rotate(360deg) } }
 
 .rp-page {
@@ -193,47 +179,6 @@ const submit = async () => {
   color: #16130F;
   padding-top: var(--public-nav-h, calc(var(--nav-h, 66px) + var(--spec-h, 35px)));
 }
-
-/* Ticker */
-.rp-ticker {
-  width: 100%;
-  background: #16130F;
-  border-bottom: 3px solid #2A55F5;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.rp-ticker-track {
-  display: flex;
-  white-space: nowrap;
-  animation: rkMarq 28s linear infinite;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #FBF6EC;
-  padding: 7px 0;
-}
-@media (prefers-reduced-motion: reduce) { .rp-ticker-track { animation: none; } }
-
-/* Logo bar */
-.rp-logo-bar {
-  width: 100%;
-  padding: 18px 32px;
-  border-bottom: 2px solid #16130F;
-  display: flex;
-  align-items: center;
-}
-.rp-logo-text {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-weight: 900;
-  font-style: italic;
-  font-size: 1.4rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: #16130F;
-}
-.rp-logo-dot { color: #2A55F5; }
 
 /* Card body */
 .rp-body {
@@ -414,7 +359,6 @@ const submit = async () => {
 .rp-state-icon--warn { background: #DC2626; }
 
 @media (max-width: 640px) {
-  .rp-logo-bar { padding: 14px 18px; }
   .rp-body { padding: 32px 18px 48px; }
 }
 </style>
