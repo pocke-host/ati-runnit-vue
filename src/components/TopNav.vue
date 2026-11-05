@@ -13,46 +13,12 @@
         <span v-else class="brand-text brand-text--gr">RUNNIT<span class="brand-dot">.</span></span>
       </router-link>
 
-      <!-- LEFT: desktop nav links (authenticated athletes, focused on the core loop) -->
+      <!-- Core navigation stays short; deeper tools live in Training and the account menu. -->
       <div class="navbar-links navbar-links--athlete" v-if="isAuthenticated && role !== 'coach'" aria-label="Primary navigation">
         <router-link to="/dashboard" class="nav-link-auth">Home</router-link>
         <router-link to="/feed" class="nav-link-auth">Feed</router-link>
-        <div class="training-menu" ref="trainingRef">
-          <button class="nav-link-auth training-menu-trigger" @click="toggleTrainingMenu" :aria-expanded="trainingOpen" aria-haspopup="true">
-            <span>Training</span><span class="training-menu-chevron" aria-hidden="true">⌄</span>
-          </button>
-          <div v-if="trainingOpen" class="training-menu-dropdown">
-            <div class="training-menu-heading"><span class="training-menu-eyebrow">Training hub</span><strong>Build the week.</strong><small>Plans, races, and the context behind your next move.</small></div>
-            <router-link to="/train" class="training-menu-featured" @click="trainingOpen = false"><i class="bi bi-grid-3x3-gap"></i><span><strong>Open training hub</strong><small>See your block at a glance</small></span><b>→</b></router-link>
-            <span class="training-menu-section-label">Plan &amp; progress</span>
-            <div class="training-menu-grid">
-              <router-link to="/plans" @click="trainingOpen = false"><i class="bi bi-journal-text"></i><span><strong>Plans</strong><small>Structure the week</small></span></router-link>
-              <router-link to="/calendar" @click="trainingOpen = false"><i class="bi bi-calendar3"></i><span><strong>Calendar</strong><small>See what comes next</small></span></router-link>
-              <router-link to="/races" @click="trainingOpen = false"><i class="bi bi-flag"></i><span><strong>Races</strong><small>Find your start line</small></span></router-link>
-              <router-link to="/training-folders" @click="trainingOpen = false"><i class="bi bi-folder2-open"></i><span><strong>Folders</strong><small>Keep a block together</small></span></router-link>
-              <router-link to="/strength" @click="trainingOpen = false"><i class="bi bi-barbell"></i><span><strong>Strength</strong><small>Build durability</small></span></router-link>
-              <router-link to="/fuel" @click="trainingOpen = false"><i class="bi bi-lightning-charge"></i><span><strong>Fuel</strong><small>Support the work</small></span></router-link>
-            </div>
-            <span class="training-menu-section-label training-menu-section-label--context">Connected context</span>
-            <div class="training-menu-context-grid">
-              <router-link to="/devices" @click="trainingOpen = false"><i class="bi bi-phone"></i><span><strong>Devices</strong><small>Sync health and sources</small></span></router-link>
-              <router-link to="/coros-coach" @click="trainingOpen = false"><i class="bi bi-watch"></i><span><strong>COROS Coach</strong><small>Recovery and load context</small></span></router-link>
-            </div>
-          </div>
-        </div>
-        <router-link to="/stats" class="nav-link-auth">Insights</router-link>
-        <div class="community-menu" ref="communityRef">
-          <button class="nav-link-auth community-menu-trigger" @click="toggleCommunityMenu" :aria-expanded="communityOpen" aria-haspopup="true">
-            <span>Community</span><span class="training-menu-chevron" aria-hidden="true">⌄</span>
-          </button>
-          <div v-if="communityOpen" class="community-menu-dropdown">
-            <span class="training-menu-section-label">Find your people</span>
-            <router-link to="/discover" @click="communityOpen = false"><i class="bi bi-compass"></i><span><strong>Discover</strong><small>Find athletes, groups, and ideas</small></span></router-link>
-            <router-link to="/friends" @click="communityOpen = false"><i class="bi bi-people"></i><span><strong>Friends</strong><small>Keep up with your crew</small></span></router-link>
-            <router-link to="/clubs" @click="communityOpen = false"><i class="bi bi-person-hearts"></i><span><strong>Clubs</strong><small>Train together</small></span></router-link>
-            <router-link to="/challenges" @click="communityOpen = false"><i class="bi bi-trophy"></i><span><strong>Challenges</strong><small>Share a goal</small></span></router-link>
-          </div>
-        </div>
+        <router-link to="/discover" class="nav-link-auth">Discover</router-link>
+        <router-link to="/train" class="nav-link-auth">Train</router-link>
       </div>
 
       <!-- RIGHT: icons + coach links + public links + hamburger -->
@@ -80,8 +46,8 @@
 
         <!-- Auth icons -->
         <template v-if="isAuthenticated">
-          <router-link to="/track" class="nav-track-pill desktop-only" aria-label="Track activity">
-            <span class="track-pill-play">▶</span>Track
+          <router-link to="/track" class="nav-track-pill desktop-only" aria-label="Record activity">
+            <span class="track-pill-play" aria-hidden="true">+</span>Record
           </router-link>
           <div class="icon-group">
           <!-- DM (hidden on mobile — accessible via drawer) -->
@@ -276,7 +242,7 @@
               <div class="drawer-track-wrap">
                 <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
                   <span class="drawer-track-icon">▶</span>
-                  Track Activity
+                  Record activity
                 </router-link>
               </div>
               <router-link to="/create-moment" class="drawer-link" @click="mobileMenuOpen = false">
@@ -432,10 +398,6 @@ const onDrawerTouchEnd = (e) => {
 const notifOpen = ref(false)
 const notifRef = ref(null)
 const avatarOpen = ref(false)
-const trainingOpen = ref(false)
-const communityOpen = ref(false)
-const trainingRef = ref(null)
-const communityRef = ref(null)
 const avatarRef = ref(null)
 const userId = computed(() => user.value?.id)
 const userInitial = computed(() => user.value?.displayName?.charAt(0).toUpperCase() || '?')
@@ -451,34 +413,14 @@ const toggleAvatarDropdown = () => {
   avatarOpen.value = !avatarOpen.value
   if (avatarOpen.value) {
     notifOpen.value = false
-    trainingOpen.value = false
-    communityOpen.value = false
   }
 }
 
 const toggleNotifDropdown = () => {
   notifOpen.value = !notifOpen.value
   if (notifOpen.value) {
-    trainingOpen.value = false
-    communityOpen.value = false
     avatarOpen.value = false
     notifStore.fetchNotifications()
-  }
-}
-const toggleTrainingMenu = () => {
-  trainingOpen.value = !trainingOpen.value
-  if (trainingOpen.value) {
-    communityOpen.value = false
-    notifOpen.value = false
-    avatarOpen.value = false
-  }
-}
-const toggleCommunityMenu = () => {
-  communityOpen.value = !communityOpen.value
-  if (communityOpen.value) {
-    trainingOpen.value = false
-    notifOpen.value = false
-    avatarOpen.value = false
   }
 }
 
@@ -544,16 +486,12 @@ const handleNotifClick = async (n) => {
 const handleOutsideClick = (e) => {
   if (notifRef.value && !notifRef.value.contains(e.target)) notifOpen.value = false
   if (avatarRef.value && !avatarRef.value.contains(e.target)) avatarOpen.value = false
-  if (trainingRef.value && !trainingRef.value.contains(e.target)) trainingOpen.value = false
-  if (communityRef.value && !communityRef.value.contains(e.target)) communityOpen.value = false
 }
 
 const handleKeydown = (e) => {
   if (e.key === 'Escape') {
     notifOpen.value = false
     avatarOpen.value = false
-    trainingOpen.value = false
-    communityOpen.value = false
     mobileMenuOpen.value = false
   }
 }
@@ -593,23 +531,23 @@ onUnmounted(() => {
 }
 .navbar {
   background: #FBF6EC;
-  border-bottom: 2px solid #16130F;
+  border-bottom: 1px solid rgba(22, 19, 15, 0.14);
   padding: 0;
 }
 
 .navbar-content {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 66px;
+  padding: 0 28px;
+  height: 72px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  column-gap: 18px;
+  column-gap: 24px;
   align-items: center;
 }
 
-/* Desktop layout: brand left | athlete links centered | icons right */
+/* Desktop layout: brand and primary destinations left | controls right */
 .navbar-content { position: relative; }
 .mobile-menu-toggle { display: none; }
 /* Override Bootstrap's .navbar-brand margin-right: 1rem */
@@ -622,23 +560,6 @@ onUnmounted(() => {
   gap: clamp(14px, 1.8vw, 24px);
   margin-left: 0;
 }
-.training-menu{position:relative;display:flex;align-items:center}.training-menu-trigger{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;font:inherit;cursor:pointer}.training-menu-chevron{font-size:15px;line-height:1;transition:transform .16s ease}.training-menu-trigger[aria-expanded="true"] .training-menu-chevron{transform:rotate(180deg)}.training-menu-dropdown{position:absolute;top:calc(100% + 8px);right:-18px;left:auto;width:min(390px,calc(100vw - 32px));padding:15px;background:#fbf6ec;border:2px solid #16130f;box-shadow:7px 7px rgba(22,19,15,.16);z-index:1200}.training-menu-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 11px;color:#16130f;text-decoration:none}.training-menu-dropdown a:hover,.training-menu-dropdown a.router-link-active{background:#e6edff}.training-menu-dropdown i{width:18px;color:#2a55f5;font-size:15px}.training-menu-heading{display:grid;gap:4px;padding:2px 4px 13px}.training-menu-eyebrow{color:#2a55f5;font:700 9px 'Spline Sans Mono',monospace;letter-spacing:.13em;text-transform:uppercase}.training-menu-heading>strong{font:900 25px/.9 'Big Shoulders Display',sans-serif;text-transform:uppercase}.training-menu-heading>small{color:#665f55;font:400 11px 'Hanken Grotesk',system-ui,sans-serif;line-height:1.45}.training-menu-section-label{display:block;margin:2px 4px 5px;color:#8a8174;font:700 8px 'Spline Sans Mono',monospace;letter-spacing:.15em;text-transform:uppercase}.training-menu-section-label--context{margin-top:12px}.training-menu-featured,.training-menu-context{gap:10px!important;border:2px solid #16130f!important}.training-menu-featured{background:#ffc53d;margin-bottom:12px}.training-menu-context{margin-top:5px;background:#fff}.training-menu-featured span,.training-menu-context span,.training-menu-grid span{display:flex;flex:1;flex-direction:column;gap:3px}.training-menu-featured strong,.training-menu-context strong,.training-menu-grid strong{font:700 10px 'Spline Sans Mono',monospace;letter-spacing:.05em;text-transform:uppercase}.training-menu-featured small,.training-menu-context small,.training-menu-grid small{color:#665f55;font:400 10px 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:0;text-transform:none}.training-menu-featured b,.training-menu-context b{font-size:15px}.training-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.training-menu-grid a{align-items:flex-start;min-height:64px;border:1px solid #e7dfce}.training-menu-grid a:hover{border-color:#16130f}
-/* Keep secondary destinations grouped without adding another crowded row. */
-.training-menu-context-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
-.training-menu-context-grid a { align-items:flex-start; min-height:64px; border:1px solid #e7dfce; }
-.training-menu-context-grid a:hover { border-color:#16130f; }
-.training-menu-context-grid span { display:flex; flex:1; flex-direction:column; gap:3px; }
-.training-menu-context-grid strong { font:700 10px 'Spline Sans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; }
-.training-menu-context-grid small { color:#665f55; font:400 10px 'Hanken Grotesk',system-ui,sans-serif; letter-spacing:0; text-transform:none; }
-.community-menu { position:relative; display:flex; align-items:center; }
-.community-menu-trigger { display:inline-flex; align-items:center; gap:5px; border:0; background:transparent; font:inherit; cursor:pointer; }
-.community-menu-dropdown { position:absolute; top:calc(100% + 8px); right:-12px; width:min(300px,calc(100vw - 32px)); padding:15px; background:#fbf6ec; border:2px solid #16130f; box-shadow:7px 7px rgba(22,19,15,.16); z-index:1200; border-radius:16px; }
-.community-menu-dropdown a { display:flex; align-items:flex-start; gap:10px; padding:11px; color:#16130f; text-decoration:none; }
-.community-menu-dropdown a:hover,.community-menu-dropdown a.router-link-active { background:#e6edff; }
-.community-menu-dropdown i { width:18px; color:#2a55f5; font-size:15px; }
-.community-menu-dropdown span { display:flex; flex:1; flex-direction:column; gap:3px; }
-.community-menu-dropdown strong { font:700 10px 'Spline Sans Mono',monospace; letter-spacing:.05em; text-transform:uppercase; }
-.community-menu-dropdown small { color:#665f55; font:400 10px 'Hanken Grotesk',system-ui,sans-serif; letter-spacing:0; text-transform:none; }
 
 /* Coach + public links: sit inside nav-right */
 .navbar-links--coach,
@@ -658,11 +579,10 @@ onUnmounted(() => {
 .nav-right .icon-group {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 4px 5px 4px 12px;
-  border: 1px solid #e7dfce;
-  border-radius: 999px;
-  background: rgba(255,255,255,.52);
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .brand-text {
@@ -765,7 +685,7 @@ onUnmounted(() => {
   border-bottom: 2px solid #000;
   padding-bottom: 5px;
 }
-/* non-mono links keep old styling (e.g. Track) */
+/* Public links keep their original display type. */
 .nav-link:not(.nav-link-mono) {
   font-family: Futura, "Futura PT", "Avenir Next", Avenir, "Jost", system-ui, sans-serif;
   font-size: 0.85rem;
@@ -808,61 +728,64 @@ onUnmounted(() => {
 /* GR authenticated nav links */
 .nav-link-auth {
   position: relative;
-  padding: 22px 0;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #5a5348;
+  padding: 10px 8px;
+  border-radius: 999px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: #665f55;
   text-decoration: none;
   white-space: nowrap;
-  transition: color 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
-.nav-link-auth:hover { color: #16130F; }
+.nav-link-auth:hover { color: #16130F; background: rgba(42, 85, 245, 0.07); }
 .nav-link-auth.router-link-active { color: #16130F; }
 .nav-link-auth.router-link-active::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  right: auto;
+  bottom: 3px;
+  width: 18px;
   height: 3px;
+  border-radius: 999px;
+  transform: translateX(-50%);
   background: #2A55F5;
 }
 
-/* GR Track CTA pill */
+/* Primary Record CTA */
 .nav-track-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   background: #2A55F5;
   color: #fff !important;
-  border: 2px solid #16130F;
+  border: 0;
   border-radius: 999px;
-  padding: 9px 18px;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  box-shadow: 3px 3px 0 #16130F;
+  padding: 11px 17px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.84rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.15s;
   flex-shrink: 0;
 }
-.nav-track-pill:hover { background: #1E42D6 !important; text-decoration: none; }
+.nav-track-pill:hover { background: #1E42D6 !important; text-decoration: none; transform: translateY(-1px); }
 .track-pill-play {
   display: inline-flex;
-  width: 16px;
-  height: 16px;
+  width: 19px;
+  height: 19px;
   border-radius: 999px;
-  background: #fff;
+  background: rgba(255,255,255,.96);
   color: #2A55F5;
   align-items: center;
   justify-content: center;
-  font-size: 7px;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 500;
   flex-shrink: 0;
 }
 
@@ -879,7 +802,7 @@ onUnmounted(() => {
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
   font-weight: 800;
   font-size: 0.74rem;
-  border: 2px solid #16130F;
+  border: 0;
   flex-shrink: 0;
 }
 
@@ -1264,39 +1187,26 @@ onUnmounted(() => {
 .navbar-content { min-width: 0; }
 .navbar-links { gap: clamp(10px, 1.35vw, 18px); min-width: 0; }
 .navbar-links--athlete {
-  justify-self: center;
-  padding: 4px;
-  gap: 2px;
-  border: 1px solid #e7dfce;
-  border-radius: 999px;
-  background: rgba(255,255,255,.52);
+  justify-self: start;
+  margin-left: clamp(18px, 3.5vw, 56px);
+  padding: 0;
+  gap: clamp(4px, 1vw, 12px);
+  border: 0;
+  background: transparent;
 }
 .navbar-links--athlete .nav-link-auth {
-  padding: 10px 11px;
-  border-radius: 999px;
+  padding: 10px 9px;
 }
-.navbar-links--athlete .nav-link-auth.router-link-active,
-.navbar-links--athlete .training-menu-trigger[aria-expanded="true"] {
-  color: #16130f;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(22,19,15,.10);
-}
-.navbar-links--athlete .nav-link-auth.router-link-active::after { display: none; }
-.navbar-links--athlete .training-menu-trigger[aria-expanded="true"] { color: #2a55f5; }
 .navbar-links--public { gap: clamp(10px, 1.3vw, 18px); }
 .navbar-links--public .nav-link-gr { padding-inline: 2px !important; }
 .nav-link-auth { white-space: nowrap; }
 .nav-link-gr { white-space: nowrap; }
-.training-menu-dropdown { border-radius: 16px; }
-.training-menu-featured, .training-menu-context { border-radius: 12px !important; }
-.training-menu-grid a { border-radius: 10px; }
-.nav-track-pill { box-shadow: 3px 3px 0 #16130F; }
 @media (max-width: 1080px) and (min-width: 769px) {
   .navbar-content { padding-inline: 16px; }
   .navbar-content { column-gap: 10px; }
-  .navbar-links--athlete { gap: 0; }
-  .navbar-links--athlete .nav-link-auth { padding-inline: 8px; }
-  .nav-link-auth { font-size: .66rem !important; letter-spacing: .07em !important; }
+  .navbar-links--athlete { gap: 2px; margin-left: 12px; }
+  .navbar-links--athlete .nav-link-auth { padding-inline: 7px; }
+  .nav-link-auth { font-size: .8rem !important; }
   .nav-right .icon-group { gap: 8px; padding-left: 8px; }
 }
 @media (max-width: 768px) {
@@ -1320,12 +1230,14 @@ onUnmounted(() => {
 /* Drawer panel */
 .mobile-drawer {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
   width: min(320px, 85vw);
   background: #16130F;
-  border-left: 3px solid #2A55F5;
+  border-left: 0;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(22, 19, 15, 0.28);
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -1340,10 +1252,10 @@ onUnmounted(() => {
 /* Public drawer: Good Record cream (unauthenticated) */
 .mobile-drawer--public {
   background: #FBF6EC;
-  border-left: 2px solid #16130F;
+  border: 1px solid rgba(22, 19, 15, 0.14);
   color: #16130F;
 }
-.mobile-drawer--public .drawer-header { border-bottom: 2px solid #16130F; }
+.mobile-drawer--public .drawer-header { border-bottom: 1px solid rgba(22, 19, 15, 0.14); }
 .mobile-drawer--public .drawer-brand { color: #16130F; }
 .mobile-drawer--public .drawer-brand-dot { color: #2A55F5; }
 .mobile-drawer--public .drawer-close { color: #16130F; border-color: rgba(22,19,15,0.3); }
@@ -1357,6 +1269,7 @@ onUnmounted(() => {
   border: 2px solid #16130F;
   border-radius: 999px;
   margin: 12px 20px;
+  width: calc(100% - 40px);
   padding: 13px 20px;
   text-align: center;
   justify-content: center;
@@ -1369,7 +1282,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 18px 20px;
-  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
+  border-bottom: 1px solid rgba(251, 246, 236, 0.14);
   flex-shrink: 0;
 }
 .drawer-brand {
@@ -1383,9 +1296,10 @@ onUnmounted(() => {
 }
 .drawer-brand-dot { color: #2A55F5; }
 .drawer-close {
-  width: 30px;
-  height: 30px;
-  border: 2px solid rgba(251, 246, 236, 0.35);
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(251, 246, 236, 0.25);
+  border-radius: 999px;
   background: transparent;
   color: rgba(251, 246, 236, 0.85);
   font-size: 0.85rem;
@@ -1404,7 +1318,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
+  border-bottom: 1px solid rgba(251, 246, 236, 0.14);
   flex-shrink: 0;
 }
 .drawer-user-name {
@@ -1430,7 +1344,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: 6px 0;
-  border-bottom: 2px solid rgba(251, 246, 236, 0.15);
+  border-bottom: 1px solid rgba(251, 246, 236, 0.14);
 }
 
 /* Nav links */
@@ -1442,7 +1356,7 @@ onUnmounted(() => {
 }
 .drawer-footer {
   padding: 12px 20px;
-  border-top: 2px solid rgba(251, 246, 236, 0.15);
+  border-top: 1px solid rgba(251, 246, 236, 0.14);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -1475,13 +1389,15 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 13px;
-  padding: 13px 20px;
+  margin: 2px 12px;
+  width: calc(100% - 24px);
+  padding: 13px 12px;
   color: rgba(251, 246, 236, 0.85);
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 650;
+  font-size: 0.86rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
   text-decoration: none;
   border: none;
   background: transparent;
@@ -1495,20 +1411,22 @@ onUnmounted(() => {
 .drawer-link:hover { color: #FBF6EC; background: rgba(251,246,236,0.05); }
 .drawer-link.router-link-active {
   color: #2A55F5;
-  background: rgba(42, 85, 245, 0.14);
+  background: rgba(42, 85, 245, 0.13);
 }
 .drawer-link.router-link-active::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
+  left: 5px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  transform: translateY(-50%);
   background: #2A55F5;
 }
 .drawer-link.router-link-active svg { stroke: #2A55F5; }
 
-/* Track Activity CTA */
+/* Record activity CTA */
 .drawer-track-wrap { padding: 6px 20px; }
 .drawer-link-primary {
   background: #2A55F5;
@@ -1517,9 +1435,10 @@ onUnmounted(() => {
   border-radius: 999px;
   padding: 12px 16px;
   justify-content: center;
-  box-shadow: 3px 3px 0 rgba(251, 246, 236, 0.5);
+  box-shadow: none;
   width: 100%;
   letter-spacing: 0.1em;
+  margin: 0;
 }
 .drawer-link-primary:hover { background: #1E42D6 !important; }
 .drawer-track-icon {
@@ -1585,9 +1504,9 @@ onUnmounted(() => {
   margin: 4px 20px;
 }
 
-/* Hairline within nav — between Feed and Track */
+/* Hairline between quick actions and primary navigation */
 .drawer-section-divider {
-  height: 2px;
+  height: 1px;
   background: rgba(251, 246, 236, 0.15);
   margin: 10px 20px;
 }
@@ -1644,15 +1563,15 @@ onUnmounted(() => {
   justify-content: center;
   gap: 7px;
   padding: 14px 10px;
-  border: 1.5px solid rgba(251, 246, 236, 0.18);
-  border-radius: 2px;
+  border: 1px solid rgba(251, 246, 236, 0.12);
+  border-radius: 14px;
   text-decoration: none;
   color: rgba(251, 246, 236, 0.75);
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-transform: none;
   text-align: center;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   cursor: pointer;
