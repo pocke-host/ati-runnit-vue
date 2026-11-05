@@ -2121,6 +2121,14 @@ onUnmounted(() => {
 .feed-error-banner { border-bottom: 1px solid #E3C77A; background: #FFF7DD; }
 .feed-error-retry { border: 1px solid #16130F; border-radius: 999px; }
 .feed-comment-media { border: 1px solid #DED5C4; border-radius: 10px; }
+.feed-header-bar { border-bottom-width: 1px; }
+.feed-controls-bar { border-top-width: 1px; }
+.gr-sport-tag, .gr-route-name-chip { border-radius: 999px; }
+.gr-route-card { border-top-width: 1px; }
+.gr-reaction-bar { border-top-width: 1px; }
+.modal-box, .moment-modal { border-radius: var(--rk-radius-lg); border: 1px solid #DED5C4; box-shadow: 0 20px 50px rgba(22,19,15,.16); }
+.moment-song-compact { border-radius: var(--rk-radius-sm); }
+.user-avatar-small { border-radius: 999px; }
 .feed-mention-suggestions,
 .feed-gif-picker { border: 1px solid #DED5C4; border-radius: 12px; box-shadow: 0 12px 28px rgba(22,19,15,.12); }
 .feed-mention-suggestions button { border: 1px solid #E2B52F; border-radius: 999px; }
