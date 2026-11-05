@@ -377,6 +377,10 @@ const searchHelp = async () => {
 .support-page .sp-search-btn { border-radius: 999px; }
 .support-page .sp-cat-tile { transition: transform .18s ease, background .18s ease; }
 .support-page .sp-cat-tile:hover { transform: translateY(-3px); background: #fff; }
+.support-page .sp-contact-card { border: 1px solid rgba(255,255,255,.28); box-shadow: 0 18px 42px rgba(42,85,245,.18); }
+.support-page .sp-search-bar { border: 1px solid #DED5C4; }
+.support-page .sp-cat-tile,
+.support-page .sp-faq-list { border: 1px solid #DED5C4; }
 @media (max-width: 640px) {
   .support-page .sp-search-bar { padding: 6px; }
   .support-page .sp-search-btn { min-height: 44px; }

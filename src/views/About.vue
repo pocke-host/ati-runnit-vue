@@ -315,4 +315,16 @@ const stackItems = [
 .about-page .belief-card:hover { background: #fff; transform: translateY(-4px); }
 .about-page .beliefs-grid { border-radius: 18px; overflow: hidden; }
 .about-page .final-cta { position: relative; overflow: hidden; }
+.about-page .beliefs-grid {
+  gap: 12px;
+  border: 0;
+  overflow: visible;
+}
+.about-page .belief-card,
+.about-page .belief-card:last-child {
+  border: 1px solid #DED5C4;
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(22,19,15,.07);
+}
+.about-page .hero-photo { box-shadow: 0 18px 42px rgba(42,85,245,.18); }
 </style>

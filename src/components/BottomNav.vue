@@ -1,6 +1,6 @@
 <template>
   <nav class="bottom-nav" v-if="isAuthenticated" aria-label="Primary navigation">
-    <!-- Coach tabs — 5 items, Track centered -->
+    <!-- Coach tabs — 5 items, Record centered -->
     <template v-if="role === 'coach'">
       <router-link to="/coach/dashboard" class="tab-item" active-class="tab-active">
         <i class="bi bi-grid-3x3-gap-fill tab-icon"></i>
@@ -14,7 +14,7 @@
         <div class="track-circle">
           <i class="bi bi-play-fill"></i>
         </div>
-        <span class="tab-label">Track</span>
+        <span class="tab-label">Record</span>
       </router-link>
       <router-link to="/coach/library" class="tab-item" active-class="tab-active">
         <i class="bi bi-collection-fill tab-icon"></i>
@@ -26,7 +26,7 @@
       </router-link>
     </template>
 
-    <!-- Athlete tabs — 5 items, Track centered -->
+    <!-- Athlete tabs — 5 items, Record centered -->
     <template v-else>
       <router-link to="/dashboard" class="tab-item" active-class="tab-active">
         <i class="bi bi-grid-3x3-gap-fill tab-icon"></i>
@@ -40,7 +40,7 @@
         <div class="track-circle">
           <i class="bi bi-play-fill"></i>
         </div>
-        <span class="tab-label">Track</span>
+        <span class="tab-label">Record</span>
       </router-link>
       <router-link to="/calendar" class="tab-item" active-class="tab-active">
         <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M10 14h1M10 17h1M14 14h1"/></svg>
@@ -82,12 +82,12 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   z-index: 900;
   background: rgba(251, 246, 236, 0.94);
   border-top: 1px solid #E7DFCE;
-  box-shadow: 0 -8px 24px rgba(22, 19, 15, 0.08);
+  box-shadow: 0 -8px 24px rgba(22, 19, 15, 0.06);
   backdrop-filter: blur(16px);
   align-items: center;
   justify-content: space-around;
   padding: 0 8px env(safe-area-inset-bottom, 0px);
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
   min-height: calc(var(--tab-h, 64px) + env(safe-area-inset-bottom, 0px));
 }
 
@@ -120,9 +120,8 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
 
 .tab-label {
   font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-weight: 650;
+  letter-spacing: 0.01em;
   line-height: 1;
 }
 
@@ -157,7 +156,7 @@ const hapticTrack = () => { try { navigator.vibrate?.(50) } catch { /* not suppo
   font-size: 1.3rem;
   margin-top: -22px;
   border: 3px solid #FBF6EC;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+  box-shadow: 0 8px 18px rgba(42,85,245,.24);
   transition: transform 0.15s;
   flex-shrink: 0;
 }

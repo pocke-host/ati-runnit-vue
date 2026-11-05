@@ -543,6 +543,12 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid 
 .waitlist-page .sync-item { border-radius: 18px; }
 .waitlist-page .form-card { box-shadow: 0 18px 46px rgba(22,19,15,.10); }
 .waitlist-page .btn-submit { min-height: 48px; border-radius: 999px; }
+.waitlist-page .form-card { border: 1px solid #DED5C4; }
+.waitlist-page .field-input { border: 1px solid #DED5C4; border-radius: 12px; }
+.waitlist-page .field-input:focus { box-shadow: 0 0 0 4px rgba(42,85,245,.12); }
+.waitlist-page .hero-sticker { border-width: 1px; border-radius: 12px; box-shadow: 0 10px 24px rgba(22,19,15,.14); }
+.waitlist-page .preview-card--back,
+.waitlist-page .preview-card--front { box-shadow: 0 18px 42px rgba(22,19,15,.14); }
 @media (max-width: 640px) {
   .waitlist-page .hero { padding-top: 52px; }
   .waitlist-page .hero-visual { margin-top: 8px; }

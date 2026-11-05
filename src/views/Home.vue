@@ -1308,7 +1308,17 @@ function scrollTo(id) {
 .home-page .activity-card,
 .home-page .feature-box { box-shadow: 0 18px 50px rgba(22,19,15,.10); }
 .home-page .crew-card { transition: transform .18s ease, box-shadow .18s ease; }
-.home-page .crew-card:hover { transform: translateY(-4px); box-shadow: 5px 5px 0 #2A55F5; }
+.home-page .crew-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(22,19,15,.14); }
+.home-page .home-final-cta-card {
+  border: 1px solid #DED5C4;
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(22,19,15,.10);
+}
+.home-page .activity-card,
+.home-page .feature-box,
+.home-page .leaderboard,
+.home-page .crew-card,
+.home-page .moment-photo { border: 1px solid #DED5C4; }
 .home-page .btn-pill-primary,
 .home-page .btn-pill-yellow,
 .home-page .btn-pill-ghost { min-height: 46px; }

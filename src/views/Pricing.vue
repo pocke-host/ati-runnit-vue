@@ -402,10 +402,22 @@ const upgradeToPro = async () => {
 }
 .btn-pill-paper:hover { opacity: 0.85; color: #16130F; }
 
+/* Refinement: make plan selection feel calm and comparable rather than boxed in. */
+.pricing-page .price-card {
+  border: 1px solid #DED5C4;
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(22,19,15,.08);
+  overflow: hidden;
+}
+.pricing-page .price-card--featured { box-shadow: 0 18px 50px rgba(42,85,245,.16); }
+.pricing-page .launch-terms { border-left-width: 3px; border-radius: 12px; }
+.pricing-page .popular-tag { top: 14px; right: 14px; border-radius: 999px; padding: 7px 10px; }
+.pricing-page .btn-pill-paper { box-shadow: none; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .cards-grid { grid-template-columns: 1fr; gap: 16px; }
-  .price-card--featured { box-shadow: 4px 4px 0 #2A55F5; }
+  .price-card--featured { box-shadow: 0 18px 50px rgba(42,85,245,.16); }
 }
 @media (max-width: 640px) {
   .page-inner { padding: 0 22px; }
