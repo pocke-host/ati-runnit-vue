@@ -139,7 +139,6 @@
       <h2 class="cta-h2">Train like you mean it.</h2>
       <p class="cta-sub">One training home for the data you already collect.</p>
       <router-link to="/signup" class="btn-pill-paper" data-analytics="cta_signup_features_bottom">Start free →</router-link>
-      <p class="features-waitlist">Not ready yet? <router-link to="/waitlist">Join the waitlist for launch updates.</router-link></p>
     </section>
 
   </main>
@@ -198,7 +197,7 @@ useHead({
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 6px 12px;
-  transform: rotate(-2deg);
+  border-radius: 999px;
 }
 .hero-h1 {
   font-family: 'Big Shoulders Display', system-ui, sans-serif;
@@ -225,7 +224,12 @@ useHead({
 .moments-feature {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  border-bottom: 2px solid #16130F;
+  max-width: 1200px;
+  margin: 24px auto;
+  border: 2px solid #16130F;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(22,19,15,.10);
 }
 .moments-photo-col {
   position: relative;
@@ -262,6 +266,8 @@ useHead({
   bottom: 20px;
   display: flex;
   border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 12px;
+  overflow: hidden;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
@@ -285,7 +291,7 @@ useHead({
   text-transform: uppercase;
   padding: 7px 11px;
   border: 2px solid #16130F;
-  transform: rotate(5deg);
+  border-radius: 999px;
 }
 .moments-text-col {
   padding: 48px 40px;
@@ -338,16 +344,15 @@ useHead({
 .kit-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border: 2px solid #16130F;
+  gap: 12px;
   margin-top: 28px;
 }
 .kit-cell {
   padding: 22px;
-  border-right: 2px solid #16130F;
-  border-bottom: 2px solid #16130F;
+  min-height: 138px;
+  border: 2px solid #16130F;
+  border-radius: 16px;
 }
-.kit-cell:nth-child(4n) { border-right: none; }
-.kit-cell:nth-child(n+9) { border-bottom: none; }
 .kit-num {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.9rem;
@@ -366,13 +371,13 @@ useHead({
 .leave-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border: 2px solid #16130F;
+  gap: 12px;
 }
 .leave-cell {
   padding: 28px;
-  border-right: 2px solid #16130F;
+  border: 2px solid #16130F;
+  border-radius: 16px;
 }
-.leave-cell--last { border-right: none; }
 .leave-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 8px; }
 .leave-body { color: #5A5348; line-height: 1.6; font-size: 0.9rem; }
 
@@ -414,21 +419,16 @@ useHead({
   transition: opacity 0.15s;
 }
 .btn-pill-paper:hover { opacity: 0.85; text-decoration: none; color: #16130F; }
-.features-waitlist { margin: 18px 0 0; color: rgba(255,255,255,.72); font-size: .8rem; }
-.features-waitlist a { color: #fff; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
-.features-waitlist a:hover { color: #FFC53D; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .moments-feature { grid-template-columns: 1fr; }
+  .moments-feature { margin: 16px 18px; }
   .moments-photo-col { min-height: 300px; border-right: none; border-bottom: 2px solid #16130F; }
   .moments-text-col { padding: 36px 24px; }
   .kit-grid { grid-template-columns: repeat(2, 1fr); }
-  .kit-cell:nth-child(2n) { border-right: none; }
-  .kit-cell:nth-child(n+11) { border-bottom: none; }
   .leave-grid { grid-template-columns: 1fr; }
-  .leave-cell { border-right: none; border-bottom: 2px solid #16130F; }
-  .leave-cell--last { border-bottom: none; }
+  .leave-cell { border-bottom: 2px solid #16130F; }
 }
 @media (max-width: 640px) {
   .page-inner { padding: 0 22px; }
@@ -448,10 +448,9 @@ useHead({
 .features-page .moments-photo-col,
 .features-page .kit-cell,
 .features-page .leave-cell { transition: background .18s ease, transform .18s ease; }
-.features-page .moments-photo-col { border-radius: 20px; overflow: hidden; box-shadow: 0 18px 44px rgba(22,19,15,.12); }
+.features-page .moments-photo-col { overflow: hidden; }
 .features-page .kit-cell { background: rgba(255,255,255,.65); }
 .features-page .kit-cell:hover { background: #fff; transform: translateY(-3px); }
-.features-page .leave-grid { border-radius: 18px; overflow: hidden; }
 .features-page .final-cta { position: relative; overflow: hidden; }
 @media (max-width: 640px) {
   .features-page .hero { padding-top: 52px; }
