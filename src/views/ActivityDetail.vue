@@ -2214,4 +2214,29 @@ onMounted(init)
   color: rgba(15,18,16,0.65);
   line-height: 1.5;
 }
+
+/* ── Activity detail refinement ─────────────────────────────────────────── */
+.event-banner { max-width: 1000px; margin: 16px auto 0; border: 0; border-radius: var(--rk-radius-md); }
+.event-banner-type { border-radius: var(--rk-radius-pill); }
+.top-bar { border-bottom: 0; padding: 18px max(24px, calc((100% - 1000px) / 2)); }
+.combine-btn { border: 1px solid rgba(22,19,15,.16); border-radius: var(--rk-radius-pill); box-shadow: none; transition: background .15s, transform .15s; }
+.combine-btn:hover { box-shadow: none; background: #E9B52F; }
+.user-row { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-md); box-shadow: 0 12px 28px rgba(22,19,15,.06); }
+.gr-pr-stamp { border: 0; border-radius: var(--rk-radius-pill); transform: none; }
+.gr-stat-strip { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-md); box-shadow: 0 10px 24px rgba(22,19,15,.05); }
+.gr-stat-strip-cell--div { border-left: 1px solid var(--rk-rule); }
+.combine-modal { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-lg); box-shadow: 0 20px 50px rgba(22,19,15,.18); }
+.det-card { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-md); box-shadow: 0 10px 26px rgba(22,19,15,.05); }
+.stats-grid { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-sm); overflow: hidden; }
+.stat-box { border-right: 1px solid var(--rk-rule); border-bottom: 1px solid var(--rk-rule); }
+.workout-type-chip { border-radius: var(--rk-radius-pill); }
+.course-pr-banner { border: 1px solid rgba(255,197,61,.75); border-radius: var(--rk-radius-sm); }
+.ex-table-wrap { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-sm); overflow: hidden; }
+.ex-warmup-badge { border-radius: var(--rk-radius-pill); }
+@media (max-width: 720px) {
+  .event-banner { margin: 12px 16px 0; }
+  .top-bar { padding: 14px 16px; }
+  .user-row-wrap { padding: 16px 16px 4px; }
+  .detail-layout { padding-left: 16px; padding-right: 16px; }
+}
 </style>

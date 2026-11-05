@@ -31,6 +31,13 @@
   --rk-font-display: 'Big Shoulders Display', system-ui, sans-serif;
   --rk-font-body:    'Hanken Grotesk', system-ui, sans-serif;
   --rk-font-mono-gr: 'Spline Sans Mono', ui-monospace, monospace;
+  --rk-surface:      #FFFFFF;
+  --rk-surface-soft: #F5F0E7;
+  --rk-radius-xs:    8px;
+  --rk-radius-sm:    12px;
+  --rk-radius-md:    16px;
+  --rk-radius-lg:    24px;
+  --rk-radius-pill:  999px;
 
   /* ── Legacy compat aliases (do not use in new code) ── */
   --rk-void:    #16130F;
@@ -61,10 +68,10 @@
   --bs-link-color:        #2A55F5;
   --bs-link-hover-color:  #1E42D6;
   --bs-border-color:      #E7DFCE;
-  --bs-border-radius:     0;
-  --bs-border-radius-sm:  0;
-  --bs-border-radius-lg:  0;
-  --bs-border-radius-pill: 0;
+  --bs-border-radius:     var(--rk-radius-sm);
+  --bs-border-radius-sm:  var(--rk-radius-xs);
+  --bs-border-radius-lg:  var(--rk-radius-md);
+  --bs-border-radius-pill: var(--rk-radius-pill);
 }
 
 /* ── Base Reset ── */
@@ -141,7 +148,7 @@ button:not(.nav-icon-btn):not(.mobile-menu-toggle):not(.drawer-close):not(.modal
   --bs-btn-hover-border-color: #1E42D6;
   --bs-btn-color:              #fff;
   --bs-btn-active-bg:          #002EB8;
-  border-radius: 0 !important;
+  border-radius: var(--rk-radius-pill) !important;
   text-transform: uppercase;
   letter-spacing: 0.10em;
   font-weight: 700;
@@ -149,12 +156,12 @@ button:not(.nav-icon-btn):not(.mobile-menu-toggle):not(.drawer-close):not(.modal
 }
 
 .btn-outline-dark {
-  border-radius: 0;
+  border-radius: var(--rk-radius-pill);
 }
 
 /* ── Form Controls — electric blue focus ── */
 .form-control, .form-select {
-  border-radius: 0;
+  border-radius: var(--rk-radius-sm);
   border-color: var(--rk-rule);
   background: #fff;
 }
@@ -205,7 +212,7 @@ button:not(.nav-icon-btn):not(.mobile-menu-toggle):not(.drawer-close):not(.modal
 
 /* ── Utility ── */
 .runnit-muted    { color: var(--rk-ash) !important; }
-.runnit-card     { background: #fff; border: 1px solid var(--rk-rule); border-radius: 0; box-shadow: none; }
+.runnit-card     { background: var(--rk-surface); border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-md); box-shadow: none; }
 .runnit-overline { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--rk-signal); }
 
 /* ── Mobile bottom nav padding — includes home indicator safe area ── */

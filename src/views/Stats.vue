@@ -2030,6 +2030,17 @@ onUnmounted(() => {
 .hero-chip { border-color: rgba(251,246,236,.18); }
 .hero-action { border-radius: 999px; }
 .hero-action--primary { box-shadow: 0 7px 18px rgba(42,85,245,.25); }
+.period-summary-toggle { border: 1px solid #DED5C4; border-radius: 999px; overflow: hidden; }
+.period-summary-toggle button + button { border-left: 0; }
+.period-summary-toggle button.active { margin: 2px; border-radius: 999px; }
+.period-summary-state,
+.period-summary-grid,
+.sync-notice,
+.stats-error,
+.training-read { border: 1px solid #DED5C4; border-radius: 16px; box-shadow: 0 8px 22px rgba(22,19,15,.04); }
+.period-summary-grid { overflow: hidden; }
+.training-read-icon { border-radius: 12px; }
+.comparison-refresh { border: 1px solid #DED5C4; border-radius: 999px; }
 .stats-jumpnav {
   background: rgba(251,246,236,.94);
   border-bottom: 1px solid #DED5C4;
