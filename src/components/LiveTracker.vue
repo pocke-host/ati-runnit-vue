@@ -296,7 +296,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useUnits } from '@/composables/useUnits'
 import { useActivityStore } from '@/stores/activity'
 import { useVoiceNote } from '@/composables/useVoiceNote'
@@ -411,7 +411,7 @@ const avgPaceMinPerKm = computed(() => {
 // ── Map ─────────────────────────────────────────────────────────────────────
 
 const initializeMap = async () => {
-  mapboxgl = (await import('maplibre-gl')).default
+  mapboxgl = (await import('mapbox-gl')).default
   if (!MAPBOX_TOKEN) {
     gpsError.value = 'Mapbox token missing'
     return
@@ -428,7 +428,7 @@ const initializeMap = async () => {
     style: `https://api.mapbox.com/styles/v1/quinn-runnit/cmml6ynyy000701suetifc5y0?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,
     zoom: savedLng === -98.5 ? 3.5 : 13,
     center: [savedLng, savedLat],
-    attributionControl: false,
+    attributionControl: true,
   })
 
   // Native GPS control — shows pulsing blue dot + heading cone + follows user
@@ -1713,11 +1713,11 @@ onUnmounted(() => {
 .lt-selected-track button { margin-left: auto; border: 0; background: transparent; color: #2A55F5; font-size: .7rem; font-weight: 800; cursor: pointer; }
 
 /* ── Map control overrides ── */
-:deep(.maplibregl-ctrl-geolocate),
-:deep(.maplibregl-ctrl-zoom-in),
-:deep(.maplibregl-ctrl-zoom-out),
-:deep(.maplibregl-ctrl-compass) { border-radius: 0 !important; }
-:deep(.maplibregl-ctrl-group) {
+:deep(.mapboxgl-ctrl-geolocate),
+:deep(.mapboxgl-ctrl-zoom-in),
+:deep(.mapboxgl-ctrl-zoom-out),
+:deep(.mapboxgl-ctrl-compass) { border-radius: 0 !important; }
+:deep(.mapboxgl-ctrl-group) {
   border-radius: 0 !important;
   box-shadow: none !important;
   border: 2px solid rgba(251,246,236,0.25) !important;

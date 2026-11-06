@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 const props = defineProps({
   activity: { type: Object, required: true },
@@ -76,6 +76,7 @@ let mapboxgl
 const currentStyle = ref('runnit')
 const startMarker  = ref(null)
 const endMarker    = ref(null)
+let mapHasLoaded = false
 
 // ── Style definitions ────────────────────────────────
 // terrain: true enables the 3D DEM + sky atmosphere on that style
@@ -240,7 +241,7 @@ const initializeMap = async () => {
   // Vue's DOM flush also makes re-initialization safe when the activity prop
   // changes while the detail view remains mounted.
   await nextTick()
-  const module = await import('maplibre-gl')
+  const module = await import('mapbox-gl')
   mapboxgl = module.default
   if (!props.activity.routePolyline) {
     error.value = 'No route on record for this one.'
@@ -272,10 +273,11 @@ const initializeMap = async () => {
       bounds,
       fitBoundsOptions:   { padding: 64 },
       pitch:              0,
-      attributionControl: false,
+      attributionControl: true,
     })
 
     map.value.on('load', () => {
+      mapHasLoaded = true
       const isDark = currentStyle.value === 'dark'
       addSkyAndFog(map.value, isDark)
       if (styleDef.terrain) addTerrain(map.value)
@@ -289,12 +291,21 @@ const initializeMap = async () => {
       }, 500)
     })
 
-    map.value.on('error', () => {
-      error.value = 'Map wouldn\'t load.'
+    map.value.on('error', (event) => {
+      // Mapbox emits this for individual tile/image failures as well as a
+      // fatal style failure. Do not replace a usable route because one tile
+      // was unavailable; only surface an error before the initial style loads.
+      const status = event?.error?.status
+      const message = event?.error?.message || 'unknown map error'
+      console.warn('[RouteViewer] Mapbox error', { status, message })
+      if (mapHasLoaded) return
+      error.value = status === 401 || status === 403
+        ? 'Map access is not configured for this site.'
+        : 'Map service is temporarily unavailable.'
       loading.value = false
     })
   } catch {
-    error.value = 'Map wouldn\'t start.'
+    error.value = 'Map service is temporarily unavailable.'
     loading.value = false
   }
 }
@@ -365,6 +376,7 @@ onMounted(initializeMap)
 onUnmounted(() => { map.value?.remove() })
 watch(() => props.activity, () => {
   map.value?.remove()
+  mapHasLoaded = false
   loading.value = true
   error.value   = null
   initializeMap()
@@ -548,10 +560,6 @@ watch(() => props.activity, () => {
   pointer-events: none;
   backdrop-filter: blur(4px);
 }
-
-/* Hide default map UI chrome */
-:deep(.maplibregl-ctrl-logo),
-:deep(.maplibregl-ctrl-attrib) { display: none !important; }
 
 @media (max-width: 600px) {
   .rs-label  { font-size: 0.50rem; }

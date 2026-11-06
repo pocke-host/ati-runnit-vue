@@ -306,7 +306,7 @@ function relativeDate(iso) {
 
 // ── Lifecycle ─────────────────────────────────────────────────────
 onMounted(async () => {
-  mapboxgl = (await import('maplibre-gl')).default
+  mapboxgl = (await import('mapbox-gl')).default
   mapboxgl.accessToken = MAPBOX_TOKEN
   navigator.geolocation.getCurrentPosition(
     pos => {

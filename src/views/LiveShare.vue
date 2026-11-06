@@ -40,7 +40,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import axios from 'axios'
 
 const route = useRoute()
@@ -130,7 +130,7 @@ async function fetchShare() {
 
 onMounted(async () => {
   if (MAPBOX_TOKEN) {
-    mapboxgl = (await import('maplibre-gl')).default
+    mapboxgl = (await import('mapbox-gl')).default
     mapboxgl.accessToken = MAPBOX_TOKEN
     map = new mapboxgl.Map({
       container: mapContainer.value,

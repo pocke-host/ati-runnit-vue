@@ -412,7 +412,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, watch } from 'vue'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useToast } from '@/composables/useToast'
 
 const { showToast } = useToast()
@@ -724,7 +724,7 @@ async function loadMapClubs() {
 
 async function initClubMap(clubs) {
   if (!MAPBOX_TOKEN || !clubMapContainer.value) return
-  mapboxgl = (await import('maplibre-gl')).default
+  mapboxgl = (await import('mapbox-gl')).default
   if (clubMap.value) { clubMap.value.remove(); clubMap.value = null }
 
   mapboxgl.accessToken = MAPBOX_TOKEN
@@ -733,7 +733,7 @@ async function initClubMap(clubs) {
     style: `https://api.mapbox.com/styles/v1/quinn-runnit/cmml6ynyy000701suetifc5y0?access_token=${encodeURIComponent(MAPBOX_TOKEN)}`,
     zoom: 3.5,
     center: [-98.5, 39.5],
-    attributionControl: false,
+    attributionControl: true,
   })
   clubMap.value = map
 
