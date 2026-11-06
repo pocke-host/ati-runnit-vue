@@ -1,9 +1,10 @@
-<!-- src/views/Races.vue — All US Sports Edition -->
+<!-- src/views/Races.vue — Race discovery and training context -->
 <!--
   Data sources (parallel fetch):
     1. RunSignup backend integration
-    2. FindARace backend proxy: GET /api/events/findarace
-    3. BikeReg backend proxy:   GET /api/events/bikereg
+    2. ACTIVE Network Activity Search API (optional, server-keyed)
+    3. FindARace backend proxy: GET /api/events/findarace
+    4. BikeReg backend proxy:   GET /api/events/bikereg
   Sport detection is client-side keyword matching against race name/description.
   Filtering is entirely client-side — no re-fetch on filter changes.
 -->
@@ -16,14 +17,14 @@
         <div class="hero-inner">
           <div class="hero-copy">
             <div class="hero-eyebrow">Event Calendar</div>
-            <h1 class="hero-headline">Every sport.<br>Every start line.</h1>
-            <p class="hero-lead">Running, cycling, trail, triathlon, OCR, open water, nordic — every race in America, in one place. Browse freely; sign in only when you want to save a race or import your result.</p>
+            <h1 class="hero-headline">Find the start<br>line that moves you.</h1>
+            <p class="hero-lead">Search live race listings, save the one you are training for, and turn race day into a clearer next block. Browse freely; sign in when you want to save a race or import a result.</p>
           </div>
           <div class="hero-panel-wrap d-none d-lg-block" aria-hidden="true">
             <div class="hero-panel">
               <div class="hero-panel-kicker">
                 <span class="hero-pulse-dot"></span>
-                All US Events · Live Data
+                {{ usingLiveData ? 'Live race listings' : 'Race discovery' }}
               </div>
               <div class="hero-panel-grid">
                 <span class="hero-panel-chip">Running</span>
@@ -33,7 +34,7 @@
                 <span class="hero-panel-chip">OCR</span>
                 <span class="hero-panel-chip">Open Water</span>
               </div>
-              <div class="hero-panel-sources">RunSignup · FindARace · BikeReg</div>
+              <div class="hero-panel-sources">{{ liveProviderNames.length ? liveProviderNames.join(' · ') : 'Provider data loads here' }}</div>
             </div>
           </div>
         </div>
@@ -182,7 +183,7 @@
           />
 
           <div v-else class="events-grid">
-            <article v-for="event in pagedEvents" :key="event.id" class="event-card" style="cursor:pointer" @click="openRaceDrawer(event)">
+            <article v-for="event in pagedEvents" :key="event.id" class="event-card" tabindex="0" role="button" @click="openRaceDrawer(event)" @keydown.enter.prevent="openRaceDrawer(event)" @keydown.space.prevent="openRaceDrawer(event)">
               <div class="event-img" :style="getCardStyle(event)">
                 <span class="date-badge">{{ formatDateShort(event.date) }}</span>
                 <span class="sport-badge">{{ event.sportLabel }}</span>
@@ -197,6 +198,10 @@
                 </button>
               </div>
               <div class="event-body">
+                <div class="event-source-row">
+                  <span class="event-source">{{ providerLabel(event.provider || 'Runnit') }}</span>
+                  <span class="event-open-hint">View details <i class="bi bi-arrow-up-right"></i></span>
+                </div>
                 <h3 class="event-name">{{ event.name }}</h3>
                 <p class="event-location">
                   <svg viewBox="0 0 16 20" width="12" height="14" fill="none" stroke="#5A5348" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 12 5 12s5-8.25 5-12c0-2.76-2.24-5-5-5z"/><circle cx="8" cy="6" r="1.5"/></svg>
@@ -393,7 +398,7 @@ const loadRaceResults = async () => {
   try { const { data } = await axios.get(`${API_URL}/race-results`); raceResults.value = Array.isArray(data) ? data : [] } catch { /* unauthenticated users can still browse races */ }
 }
 
-const providerLabel = (provider) => ({ ATHLINKS: 'Athlinks', RUNSIGNUP: 'RunSignup', RACEROSTER: 'Race Roster' }[provider] || provider)
+const providerLabel = (provider) => ({ ATHLINKS: 'Athlinks', RUNSIGNUP: 'RunSignup', RACEROSTER: 'Race Roster', ACTIVE: 'ACTIVE Network' }[provider] || provider)
 const loadResultProviders = async () => {
   try {
     const { data } = await axios.get(`${API_URL}/race-results/providers`)
@@ -602,6 +607,7 @@ const loading       = ref(false)
 const apiError      = ref('')
 const events        = ref([])
 const usingLiveData = ref(false)
+const liveProviderNames = computed(() => [...new Set(events.value.map(event => event.provider).filter(Boolean))].map(providerLabel))
 
 
 /* ─── Keyword patterns for sport detection ───────────────── */
@@ -714,10 +720,32 @@ const normalizeRace = (race) => {
   }
 }
 
-/* ─── Fetch: RunSignup + FindARace + BikeReg in parallel ──── */
+// ACTIVE is normalized by the backend so provider credentials and payload
+// handling never reach the browser. Keep this defensive for a partial response.
+const normalizeActiveRace = (race) => {
+  const sport = race.sport || detectSport(race)
+  return {
+    ...race,
+    id: race.id || `active_${race.assetGuid || `${race.name || 'event'}_${race.date || ''}`}`,
+    provider: race.provider || 'ACTIVE',
+    sport,
+    sportEmoji: race.sportEmoji || sportEmojiMap[sport] || '🏅',
+    sportLabel: race.sportLabel || sportLabelMap[sport] || 'Event',
+    city: race.city || '',
+    state: race.state || '',
+    distances: race.distances?.length ? race.distances : extractDistances(race).slice(0, 4),
+    summary: race.summary || `${race.name || 'Event'} in ${race.city || 'your area'}.`,
+    url: race.url || '',
+    registerUrl: race.registerUrl || race.url || '',
+    image: race.image || '',
+  }
+}
+
+/* ─── Fetch: RunSignup + ACTIVE + FindARace + BikeReg in parallel ──── */
 const fetchEvents = async () => {
   loading.value  = true
   apiError.value = ''
+  usingLiveData.value = false
 
   const params = new URLSearchParams({
     format:             'json',
@@ -727,7 +755,7 @@ const fetchEvents = async () => {
   })
   if (zipcode.value.trim()) params.set('zipcode', zipcode.value.trim())
 
-  const [rsResult, farResult, bikeResult] = await Promise.allSettled([
+  const [rsResult, activeResult, farResult, bikeResult] = await Promise.allSettled([
     // 1. RunSignup: use the backend proxy so API credentials and caller identity stay server-side
     (async () => {
       const proxyParams = { page: 1, results_per_page: 100, future_events_only: 'T' }
@@ -735,19 +763,33 @@ const fetchEvents = async () => {
       const { data } = await axios.get(`${API_URL}/events`, { params: proxyParams, timeout: 8000 })
       return Array.isArray(data) ? data : (data.races || [])
     })(),
-    // 2. FindARace backend proxy (triathlon-heavy)
+    // 2. ACTIVE Network: optional server-side proxy. A missing key is a
+    // partial-provider failure, not a page failure.
+    (async () => {
+      const activeParams = { page: 1, results_per_page: 50 }
+      if (zipcode.value.trim()) activeParams.zipcode = zipcode.value.trim()
+      if (stateFilter.value) activeParams.state = stateFilter.value
+      const { data } = await axios.get(`${API_URL}/events/active`, { params: activeParams, timeout: 10000 })
+      return Array.isArray(data) ? data : (data.events || [])
+    })(),
+    // 3. FindARace backend proxy (triathlon-heavy)
     axios.get(`${API_URL}/events/findarace`, { timeout: 15000 }).then(r => r.data),
-    // 3. BikeReg backend proxy (cycling events)
+    // 4. BikeReg backend proxy (cycling events)
     axios.get(`${API_URL}/events/bikereg`, { timeout: 10000 }).then(r => r.data),
   ])
 
   let rawRaces = null
+  let activeEvents = []
   let farEvents = []
   let bikeEvents = []
 
   if (rsResult.status === 'fulfilled' && rsResult.value?.length) {
     rawRaces = rsResult.value
     usingLiveData.value = true
+  }
+  if (activeResult.status === 'fulfilled' && Array.isArray(activeResult.value)) {
+    activeEvents = activeResult.value.map(normalizeActiveRace)
+    if (activeEvents.length) usingLiveData.value = true
   }
   if (farResult.status === 'fulfilled' && Array.isArray(farResult.value)) {
     farEvents = farResult.value
@@ -758,7 +800,7 @@ const fetchEvents = async () => {
     usingLiveData.value = true
   }
 
-  if (!rawRaces && farEvents.length === 0 && bikeEvents.length === 0) {
+  if (!rawRaces && activeEvents.length === 0 && farEvents.length === 0 && bikeEvents.length === 0) {
     events.value    = []
     apiError.value  = 'Live event data is temporarily unavailable. Please try again shortly.'
     usingLiveData.value = false
@@ -772,8 +814,8 @@ const fetchEvents = async () => {
   // Merge all sources, deduplicate by name+date
   const seen = new Set()
   const merged = []
-  for (const ev of [...rsNormalized, ...farEvents, ...bikeEvents]) {
-    const key = `${ev.name}|${ev.date}`
+  for (const ev of [...rsNormalized, ...activeEvents, ...farEvents, ...bikeEvents]) {
+    const key = `${ev.name.trim().toLowerCase()}|${ev.date}|${ev.city || ''}`
     if (!seen.has(key)) {
       seen.add(key)
       merged.push(ev)
@@ -1064,27 +1106,27 @@ watch(zipcode, () => {
 </script>
 
 <style scoped>
-.results-import-section { padding: 28px 0; background: #FFC53D; border-top: 2px solid #16130F; border-bottom: 2px solid #16130F; }
-.results-import-inner { display: grid; grid-template-columns: minmax(220px, .8fr) 1.2fr; gap: 24px; align-items: start; }
+.results-import-section { padding: 30px 0 18px; background: #FBF6EC; }
+.results-import-inner { display: grid; grid-template-columns: minmax(220px, .8fr) 1.2fr; gap: 24px; align-items: start; padding: 28px; background: #FFC53D; border: 1px solid #E6B334; border-radius: 24px; box-shadow: 0 16px 34px rgba(22,19,15,.08); }
 .results-import-title { margin: 4px 0; font-size: 2rem; font-weight: 900; text-transform: uppercase; }
 .results-import-copy { max-width: 380px; margin: 0; font-size: .82rem; }
 .results-signin-prompt { max-width: 380px; margin: 12px 0 0; font-size: .78rem; line-height: 1.45; }
 .results-signin-prompt a, .public-results-gate a { color: #16130F; font-weight: 900; text-decoration: underline; }
-.public-results-gate { display: flex; flex-direction: column; gap: 7px; padding: 18px; background: #fff; border: 2px solid #16130F; box-shadow: 4px 4px #16130F; }
+.public-results-gate { display: flex; flex-direction: column; gap: 7px; padding: 18px; background: #fff; border: 1px solid rgba(22,19,15,.14); border-radius: 16px; box-shadow: 0 8px 20px rgba(22,19,15,.08); }
 .public-results-gate strong { font-size: 1.05rem; }
 .public-results-gate span { color: #665F55; font-size: .82rem; }
 .results-import-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.result-input { min-width: 0; padding: 10px; border: 2px solid #16130F; background: #fff; font-size: .78rem; }
-.result-submit { grid-column: 1 / -1; border: 2px solid #16130F; padding: 10px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.result-input { min-width: 0; padding: 10px 12px; border: 1px solid rgba(22,19,15,.22); border-radius: 10px; background: #fff; font-size: .78rem; }
+.result-submit { grid-column: 1 / -1; border: 1px solid #16130F; border-radius: 10px; padding: 11px; background: #2A55F5; color: #fff; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .result-submit:disabled { opacity: .5; }
-.result-link-btn { border: 2px solid #16130F; padding: 10px; background: #F5D547; color: #16130F; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+.result-link-btn { border: 1px solid #16130F; border-radius: 10px; padding: 10px 12px; background: #F5D547; color: #16130F; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .discovery-steps{display:flex;gap:6px;grid-column:1 / -1;margin-bottom:4px}.discovery-steps span{padding:5px 7px;color:#665f55;font:10px 'Spline Sans Mono',monospace;text-transform:uppercase;border:1px solid rgba(22,19,15,.25)}.discovery-steps span.active{background:#fff;border-color:#16130f;color:#16130f;font-weight:700}
 .manual-import { grid-column: 1 / -1; margin-top: 4px; border-top: 1px solid rgba(22,19,15,.35); padding-top: 12px; }
 .manual-import summary { cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: .78rem; }
 .manual-import summary span { display: block; margin-top: 4px; font-size: .7rem; font-weight: 400; text-transform: none; opacity: .75; }
 .manual-import[open] summary { margin-bottom: 12px; }
 .result-history { grid-column: 1 / -1; display: grid; gap: 6px; margin-top: 4px; }
-.result-history-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; background: #fff; border: 2px solid #16130F; font-size: .8rem; }
+.result-history-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; background: #fff; border: 1px solid rgba(22,19,15,.14); border-radius: 12px; font-size: .8rem; }
 .result-history-row span { display: block; color: #5A5348; font-size: .7rem; margin-top: 3px; }
 .result-history-row a { color: #2A55F5; font-weight: 800; white-space: nowrap; }
 @media (max-width: 700px) { .results-import-inner { grid-template-columns: 1fr; } .results-import-form { grid-template-columns: 1fr; } .result-submit { grid-column: auto; } }
@@ -1097,11 +1139,21 @@ watch(zipcode, () => {
   color: #16130F;
 }
 
+.events-page button:focus-visible,
+.events-page input:focus-visible,
+.events-page select:focus-visible,
+.events-page summary:focus-visible,
+.event-card:focus-visible {
+  outline: 3px solid rgba(42,85,245,.34);
+  outline-offset: 3px;
+}
+
 /* HERO */
 .hero {
   background: #16130F;
   color: #FBF6EC;
-  padding: 68px 0 52px;
+  padding: 68px 0 58px;
+  border-radius: 0 0 30px 30px;
 }
 .hero-inner {
   display: grid;
@@ -1134,8 +1186,10 @@ watch(zipcode, () => {
   margin: 0;
 }
 .hero-panel {
-  border: 2px solid rgba(251,246,236,0.3);
+  border: 1px solid rgba(251,246,236,0.24);
+  border-radius: 22px;
   padding: 22px;
+  background: rgba(255,255,255,.04);
 }
 .hero-panel-kicker {
   display: flex;
@@ -1169,7 +1223,8 @@ watch(zipcode, () => {
   text-transform: uppercase;
 }
 .hero-panel-chip {
-  border: 2px solid rgba(251,246,236,0.4);
+  border: 1px solid rgba(251,246,236,0.28);
+  border-radius: 999px;
   padding: 8px 10px;
   text-align: center;
   color: #FBF6EC;
@@ -1190,7 +1245,7 @@ watch(zipcode, () => {
 /* SPORT TABS — scrollable for 10 tabs */
 .sport-tabs-wrap {
   background: #FBF6EC;
-  border-bottom: 2px solid #16130F;
+  border-bottom: 0;
   position: sticky;
   top: var(--nav-h, 66px);
   z-index: 10;
@@ -1199,7 +1254,13 @@ watch(zipcode, () => {
   display: flex;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 5px;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  border: 1px solid #E7DFCE;
+  border-radius: 999px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 8px 20px rgba(22,19,15,.06);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -1210,8 +1271,8 @@ watch(zipcode, () => {
   gap: 6px;
   padding: 14px 20px;
   background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
+  border: 0;
+  border-radius: 999px;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1225,12 +1286,13 @@ watch(zipcode, () => {
 }
 .sport-tab:hover { color: #16130F; }
 .sport-tab.active { color: #16130F; border-bottom-color: #2A55F5; }
+.sport-tab.active { background: #16130F; color: #FBF6EC; }
 
 /* FILTERS */
 .filters {
   background: #FBF6EC;
-  border-bottom: 2px solid #16130F;
-  padding: 14px 0 12px;
+  border-bottom: 0;
+  padding: 14px 0 18px;
 }
 .filter-row {
   display: flex;
@@ -1238,6 +1300,11 @@ watch(zipcode, () => {
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 12px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #E7DFCE;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(22,19,15,.05);
 }
 .filter-search {
   flex: 1;
@@ -1255,8 +1322,8 @@ watch(zipcode, () => {
 .filter-input {
   width: 100%;
   height: 40px;
-  border: 2px solid #16130F;
-  border-radius: 0;
+  border: 1px solid #D7CFC0;
+  border-radius: 11px;
   padding: 0 12px 0 36px;
   font-size: 0.88rem;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
@@ -1266,12 +1333,12 @@ watch(zipcode, () => {
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
-.filter-input:focus { border-color: #2A55F5; }
+.filter-input:focus { border-color: #2A55F5; box-shadow: 0 0 0 3px rgba(42,85,245,.12); }
 .filter-input--sm { flex: 0 0 120px; padding-left: 12px; }
 .filter-select {
   height: 40px;
-  border: 2px solid #16130F;
-  border-radius: 0;
+  border: 1px solid #D7CFC0;
+  border-radius: 11px;
   padding: 0 32px 0 12px;
   font-size: 0.88rem;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
@@ -1285,11 +1352,12 @@ watch(zipcode, () => {
   cursor: pointer;
   box-sizing: border-box;
 }
-.filter-select:focus { border-color: #2A55F5; }
+.filter-select:focus { border-color: #2A55F5; box-shadow: 0 0 0 3px rgba(42,85,245,.12); }
 .filter-clear {
   height: 40px;
   padding: 0 16px;
-  border: 2px solid #16130F;
+  border: 1px solid #D7CFC0;
+  border-radius: 11px;
   background: #FBF6EC;
   font-size: 0.82rem;
   font-weight: 700;
@@ -1308,7 +1376,8 @@ watch(zipcode, () => {
 .chip-btn {
   height: 32px;
   padding: 0 14px;
-  border: 2px solid #16130F;
+  border: 1px solid #D7CFC0;
+  border-radius: 999px;
   background: #FBF6EC;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1350,7 +1419,8 @@ watch(zipcode, () => {
   text-transform: uppercase;
   color: #2A55F5;
   background: #EEF1FF;
-  border: 2px solid #2A55F5;
+  border: 1px solid #2A55F5;
+  border-radius: 999px;
   padding: 3px 8px;
 }
 .live-dot {
@@ -1378,18 +1448,20 @@ watch(zipcode, () => {
 .events-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 18px;
 }
 
 .event-card {
   background: #fff;
-  border: 2px solid #16130F;
+  border: 1px solid #E7DFCE;
+  border-radius: 22px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.15s;
+  box-shadow: 0 8px 20px rgba(22,19,15,.06);
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
 }
-.event-card:hover { box-shadow: 4px 4px 0 #16130F; }
+.event-card:hover, .event-card:focus-visible { transform: translateY(-3px); box-shadow: 0 16px 28px rgba(22,19,15,.12); border-color: rgba(42,85,245,.44); }
 
 .event-img {
   position: relative;
@@ -1410,7 +1482,8 @@ watch(zipcode, () => {
   padding: 4px 8px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 2px solid #16130F;
+  border: 1px solid rgba(22,19,15,.14);
+  border-radius: 999px;
 }
 .sport-badge {
   position: absolute;
@@ -1422,6 +1495,7 @@ watch(zipcode, () => {
   font-size: 0.66rem;
   font-weight: 700;
   padding: 4px 8px;
+  border-radius: 999px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -1433,7 +1507,8 @@ watch(zipcode, () => {
   color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
 }
 .bookmark-btn {
   position: absolute;
@@ -1442,7 +1517,8 @@ watch(zipcode, () => {
   width: 30px;
   height: 30px;
   background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(255,255,255,0.30);
+  border: 1px solid rgba(22,19,15,.12);
+  border-radius: 999px;
   color: #000;
   font-size: 0.9rem;
   cursor: pointer;
@@ -1460,6 +1536,9 @@ watch(zipcode, () => {
   flex-direction: column;
   flex: 1;
 }
+.event-source-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.event-source { color: #2A55F5; font-family: 'Spline Sans Mono', ui-monospace, monospace; font-size: .6rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.event-open-hint { color: #8B8378; font-size: .7rem; }
 .event-name {
   font-size: 1rem;
   font-weight: 900;
@@ -1491,6 +1570,7 @@ watch(zipcode, () => {
   font-weight: 700;
   padding: 3px 8px;
   border: 1px solid #E7DFCE;
+  border-radius: 999px;
   color: #5A5348;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1510,8 +1590,9 @@ watch(zipcode, () => {
   display: block;
   background: #2A55F5;
   color: #fff;
-  border: 2px solid #16130F;
-  border-top: none;
+  border: 0;
+  border-top: 1px solid rgba(22,19,15,.08);
+  border-radius: 0 0 22px 22px;
   padding: 13px;
   text-align: center;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
@@ -1520,11 +1601,11 @@ watch(zipcode, () => {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  box-shadow: 3px 3px 0 #16130F;
+  box-shadow: none;
   transition: background 0.15s, box-shadow 0.15s;
   flex-shrink: 0;
 }
-.btn-register-full:hover { background: #1E42D6; box-shadow: 4px 4px 0 #16130F; color: #fff; text-decoration: none; }
+.btn-register-full:hover { background: #1E42D6; box-shadow: none; color: #fff; text-decoration: none; }
 .btn-register-full--disabled { background: #E7DFCE; color: #8A8A8A; box-shadow: none; cursor: default; }
 
 /* Error */
@@ -1542,7 +1623,8 @@ watch(zipcode, () => {
 .retry-btn {
   height: 36px;
   padding: 0 20px;
-  border: 1px solid #E5E5E5;
+  border: 1px solid #D7CFC0;
+  border-radius: 10px;
   background: #fff;
   font-size: 0.82rem;
   font-weight: 700;
@@ -1555,7 +1637,8 @@ watch(zipcode, () => {
 .load-more-btn {
   height: 44px;
   padding: 0 40px;
-  border: 2px solid #16130F;
+  border: 1px solid #16130F;
+  border-radius: 999px;
   background: #FBF6EC;
   color: #16130F;
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
@@ -1566,7 +1649,7 @@ watch(zipcode, () => {
   cursor: pointer;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 }
-.load-more-btn:hover { background: #16130F; color: #FBF6EC; box-shadow: 3px 3px 0 #2A55F5; }
+.load-more-btn:hover { background: #16130F; color: #FBF6EC; box-shadow: 0 8px 16px rgba(22,19,15,.16); }
 
 @media (max-width: 1024px) {
   .events-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1575,12 +1658,28 @@ watch(zipcode, () => {
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 28px 0; }
+  .hero { padding: 34px 0 30px; border-radius: 0 0 22px 22px; }
+  .hero-headline { font-size: clamp(2.5rem, 13vw, 4rem); line-height: .88; }
+  .hero-lead { font-size: .92rem; }
+  .results-import-section { padding: 18px 0 8px; }
+  .results-import-inner { padding: 20px; border-radius: 20px; }
   .filter-row { gap: 8px; }
   .filter-input--sm { flex: 1 1 100px; }
   .events-grid { grid-template-columns: 1fr; }
-  .sport-tabs { padding: 0 12px; }
+  .sport-tabs { padding: 5px 12px; }
   .sport-tab { padding: 12px 14px; font-size: 0.66rem; }
+  .sport-tabs-wrap { top: var(--nav-h, 66px); }
+  .filter-search { min-width: 100%; }
+  .filter-select, .filter-input--sm, .filter-clear { flex: 1 1 calc(50% - 8px); }
+}
+
+@media (max-width: 460px) {
+  .sport-tabs { margin-left: 12px; margin-right: 12px; }
+  .sport-tab { padding: 10px 12px; }
+  .results-import-inner { margin: 0 12px; padding: 18px; }
+  .results { padding-top: 18px; }
+  .results-meta { margin: 0 12px 16px; }
+  .events-grid, .events-error, .load-more-wrap { margin-left: 12px; margin-right: 12px; }
 }
 
 /* ── Race Detail Drawer ── */
@@ -1588,8 +1687,8 @@ watch(zipcode, () => {
   position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1040;
 }
 .race-drawer {
-  position: fixed; top: 0; right: 0; width: 480px; max-width: 100vw;
-  height: 100vh; background: #FBF6EC; border-left: 2px solid #16130F;
+  position: fixed; top: 12px; right: 12px; width: 480px; max-width: calc(100vw - 24px);
+  height: calc(100vh - 24px); background: #FBF6EC; border: 1px solid #E7DFCE; border-radius: 24px;
   z-index: 1050; display: flex; flex-direction: column;
   font-family: 'Hanken Grotesk', system-ui, sans-serif;
 }
@@ -1600,11 +1699,11 @@ watch(zipcode, () => {
 
 .rd-header {
   display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; border-bottom: 1px solid #E5E5E5;
+  padding: 14px 16px; border-bottom: 1px solid #E5E5E5; border-radius: 24px 24px 0 0;
   flex-shrink: 0; position: sticky; top: 0; background: #fff; z-index: 2;
 }
 .rd-close {
-  width: 36px; height: 36px; border: 1px solid #E5E5E5; background: #fff;
+  width: 36px; height: 36px; border: 1px solid #E5E5E5; border-radius: 999px; background: #fff;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 0.9rem; color: #767676;
   transition: border-color 0.15s;
@@ -1624,7 +1723,7 @@ watch(zipcode, () => {
 .rd-date-badge {
   background: rgba(255,255,255,0.93); color: #000;
   font-size: 0.72rem; font-weight: 900; padding: 4px 10px;
-  letter-spacing: 0.04em; border: 1px solid rgba(15,18,16,0.08);
+  letter-spacing: 0.04em; border: 1px solid rgba(15,18,16,0.08); border-radius: 999px;
 }
 
 .rd-title-block { padding: 20px 20px 0; }
@@ -1647,7 +1746,7 @@ watch(zipcode, () => {
 /* Pacing */
 .rd-pace-inputs { display: flex; gap: 10px; margin-bottom: 14px; }
 .rd-select, .rd-input {
-  height: 40px; border: 1px solid #E5E5E5; border-radius: 0;
+  height: 40px; border: 1px solid #E5E5E5; border-radius: 10px;
   padding: 0 12px; font-size: 0.88rem; font-family: inherit;
   color: #000; outline: none; background: #fff;
   transition: border-color 0.15s;
@@ -1661,7 +1760,7 @@ watch(zipcode, () => {
 .rd-input { flex: 1; }
 .rd-select:focus, .rd-input:focus { border-color: #000; }
 
-.rd-splits { border: 1px solid #E5E5E5; }
+.rd-splits { border: 1px solid #E5E5E5; border-radius: 12px; overflow: hidden; }
 .rd-splits-head, .rd-split-row {
   display: grid; grid-template-columns: 60px 1fr 1fr;
   padding: 8px 12px; font-size: 0.80rem;
@@ -1678,14 +1777,14 @@ watch(zipcode, () => {
 
 /* Plan */
 .rd-plan-error {
-  background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626;
+  background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px; color: #dc2626;
   font-size: 0.82rem; padding: 10px 12px; margin-bottom: 12px;
 }
 
 /* Buttons */
 .rd-btn-outline {
   display: inline-flex; align-items: center;
-  height: 40px; padding: 0 16px; border: 1px solid #E5E5E5;
+  height: 40px; padding: 0 16px; border: 1px solid #E5E5E5; border-radius: 10px;
   background: #fff; color: #000; font-size: 0.80rem; font-weight: 700;
   text-decoration: none; cursor: pointer; font-family: inherit;
   transition: border-color 0.15s;
@@ -1694,7 +1793,7 @@ watch(zipcode, () => {
 .rd-btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
   width: 100%; height: 44px; background: #2A55F5; color: #fff;
-  border: none; font-size: 0.82rem; font-weight: 700;
+  border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.10em; cursor: pointer;
   font-family: inherit; transition: background 0.15s;
 }
@@ -1706,4 +1805,9 @@ watch(zipcode, () => {
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+@media (max-width: 460px) {
+  .race-drawer { top: 0; right: 0; max-width: 100vw; width: 100vw; height: 100vh; border-radius: 0; }
+  .rd-header { border-radius: 0; }
+}
 </style>
