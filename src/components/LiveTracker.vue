@@ -24,7 +24,7 @@
 
     <!-- Big timer (recording / paused) -->
     <div v-if="hasStarted" class="lt-timer-block" :class="{ 'lt-timer-block--dim': !isTracking }">
-      <div class="lt-timer">{{ formatDurationClock(elapsedTime) }}</div>
+      <div class="lt-timer" aria-live="polite" aria-atomic="true">{{ formatDurationClock(elapsedTime) }}</div>
     </div>
 
     <!-- 3-up stat row (recording / paused) -->
@@ -58,52 +58,19 @@
       </div>
     </div>
 
-    <!-- Content zone — visible in ready state only; fills dead ink space above the sheet -->
-    <div v-if="!hasStarted" class="lt-content-zone">
+    <!-- Ready-state guidance: useful context without invented workout data. -->
+    <div v-if="!hasStarted" class="lt-ready-context">
 
-      <!-- Elevation teaser -->
-      <div class="lt-cz-card">
-        <div class="lt-cz-eyebrow">ELEVATION PROFILE</div>
-        <svg class="lt-cz-elev-svg" viewBox="0 0 280 52" preserveAspectRatio="none" aria-hidden="true">
-          <polyline
-            points="0,48 40,36 80,42 130,14 175,24 210,8 250,20 280,26"
-            fill="none" stroke="#2A55F5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-          />
-          <polyline
-            points="0,48 40,36 80,42 130,14 175,24 210,8 250,20 280,26 280,52 0,52"
-            fill="rgba(42,85,245,0.14)" stroke="none"
-          />
-        </svg>
-        <div class="lt-cz-elev-note">Elevation loads once you start tracking</div>
+      <div class="lt-ready-context-copy">
+        <span>READY WHEN YOU ARE</span>
+        <strong>{{ selectedSportLabel }} mode</strong>
+        <p>Runnit will capture your route, distance, time, pace, and elevation while you move.</p>
       </div>
-
-      <!-- Today's plan -->
-      <div class="lt-cz-card lt-cz-card--plan">
-        <div class="lt-cz-eyebrow">TODAY'S PLAN</div>
-        <div class="lt-cz-plan-row">
-          <span class="lt-cz-plan-name">Tempo Intervals</span>
-          <router-link to="/plans" class="lt-cz-plan-link">View →</router-link>
-        </div>
+      <div class="lt-ready-context-items">
+        <span><i class="bi bi-geo-alt"></i> Route</span>
+        <span><i class="bi bi-stopwatch"></i> Time</span>
+        <span><i class="bi bi-activity"></i> Pace</span>
       </div>
-
-      <!-- 3-up mini stats -->
-      <div class="lt-cz-stats">
-        <div class="lt-cz-ms">
-          <div class="lt-cz-ms-label">LAST RUN</div>
-          <div class="lt-cz-ms-val">—</div>
-        </div>
-        <div class="lt-cz-ms-div"></div>
-        <div class="lt-cz-ms">
-          <div class="lt-cz-ms-label">WK TOTAL</div>
-          <div class="lt-cz-ms-val">—</div>
-        </div>
-        <div class="lt-cz-ms-div"></div>
-        <div class="lt-cz-ms">
-          <div class="lt-cz-ms-label">STREAK</div>
-          <div class="lt-cz-ms-val lt-cz-ms-val--streak">0 days</div>
-        </div>
-      </div>
-
     </div>
 
     <!-- Draft Recovery Banner -->
@@ -181,19 +148,22 @@
               :class="['lt-sport-btn', { 'lt-sport-btn--active': selectedSport === sport.value }]"
               @click="selectedSport = sport.value"
               type="button"
+              :aria-pressed="selectedSport === sport.value"
             >
-              <span class="lt-sport-icon">{{ sport.value.charAt(0) }}</span>
+              <span class="lt-sport-icon"><i :class="['bi', sport.icon]" aria-hidden="true"></i></span>
               <span class="lt-sport-name">{{ sport.label }}</span>
             </button>
           </div>
         </div>
         <div class="lt-ready-row">
+          <span class="lt-start-hint">Choose a sport, then go</span>
           <div class="lt-flanker">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
           </div>
-          <button class="lt-start-btn" @click="startTracking" type="button" aria-label="Start tracking">
+          <button class="lt-start-btn" @click="startTracking" type="button" :aria-label="`Start ${selectedSportLabel.toLowerCase()} tracking`">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
           </button>
+          <span class="lt-start-label">Start {{ selectedSportLabel }}</span>
           <div class="lt-flanker">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           </div>
@@ -204,10 +174,10 @@
       <template v-if="isTracking">
         <div class="lt-ctrl-row">
           <div class="lt-ctrl-col">
-            <button class="lt-ctrl lt-ctrl--lap" type="button">
+            <button class="lt-ctrl lt-ctrl--lap" type="button" @click="markLap" aria-label="Mark lap">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
             </button>
-            <span class="lt-ctrl-lbl">LAP</span>
+            <span class="lt-ctrl-lbl">LAP {{ lapCount + 1 }}</span>
           </div>
           <div class="lt-ctrl-col">
             <button class="lt-ctrl lt-ctrl--stop" @click="showFinishConfirm = true" :disabled="saving" type="button">
@@ -240,7 +210,7 @@
             {{ saving ? 'Saving…' : 'Finish' }}
           </button>
         </div>
-        <button class="lt-discard-link" @click="showFinishConfirm = true" type="button">Discard Activity</button>
+        <button class="lt-discard-link" @click="showDiscardConfirm = true" type="button">Discard activity</button>
       </template>
 
     </div>
@@ -260,6 +230,15 @@
       body="Save this workout and end the session."
       confirm-label="Save & Finish"
       @confirm="stopTracking"
+    />
+
+    <ConfirmModal
+      v-model="showDiscardConfirm"
+      title="Discard Activity?"
+      body="This will remove the unfinished route and return you to the record screen."
+      confirm-label="Discard"
+      :danger="true"
+      @confirm="discardTrackedActivity"
     />
 
     <!-- SOS Button -->
@@ -309,7 +288,7 @@ import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
 
 // Emits elapsed seconds upward so parent (Track.vue) can feed WorkoutStepGuide
-const emit = defineEmits(['elapsed'])
+const emit = defineEmits(['elapsed', 'discarded'])
 
 const isNative = Capacitor.isNativePlatform()
 
@@ -322,11 +301,11 @@ const activityStore = useActivityStore()
 const { formatDistance, formatPace, formatElevation, formatDurationClock } = useUnits()
 
 const sports = [
-  { value: 'RUN',  emoji: '🏃', label: 'Run'  },
-  { value: 'BIKE', emoji: '🚴', label: 'Bike' },
-  { value: 'SWIM', emoji: '🏊', label: 'Swim' },
-  { value: 'HIKE', emoji: '🥾', label: 'Hike' },
-  { value: 'WALK', emoji: '🚶', label: 'Walk' },
+  { value: 'RUN',  icon: 'bi-person-running', label: 'Run'  },
+  { value: 'BIKE', icon: 'bi-bicycle', label: 'Bike' },
+  { value: 'SWIM', icon: 'bi-water', label: 'Swim' },
+  { value: 'HIKE', icon: 'bi-signpost-split', label: 'Hike' },
+  { value: 'WALK', icon: 'bi-person-walking', label: 'Walk' },
 ]
 
 // State
@@ -343,6 +322,9 @@ const routeCoordinates = ref([])
 const lastPosition     = ref(null)     // [lng, lat, timestamp_ms, alt]
 const lastPaceUpdate   = ref(null)     // for smoothed current pace
 const currentPaceMinPerKm = ref(0)
+const lapCount          = ref(0)
+const lapStartDistance  = ref(0)
+const showDiscardConfirm = ref(false)
 const saving           = ref(false)
 const saveError        = ref('')
 const gpsError         = ref('')
@@ -407,6 +389,8 @@ const avgPaceMinPerKm = computed(() => {
   if (totalDistance.value < 10 || elapsedTime.value === 0) return 0
   return (elapsedTime.value / 60) / (totalDistance.value / 1000)
 })
+
+const selectedSportLabel = computed(() => sports.find(s => s.value === selectedSport.value)?.label || 'Run')
 
 // ── Map ─────────────────────────────────────────────────────────────────────
 
@@ -692,6 +676,8 @@ const resumeDraft = () => {
     totalDistance.value    = draft.totalDistance || 0
     elevationGain.value    = draft.elevationGain || 0
     selectedSport.value    = draft.sport        || 'RUN'
+    lapCount.value         = 0
+    lapStartDistance.value = totalDistance.value
     pausedMs               = elapsedTime.value * 1000
     // Redraw saved route on map
     updateRouteOnMap()
@@ -705,6 +691,21 @@ const discardDraft = () => {
   showDraftBanner.value = false
 }
 
+const markLap = () => {
+  const lapDistance = Math.max(0, totalDistance.value - lapStartDistance.value)
+  lapCount.value += 1
+  lapStartDistance.value = totalDistance.value
+  showToast(`Lap ${lapCount.value} · ${formatDistance(lapDistance)}`)
+}
+
+const discardTrackedActivity = () => {
+  showDiscardConfirm.value = false
+  stopSharing().catch(() => {})
+  pauseTracking()
+  clearDraft()
+  emit('discarded')
+}
+
 // ── Tracking controls ─────────────────────────────────────────────────────────
 
 const startTracking = async () => {
@@ -712,6 +713,7 @@ const startTracking = async () => {
   if (!trackingStartedAt.value) trackingStartedAt.value = Date.now()
   isTracking.value = true
   hasStarted.value = true
+  if (lapCount.value === 0) lapStartDistance.value = totalDistance.value
   startEpoch = Date.now() - pausedMs
 
   if (isNative) {
@@ -1851,5 +1853,86 @@ onUnmounted(() => {
 
 .lt-cz-ms-val--streak {
   color: #FFC53D;
+}
+
+/* Record refinement: make the live surface feel like a focused instrument. */
+.lt {
+  width: min(100%, 920px);
+  min-height: calc(100svh - var(--nav-h, 66px));
+  margin: 0 auto;
+  border-radius: 0 0 24px 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 60px rgba(22,19,15,.16);
+}
+.lt-status-bar { height: 48px; padding-inline: 24px; }
+.lt-timer-block { padding-top: 30px; }
+.lt-timer { font-size: clamp(78px, 12vw, 132px); }
+.lt-stats-row { border: 1px solid rgba(251,246,236,.2); border-radius: 18px; overflow: hidden; margin-inline: 24px; }
+.lt-stat-div { width: 1px; }
+.lt-map-wrap { min-height: 260px; }
+.lt-sheet { border-top: 1px solid #DED5C4; border-radius: 24px 24px 0 0; padding: 24px 24px 30px; }
+.lt-sport-options { gap: 10px; }
+.lt-sport-btn { border: 1px solid #DED5C4; border-radius: 14px; box-shadow: none; }
+.lt-sport-btn:hover { background: #EEF1FF; }
+.lt-sport-btn--active { border-color: #2A55F5; box-shadow: 0 8px 18px rgba(42,85,245,.16); }
+.lt-sport-icon { border: 0; width: 28px; height: 28px; font-size: 1.1rem; }
+.lt-ready-row { gap: 18px; }
+.lt-ready-row .lt-flanker { display: none; }
+.lt-start-hint,
+.lt-start-label { color: #756D62; font-size: .74rem; line-height: 1.3; }
+.lt-start-hint { max-width: 95px; text-align: right; }
+.lt-start-label { max-width: 72px; }
+.lt-start-btn { width: 88px; height: 88px; border: 0; box-shadow: 0 12px 26px rgba(42,85,245,.28); }
+.lt-start-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(42,85,245,.34); }
+.lt-ctrl { border-width: 1px; box-shadow: 0 8px 18px rgba(22,19,15,.12); }
+.lt-ctrl:active { box-shadow: 0 3px 8px rgba(22,19,15,.12); }
+.lt-share-btn { height: 46px; border: 1px solid #DED5C4; border-radius: 999px; }
+.lt-paused-row { gap: 10px; }
+.lt-resume-btn, .lt-finish-btn { border-width: 1px; box-shadow: 0 8px 18px rgba(22,19,15,.12); }
+.lt-discard-link { letter-spacing: .04em; text-transform: none; }
+.lt-ready-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 24px;
+  background: #16130F;
+  border-top: 1px solid rgba(251,246,236,.1);
+}
+.lt-ready-context-copy { display: grid; gap: 4px; }
+.lt-ready-context-copy > span { color: rgba(251,246,236,.48); font: 700 .58rem/1.2 'Spline Sans Mono', ui-monospace, monospace; letter-spacing: .12em; }
+.lt-ready-context-copy strong { color: #FBF6EC; font-size: .96rem; }
+.lt-ready-context-copy p { margin: 0; color: rgba(251,246,236,.58); font-size: .76rem; line-height: 1.35; }
+.lt-ready-context-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.lt-ready-context-items span { display: inline-flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid rgba(251,246,236,.18); border-radius: 999px; color: rgba(251,246,236,.72); font-size: .68rem; }
+.lt-ready-context-items i { color: #FFC53D; }
+.lt-draft-banner { border-top: 0; padding: 14px 24px; }
+.lt-draft-btn { border-width: 1px; border-radius: 999px; }
+.lt-save-error { border-top: 0; padding-inline: 24px; }
+.lt-share-banner { border-top: 0; padding-inline: 24px; }
+.lt-sos-btn { height: 52px; border-top: 0; }
+.lt-sos-modal { border: 1px solid #DED5C4; border-radius: 22px; box-shadow: 0 20px 60px rgba(22,19,15,.24); }
+.lt-notes-overlay { background: rgba(22,19,15,.62); align-items: center; padding: 24px; }
+.lt-notes-inner { max-width: 560px; padding: 28px; border: 1px solid #DED5C4; border-radius: 24px; background: #FBF6EC; box-shadow: 0 24px 80px rgba(22,19,15,.24); }
+.lt-notes-textarea { border: 1px solid #DED5C4; border-radius: 14px; padding: 13px 14px 40px; }
+.lt-notes-textarea:focus { box-shadow: 0 0 0 4px rgba(42,85,245,.12); }
+.lt-notes-actions { border: 0; gap: 10px; }
+.lt-notes-skip, .lt-notes-done { border: 1px solid #DED5C4; border-radius: 999px; }
+.lt-notes-skip { border-right: 1px solid #DED5C4; }
+@media (max-width: 640px) {
+  .lt { width: 100%; border-radius: 0; box-shadow: none; }
+  .lt-status-bar { padding-inline: 16px; }
+  .lt-timer-block { padding-top: 24px; }
+  .lt-stats-row { margin-inline: 16px; }
+  .lt-sheet { padding: 20px 16px 26px; border-radius: 22px 22px 0 0; }
+  .lt-ready-context { align-items: flex-start; flex-direction: column; padding: 14px 16px; gap: 12px; }
+  .lt-ready-context-items { width: 100%; justify-content: space-between; }
+  .lt-ready-context-items span { flex: 1; justify-content: center; }
+  .lt-start-hint { display: none; }
+  .lt-start-label { max-width: 58px; }
+  .lt-start-btn { width: 78px; height: 78px; }
+  .lt-draft-banner, .lt-save-error, .lt-share-banner { padding-inline: 16px; }
+  .lt-notes-overlay { align-items: flex-start; padding: 16px; }
+  .lt-notes-inner { padding: 20px; border-radius: 20px; }
 }
 </style>
