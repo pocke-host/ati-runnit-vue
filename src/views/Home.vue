@@ -56,82 +56,96 @@
     </section>
 
     <!-- TRACK -->
-    <section id="track" class="content-section">
+    <section id="track" class="content-section track-section">
       <div class="home-inner">
         <div class="two-col two-col--text-left">
           <div class="col-copy">
-            <div class="rk-eyebrow">Track</div>
-            <h2 class="section-h2">Every step,<br>on the record.</h2>
-            <p class="section-body">Watch, phone, or a shoelace and a dream — it all lands in one place. Splits, route, elevation, heart rate. Then your crew piles on the kudos.</p>
+            <div class="track-intro-line"><div class="rk-eyebrow">01 / Track</div><span>Capture the work once</span></div>
+            <h2 class="section-h2">Every step,<br><span class="track-h2-accent">on the record.</span></h2>
+            <p class="section-body">Phone, watch, or a connected provider — your activity lands in one clear record. Route, splits, elevation, heart rate, and the people showing up for the work.</p>
             <!-- Animated flow steps -->
             <div class="track-steps">
               <div class="track-step">
                 <div class="ts-dot ts-dot--done"></div>
                 <div class="ts-body">
-                  <div class="ts-num">01 — GPS locks in</div>
-                  <div class="ts-desc">Position confirmed. You're on the clock.</div>
+                  <div class="ts-num">01 — Start anywhere</div>
+                  <div class="ts-desc">GPS locks in. No setup theater.</div>
                 </div>
               </div>
               <div class="ts-connector"></div>
               <div class="track-step">
                 <div class="ts-dot ts-dot--active"></div>
                 <div class="ts-body">
-                  <div class="ts-num">02 — Route records</div>
-                  <div class="ts-desc">Every turn, split, and elevation change logged.</div>
+                  <div class="ts-num">02 — Keep the detail</div>
+                  <div class="ts-desc">Route, splits, elevation, and heart rate stay together.</div>
                 </div>
               </div>
               <div class="ts-connector"></div>
               <div class="track-step">
                 <div class="ts-dot"></div>
                 <div class="ts-body">
-                  <div class="ts-num">03 — Crew reacts</div>
-                  <div class="ts-desc">Post the moment. Kudos flood in.</div>
+                  <div class="ts-num">03 — Share the moment</div>
+                  <div class="ts-desc">Post the work. Let your crew show up.</div>
                 </div>
               </div>
             </div>
+            <div class="track-payoff">
+              <span class="track-payoff-mark"><i class="bi bi-arrow-down-right"></i></span>
+              <div><strong>One activity. A clearer next move.</strong><span>Runnit keeps the record useful after the route ends.</span></div>
+            </div>
           </div>
-          <div class="activity-card">
-            <div class="ac-header">
-              <div class="ac-avatar">MK</div>
-              <div class="ac-info">
-                <div class="ac-name">Morning Long Run</div>
-                <div class="ac-meta">@maya.k · 06:12</div>
+          <div class="track-demo-wrap">
+            <div class="track-demo-label"><span>Example activity</span><span>Live route → useful record</span></div>
+            <div class="activity-card">
+              <div class="ac-header">
+                <div class="ac-avatar">MK</div>
+                <div class="ac-info">
+                  <div class="ac-name">Morning Long Run</div>
+                  <div class="ac-meta">@maya.k · Today, 06:12 · Marathon build</div>
+                </div>
+                <div class="ac-rec-badge">
+                  <span class="ac-rec-dot"></span>REC
+                </div>
               </div>
-              <div class="ac-rec-badge">
-                <span class="ac-rec-dot"></span>REC
+              <div class="ac-map">
+                <!-- Phase 1: GPS chip fades in first -->
+                <div class="ac-gps-chip">
+                  <span class="ac-gps-dot"></span>GPS Locked
+                </div>
+                <!-- Phase 2: live pace appears as route draws -->
+                <div class="ac-live-pace">4:38 /KM LIVE</div>
+                <div class="ac-route-caption"><span>ROUTE IN PROGRESS</span><span>21.1 KM GOAL</span></div>
+                <svg viewBox="0 0 600 200" preserveAspectRatio="none" class="ac-route-svg">
+                  <!-- start dot -->
+                  <circle cx="30" cy="160" r="6" fill="#FBF6EC" stroke="#2A55F5" stroke-width="2" class="route-start-dot"></circle>
+                  <!-- route draws after GPS lock -->
+                  <path d="M30,160 C120,90 150,150 240,110 C330,70 380,130 470,70 C520,40 560,80 580,55"
+                    fill="none" stroke="#2A55F5" stroke-width="3"
+                    stroke-dasharray="1000" stroke-dashoffset="1000" class="route-draw"></path>
+                  <!-- end dot pulses after route finishes -->
+                  <circle cx="580" cy="55" r="5" fill="#2A55F5" class="route-end-dot"></circle>
+                  <circle cx="580" cy="55" r="5" fill="none" stroke="#2A55F5" stroke-width="3" class="route-end-ping"></circle>
+                </svg>
+              </div>
+              <!-- Phase 3: stats and reactions stagger in -->
+              <div class="ac-stats">
+                <div class="ac-stat ac-stat--s1"><div class="ac-stat-label">DIST</div><div class="ac-stat-val">21.1</div></div>
+                <div class="ac-stat ac-stat--s2"><div class="ac-stat-label">PACE</div><div class="ac-stat-val">4:38</div></div>
+                <div class="ac-stat ac-stat--s3"><div class="ac-stat-label">TIME</div><div class="ac-stat-val">1:37</div></div>
+                <div class="ac-reactions ac-reactions--pop">
+                  <span class="reaction-pill reaction-pill--cobalt">↑ 41</span>
+                  <span class="reaction-pill reaction-pill--yellow">👏 12</span>
+                </div>
+              </div>
+              <div class="ac-after-row">
+                <div><span>TRAINING BLOCK</span><strong>MARATHON BUILD · WEEK 08</strong></div>
+                <div class="ac-after-status"><i class="bi bi-check-circle-fill"></i> Ready for your next session</div>
               </div>
             </div>
-            <div class="ac-map">
-              <!-- Phase 1: GPS chip fades in first -->
-              <div class="ac-gps-chip">
-                <span class="ac-gps-dot"></span>GPS Locked
-              </div>
-              <!-- Phase 2: live pace appears as route draws -->
-              <div class="ac-live-pace">4:38 /KM LIVE</div>
-              <svg viewBox="0 0 600 200" preserveAspectRatio="none" class="ac-route-svg">
-                <!-- start dot -->
-                <circle cx="30" cy="160" r="6" fill="#FBF6EC" stroke="#2A55F5" stroke-width="2" class="route-start-dot"></circle>
-                <!-- route draws after GPS lock -->
-                <path d="M30,160 C120,90 150,150 240,110 C330,70 380,130 470,70 C520,40 560,80 580,55"
-                  fill="none" stroke="#2A55F5" stroke-width="3"
-                  stroke-dasharray="1000" stroke-dashoffset="1000" class="route-draw"></path>
-                <!-- end dot pulses after route finishes -->
-                <circle cx="580" cy="55" r="5" fill="#2A55F5" class="route-end-dot"></circle>
-                <circle cx="580" cy="55" r="5" fill="none" stroke="#2A55F5" stroke-width="3" class="route-end-ping"></circle>
-              </svg>
-            </div>
-            <!-- Phase 3: stats and reactions stagger in -->
-            <div class="ac-stats">
-              <div class="ac-stat ac-stat--s1"><div class="ac-stat-label">DIST</div><div class="ac-stat-val">21.1</div></div>
-              <div class="ac-stat ac-stat--s2"><div class="ac-stat-label">PACE</div><div class="ac-stat-val">4:38</div></div>
-              <div class="ac-stat ac-stat--s3"><div class="ac-stat-label">TIME</div><div class="ac-stat-val">1:37</div></div>
-              <div class="ac-reactions ac-reactions--pop">
-                <span class="reaction-pill reaction-pill--cobalt">↑ 41</span>
-                <span class="reaction-pill reaction-pill--yellow">👏 12</span>
-              </div>
-            </div>
+            <div class="track-demo-foot"><i class="bi bi-stars"></i><span>Not just a workout log. A living record of the work.</span></div>
           </div>
         </div>
+        <div class="track-section-cta"><span>Ready when you are.</span><router-link to="/signup" class="btn-pill-primary">Start tracking free <i class="bi bi-arrow-up-right"></i></router-link></div>
       </div>
     </section>
 
@@ -1348,6 +1362,223 @@ function scrollTo(id) {
     transform: scale(.82);
     transform-origin: top center;
     margin-bottom: -42px;
+  }
+}
+
+/* Track story refinement: make the capture-to-progress loop feel tangible. */
+.home-page .track-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 14%, rgba(42,85,245,.08), transparent 24%),
+    #FBF6EC;
+}
+.home-page .track-section .two-col {
+  align-items: start;
+  gap: clamp(32px, 5vw, 72px);
+}
+.track-intro-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.track-intro-line > span,
+.track-demo-label,
+.track-section-cta > span {
+  color: #8A8173;
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.track-h2-accent {
+  display: inline-block;
+  color: #2A55F5;
+  transform: translateX(10px);
+}
+.home-page .track-section .section-body {
+  max-width: 470px;
+  font-size: 1.05rem;
+}
+.track-payoff {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 450px;
+  margin-top: 28px;
+  padding: 15px 16px;
+  border: 1px solid #DED5C4;
+  border-radius: 16px;
+  background: rgba(255,255,255,.56);
+  box-shadow: 0 10px 24px rgba(22,19,15,.05);
+}
+.track-payoff-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 999px;
+  background: #FFC53D;
+  color: #16130F;
+  font-size: .9rem;
+}
+.track-payoff strong,
+.track-payoff span {
+  display: block;
+}
+.track-payoff strong {
+  color: #16130F;
+  font-size: .88rem;
+  line-height: 1.25;
+}
+.track-payoff div > span {
+  margin-top: 4px;
+  color: #6E665A;
+  font-size: .78rem;
+  line-height: 1.4;
+}
+.track-demo-wrap {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #DED5C4;
+  border-radius: 24px;
+  background: rgba(255,255,255,.68);
+  box-shadow: 0 22px 60px rgba(22,19,15,.11);
+}
+.track-demo-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 5px 12px;
+}
+.track-demo-label span:last-child {
+  color: #2A55F5;
+}
+.home-page .track-demo-wrap .activity-card {
+  overflow: hidden;
+  border: 0;
+  border-radius: 17px;
+  box-shadow: none;
+}
+.ac-route-caption {
+  position: absolute;
+  z-index: 1;
+  right: 14px;
+  bottom: 12px;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(251,246,236,.62);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: .53rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+.ac-route-caption span:last-child {
+  padding: 5px 8px;
+  border: 1px solid rgba(255,197,61,.62);
+  border-radius: 999px;
+  color: #FFC53D;
+  white-space: nowrap;
+}
+.ac-after-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 16px 15px;
+  border-top: 1px solid rgba(251,246,236,.14);
+  background: #201D18;
+  color: rgba(251,246,236,.58);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: .56rem;
+  letter-spacing: .1em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+.ac-after-row > div:first-child span,
+.ac-after-row > div:first-child strong {
+  display: block;
+}
+.ac-after-row > div:first-child strong {
+  margin-top: 3px;
+  color: #FBF6EC;
+  font-size: .62rem;
+  font-weight: 700;
+}
+.ac-after-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #9CC7A2;
+  text-align: right;
+  white-space: nowrap;
+}
+.ac-after-status i { font-size: .75rem; }
+.track-demo-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 5px 2px;
+  color: #6E665A;
+  font-size: .76rem;
+}
+.track-demo-foot i {
+  color: #2A55F5;
+  font-size: .9rem;
+}
+.track-section-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #DED5C4;
+}
+.track-section-cta .btn-pill-primary {
+  padding: 11px 18px;
+  font-size: .84rem;
+  box-shadow: 3px 3px 0 #16130F;
+}
+@media (max-width: 860px) {
+  .home-page .track-section .two-col { gap: 28px; }
+  .home-page .track-section .col-copy { max-width: 620px; }
+  .track-section-cta { margin-top: 24px; }
+}
+@media (max-width: 640px) {
+  .track-intro-line { align-items: flex-start; }
+  .track-intro-line > span { max-width: 130px; text-align: right; }
+  .track-h2-accent { transform: none; }
+  .track-payoff { margin-top: 22px; }
+  .track-demo-wrap { padding: 9px; border-radius: 20px; }
+  .track-demo-label { align-items: flex-start; flex-direction: column; gap: 4px; padding: 4px 4px 10px; }
+  .home-page .track-demo-wrap .activity-card { border-radius: 14px; }
+  .ac-header { padding: 14px; }
+  .ac-meta { max-width: 190px; line-height: 1.4; }
+  .ac-map { height: 138px; }
+  .ac-route-caption { right: 12px; bottom: 10px; left: 12px; }
+  .ac-after-row { align-items: flex-start; flex-direction: column; gap: 10px; padding: 12px 14px 14px; }
+  .ac-after-status { text-align: left; }
+  .track-demo-foot { padding: 11px 3px 1px; line-height: 1.4; }
+  .track-section-cta { align-items: stretch; flex-direction: column; gap: 14px; }
+  .track-section-cta .btn-pill-primary { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .track-section *,
+  .track-section *::before,
+  .track-section *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
   }
 }
 </style>
