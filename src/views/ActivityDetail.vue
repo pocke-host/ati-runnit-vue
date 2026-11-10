@@ -2239,4 +2239,16 @@ onMounted(init)
   .user-row-wrap { padding: 16px 16px 4px; }
   .detail-layout { padding-left: 16px; padding-right: 16px; }
 }
+@media (max-width: 480px) {
+  .combine-modal {
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+  .course-table-wrap,
+  .ex-table-wrap {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+}
 </style>

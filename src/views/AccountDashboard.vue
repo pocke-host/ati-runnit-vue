@@ -5622,4 +5622,19 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 @media (prefers-reduced-motion: reduce) {
   .dashboard-record-button { transition: none !important; }
 }
+
+/* Keep the responsive dashboard focused on one story. The new command-center
+   cards replace the older hero/next-up/insights copies at their breakpoints. */
+@media (min-width: 769px) {
+  .db2-hero,
+  .db2-next-up,
+  .db2-insights,
+  .db2-recovery { display: none !important; }
+}
+@media (max-width: 768px) {
+  .dash-mobile .dm-hero,
+  .dash-mobile .dm-featured,
+  .dash-mobile .dm-next-up,
+  .dash-mobile .dm-two-col { display: none !important; }
+}
 </style>

@@ -1029,10 +1029,11 @@ onUnmounted(() => {
 .time-chip:hover { color: #16130F; }
 .time-chip.active { background: #16130F; color: #FBF6EC; }
 
+.feed-page { --feed-header-offset: 196px; }
 .feed-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 196px 32px 60px;
+  padding: var(--feed-header-offset) 32px 60px;
 }
 
 .feed-loading {
@@ -1959,7 +1960,8 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .feed-header-inner { padding: 0 16px; }
-  .feed-container { padding-top: 180px; padding-left: 16px; padding-right: 16px; }
+  .feed-page { --feed-header-offset: 180px; }
+  .feed-container { padding-top: var(--feed-header-offset); padding-left: 16px; padding-right: 16px; }
   .feed-tabs { gap: 0; }
   .feed-title { font-size: 2rem; }
   .feed-headline-row { padding: 14px 0 10px; }
@@ -2019,6 +2021,7 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
+  .feed-page { --feed-header-offset: 220px; }
   /* Hide the date — no room, subline covers context */
   .feed-date-text { display: none; }
 
@@ -2040,12 +2043,13 @@ onUnmounted(() => {
   }
 
   /* Extra top padding since header is now taller (two rows) */
-  .feed-container { padding-top: 220px; }
+  .feed-container { padding-top: var(--feed-header-offset); }
 }
 
 @media (max-width: 375px) {
+  .feed-page { --feed-header-offset: 228px; }
   .feed-header-inner { padding: 0 8px; }
-  .feed-container { padding: 8px; padding-top: 228px; }
+  .feed-container { padding: 8px; padding-top: var(--feed-header-offset); }
 }
 
 .create-event-btn {
@@ -2136,11 +2140,11 @@ onUnmounted(() => {
 .feed-gif-search button { border: 0; border-radius: 999px; }
 @media (max-width: 768px) {
   .feed-headline-row { padding-top: 28px; }
-  .feed-container { padding-top: 184px; }
+  .feed-container { padding-top: var(--feed-header-offset); }
   .feed-card { border-radius: 15px; }
 }
 @media (max-width: 640px) {
-  .feed-container { padding-top: 208px; }
+  .feed-container { padding-top: var(--feed-header-offset); }
   .feed-controls-bar { gap: 10px; }
   .feed-time-chips { gap: 5px; overflow-x: auto; padding-bottom: 9px; }
   .time-chip { padding: 7px 10px; }

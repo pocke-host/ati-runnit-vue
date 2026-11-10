@@ -1744,6 +1744,9 @@ textarea.form-control { resize: vertical; min-height: 60px; }
     z-index: 200;
     border: none;
     border-top: 2px solid #16130F;
+    border-radius: 24px 24px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow-y: auto;
   }
   .cal-cell { min-height: 72px; }
   .cal-chip-type { font-size: 0.52rem; }

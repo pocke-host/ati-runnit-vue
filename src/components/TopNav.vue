@@ -252,6 +252,12 @@
             </template>
             <!-- Athlete tile nav v2 -->
             <template v-else>
+              <div class="drawer-track-wrap drawer-track-wrap--athlete">
+                <router-link to="/track" class="drawer-link drawer-link-primary" @click="mobileMenuOpen = false">
+                  <span class="drawer-track-icon">▶</span>
+                  Record activity
+                </router-link>
+              </div>
               <div class="drawer-tile-section">
                 <div class="drawer-group-label">Today &amp; train</div>
                 <div class="drawer-tile-grid">
@@ -275,6 +281,18 @@
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v18M5 4h13l-2 4 2 4H5"/></svg>
                     <span>Races</span>
                   </router-link>
+                  <router-link to="/train" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19V5M4 5h12l-2 4 2 4H4"/><path d="M8 19h12"/></svg>
+                    <span>Training Hub</span>
+                  </router-link>
+                </div>
+              </div>
+              <details class="drawer-more-section">
+                <summary class="drawer-more-summary">
+                  More training tools
+                  <span aria-hidden="true">⌄</span>
+                </summary>
+                <div class="drawer-tile-grid">
                   <router-link to="/training-folders" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h7l2 2h9v10H3z"/><path d="M3 6V4h7l2 2"/></svg>
                     <span>Folders</span>
@@ -296,9 +314,12 @@
                     <span>Fuel</span>
                   </router-link>
                 </div>
-              </div>
-              <div class="drawer-tile-section">
-                <div class="drawer-group-label">Compete &amp; Connect</div>
+              </details>
+              <details class="drawer-more-section">
+                <summary class="drawer-more-summary">
+                  Community &amp; rewards
+                  <span aria-hidden="true">⌄</span>
+                </summary>
                 <div class="drawer-tile-grid">
                   <router-link to="/achievements" class="drawer-tile" active-class="drawer-tile--active" @click="mobileMenuOpen = false">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9a6 6 0 0 0 12 0V3H6Z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 21h6M12 15v6"/></svg>
@@ -325,7 +346,7 @@
                     <span>Devices</span>
                   </router-link>
                 </div>
-              </div>
+              </details>
             </template>
           </nav>
 
@@ -1541,6 +1562,37 @@ onUnmounted(() => {
 .drawer-tile-section + .drawer-tile-section {
   padding-top: 12px;
 }
+.drawer-track-wrap--athlete {
+  padding: 12px 16px 0;
+}
+.drawer-more-section {
+  margin: 12px 16px 0;
+  border-top: 1px solid rgba(251, 246, 236, 0.12);
+}
+.drawer-more-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0 2px;
+  color: rgba(251, 246, 236, 0.7);
+  font-family: 'Spline Sans Mono', ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+.drawer-more-summary::-webkit-details-marker { display: none; }
+.drawer-more-summary span {
+  color: rgba(251, 246, 236, 0.45);
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+.drawer-more-section[open] .drawer-more-summary span { transform: rotate(180deg); }
+.drawer-more-section .drawer-tile-grid { padding-bottom: 12px; }
 .drawer-group-label {
   font-family: 'Spline Sans Mono', ui-monospace, monospace;
   font-size: 0.58rem;
