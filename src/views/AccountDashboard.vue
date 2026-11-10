@@ -7,6 +7,26 @@
     <!-- Dashboard Content -->
       <div v-else class="wrap">
       <MotivationalQuote />
+      <header class="dashboard-hero-header" aria-labelledby="dashboard-hero-title">
+        <div class="dashboard-hero-copy">
+          <p class="dashboard-hero-dateline">{{ todayLine }}</p>
+          <h1 id="dashboard-hero-title">{{ greeting }}, <span>{{ user?.displayName?.split(' ')[0]?.toUpperCase() || 'ATHLETE' }}.</span></h1>
+          <p>One clear view of the work, the recovery behind it, and what moves you closer to your event.</p>
+        </div>
+        <div class="dashboard-hero-actions">
+          <div class="dashboard-hero-context">
+            <span class="dashboard-phase-chip">{{ trainingBlock.label }} phase</span>
+            <router-link v-if="daysToRace !== null" :to="raceTargetRoute" class="dashboard-event-chip">
+              <strong>{{ daysToRace === 0 ? 'Race day' : `${daysToRace} days` }}</strong>
+              <span>{{ daysToRace === 0 ? 'Make it count' : 'to your next start' }}</span>
+            </router-link>
+            <span v-else class="dashboard-event-chip dashboard-event-chip--muted">Choose an event to give your week a north star</span>
+          </div>
+          <button type="button" class="dashboard-record-button" @click="openActivityModal">
+            <i class="bi bi-plus-lg"></i> Record activity
+          </button>
+        </div>
+      </header>
       <!-- Pull-to-refresh indicator (mobile only) -->
       <div class="ptr-indicator" :style="{ height: pullY + 'px', opacity: pullY > 0 ? 1 : 0 }" aria-hidden="true">
         <div :class="['ptr-spinner', { spinning: refreshing }]">
@@ -53,6 +73,11 @@
           <p class="daily-focus-kicker">Your day in training</p>
           <h2 id="daily-focus-title">{{ todayWorkout ? todayWorkout.name || todayWorkout.type : 'Keep the momentum moving.' }}</h2>
           <p>{{ todayWorkout?.description || (activityToday ? 'Activity logged. See how the rest of your week is shaping up.' : 'No workout is scheduled yet. Start with a plan or log what you do today.') }}</p>
+          <div v-if="daysToRace !== null" class="daily-focus-event">
+            <span class="daily-focus-event-label">ROAD TO YOUR EVENT</span>
+            <strong>{{ daysToRace === 0 ? 'Race day is here.' : `${daysToRace} days to go.` }}</strong>
+            <router-link :to="raceTargetRoute">Open training plan →</router-link>
+          </div>
           <div v-if="todayTrainingCall" class="daily-focus-call" role="status">
             <span class="daily-focus-call-label">{{ todayTrainingCall.label }}</span>
             <strong>{{ todayTrainingCall.title }}</strong>
@@ -110,6 +135,20 @@
           <strong>{{ trainingRecommendation.title }}</strong>
           <span>{{ trainingRecommendation.message }}</span>
           <router-link to="/stats" class="training-status-link">Open full analysis →</router-link>
+        </div>
+        <div v-if="integrationStatuses.length" class="training-status-sources" aria-label="Connected data sources">
+          <span class="training-status-sources-label">DATA SOURCES</span>
+          <router-link
+            v-for="status in integrationStatuses.filter(item => item.connected || item.needsReconnect).slice(0, 4)"
+            :key="status.provider"
+            to="/devices"
+            :class="['training-source-chip', { 'training-source-chip--attention': status.needsReconnect }]"
+          >
+            <span class="training-source-dot"></span>
+            {{ integrationDisplayName(status.provider) }}
+            <small>{{ status.needsReconnect ? 'Reconnect' : 'Connected' }}</small>
+          </router-link>
+          <router-link to="/devices" class="training-status-manage">Manage sources →</router-link>
         </div>
       </section>
 
@@ -2397,6 +2436,16 @@ const loadIntegrationFreshness = async () => {
   ))
   integrationStatuses.value = results.filter(Boolean)
 }
+
+const integrationDisplayName = (provider) => ({
+  whoop: 'WHOOP',
+  coros: 'COROS',
+  garmin: 'Garmin',
+  'apple-health': 'Apple Health',
+  oura: 'Oura',
+  fitbit: 'Fitbit',
+  spotify: 'Spotify',
+})[provider] || String(provider || '').replace(/-/g, ' ')
 
 const integrationFreshnessLabel = computed(() => {
   const reconnect = integrationStatuses.value.filter(status => status.needsReconnect)
@@ -5366,5 +5415,211 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 }
 @media (prefers-reduced-motion: reduce) {
   .db2-card, .daily-focus-primary, .db2-btn-cobalt { transition: none !important; }
+}
+
+/* RUNNIT command center: an event-led layer above the detailed dashboard. */
+.dashboard-hero-header {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 28px;
+  margin: 0 0 18px;
+  padding: 26px 28px;
+  overflow: hidden;
+  border: 1px solid rgba(251,246,236,.12);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 88% 14%, rgba(42,85,245,.34), transparent 34%),
+    #16130F;
+  color: #FBF6EC;
+  box-shadow: 0 18px 46px rgba(22,19,15,.14);
+}
+.dashboard-hero-copy { min-width: 0; max-width: 650px; }
+.dashboard-hero-dateline {
+  margin: 0 0 11px;
+  color: rgba(251,246,236,.54);
+  font: 700 .65rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.dashboard-hero-copy h1 {
+  margin: 0;
+  color: rgba(251,246,236,.7);
+  font: 900 clamp(2.6rem, 5vw, 4.7rem)/.82 'Big Shoulders Display', system-ui, sans-serif;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+}
+.dashboard-hero-copy h1 span { color: #FBF6EC; }
+.dashboard-hero-copy > p:last-child {
+  max-width: 520px;
+  margin: 14px 0 0;
+  color: rgba(251,246,236,.67);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.dashboard-hero-actions {
+  display: flex;
+  flex: 0 0 min(285px, 34%);
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+}
+.dashboard-hero-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.dashboard-phase-chip,
+.dashboard-event-chip {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 11px;
+  border-radius: 12px;
+  font: 700 .58rem/1.25 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .09em;
+  text-align: right;
+  text-transform: uppercase;
+}
+.dashboard-phase-chip {
+  background: #FFC53D;
+  color: #16130F;
+}
+.dashboard-event-chip {
+  border: 1px solid rgba(251,246,236,.24);
+  color: rgba(251,246,236,.62);
+  text-decoration: none;
+}
+.dashboard-event-chip:hover { border-color: #FBF6EC; color: #FBF6EC; }
+.dashboard-event-chip strong {
+  color: #FBF6EC;
+  font-size: .72rem;
+}
+.dashboard-event-chip--muted { max-width: 205px; font-size: .53rem; }
+.dashboard-record-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 999px;
+  background: #2A55F5;
+  color: #fff;
+  box-shadow: 0 7px 18px rgba(42,85,245,.28);
+  cursor: pointer;
+  font: 800 .7rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  transition: background .16s ease, transform .16s ease;
+}
+.dashboard-record-button:hover { background: #1E42D6; transform: translateY(-1px); }
+.dashboard-record-button i { font-size: .9rem; }
+.daily-focus-event {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #E7DFCE;
+  color: #665F55;
+  font-size: .76rem;
+}
+.daily-focus-event-label {
+  color: #2A55F5;
+  font: 700 .57rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .1em;
+}
+.daily-focus-event strong { color: #16130F; }
+.daily-focus-event a {
+  margin-left: auto;
+  color: #2A55F5;
+  font: 700 .62rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.daily-focus-event a:hover { text-decoration: underline; }
+.training-status-sources {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(251,246,236,.14);
+}
+.training-status-sources-label {
+  margin-right: 3px;
+  color: rgba(251,246,236,.42);
+  font: 700 .55rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .11em;
+}
+.training-source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid rgba(251,246,236,.17);
+  border-radius: 999px;
+  color: #FBF6EC;
+  font: 700 .58rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .05em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.training-source-chip:hover { border-color: #FFC53D; color: #FFC53D; }
+.training-source-chip small {
+  color: rgba(251,246,236,.45);
+  font-size: .5rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.training-source-chip--attention { border-color: rgba(255,197,61,.65); color: #FFC53D; }
+.training-source-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #74D6A1;
+}
+.training-source-chip--attention .training-source-dot { background: #FFC53D; }
+.training-status-manage {
+  margin-left: auto;
+  color: #FFC53D;
+  font: 700 .58rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: .06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.training-status-manage:hover { color: #fff; }
+.dash .dashboard-hero-header ~ .first-action-card,
+.dash .dashboard-hero-header ~ .daily-focus,
+.dash .dashboard-hero-header ~ .training-status-card,
+.dash .dashboard-hero-header ~ .monthly-recap-card { border-radius: 22px; }
+@media (max-width: 900px) {
+  .dashboard-hero-header { align-items: flex-start; flex-direction: column; gap: 22px; padding: 24px; }
+  .dashboard-hero-actions { flex-basis: auto; width: 100%; }
+  .dashboard-hero-context { justify-content: flex-start; }
+  .dashboard-record-button { width: 100%; }
+  .daily-focus-event a { margin-left: 0; }
+}
+@media (max-width: 600px) {
+  .dashboard-hero-header { margin-bottom: 14px; padding: 21px 18px; border-radius: 22px; }
+  .dashboard-hero-copy h1 { font-size: clamp(2.55rem, 14vw, 3.6rem); }
+  .dashboard-hero-copy > p:last-child { font-size: .82rem; }
+  .dashboard-hero-context { align-items: stretch; flex-direction: column; }
+  .dashboard-phase-chip,
+  .dashboard-event-chip { align-items: flex-start; text-align: left; }
+  .dashboard-event-chip--muted { max-width: none; }
+  .training-status-sources { align-items: flex-start; flex-direction: column; }
+  .training-status-manage { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-record-button { transition: none !important; }
 }
 </style>
