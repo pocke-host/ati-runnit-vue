@@ -1615,7 +1615,8 @@ watch(zipcode, () => {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 280px;
+  min-height: 0;
+  padding: 48px 16px 64px;
   color: rgba(15,18,16,0.50);
 }
 .events-error i { font-size: 2.5rem; }
@@ -1671,6 +1672,7 @@ watch(zipcode, () => {
   .sport-tabs-wrap { top: var(--nav-h, 66px); }
   .filter-search { min-width: 100%; }
   .filter-select, .filter-input--sm, .filter-clear { flex: 1 1 calc(50% - 8px); }
+  .events-error { padding: 40px 16px 52px; }
 }
 
 @media (max-width: 460px) {
@@ -1680,6 +1682,7 @@ watch(zipcode, () => {
   .results { padding-top: 18px; }
   .results-meta { margin: 0 12px 16px; }
   .events-grid, .events-error, .load-more-wrap { margin-left: 12px; margin-right: 12px; }
+  .events-error { padding: 32px 12px 44px; }
 }
 
 /* ── Race Detail Drawer ── */

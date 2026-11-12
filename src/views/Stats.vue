@@ -2048,7 +2048,7 @@ onUnmounted(() => {
 }
 .jumpnav-btn { padding-left: 16px; padding-right: 16px; }
 .stats-content { padding-top: 46px; }
-.section { margin-bottom: 60px; }
+.section { margin-bottom: 48px; }
 .section-kicker { border-bottom-width: 1px; }
 .fitness-chart-card,
 .fitness-metric-card,
@@ -2089,7 +2089,7 @@ onUnmounted(() => {
 @media (max-width: 720px) {
   .hero { padding: 52px 16px 34px; }
   .stats-content { padding-top: 32px; }
-  .section { margin-bottom: 42px; }
+  .section { margin-bottom: 34px; }
   .hero-chips { border-radius: 13px; }
   .chart-card, .fitness-chart-card, .sport-mix-card, .comparison-metrics-card, .comparison-context-card { border-radius: 14px; }
 }

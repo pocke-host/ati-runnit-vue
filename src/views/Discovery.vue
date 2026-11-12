@@ -100,11 +100,11 @@ onMounted(async () => {
 }
 .discovery-search:focus-within { border-color: #2A55F5; box-shadow: 0 0 0 4px rgba(42,85,245,.12); }
 .discovery-search button { padding: 10px 4px; }
-.discovery-section { margin-top: 42px; }
-.discovery-recommendations-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 42px; padding-bottom: 14px; border-bottom: 1px solid #E7DFCE; }
+.discovery-section { margin-top: 30px; }
+.discovery-recommendations-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 26px; padding-bottom: 14px; border-bottom: 1px solid #E7DFCE; }
 .discovery-recommendations-head .discovery-kicker { margin: 0; }
 .discovery-recommendations-head > p:last-child { margin: 0; color: #665F55; font-size: .82rem; }
-.discovery-recommendations .discovery-section { margin-top: 24px; }
+.discovery-recommendations .discovery-section { margin-top: 20px; }
 .discovery-section-head { margin-bottom: 16px; }
 .discovery-section-head h2 { font-size: 1.35rem; }
 .discovery-grid { gap: 14px; }
@@ -130,8 +130,8 @@ onMounted(async () => {
 @media (max-width: 680px) {
   .discovery-page { padding-left: 16px; padding-right: 16px; }
   .discovery-header { padding-top: 8px; }
-  .discovery-section { margin-top: 32px; }
-  .discovery-recommendations-head { align-items: flex-start; flex-direction: column; gap: 5px; margin-top: 32px; }
+  .discovery-section { margin-top: 26px; }
+  .discovery-recommendations-head { align-items: flex-start; flex-direction: column; gap: 5px; margin-top: 24px; }
   .discovery-grid { gap: 10px; }
   .discovery-card { border-radius: 13px; padding: 14px; }
 }

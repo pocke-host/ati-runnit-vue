@@ -1557,7 +1557,7 @@ onBeforeRouteLeave((to, from, next) => {
 .plans-body {
   max-width: 1100px;
   padding: 38px 24px 90px;
-  gap: 56px;
+  gap: 40px;
 }
 .section-header { margin-bottom: 16px; }
 .section-title { font-size: clamp(1.7rem, 3vw, 2.35rem); line-height: .95; }
