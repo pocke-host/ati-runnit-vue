@@ -2,8 +2,10 @@
 // Reads workouts from iOS HealthKit and pushes them to the backend as Activity
 // rows (source: APPLE_HEALTH). Safe no-op on web/Android — only activates on iOS.
 
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { CapacitorHealthkit, SampleNames } from '@perfood/capacitor-healthkit'
+
+const AppleHealthBackground = registerPlugin('AppleHealthBackground')
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 const READ_PERMISSIONS = ['calories', 'distance', 'duration', 'activity']
@@ -51,6 +53,13 @@ export function useAppleHealth() {
     await CapacitorHealthkit.requestAuthorization({ all: [], read: READ_PERMISSIONS, write: [] })
   }
 
+  async function configureBackgroundSync() {
+    if (!isAvailable) return
+    const token = localStorage.getItem('token')
+    if (!token) return
+    await AppleHealthBackground.configure({ token, apiBaseURL: API_URL })
+  }
+
   // Reads workouts from the last `sinceDays` days and returns the backend-ready sample shape.
   async function fetchWorkouts(sinceDays = 30) {
     const startDate = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000)
@@ -69,9 +78,11 @@ export function useAppleHealth() {
       method: 'POST',
       headers: getAuthHeaders(),
     })
+    await configureBackgroundSync()
   }
 
   async function sync(sinceDays = 30) {
+    await configureBackgroundSync()
     const samples = await fetchWorkouts(sinceDays)
     const res = await fetch(`${API_URL}/integrations/apple-health/sync`, {
       method: 'POST',
@@ -95,7 +106,8 @@ export function useAppleHealth() {
       method: 'DELETE',
       headers: getAuthHeaders(),
     })
+    if (isAvailable) await AppleHealthBackground.clear()
   }
 
-  return { isAvailable, connect, sync, getStatus, disconnect }
+  return { isAvailable, connect, sync, getStatus, disconnect, configureBackgroundSync }
 }

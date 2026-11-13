@@ -334,6 +334,12 @@ const checkConnectionStatus = async () => {
   if (appleHealthRes) {
     appleHealthConnected.value = appleHealthRes.data.connected
     appleHealthLastSync.value = appleHealthRes.data.lastSync || null
+    if (appleHealthRes.data.connected && appleHealthAvailable) {
+      // Re-register the native observer on upgrades and fresh app launches.
+      // This does not prompt for permission; it only refreshes the saved
+      // credentials used by the background iOS sync service.
+      appleHealth.configureBackgroundSync().catch(() => {})
+    }
   }
   if (countsRes?.data) syncCounts.value = countsRes.data
 }

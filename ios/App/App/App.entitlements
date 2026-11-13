@@ -16,5 +16,8 @@
 	<!-- HealthKit: read workouts to auto-sync into Runnit -->
 	<key>com.apple.developer.healthkit</key>
 	<true/>
+	<!-- Lets HKObserverQuery wake the iPhone app after Apple Watch workouts arrive. -->
+	<key>com.apple.developer.healthkit.background-delivery</key>
+	<true/>
 </dict>
 </plist>
