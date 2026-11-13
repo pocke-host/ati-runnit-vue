@@ -94,6 +94,79 @@
         </div>
       </section>
 
+      <section class="athlete-brief" aria-labelledby="athlete-brief-title">
+        <div class="athlete-brief-head">
+          <div>
+            <p class="daily-focus-kicker">Your athlete brief</p>
+            <h2 id="athlete-brief-title">Know where you stand.</h2>
+          </div>
+          <span class="athlete-brief-caption">Goal · today · recovery · next move</span>
+        </div>
+        <div class="athlete-brief-grid">
+          <div class="athlete-brief-item">
+            <span class="athlete-brief-label">Your goal</span>
+            <strong v-if="daysToRace !== null">{{ daysToRace === 0 ? 'Race day' : `${daysToRace} days` }}</strong>
+            <strong v-else-if="fullActivePlan?.name || activePlan?.name">{{ fullActivePlan?.name || activePlan?.name }}</strong>
+            <strong v-else>Choose an event</strong>
+            <router-link v-if="daysToRace !== null" :to="raceTargetRoute">Open event plan →</router-link>
+            <router-link v-else-if="fullActivePlan?.id || activePlan?.id" :to="`/plans/${fullActivePlan?.id || activePlan?.id}`">View your plan →</router-link>
+            <router-link v-else to="/races">Find your next race →</router-link>
+          </div>
+          <div class="athlete-brief-item">
+            <span class="athlete-brief-label">Today</span>
+            <strong v-if="todayWorkout">{{ todayWorkout.name || todayWorkout.type }}</strong>
+            <strong v-else-if="activityToday">Activity complete</strong>
+            <strong v-else>Nothing planned</strong>
+            <span>{{ todayWorkout ? `${todayWorkout.duration || 'Flexible'} min · ${todayWorkout.isCompleted ? 'Completed' : 'Ready to complete'}` : activityToday ? 'You have logged today’s work.' : 'Record a session or choose a plan.' }}</span>
+          </div>
+          <div class="athlete-brief-item">
+            <span class="athlete-brief-label">Recovery</span>
+            <strong v-if="primaryRecoveryMetric != null">{{ primaryRecoveryMetric }}/100</strong>
+            <strong v-else-if="todayWellness">Syncing now</strong>
+            <strong v-else>Not connected</strong>
+            <span>{{ todayWellness ? `${primaryRecoveryLabel} · ${wellnessSourceLabel}` : 'Connect a source to see readiness.' }}</span>
+          </div>
+          <div class="athlete-brief-item athlete-brief-item--next">
+            <span class="athlete-brief-label">Next move</span>
+            <strong>{{ primaryDashboardAction.label }}</strong>
+            <span>{{ trainingRecommendation.message }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="athlete-read" aria-labelledby="athlete-read-title">
+        <div class="athlete-read-head">
+          <div>
+            <p class="daily-focus-kicker">RUNNIT READ</p>
+            <h2 id="athlete-read-title">What your data is telling you.</h2>
+          </div>
+          <router-link to="/stats" class="athlete-read-link">Open full analysis →</router-link>
+        </div>
+        <div v-if="athleteReadLoading" class="athlete-read-state" role="status">Looking across your recent training and recovery…</div>
+        <div v-else-if="athleteRead?.primary" class="athlete-read-layout">
+          <article :class="['athlete-read-primary', `athlete-read-primary--${athleteRead.primary.severity || 'info'}`]">
+            <div class="athlete-read-meta">
+              <span>{{ athleteRead.primary.category }}</span>
+              <span>{{ athleteRead.primary.confidence }} confidence · {{ athleteRead.primary.sampleSize }} data points</span>
+            </div>
+            <h3>{{ athleteRead.primary.title }}</h3>
+            <p>{{ athleteRead.primary.message }}</p>
+            <strong>Next move · {{ athleteRead.primary.action }}</strong>
+            <div v-if="athleteRead.primary.evidence?.length" class="athlete-read-evidence">
+              <span v-for="item in athleteRead.primary.evidence" :key="`${item.label}-${item.value}`"><b>{{ item.label }}</b> {{ item.value }}</span>
+            </div>
+          </article>
+          <div v-if="athleteRead.insights?.length > 1" class="athlete-read-secondary">
+            <article v-for="insight in athleteRead.insights.slice(1, 3)" :key="insight.key">
+              <span>{{ insight.category }}</span>
+              <strong>{{ insight.title }}</strong>
+              <p>{{ insight.message }}</p>
+            </article>
+          </div>
+        </div>
+        <div v-else class="athlete-read-state">Keep logging workouts and recovery data—RUNNIT will turn the pattern into a useful read.</div>
+      </section>
+
       <section class="training-status-card" aria-labelledby="training-status-title">
         <div class="training-status-head">
           <div>
@@ -105,9 +178,9 @@
         <div class="training-status-grid">
           <div class="training-status-metric">
             <span>Recovery</span>
-            <strong v-if="todayWellness?.recoveryScore != null">{{ todayWellness.recoveryScore }}<small>/100</small></strong>
+            <strong v-if="primaryRecoveryMetric != null">{{ primaryRecoveryMetric }}<small>/100</small></strong>
             <strong v-else>—</strong>
-            <em>{{ todayWellness ? wellnessSourceLabel : 'Connect a wearable' }}</em>
+            <em>{{ todayWellness ? `${primaryRecoveryLabel} · ${wellnessSourceLabel}` : 'Connect a wearable' }}</em>
           </div>
           <div class="training-status-metric">
             <span>Training load</span>
@@ -482,84 +555,14 @@
             </div>
           </div>
 
-          <!-- RECOVERY (WHOOP or other wearable-reported wellness) -->
-          <div class="db2-card db2-recovery" v-if="todayWellness">
-            <div class="db2-card-head">
-              <div class="db2-card-title">Recovery</div>
-              <div class="db2-recovery-date">Today · {{ wellnessSourceLabel }}</div>
-            </div>
-
-            <!-- Rings: Recovery + Strain -->
-            <div class="db2-recovery-rings-row">
-              <div class="db2-recovery-ring-cell" v-if="todayWellness.recoveryScore != null">
-                <div class="db2-recovery-ring" :style="{ borderColor: recoveryColor }">
-                  <span :style="{ color: recoveryColor }">{{ todayWellness.recoveryScore }}<span class="db2-recovery-pct">%</span></span>
-                </div>
-                <div class="db2-recovery-ring-lbl">Recovery</div>
-              </div>
-              <div class="db2-recovery-ring-cell" v-if="todayWellness.strain != null">
-                <div class="db2-recovery-ring db2-recovery-ring--strain">
-                  <span>{{ todayWellness.strain.toFixed(1) }}</span>
-                </div>
-                <div class="db2-recovery-ring-lbl">Strain · {{ strainBand }}</div>
-              </div>
-            </div>
-
-            <!-- HRV / RHR / Sleep stats -->
-            <div class="db2-recovery-stats">
-              <div class="db2-recovery-stat" v-if="todayWellness.hrvMilli != null">
-                <span class="db2-recovery-stat-lbl">HRV</span>
-                <span class="db2-recovery-stat-val">{{ Math.round(todayWellness.hrvMilli) }}<span class="db2-recovery-unit">ms</span></span>
-              </div>
-              <div class="db2-recovery-stat" v-if="todayWellness.restingHeartRate != null">
-                <span class="db2-recovery-stat-lbl">Resting HR</span>
-                <span class="db2-recovery-stat-val">{{ todayWellness.restingHeartRate }}<span class="db2-recovery-unit">bpm</span></span>
-              </div>
-              <div class="db2-recovery-stat" v-if="todayWellness.sleepPerformancePct != null">
-                <span class="db2-recovery-stat-lbl">Sleep</span>
-                <span class="db2-recovery-stat-val">{{ todayWellness.sleepPerformancePct }}<span class="db2-recovery-unit">%</span></span>
-              </div>
-              <div class="db2-recovery-stat" v-if="todayWellness.totalSleepMinutes != null">
-                <span class="db2-recovery-stat-lbl">Time Asleep</span>
-                <span class="db2-recovery-stat-val">{{ Math.floor(todayWellness.totalSleepMinutes / 60) }}<span class="db2-recovery-unit">h</span> {{ todayWellness.totalSleepMinutes % 60 }}<span class="db2-recovery-unit">m</span></span>
-              </div>
-            </div>
-
-            <!-- Garmin Health signals. These stay compact so the card remains useful
-                 when a user has several connected providers. -->
-            <div v-if="todayWellness.source === 'GARMIN' && garminHealthMetricCount" class="db2-garmin-health-grid">
-              <div class="db2-recovery-stat" v-if="todayWellness.steps != null">
-                <span class="db2-recovery-stat-lbl">Steps</span>
-                <span class="db2-recovery-stat-val">{{ todayWellness.steps.toLocaleString() }}</span>
-              </div>
-              <div class="db2-recovery-stat" v-if="todayWellness.bodyBattery != null">
-                <span class="db2-recovery-stat-lbl">Body Battery</span>
-                <span class="db2-recovery-stat-val">{{ todayWellness.bodyBattery }}<span class="db2-recovery-unit">/100</span></span>
-              </div>
-              <div class="db2-recovery-stat" v-if="todayWellness.averageStress != null">
-                <span class="db2-recovery-stat-lbl">Stress</span>
-                <span class="db2-recovery-stat-val">{{ Math.round(todayWellness.averageStress) }}</span>
-              </div>
-              <div class="db2-recovery-stat" v-if="todayWellness.activeKilocalories != null">
-                <span class="db2-recovery-stat-lbl">Active kcal</span>
-                <span class="db2-recovery-stat-val">{{ todayWellness.activeKilocalories }}</span>
-              </div>
-            </div>
-
-            <!-- Sleep stage breakdown -->
-            <div class="db2-sleep-stages" v-if="sleepStageBreakdown">
-              <div class="db2-sleep-stages-bar">
-                <div class="db2-sleep-stage-seg db2-sleep-stage-seg--light" :style="{ width: sleepStageBreakdown.lightPct + '%' }"></div>
-                <div class="db2-sleep-stage-seg db2-sleep-stage-seg--deep" :style="{ width: sleepStageBreakdown.deepPct + '%' }"></div>
-                <div class="db2-sleep-stage-seg db2-sleep-stage-seg--rem" :style="{ width: sleepStageBreakdown.remPct + '%' }"></div>
-              </div>
-              <div class="db2-sleep-stages-legend">
-                <span class="db2-sleep-legend-item"><span class="db2-sleep-dot db2-sleep-dot--light"></span>Light {{ sleepStageBreakdown.lightPct }}%</span>
-                <span class="db2-sleep-legend-item"><span class="db2-sleep-dot db2-sleep-dot--deep"></span>Deep {{ sleepStageBreakdown.deepPct }}%</span>
-                <span class="db2-sleep-legend-item"><span class="db2-sleep-dot db2-sleep-dot--rem"></span>REM {{ sleepStageBreakdown.remPct }}%</span>
-              </div>
-            </div>
-          </div>
+          <!-- Recovery is provider-neutral: WHOOP, Garmin, Oura, Fitbit, or Apple Health. -->
+          <DashboardRecoveryCard
+            :wellness="todayWellness"
+            :source-label="wellnessSourceLabel"
+            :loading="todayWellnessLoading"
+            :error="todayWellnessError"
+            @retry="loadTodayWellness"
+          />
 
           <!-- RECENT ACTIVITIES (grid-row span 2) -->
           <div class="db2-card db2-recent">
@@ -1228,6 +1231,15 @@
             </div>
           </div>
 
+          <!-- Recovery remains a first-class mobile dashboard section. -->
+          <DashboardRecoveryCard
+            :wellness="todayWellness"
+            :source-label="wellnessSourceLabel"
+            :loading="todayWellnessLoading"
+            :error="todayWellnessError"
+            @retry="loadTodayWellness"
+          />
+
           <!-- WEEKLY BARS -->
           <div class="dm-bars-card">
             <div class="dm-bars-head">
@@ -1571,6 +1583,7 @@ import StoriesViewer from '@/components/StoriesViewer.vue'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
 import MotivationalQuote from '@/components/MotivationalQuote.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import DashboardRecoveryCard from '@/components/DashboardRecoveryCard.vue'
 
 Chart.register(...registerables)
 
@@ -1634,6 +1647,8 @@ const monthlySummaryLoading = ref(false)
 const monthlySummaryError = ref(false)
 const workoutExportError = ref('')
 const integrationStatuses = ref([])
+const athleteRead = ref(null)
+const athleteReadLoading = ref(false)
 
 const dismissWelcome = () => {
   showWelcome.value = false
@@ -2407,6 +2422,22 @@ const loadMonthlySummary = async () => {
   }
 }
 
+const loadAthleteRead = async () => {
+  athleteReadLoading.value = true
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    const { data } = await axios.get(`${API_URL}/wellness/read`, {
+      params: { timezone },
+      headers: getAuthHeaders()
+    })
+    athleteRead.value = data
+  } catch {
+    athleteRead.value = null
+  } finally {
+    athleteReadLoading.value = false
+  }
+}
+
 const downloadWorkoutExport = async (period) => {
   workoutExportError.value = ''
   try {
@@ -2616,6 +2647,7 @@ const loadData = async () => {
     activityStore.fetchActivities(),
     loadWeeklySummary(),
     loadMonthlySummary(),
+    loadAthleteRead(),
     loadIntegrationFreshness(),
     loadFollowData(),
     planStore.fetchPlans(),
@@ -2632,45 +2664,50 @@ const loadData = async () => {
 
 const { refreshing, pullY } = usePullToRefresh(loadData)
 
-// Recovery/sleep/strain — only populated for users with a wearable that reports it (WHOOP today)
+// Provider-neutral recovery data. The backend selects the freshest connected source.
 const todayWellness = ref(null)
+const todayWellnessLoading = ref(true)
+const todayWellnessError = ref(false)
 
 async function loadTodayWellness() {
+  todayWellnessLoading.value = true
+  todayWellnessError.value = false
   try {
     const { data } = await axios.get(`${API_URL}/wellness/today`, { headers: getAuthHeaders() })
     todayWellness.value = data?.available === false ? null : data
   } catch {
     todayWellness.value = null
+    todayWellnessError.value = true
+  } finally {
+    todayWellnessLoading.value = false
   }
 }
-
-const recoveryColor = computed(() => {
-  const score = todayWellness.value?.recoveryScore
-  if (score == null) return '#767676'
-  if (score >= 67) return '#2A55F5'
-  if (score >= 34) return '#FFC53D'
-  return '#ef4444'
-})
 
 const wellnessSourceLabel = computed(() => {
   const source = todayWellness.value?.source
   if (!source) return 'Wellness'
-  const labels = { GARMIN: 'Garmin', WHOOP: 'WHOOP', OURA: 'Oura', FITBIT: 'Fitbit' }
+  const labels = { GARMIN: 'Garmin', WHOOP: 'WHOOP', OURA: 'Oura', FITBIT: 'Fitbit', APPLE_HEALTH: 'Apple Health', APPLE: 'Apple Health' }
   return labels[source] || source
 })
 
-const garminHealthMetricCount = computed(() => {
+const primaryRecoveryMetric = computed(() => {
   const wellness = todayWellness.value
-  if (!wellness || wellness.source !== 'GARMIN') return 0
-  return ['steps', 'bodyBattery', 'averageStress', 'activeKilocalories']
-    .filter(key => wellness[key] != null).length
+  return wellness?.recoveryScore ?? wellness?.readinessScore ?? wellness?.bodyBattery ?? null
+})
+
+const primaryRecoveryLabel = computed(() => {
+  const wellness = todayWellness.value
+  if (wellness?.recoveryScore != null) return 'Recovery'
+  if (wellness?.readinessScore != null) return 'Readiness'
+  if (wellness?.bodyBattery != null) return 'Body Battery'
+  return 'Recovery'
 })
 
 const todayTrainingCall = computed(() => {
   const wellness = todayWellness.value
   if (!wellness) return null
 
-  const recovery = wellness.recoveryScore
+  const recovery = wellness.recoveryScore ?? wellness.readinessScore
   const battery = wellness.bodyBattery
   const stress = wellness.averageStress
   const needsEase = (recovery != null && recovery < 34)
@@ -2700,27 +2737,6 @@ const todayTrainingCall = computed(() => {
   }
 })
 
-// WHOOP's own strain bands — 0-21 scale (Borg-based, not a percentage)
-const strainBand = computed(() => {
-  const s = todayWellness.value?.strain
-  if (s == null) return ''
-  if (s < 10) return 'Light'
-  if (s < 14) return 'Moderate'
-  if (s < 18) return 'Strenuous'
-  return 'All Out'
-})
-
-const sleepStageBreakdown = computed(() => {
-  const w = todayWellness.value
-  if (!w || w.lightSleepMinutes == null || w.deepSleepMinutes == null || w.remSleepMinutes == null) return null
-  const total = w.lightSleepMinutes + w.deepSleepMinutes + w.remSleepMinutes
-  if (total <= 0) return null
-  return {
-    lightPct: Math.round((w.lightSleepMinutes / total) * 100),
-    deepPct: Math.round((w.deepSleepMinutes / total) * 100),
-    remPct: Math.round((w.remSleepMinutes / total) * 100),
-  }
-})
 
 onMounted(async () => {
   if (route.query.log === '1') {
@@ -4971,115 +4987,6 @@ textarea.form-control{resize:vertical;min-height:72px}
 .db2-insights-link:hover { color: #FBF6EC; }
 .db2-card-head--ink .db2-eyebrow { color: #2A55F5; }
 
-/* ── RECOVERY ── */
-.db2-recovery-date {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #8A8A8A;
-}
-.db2-recovery-rings-row {
-  display: flex;
-  gap: 24px;
-  padding: 18px 18px 14px;
-}
-.db2-recovery-ring-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.db2-recovery-ring {
-  width: 72px;
-  height: 72px;
-  border-radius: 999px;
-  border: 4px solid;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1.3rem;
-}
-.db2-recovery-ring--strain { border-color: #2A55F5; color: #2A55F5; }
-.db2-recovery-pct { font-size: 0.7rem; }
-.db2-recovery-ring-lbl {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #8A8A8A;
-  text-align: center;
-}
-.db2-recovery-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 18px;
-  padding: 0 18px 16px;
-}
-.db2-garmin-health-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 18px;
-  padding: 0 18px 16px;
-  border-top: 1px solid #E7DFCE;
-  padding-top: 14px;
-}
-.db2-recovery-stat { display: flex; flex-direction: column; }
-.db2-recovery-stat-lbl {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #8A8A8A;
-}
-.db2-recovery-stat-val {
-  font-family: 'Big Shoulders Display', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1.2rem;
-  color: #16130F;
-}
-.db2-recovery-unit {
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: #8A8A8A;
-  margin-left: 2px;
-}
-
-/* Sleep stage breakdown bar */
-.db2-sleep-stages { border-top: 2px solid #E7DFCE; margin: 0 18px 18px; padding-top: 14px; }
-.db2-sleep-stages-bar {
-  display: flex;
-  height: 10px;
-  border: 2px solid #16130F;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-.db2-sleep-stage-seg { height: 100%; }
-.db2-sleep-stage-seg--light { background: #C9C2B4; }
-.db2-sleep-stage-seg--deep  { background: #16130F; }
-.db2-sleep-stage-seg--rem   { background: #2A55F5; }
-.db2-sleep-stages-legend {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.db2-sleep-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Spline Sans Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: #5A5348;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.db2-sleep-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.db2-sleep-dot--light { background: #C9C2B4; }
-.db2-sleep-dot--deep  { background: #16130F; }
-.db2-sleep-dot--rem   { background: #2A55F5; }
-
 /* ── RECENT ACTIVITIES ── */
 .db2-recent { grid-row: span 2; display: flex; flex-direction: column; }
 .db2-recent-list { display: flex; flex-direction: column; flex: 1; }
@@ -5394,7 +5301,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 .dm-insights-card .dm-insight-val--positive { color: #74D6A1; }
 .dm-insights-card .dm-insight-val--caution { color: #FFD27A; }
 .dm-insights-card .dm-insight-val--negative { color: #FF8F82; }
-.db2-recovery { background: #F8FBFF; }
 .db2-btn-cobalt,
 .db2-btn-ghost,
 .db2-feat-log-btn { border-radius: 999px; }
@@ -5628,13 +5534,80 @@ button:focus-visible, a:focus-visible { outline: 3px solid #FFC53D; outline-offs
 @media (min-width: 769px) {
   .db2-hero,
   .db2-next-up,
-  .db2-insights,
-  .db2-recovery { display: none !important; }
+  .db2-insights { display: none !important; }
 }
 @media (max-width: 768px) {
   .dash-mobile .dm-hero,
   .dash-mobile .dm-featured,
   .dash-mobile .dm-next-up,
   .dash-mobile .dm-two-col { display: none !important; }
+}
+
+/* The athlete brief is the plain-language bridge between raw metrics and action. */
+.athlete-brief { margin: 0 0 20px; padding: 20px; background: #fff; border: 2px solid #16130F; border-radius: 22px; box-shadow: 4px 4px #FFC53D; }
+.athlete-brief-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.athlete-brief-head h2 { margin: 0; color: #16130F; font-size: 1.35rem; line-height: 1.05; }
+.athlete-brief-caption { padding-top: 3px; color: #8A8174; font: 9px 'Spline Sans Mono', monospace; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.athlete-brief-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 18px; border-top: 1px solid #E7DFCE; }
+.athlete-brief-item { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 14px 16px 2px 0; border-right: 1px solid #E7DFCE; }
+.athlete-brief-item:not(:first-child) { padding-left: 16px; }
+.athlete-brief-item:last-child { border-right: 0; }
+.athlete-brief-label { color: #2A55F5; font: 700 9px 'Spline Sans Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+.athlete-brief-item strong { color: #16130F; font-size: 1.02rem; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.athlete-brief-item > span:last-child { color: #665F55; font-size: .76rem; line-height: 1.35; }
+.athlete-brief-item a { color: #2A55F5; font: 700 9px 'Spline Sans Mono', monospace; letter-spacing: .04em; text-decoration: none; text-transform: uppercase; }
+.athlete-brief-item a:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+  .athlete-brief-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .athlete-brief-item:nth-child(2) { border-right: 0; }
+  .athlete-brief-item:nth-child(n + 3) { border-top: 1px solid #E7DFCE; }
+}
+@media (max-width: 600px) {
+  .athlete-brief { margin-bottom: 16px; padding: 16px; border-radius: 18px; }
+  .athlete-brief-head { display: block; }
+  .athlete-brief-caption { display: block; margin-top: 8px; text-align: left; }
+  .athlete-brief-grid { grid-template-columns: 1fr 1fr; margin-top: 14px; }
+  .athlete-brief-item { padding: 12px 10px 2px 0; }
+  .athlete-brief-item:not(:first-child) { padding-left: 10px; }
+  .athlete-brief-item strong { font-size: .94rem; }
+  .athlete-brief-item > span:last-child { font-size: .72rem; }
+}
+.athlete-read { margin: 0 0 20px; padding: 20px; background: #16130F; color: #FBF6EC; border: 2px solid #16130F; border-radius: 22px; box-shadow: 4px 4px #2A55F5; }
+.athlete-read-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.athlete-read-head .daily-focus-kicker { color: #FFC53D; }
+.athlete-read-head h2 { margin: 0; font-size: 1.35rem; line-height: 1.05; }
+.athlete-read-link { padding-top: 3px; color: #FFC53D; font: 700 9px 'Spline Sans Mono', monospace; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+.athlete-read-link:hover { color: #fff; }
+.athlete-read-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(220px, .65fr); gap: 14px; margin-top: 18px; }
+.athlete-read-primary { padding: 16px; border: 1px solid rgba(251,246,236,.18); border-left: 5px solid #FFC53D; background: rgba(251,246,236,.06); }
+.athlete-read-primary--caution { border-left-color: #FFC53D; }
+.athlete-read-primary--positive { border-left-color: #74D6A1; }
+.athlete-read-primary--info { border-left-color: #8FA7FF; }
+.athlete-read-meta { display: flex; justify-content: space-between; gap: 12px; color: rgba(251,246,236,.56); font: 9px 'Spline Sans Mono', monospace; letter-spacing: .07em; text-transform: uppercase; }
+.athlete-read-primary h3 { margin: 14px 0 7px; font-size: 1.55rem; line-height: 1; }
+.athlete-read-primary p { max-width: 60ch; margin: 0 0 12px; color: rgba(251,246,236,.76); font-size: .82rem; line-height: 1.45; }
+.athlete-read-primary > strong { display: block; color: #FFC53D; font-size: .78rem; line-height: 1.35; }
+.athlete-read-evidence { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.athlete-read-evidence span { padding: 6px 8px; color: rgba(251,246,236,.72); background: rgba(251,246,236,.08); font: 9px 'Spline Sans Mono', monospace; }
+.athlete-read-evidence b { color: #FBF6EC; }
+.athlete-read-secondary { display: grid; gap: 10px; }
+.athlete-read-secondary article { padding: 12px 14px; border: 1px solid rgba(251,246,236,.14); background: rgba(251,246,236,.035); }
+.athlete-read-secondary article > span { color: #8FA7FF; font: 700 9px 'Spline Sans Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.athlete-read-secondary strong { display: block; margin: 7px 0 4px; font-size: .95rem; line-height: 1.1; }
+.athlete-read-secondary p { margin: 0; color: rgba(251,246,236,.64); font-size: .73rem; line-height: 1.4; }
+.athlete-read-state { padding: 18px 0 2px; color: rgba(251,246,236,.68); font-size: .82rem; line-height: 1.45; }
+@media (max-width: 900px) {
+  .athlete-read-layout { grid-template-columns: 1fr; }
+  .athlete-read-secondary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .athlete-read { margin-bottom: 16px; padding: 16px; border-radius: 18px; }
+  .athlete-read-head { display: block; }
+  .athlete-read-link { display: inline-block; margin-top: 9px; }
+  .athlete-read-layout { margin-top: 14px; }
+  .athlete-read-meta { display: block; }
+  .athlete-read-meta span { display: block; margin-bottom: 5px; }
+  .athlete-read-primary h3 { font-size: 1.35rem; }
+  .athlete-read-secondary { grid-template-columns: 1fr; }
 }
 </style>
