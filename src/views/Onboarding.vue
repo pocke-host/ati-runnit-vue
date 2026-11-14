@@ -235,7 +235,7 @@
       <button class="btn-back standalone" @click="back">← Back</button>
       <h2 class="step-question">Where do<br>you train?</h2>
       <p style="color:#767676;font-size:0.9rem;margin:-24px 0 28px;font-weight:300;">
-        This connects you with crews and events near you.
+        Optional — this helps personalize nearby crews and events. You can add it later.
       </p>
       <div class="tile-grid" style="grid-template-columns:1fr;gap:0;">
         <div class="city-input-wrap">
@@ -265,6 +265,7 @@
         </div>
       </div>
       <button class="btn-cta mt-auto" @click="finish">Continue</button>
+      <button type="button" class="btn-skip" @click="finish">Skip for now</button>
     </div>
 
     <!-- ── Step 8: Done ── -->
@@ -1056,6 +1057,21 @@ async function goToDashboard() {
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+.btn-skip {
+  align-self: center;
+  margin-top: 16px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 0;
+  color: #5A5348;
+  font: 700 0.68rem 'Spline Sans Mono', ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn-skip:hover { color: #2A55F5; }
 
 /* ── Done step ── */
 .step-done {

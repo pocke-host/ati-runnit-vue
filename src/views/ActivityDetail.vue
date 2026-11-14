@@ -137,6 +137,19 @@
         </template>
       </div>
 
+      <!-- Evidence-led session closeout -->
+      <section v-if="activityRead" class="activity-read-card" aria-labelledby="activity-read-title">
+        <div class="activity-read-card-copy">
+          <p class="activity-read-eyebrow">SESSION READ</p>
+          <h2 id="activity-read-title">{{ activityRead.title }}</h2>
+          <p>{{ activityRead.message }}</p>
+          <strong>Next move · {{ activityRead.action }}</strong>
+        </div>
+        <div class="activity-read-evidence" aria-label="Session evidence">
+          <span v-for="item in activityRead.evidence" :key="`${item.label}-${item.value}`"><b>{{ item.label }}</b>{{ item.value }}</span>
+        </div>
+      </section>
+
       <!-- MAIN LAYOUT -->
       <div class="detail-layout">
 
@@ -767,6 +780,39 @@ const computedMetric = computed(() => {
   }
   const minPerKm = 1 / speedMps * (1000 / 60)
   return formatPace(minPerKm)
+})
+
+const activityRead = computed(() => {
+  const current = activity.value
+  if (!current) return null
+
+  const sport = sportLabel(current).toLowerCase()
+  const evidence = []
+  if (current.distanceMeters != null) evidence.push({ label: 'Distance', value: formatDistance(current.distanceMeters) || '—' })
+  if (current.durationSeconds != null) evidence.push({ label: 'Time', value: formatDuration(current.durationSeconds) })
+  if (current.averageHeartRate != null) evidence.push({ label: 'Avg HR', value: `${current.averageHeartRate} bpm` })
+  if (current.maxHeartRate != null) evidence.push({ label: 'Max HR', value: `${current.maxHeartRate} bpm` })
+  if (current.source || current.provider) evidence.push({ label: 'Source', value: current.source || current.provider })
+
+  let title = `${sport.charAt(0).toUpperCase()}${sport.slice(1)} logged.`
+  let message = 'This session is now part of your training history and can be compared with future work.'
+  let action = 'Use this session as context for your next training decision.'
+
+  if (similarEfforts.value.length > 1) {
+    title = `You have a useful comparison point.`
+    message = `RUNNIT found ${similarEfforts.value.length - 1} similar ${sport} effort${similarEfforts.value.length - 1 === 1 ? '' : 's'} in your recent history.`
+    action = 'Compare similar efforts below.'
+  } else if (current.sourceComparisons?.length > 1) {
+    title = 'Your connected sources saw the same session.'
+    message = `RUNNIT kept ${current.sourceComparisons.length} provider readings together so you can compare the sensors without creating duplicate workouts.`
+    action = 'Review the source comparison below.'
+  } else if (current.routePolyline || hasCoords.value) {
+    title = 'Your route is in the record.'
+    message = 'Distance, time, and route context are saved together so this workout can inform the next block.'
+    action = 'Review the route and elevation profile.'
+  }
+
+  return { title, message, action, evidence: evidence.slice(0, 5) }
 })
 
 // Strength activities — volume/exercise/set totals in place of distance/pace/elevation
@@ -2225,6 +2271,24 @@ onMounted(init)
 .gr-pr-stamp { border: 0; border-radius: var(--rk-radius-pill); transform: none; }
 .gr-stat-strip { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-md); box-shadow: 0 10px 24px rgba(22,19,15,.05); }
 .gr-stat-strip-cell--div { border-left: 1px solid var(--rk-rule); }
+.activity-read-card {
+  max-width: 1000px;
+  margin: 16px auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(240px, .8fr);
+  gap: 20px;
+  padding: 22px;
+  background: #16130F;
+  border-radius: var(--rk-radius-md);
+  color: #FBF6EC;
+}
+.activity-read-card-copy h2 { margin: 6px 0 7px; font-size: clamp(1.3rem, 3vw, 1.8rem); line-height: 1; letter-spacing: -.02em; }
+.activity-read-eyebrow { margin: 0; color: #FFD447; font: 700 .62rem 'Spline Sans Mono', monospace; letter-spacing: .13em; text-transform: uppercase; }
+.activity-read-card-copy p:not(.activity-read-eyebrow) { max-width: 600px; margin: 0; color: rgba(251,246,236,.7); font-size: .86rem; line-height: 1.5; }
+.activity-read-card-copy strong { display: block; margin-top: 14px; color: #FFD447; font: 700 .68rem 'Spline Sans Mono', monospace; letter-spacing: .05em; text-transform: uppercase; }
+.activity-read-evidence { display: grid; align-content: center; gap: 8px; padding-left: 18px; border-left: 1px solid rgba(251,246,236,.18); }
+.activity-read-evidence span { display: flex; justify-content: space-between; gap: 12px; color: rgba(251,246,236,.64); font: 600 .67rem 'Spline Sans Mono', monospace; text-transform: uppercase; }
+.activity-read-evidence b { color: #FBF6EC; font-weight: 600; }
 .combine-modal { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-lg); box-shadow: 0 20px 50px rgba(22,19,15,.18); }
 .det-card { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-md); box-shadow: 0 10px 26px rgba(22,19,15,.05); }
 .stats-grid { border: 1px solid var(--rk-rule); border-radius: var(--rk-radius-sm); overflow: hidden; }
@@ -2238,6 +2302,8 @@ onMounted(init)
   .top-bar { padding: 14px 16px; }
   .user-row-wrap { padding: 16px 16px 4px; }
   .detail-layout { padding-left: 16px; padding-right: 16px; }
+  .activity-read-card { grid-template-columns: 1fr; margin: 14px 16px 0; padding: 18px; }
+  .activity-read-evidence { padding: 14px 0 0; border-top: 1px solid rgba(251,246,236,.18); border-left: 0; }
 }
 @media (max-width: 480px) {
   .combine-modal {
